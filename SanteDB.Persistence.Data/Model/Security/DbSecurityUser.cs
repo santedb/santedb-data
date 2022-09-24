@@ -37,7 +37,7 @@ public class DbSecurityUser : DbNonVersionedBaseData
 		/// Gets or sets the email.
 		/// </summary>
 		/// <value>The email.</value>
-		[Column("email")]
+		[Column("email"), IgnoreCase]
 		public String Email {
 			get;
 			set;
@@ -102,7 +102,7 @@ public class DbSecurityUser : DbNonVersionedBaseData
 		/// Gets or sets the name of the user.
 		/// </summary>
 		/// <value>The name of the user.</value>
-		[Column("usr_name")]
+		[Column("usr_name"), IgnoreCase]
 		public String UserName {
 			get;
 			set;

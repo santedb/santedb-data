@@ -37,7 +37,7 @@ namespace SanteDB.Persistence.Data.Model.Security
 		/// Gets or sets the public identifier.
 		/// </summary>
 		/// <value>The public identifier.</value>
-		[Column("dev_pub_id")]
+		[Column("dev_pub_id"), IgnoreCase]
 		public String PublicId {
 			get;
 			set;

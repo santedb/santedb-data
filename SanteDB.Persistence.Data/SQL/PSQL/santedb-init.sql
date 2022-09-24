@@ -15,7 +15,7 @@ INSERT INTO SEC_USR_TBL (USR_NAME, SEC_STMP, PASSWD, EMAIL, PHN_NUM, EMAIL_CNF, 
 
 INSERT INTO ent_tbl (ent_id, cls_cd_id, dtr_cd_id) 
 	VALUES ('b55f0836-40e6-4ee2-9522-27e3f8bfe532', '9de2a846-ddf2-4ebc-902e-84508c5089ea', 'f29f08de-78a7-4a5e-aeaf-7b545ba19a09');
-	
+
 INSERT INTO ent_vrsn_tbl(ent_vrsn_id, ent_id, sts_cd_id, CRT_PROV_ID) 
 	VALUES ('abfaffc1-5021-40fd-a8e6-9b290f34ead7', 'b55f0836-40e6-4ee2-9522-27e3f8bfe532', 'c8064cbd-fa06-4530-b430-1a52f1530c27', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
 

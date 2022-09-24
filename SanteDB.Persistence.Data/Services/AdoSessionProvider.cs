@@ -530,14 +530,22 @@ namespace SanteDB.Persistence.Data.Services
                         context.Open();
 
                         var dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionguid);
-                        if (dbSession == null || !allowExpired && dbSession.NotAfter < DateTimeOffset.Now)
+                        if (dbSession == null)
                         {
                             return null;
+                        }
+                        else if (!allowExpired && dbSession.NotAfter < DateTimeOffset.Now)
+                        {
+                            throw new SecuritySessionException(SessionExceptionType.Expired, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_EXPIRE), null);
                         }
                         else
                         {
                             return new AdoSecuritySession(sessionId, null, dbSession, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key));
                         }
+                    }
+                    catch(SecuritySessionException)
+                    {
+                        throw;
                     }
                     catch (Exception e)
                     {

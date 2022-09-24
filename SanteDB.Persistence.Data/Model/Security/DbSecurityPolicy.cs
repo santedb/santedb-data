@@ -47,7 +47,7 @@ namespace SanteDB.Persistence.Data.Model.Security
 		/// Gets or sets the name.
 		/// </summary>
 		/// <value>The name.</value>
-		[Column("pol_name")]
+		[Column("pol_name"), IgnoreCase]
 		public String Name {
 			get;
 			set;

@@ -22,6 +22,7 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Map;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.Model.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,14 +48,14 @@ namespace SanteDB.Persistence.Data.Hax
             {
                 cmpTblType = "ent_addr_cmp_tbl";
                 guardType = typeof(AddressComponentKeys);
-                componentType = typeof(EntityAddressComponent);
+                componentType = typeof(DbEntityAddressComponent);
                 keyName = "addr_id";
             }
             else if (typeof(EntityName).IsAssignableFrom(tmodel))
             {
                 cmpTblType = "ent_name_cmp_tbl";
                 guardType = typeof(NameComponentKeys);
-                componentType = typeof(EntityNameComponent);
+                componentType = typeof(DbEntityNameComponent);
                 keyName = "name_id";
             }
             else
@@ -103,7 +104,7 @@ namespace SanteDB.Persistence.Data.Hax
                         .Append($" SELECT {queryPrefix}{cmpTblType}.{keyName} ")
                             .Append($" FROM {cmpTblType} AS {queryPrefix}{cmpTblType} ")
                             .Append(" WHERE ")
-                            .Append(builder.CreateSqlPredicate($"{queryPrefix}{cmpTblType}", "val", componentType.GetProperty("Value"), itm.Value))
+                            .Append(builder.CreateSqlPredicate($"{queryPrefix}{cmpTblType}", "val", componentType.GetProperty(nameof(DbGenericNameComponent.Value)), itm.Value))
                             .Append(guardFilter)
                             .Append(" INTERSECT ");
             }

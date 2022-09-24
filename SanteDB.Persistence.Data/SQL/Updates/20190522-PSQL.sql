@@ -1,9 +1,9 @@
 ﻿/** 
- * <update id="20190522-01" applyRange="1.0.0.0-1.9.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20190522-01" name="Update:20190522-01" applyRange="1.0.0.0-1.9.0.0"  invariantName="npgsql">
  *	<summary>Add relationship "next of kin" between all persons of the same class</summary>
  *	<remarks>Any entity is technically allowed to replace itself :)</remarks>
  *	<isInstalled>select ck_patch('20190522-01')</isInstalled>
- * </update>
+ * </feature>
  */
 
 BEGIN TRANSACTION ;
@@ -12,8 +12,8 @@ ALTER TABLE ENT_EXT_TBL ALTER EXT_DISP TYPE TEXT;
 ALTER TABLE ACT_EXT_TBL ALTER EXT_DISP TYPE TEXT;
 
 -- GRANT SYSTEM LOGIN AS A SERVICE
-INSERT INTO sec_rol_pol_assoc_tbl (pol_id, rol_id, pol_act) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67d7c', 'c3ae21d2-fc23-4133-ba42-b0e0a3b817d7', 2);
-DROP INDEX SEC_DEV_SCRT_IDX ;--#!
+INSERT INTO sec_rol_pol_assoc_tbl (pol_id, rol_id, pol_act) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67d7c', 'c3ae21d2-fc23-4133-ba42-b0e0a3b817d7', 2) ON CONFLICT DO NOTHING;
+DROP INDEX IF EXISTS SEC_DEV_SCRT_IDX ;--#!
 
 INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
 	SELECT cd_id, 'bacd9c6f-3fa9-481e-9636-37457962804d', 'bacd9c6f-3fa9-481e-9636-37457962804d', 'err_patient_nok_personOnly'

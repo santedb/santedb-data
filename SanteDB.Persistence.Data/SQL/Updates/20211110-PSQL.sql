@@ -21,13 +21,13 @@ ALTER TABLE ent_name_cmp_tbl ADD CONSTRAINT fk_ent_name_cmp_name_id FOREIGN KEY 
 ALTER TABLE ent_name_cmp_tbl ADD CONSTRAINT fk_ent_name_cmp_typ_cd_id FOREIGN KEY (typ_cd_id) REFERENCES cd_tbl(cd_id);
 drop table if exists phon_val_tbl;
 drop sequence if exists phon_val_seq;
+ALTER TABLE ENT_NAME_CMP_TBL DROP COLUMN VAL_SEQ_ID;
+alter table ent_name_cmp_tbl alter column val set not null;
 alter table ent_name_cmp_tbl rename cmp_seq to seq_id;
 alter table ent_name_cmp_tbl ALTER seq_id SET not NULL;
 alter table ent_name_cmp_tbl ALTER seq_id SET default nextval('name_val_seq');
 alter table ent_name_cmp_tbl alter cmp_id SET not NULL;
 alter table ent_name_cmp_tbl alter cmp_id SET default uuid_generate_v1();
-ALTER TABLE ENT_NAME_CMP_TBL DROP COLUMN VAL_SEQ_ID;
-alter table ent_name_cmp_tbl alter column val set not null;
 
 --#!
 -- INFO: Migrating Addresses
@@ -47,6 +47,8 @@ alter table ent_addr_cmp_tbl drop column if exists val_seq_id;
 alter table ent_addr_cmp_tbl alter column val set not null;
 alter sequence ent_addr_cmp_val_seq rename to ent_addr_cmp_seq;
 alter table ent_addr_cmp_tbl add seq_id bigint not null default nextval('ent_addr_cmp_seq');
+alter table ent_addr_cmp_tbl alter cmp_id set not null;
+alter table ent_addr_cmp_tbl alter cmp_id set default uuid_generate_v1();
 --#!
 -- INFO: Adding GIN and Fuzzy Indexes on Columns
 CREATE INDEX ENT_NAME_CMP_VAL_IDX ON ENT_NAME_CMP_TBL USING GIN (VAL gin_trgm_ops); --#

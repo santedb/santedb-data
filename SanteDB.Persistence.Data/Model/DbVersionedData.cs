@@ -93,5 +93,6 @@ namespace SanteDB.Persistence.Data.Model
         /// True if replaces version key is being nulled
         /// </summary>
         public bool ReplacesVersionKeySpecified { get; set; }
+
     }
 }

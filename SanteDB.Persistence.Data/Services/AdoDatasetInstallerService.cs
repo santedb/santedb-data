@@ -107,9 +107,10 @@ namespace SanteDB.Persistence.Data.Services
                     // Check if dataset is installed
                     if (context.Any<DbPatch>(o => o.PatchId == patchId))
                     {
-                        this.m_tracer.TraceWarning("Skipping {0} because it is already installed", dataset.Id);
+                        this.m_tracer.TraceVerbose("Skipping {0} because it is already installed", dataset.Id);
                         return false;
                     }
+                    this.m_tracer.TraceInfo("Installing dataset {0}...", dataset.Id);
 
                     using (var tx = context.BeginTransaction())
                     {

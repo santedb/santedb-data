@@ -454,6 +454,7 @@ namespace SanteDB.Persistence.Data.Services
 
                         if (securable is IdentifiedData id1)
                         {
+                            results = results.ToArray();
                             this.m_adhocCache?.Add($"pip.{id1.Type}.{id1.Key}.{id1.Tag}", results, new TimeSpan(0, 5, 0));
                         }
                     }
