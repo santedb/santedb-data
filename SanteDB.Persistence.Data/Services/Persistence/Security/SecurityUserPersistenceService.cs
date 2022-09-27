@@ -52,6 +52,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Security
                 context.Update(cdrUe);
             }
 
+            context.DeleteAll<DbUserClaim>(o => o.SourceKey == key);
             base.DoDeleteReferencesInternal(context, key);
         }
 

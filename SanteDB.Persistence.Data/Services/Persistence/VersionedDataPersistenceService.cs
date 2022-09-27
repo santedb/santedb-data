@@ -167,11 +167,30 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
             // Validation map
-            this.m_validationConfiguration = 
-                this.m_configuration.Validation
+            this.m_validationConfiguration =
+                this.m_configuration.Validation?
                 .Where(o => o.Target == null || typeof(TModel).IsAssignableFrom(o.Target.Type))
-                .GroupBy(o=>o.Target?.Type ?? typeof(Object))
+                .GroupBy(o => o.Target?.Type ?? typeof(Object))
                 .ToDictionary(o => o.Key ?? typeof(Object), o => o.First());
+
+            // Apply defaults
+            if (this.m_validationConfiguration == null)
+            {
+                this.m_validationConfiguration = new Dictionary<Type, AdoValidationPolicy>()
+                {
+                    {
+                        typeof(object),
+                        new AdoValidationPolicy()
+                        {
+                            Authority = AdoValidationEnforcement.Strict,
+                            Scope = AdoValidationEnforcement.Strict,
+                            Uniqueness = AdoValidationEnforcement.Strict,
+                            Format = AdoValidationEnforcement.Loose,
+                            CheckDigit = AdoValidationEnforcement.Loose
+                        }
+                    }
+                };
+            }
         }
 
         /// <summary>
@@ -181,11 +200,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             where TToVerify : TModel, IHasIdentifiers
         {
             // Validate unique values for IDs
-            if(!this.m_validationConfiguration.TryGetValue(objectToVerify.GetType(), out var validation) &&
+            if (!this.m_validationConfiguration.TryGetValue(objectToVerify.GetType(), out var validation) &&
                 !this.m_validationConfiguration.TryGetValue(typeof(object), out validation))
             {
                 yield break;
             }
+
+            // No validation is enabled
+            if (validation.Uniqueness == AdoValidationEnforcement.Off &&
+                validation.Format == AdoValidationEnforcement.Off &&
+                validation.CheckDigit == AdoValidationEnforcement.Off &&
+                validation.Authority == AdoValidationEnforcement.Off &&
+                validation.Scope == AdoValidationEnforcement.Off)
+                yield break;
 
             foreach (var id in objectToVerify.Identifiers)
             {
@@ -234,7 +261,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
 
                 // Get this identifier records which is not owned by my record
-                bool ownedByOthers , ownedByMe;
+                bool ownedByOthers, ownedByMe;
 
                 if (objectToVerify is Entity)
                 {
@@ -797,7 +824,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && o.ObsoleteVersionSequenceId == null || assocKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
             var associationKeys = associations.Select(o => o.Key).ToArray();
             var toDelete = associations.Where(a => a.BatchOperation == BatchOperationType.Delete).Select(o => o.Key)
-                .Union(existing.Where(e=>!associationKeys.Contains(e))).ToArray();
+                .Union(existing.Where(e => !associationKeys.Contains(e))).ToArray();
 
             // Anything to remove?
             if (toDelete.Any())

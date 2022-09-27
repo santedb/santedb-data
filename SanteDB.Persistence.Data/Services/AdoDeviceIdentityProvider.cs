@@ -24,6 +24,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
@@ -46,6 +47,14 @@ namespace SanteDB.Persistence.Data.Services
     /// </summary>
     public class AdoDeviceIdentityProvider : IDeviceIdentityProviderService
     {
+
+
+        // Secret claims which should not be disclosed in an IIdentity 
+        private readonly String[] m_nonIdentityClaims =
+        {
+            SanteDBClaimTypes.SanteDBOTAuthCode
+        };
+
         /// <summary>
         /// Gets the service name
         /// </summary>
@@ -169,7 +178,12 @@ namespace SanteDB.Persistence.Data.Services
 
                     dev.DeviceSecret = this.m_hasher.ComputeHash(this.m_configuration.AddPepper(deviceSecret));
 
-                    var retVal = new AdoClaimsPrincipal(new AdoDeviceIdentity(dev, "LOCAL"));
+                    var identity = new AdoDeviceIdentity(dev, "LOCAL");
+                    var retVal = new AdoClaimsPrincipal(identity);
+
+                    var dbClaims = context.Query<DbDeviceClaim>(o => o.SourceKey == dev.Key &&
+                           (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now));
+                    identity.AddClaims(dbClaims.ToArray().Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
 
                     // demand login
                     this.m_pepService.Demand(PermissionPolicyIdentifiers.LoginAsService, retVal);
@@ -271,7 +285,12 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         return null;
                     }
-                    return new AdoDeviceIdentity(dev);
+
+                    var dbClaims = context.Query<DbDeviceClaim>(o => o.SourceKey == dev.Key &&
+                       (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now));
+                    var retVal = new AdoDeviceIdentity(dev);
+                    retVal.AddClaims(dbClaims.ToArray().Where(o=>!this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
+                    return retVal;
                 }
                 catch (Exception e)
                 {
@@ -465,6 +484,143 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
+                }
+            }
+        }
+
+
+        /// <inheritdoc/>
+        public void AddClaim(string deviceName, IClaim claim, IPrincipal principal, TimeSpan? expiry = null)
+        {
+            if (String.IsNullOrEmpty(deviceName))
+            {
+                throw new ArgumentNullException(nameof(deviceName));
+            }
+            else if (claim == null)
+            {
+                throw new ArgumentNullException(nameof(claim));
+            }
+            else if (principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal));
+            }
+
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateDevice, principal);
+
+            // Add the claim
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var dbDevice = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceName.ToLowerInvariant() && o.ObsoletionTime == null).FirstOrDefault();
+                    if (dbDevice == null)
+                    {
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = deviceName }));
+                    }
+
+                    var dbClaim = context.FirstOrDefault<DbDeviceClaim>(o => o.SourceKey == dbDevice.Key && o.ClaimType.ToLowerInvariant() == claim.Type.ToLowerInvariant());
+                    if (dbClaim == null)
+                    {
+                        dbClaim = new DbDeviceClaim()
+                        {
+                            SourceKey = dbDevice.Key
+                        };
+                    }
+                    dbClaim.ClaimType = claim.Type;
+                    dbClaim.ClaimValue = claim.Value;
+
+                    if (expiry.HasValue)
+                    {
+                        dbClaim.ClaimExpiry = DateTime.Now.Add(expiry.Value);
+                    }
+
+                    using (var tx = context.BeginTransaction())
+                    {
+                        dbClaim = context.InsertOrUpdate(dbClaim);
+                        context.Update(dbDevice);
+                        tx.Commit();
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DEV_CLAIM_GEN_ERR), e);
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public void RemoveClaim(string deviceName, string claimType, IPrincipal principal)
+        {
+            if (String.IsNullOrEmpty(deviceName))
+            {
+                throw new ArgumentNullException(nameof(deviceName));
+            }
+            else if (String.IsNullOrEmpty(claimType))
+            {
+                throw new ArgumentNullException(nameof(claimType));
+            }
+            else if (principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal));
+            }
+
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateDevice, principal);
+
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+                    var dbDevice = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceName.ToLowerInvariant() && o.ObsoletionTime == null).FirstOrDefault();
+                    if (dbDevice == null)
+                    {
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = deviceName }));
+                    }
+
+                    dbDevice.UpdatedByKey = context.EstablishProvenance(principal);
+                    dbDevice.UpdatedTime = DateTimeOffset.Now;
+
+                    using (var tx = context.BeginTransaction())
+                    {
+                        context.DeleteAll<DbDeviceClaim>(o => o.SourceKey == dbDevice.Key && o.ClaimType.ToLowerInvariant() == claimType.ToLowerInvariant());
+                        context.Update(dbDevice);
+                        tx.Commit();
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DEV_CLAIM_GEN_ERR), e);
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<IClaim> GetClaims(String deviceName)
+        {
+            if (String.IsNullOrEmpty(deviceName))
+            {
+                throw new ArgumentNullException(nameof(deviceName));
+            }
+
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var dbDeviceKey = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceName.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
+                    if (dbDeviceKey == null)
+                    {
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = deviceName }));
+                    }
+                    return context.Query<DbDeviceClaim>(o => o.SourceKey == dbDeviceKey && o.ClaimExpiry == null || o.ClaimExpiry > DateTime.Now).ToArray().Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue));
+                }
+                catch (Exception e)
+                {
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DEV_CLAIM_GEN_ERR), e);
                 }
             }
         }

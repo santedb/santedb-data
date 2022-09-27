@@ -398,7 +398,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<TModelAssociation> UpdateModelAssociations<TModelAssociation>(DataContext context, TModel data, IEnumerable<TModelAssociation> associations)
             where TModelAssociation : IdentifiedData, ISimpleAssociation, new()
         {
-            if (data == null || data.Key.GetValueOrDefault() == Guid.Empty)
+            if(context == null)
+            {
+                throw new ArgumentNullException(nameof(context), ErrorMessages.ARGUMENT_NULL);
+            }
+            else if(associations == null)
+            {
+                return associations;
+            }
+            else if (data == null || data.Key.GetValueOrDefault() == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(IdentifiedData.Key), ErrorMessages.ARGUMENT_NULL);
             }

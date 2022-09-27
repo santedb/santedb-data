@@ -23,6 +23,7 @@ using SanteDB.Core;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
 using System;
@@ -331,6 +332,46 @@ namespace SanteDB.Persistence.Data.Test
             {
                 Assert.Fail($"Incorrect exception thrown expected {typeof(AuthenticationException)} but got {e.GetType()}");
             }
+        }
+
+
+        /// <summary>
+        /// Test that the provider adds a claim
+        /// </summary>
+        [Test]
+        public void TestAddClaim()
+        {
+            var service = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();
+            Assert.IsNull(service.GetIdentity("TEST_DEV_014"));
+
+            var identity = service.CreateIdentity("TEST_DEV_014", "@TESTPa$$w0rd", AuthenticationContext.SystemPrincipal);
+
+            // Add a claim
+            service.AddClaim("TEST_DEV_014", new SanteDBClaim("test", "TEST"), AuthenticationContext.SystemPrincipal);
+            var claimsIdentity = service.GetIdentity("TEST_DEV_014") as IClaimsIdentity;
+            Assert.AreEqual("TEST", claimsIdentity.FindFirst("test")?.Value);
+
+            // Get a claim
+            Assert.AreEqual("TEST", service.GetClaims("TEST_DEV_014").FirstOrDefault(o => o.Type == "test")?.Value);
+        }
+
+        /// <summary>
+        /// Test that the provider removes a claim
+        /// </summary>
+        [Test]
+        public void TestRemoveClaim()
+        {
+            var service = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>();
+            Assert.IsNull(service.GetIdentity("TEST_DEV_015"));
+            var identity = service.CreateIdentity("TEST_DEV_015", "@TESTPa$$w0rd", AuthenticationContext.SystemPrincipal);
+
+            // Add a claim
+            service.AddClaim("TEST_DEV_015", new SanteDBClaim("test", "TEST"), AuthenticationContext.SystemPrincipal);
+            var claimsIdentity = service.GetIdentity("TEST_DEV_015") as IClaimsIdentity;
+            Assert.AreEqual("TEST", claimsIdentity.FindFirst("test")?.Value);
+            service.RemoveClaim("TEST_DEV_015", "test", AuthenticationContext.SystemPrincipal);
+            claimsIdentity = service.GetIdentity("TEST_DEV_015") as IClaimsIdentity;
+            Assert.IsNull(claimsIdentity.FindFirst("test"));
         }
     }
 }

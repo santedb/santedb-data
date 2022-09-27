@@ -50,6 +50,13 @@ namespace SanteDB.Persistence.Data.Services
     /// </summary>
     public class AdoIdentityProvider : IIdentityProviderService
     {
+        
+        // Secret claims which should not be disclosed 
+        private readonly String[] m_nonIdentityClaims =
+        {
+            SanteDBClaimTypes.SanteDBOTAuthCode
+        };
+
         // Tracer
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoIdentityProvider));
 
@@ -115,7 +122,6 @@ namespace SanteDB.Persistence.Data.Services
         /// <param name="claim">The claim which is to be persisted</param>
         /// <param name="principal">The principal which is adding the claim (the authority under which the claim is being added)</param>
         /// <param name="expiry">The expiration time for the claim</param>
-        /// <param name="protect">True if the claim should be protected in the database via a hash</param>
         public void AddClaim(string userName, IClaim claim, IPrincipal principal, TimeSpan? expiry = null)
         {
             if (String.IsNullOrEmpty(userName))
@@ -139,20 +145,23 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
-                    var dbUser = context.Query<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
-                    if (dbUser == Guid.Empty)
+                    var dbUser = context.Query<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null).FirstOrDefault();
+                    if (dbUser == null)
                     {
-                        throw new KeyNotFoundException(String.Format(this.m_localizationService.GetString(ErrorMessageStrings.USR_INVALID, userName)));
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.USR_INVALID,new { user = userName }));
                     }
 
-                    var dbClaim = context.FirstOrDefault<DbUserClaim>(o => o.SourceKey == dbUser);
+                    dbUser.UpdatedByKey = context.EstablishProvenance(principal, null);
+                    dbUser.UpdatedTime = DateTimeOffset.Now;
+
+                    var dbClaim = context.FirstOrDefault<DbUserClaim>(o => o.SourceKey == dbUser.Key && o.ClaimType.ToLowerInvariant() == claim.Type.ToLowerInvariant());
 
                     // Current claim in DB? Update
                     if (dbClaim == null)
                     {
                         dbClaim = new DbUserClaim()
                         {
-                            SourceKey = dbUser
+                            SourceKey = dbUser.Key
                         };
                     }
                     dbClaim.ClaimType = claim.Type;
@@ -163,7 +172,12 @@ namespace SanteDB.Persistence.Data.Services
                         dbClaim.ClaimExpiry = DateTimeOffset.Now.Add(expiry.Value).DateTime;
                     }
 
-                    dbClaim = context.InsertOrUpdate(dbClaim);
+                    using (var tx = context.BeginTransaction())
+                    {
+                        dbClaim = context.InsertOrUpdate(dbClaim);
+                        context.Update(dbUser);
+                        tx.Commit();
+                    }
                 }
                 catch (Exception e)
                 {
@@ -263,7 +277,6 @@ namespace SanteDB.Persistence.Data.Services
 
                             // Claims to add to the principal
                             var claims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Key && o.ClaimExpiry < DateTimeOffset.Now).ToList();
-                            claims.RemoveAll(o => o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode);
 
                             if (!String.IsNullOrEmpty(password))
                             {
@@ -272,6 +285,7 @@ namespace SanteDB.Persistence.Data.Services
                                     claims.Add(new DbUserClaim() { ClaimType = SanteDBClaimTypes.PurposeOfUse, ClaimValue = PurposeOfUseKeys.SecurityAdmin.ToString() });
                                     claims.Add(new DbUserClaim() { ClaimType = SanteDBClaimTypes.SanteDBScopeClaim, ClaimValue = PermissionPolicyIdentifiers.LoginPasswordOnly });
                                     claims.Add(new DbUserClaim() { ClaimType = SanteDBClaimTypes.SanteDBScopeClaim, ClaimValue = PermissionPolicyIdentifiers.ReadMetadata });
+                                    claims.Add(new DbUserClaim() { ClaimType = SanteDBClaimTypes.ForceResetPassword, ClaimValue = "true" });
                                 }
                                 else
                                 {
@@ -284,7 +298,7 @@ namespace SanteDB.Persistence.Data.Services
                                     }
                                 }
                             }
-                            else if (String.IsNullOrEmpty(password) && !claims.Any(c => c.ClaimType == SanteDBClaimTypes.SanteDBCodeAuth && "true".Equals(c.ClaimValue, StringComparison.OrdinalIgnoreCase)))
+                            else 
                             {
                                 throw new InvalidIdentityAuthenticationException();
                             }
@@ -321,7 +335,7 @@ namespace SanteDB.Persistence.Data.Services
                             identity.AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
 
                             // Establish additional claims
-                            identity.AddClaims(claims.Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
+                            identity.AddClaims(claims.Where(o=>!this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
 
                             // Create principal
                             var retVal = new AdoClaimsPrincipal(identity);
@@ -618,7 +632,7 @@ namespace SanteDB.Persistence.Data.Services
                     var dbClaims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Key &&
                         (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now));
                     var retVal = new AdoUserIdentity(dbUser);
-                    retVal.AddClaims(dbClaims.ToArray().Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
+                    retVal.AddClaims(dbClaims.ToArray().Where(o=>!this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
 
                     // Establish role
                     var roleSql = context.CreateSqlStatement<DbSecurityRole>()
@@ -731,13 +745,21 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
-                    var dbUser = context.Query<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
-                    if (dbUser == Guid.Empty)
+                    var dbUser = context.Query<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null).FirstOrDefault();
+                    if (dbUser == null)
                     {
-                        throw new KeyNotFoundException(String.Format(this.m_localizationService.GetString(ErrorMessageStrings.USR_INVALID, userName)));
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.USR_INVALID, new { user = userName }));
                     }
 
-                    context.DeleteAll<DbUserClaim>(o => o.SourceKey == dbUser && o.ClaimType.ToLowerInvariant() == claimType.ToLowerInvariant());
+                    dbUser.UpdatedByKey = context.EstablishProvenance(principal);
+                    dbUser.UpdatedTime = DateTimeOffset.Now;
+
+                    using (var tx = context.BeginTransaction())
+                    {
+                        context.DeleteAll<DbUserClaim>(o => o.SourceKey == dbUser.Key && o.ClaimType.ToLowerInvariant() == claimType.ToLowerInvariant());
+                        context.Update(dbUser);
+                        tx.Commit();
+                    }
                 }
                 catch (Exception e)
                 {
@@ -782,7 +804,7 @@ namespace SanteDB.Persistence.Data.Services
                     var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (dbUser == null)
                     {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = userName }));
                     }
 
                     dbUser.UpdatedByKey = context.EstablishProvenance(principal, null);
@@ -795,6 +817,34 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     throw;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<IClaim> GetClaims(String userName)
+        {
+            if(String.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentNullException(nameof(userName));
+            }
+
+            using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var dbUserKey = context.Query<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
+                    if(dbUserKey == null)
+                    {
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = userName }));
+                    }
+                    return context.Query<DbUserClaim>(o => o.SourceKey == dbUserKey && o.ClaimExpiry == null || o.ClaimExpiry > DateTime.Now).ToArray().Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue));
+                }
+                catch(Exception e)
+                {
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.USER_CLAIM_GEN_ERR), e);
                 }
             }
         }

@@ -100,7 +100,8 @@
            autoUpdateExisting="true"
            autoInsertChildren="true"
            prepareStatements="true">
-    
+    <validation unique="loose" scope="loose" format="loose" checkDigit="loose" authority="loose"/>
+
   </section>
   <section xsi:type="ApplicationServiceContextConfigurationSection" allowUnsignedAssemblies="true" threadPoolSize="4">
     <serviceProviders>

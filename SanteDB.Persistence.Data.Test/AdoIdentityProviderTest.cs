@@ -229,6 +229,9 @@ namespace SanteDB.Persistence.Data.Test
             service.AddClaim("TEST_08", new SanteDBClaim("test", "TEST"), adminPrincipal);
             var claimsIdentity = service.GetIdentity("TEST_08") as IClaimsIdentity;
             Assert.AreEqual("TEST", claimsIdentity.FindFirst("test")?.Value);
+
+            // Get a claim
+            Assert.AreEqual("TEST", service.GetClaims("TEST_08").FirstOrDefault(o => o.Type == "test")?.Value);
         }
 
         /// <summary>

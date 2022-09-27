@@ -404,21 +404,21 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                             case IIdentity identity:
                                 {
-                                    results = this.GetIdentityPolicies(context, identity, new String[0]).ToArray();
+                                    results = this.GetIdentityPolicies(context, identity).ToArray();
                                     break;
                                 }
                             case IPrincipal principal:
                                 {
                                     var primaryId = principal.Identity;
 
-                                    results = this.GetIdentityPolicies(context, primaryId, new String[0]).ToArray();
+                                    results = this.GetIdentityPolicies(context, primaryId).ToArray();
 
                                     // Secondary identities
                                     if (principal is IClaimsPrincipal claimsPrincipal)
                                     {
                                         foreach (var subId in claimsPrincipal.Identities.Where(o => o != primaryId))
                                         {
-                                            results = results.Union(this.GetIdentityPolicies(context, subId, results.Select(o => o.Policy.Oid))).ToArray();
+                                            results = results.Union(this.GetIdentityPolicies(context, subId)).ToArray();
                                         }
                                     }
                                     break;
@@ -452,6 +452,8 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                         }
 
+                        // Most-restrictive apply
+                        results = results.GroupBy(o => o.Policy.Oid).Select(o => o.OrderBy(r => r.Rule).First()).ToArray();
                         if (securable is IdentifiedData id1)
                         {
                             results = results.ToArray();
@@ -471,7 +473,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// Get identity policies
         /// </summary>
-        private IEnumerable<AdoSecurityPolicyInstance> GetIdentityPolicies(DataContext context, IIdentity identity, IEnumerable<String> filterOids)
+        private IEnumerable<AdoSecurityPolicyInstance> GetIdentityPolicies(DataContext context, IIdentity identity)
         {
             IEnumerable<CompositeResult<DbSecurityPolicyActionableInstance, DbSecurityPolicy>> retVal = null;
             // Establish baseline
@@ -505,11 +507,6 @@ namespace SanteDB.Persistence.Data.Services
                         .InnerJoin<DbSecurityUserRole, DbSecurityUser>(o => o.UserKey, o => o.Key)
                         .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == identity.Name.ToLowerInvariant())
                     );
-            }
-
-            if (filterOids.Any())
-            {
-                retVal = retVal.ToArray().Where(o => filterOids.Contains(o.Object2.Oid));
             }
 
             return retVal.Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, identity));

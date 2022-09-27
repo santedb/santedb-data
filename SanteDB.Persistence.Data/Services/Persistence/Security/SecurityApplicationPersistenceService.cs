@@ -22,6 +22,7 @@ using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
+using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
@@ -39,6 +40,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Security
         /// </summary>
         public SecurityApplicationPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
+        }
+
+        /// <inheritdoc/>
+        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
+        {
+            // is there a CDR user entity which points to this? 
+            foreach (var cdrUe in context.Query<DbApplicationEntity>(o => o.SecurityApplicationKey == key))
+            {
+                cdrUe.SecurityApplicationKey = Guid.Empty;
+                context.Update(cdrUe);
+            }
+
+            context.DeleteAll<DbApplicationClaim>(o => o.SourceKey == key);
+            base.DoDeleteReferencesInternal(context, key);
         }
 
         /// <summary>

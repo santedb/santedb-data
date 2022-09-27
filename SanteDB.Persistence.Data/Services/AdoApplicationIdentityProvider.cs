@@ -24,6 +24,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
@@ -46,6 +47,13 @@ namespace SanteDB.Persistence.Data.Services
     /// </summary>
     public class AdoApplicationIdentityProvider : IApplicationIdentityProviderService
     {
+
+        // Secret claims which should not be disclosed 
+        private readonly String[] m_nonIdentityClaims =
+        {
+            SanteDBClaimTypes.SanteDBOTAuthCode
+        };
+        
         /// <summary>
         /// Gets the name of the service
         /// </summary>
@@ -176,7 +184,12 @@ namespace SanteDB.Persistence.Data.Services
                     app.Secret = this.m_hasher.ComputeHash(this.m_configuration.AddPepper(applicationSecret));
 
                     // Construct an identity and login
-                    var retVal = new AdoClaimsPrincipal(new AdoApplicationIdentity(app, "LOCAL"));
+                    var identity = new AdoApplicationIdentity(app, "LOCAL");
+                    var retVal = new AdoClaimsPrincipal(identity);
+
+                    var dbClaims = context.Query<DbApplicationClaim>(o => o.SourceKey == app.Key &&
+                           (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now));
+                    identity.AddClaims(dbClaims.ToArray().Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
 
                     // Demand login as a service
                     this.m_pepService.Demand(PermissionPolicyIdentifiers.LoginAsService, retVal);
@@ -287,7 +300,13 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         return null;
                     }
-                    return new AdoApplicationIdentity(app);
+                    var identity =  new AdoApplicationIdentity(app);
+                    var dbClaims = context.Query<DbApplicationClaim>(o => o.SourceKey == app.Key &&
+                        (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now));
+    
+                    identity.AddClaims(dbClaims.ToArray().Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
+                    
+                    return identity;
                 }
                 catch (Exception e)
                 {
@@ -596,6 +615,147 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.APP_DELETE_ERROR), e);
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public void AddClaim(string applicationName, IClaim claim, IPrincipal principal, TimeSpan? expiry = null)
+        {
+            if (String.IsNullOrEmpty(applicationName))
+            {
+                throw new ArgumentNullException(nameof(applicationName));
+            }
+            else if (claim == null)
+            {
+                throw new ArgumentNullException(nameof(claim));
+            }
+            else if (principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal));
+            }
+
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateApplication, principal);
+
+            // Add the claim
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var dbApplication = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationName.ToLowerInvariant() && o.ObsoletionTime == null).FirstOrDefault();
+                    if(dbApplication == null)
+                    {
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = applicationName }));
+                    }
+
+                    var dbClaim = context.FirstOrDefault<DbApplicationClaim>(o => o.SourceKey == dbApplication.Key && o.ClaimType.ToLowerInvariant() == claim.Type.ToLowerInvariant());
+                    if(dbClaim == null)
+                    {
+                        dbClaim = new DbApplicationClaim()
+                        {
+                            SourceKey = dbApplication.Key
+                        };
+                    }
+                    dbClaim.ClaimType = claim.Type;
+                    dbClaim.ClaimValue = claim.Value;
+
+                    if(expiry.HasValue)
+                    {
+                        dbClaim.ClaimExpiry = DateTime.Now.Add(expiry.Value);
+                    }
+
+                    dbApplication.UpdatedByKey = context.EstablishProvenance(principal);
+                    dbApplication.UpdatedTime = DateTimeOffset.Now;
+                    using (var tx = context.BeginTransaction())
+                    {
+                        dbClaim = context.InsertOrUpdate(dbClaim);
+                        context.Update(dbApplication);
+                        tx.Commit();
+                    }
+
+
+                }
+                catch (Exception e)
+                {
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.APP_CLAIM_GEN_ERR), e);
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public void RemoveClaim(string applicationName, string claimType, IPrincipal principal)
+        {
+            if(String.IsNullOrEmpty(applicationName))
+            {
+                throw new ArgumentNullException(nameof(applicationName));
+            }
+            else if(String.IsNullOrEmpty(claimType))
+            {
+                throw new ArgumentNullException(nameof(claimType));
+            }
+            else if(principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal));
+            }
+
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateApplication, principal);
+
+            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var dbApplication = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationName.ToLowerInvariant() && o.ObsoletionTime == null).FirstOrDefault();
+                    if(dbApplication == null)
+                    {
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = applicationName }));
+                    }
+
+                    dbApplication.UpdatedByKey = context.EstablishProvenance(principal);
+                    dbApplication.UpdatedTime = DateTimeOffset.Now;
+
+                    using (var tx = context.BeginTransaction())
+                    {
+                        context.DeleteAll<DbApplicationClaim>(o => o.SourceKey == dbApplication.Key && o.ClaimType.ToLowerInvariant() == claimType.ToLowerInvariant());
+                        context.Update(dbApplication);
+                        tx.Commit();
+                    }
+                }
+                catch(Exception e)
+                {
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.APP_CLAIM_GEN_ERR), e);
+                }
+            }
+        }
+
+
+        /// <inheritdoc/>
+        public IEnumerable<IClaim> GetClaims(String applicationName)
+        {
+            if (String.IsNullOrEmpty(applicationName))
+            {
+                throw new ArgumentNullException(nameof(applicationName));
+            }
+
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var dbDeviceKey = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationName.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
+                    if (dbDeviceKey == null)
+                    {
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = applicationName }));
+                    }
+                    return context.Query<DbApplicationClaim>(o => o.SourceKey == dbDeviceKey && o.ClaimExpiry == null || o.ClaimExpiry > DateTime.Now).ToArray().Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue));
+                }
+                catch (Exception e)
+                {
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.APP_CLAIM_GEN_ERR), e);
                 }
             }
         }

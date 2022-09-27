@@ -110,9 +110,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                         ScopeConceptKey = o
                     })).Select(o => o.ScopeConceptKey).ToList();
             }
-            if (data.AssigningAuthority?.Any() == true)
+            if (data.AssigningAuthority != null)
             {
-                retVal.AssigningAuthority = base.UpdateModelAssociations(context, retVal, retVal.AssigningAuthority).ToList();
+                retVal.AssigningAuthority = base.UpdateModelAssociations(context, retVal, data.AssigningAuthority).ToList();
             }
 
             return retVal;

@@ -116,6 +116,9 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
+                    // Enusre there is no active mapping
+                    var existingMap = context.FirstOrDefault<DbCertificateMapping>(o => o.X509Thumbprint == authenticationCertificate.Thumbprint && o.ObsoletionTime == null);
+                   
                     // get the identity
                     var certificateRegistration = new DbCertificateMapping()
                     {
@@ -139,8 +142,23 @@ namespace SanteDB.Persistence.Data.Services
                             break;
                     }
 
-                    // attempt storage
-                    context.Insert(certificateRegistration);
+                    if (existingMap != null &&
+                        (existingMap.SecurityApplicationKey ?? existingMap.SecurityDeviceKey ?? existingMap.SecurityUserKey) != (certificateRegistration.SecurityApplicationKey ?? certificateRegistration.SecurityDeviceKey ?? certificateRegistration.SecurityUserKey))
+                    {
+                        throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_CERT_ALREADY_ASSIGNED, new { x5a = authenticationCertificate.Thumbprint }));
+                    }
+                    else if (existingMap != null)
+                    {
+                        certificateRegistration.Key = existingMap.Key;
+                        certificateRegistration.UpdatedByKey = context.ContextId;
+                        certificateRegistration.UpdatedTime = DateTimeOffset.Now;
+                        context.Update(certificateRegistration);
+                    }
+                    else
+                    {
+                        // attempt storage
+                        context.Insert(certificateRegistration);
+                    }
 
                 }
             }

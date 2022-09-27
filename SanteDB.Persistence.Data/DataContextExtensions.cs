@@ -338,7 +338,7 @@ namespace SanteDB.Persistence.Data
         /// <summary>
         /// Establish a provenance entry for the specified connection
         /// </summary>
-        public static Guid EstablishProvenance(this DataContext me, IPrincipal principal, Guid? externalRef)
+        public static Guid EstablishProvenance(this DataContext me, IPrincipal principal, Guid? externalRef = null)
         {
             // First, we want to get the identities
             DbSecurityProvenance retVal = new DbSecurityProvenance()
