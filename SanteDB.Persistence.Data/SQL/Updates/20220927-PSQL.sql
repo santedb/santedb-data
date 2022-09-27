@@ -15,7 +15,7 @@ CREATE TABLE SEC_APP_CLM_TBL
 	CONSTRAINT pk_sec_app_clm_tbl PRIMARY KEY (clm_id),
 	CONSTRAINT fk_sec_app_clm_tbl FOREIGN KEY (app_id) REFERENCES sec_app_tbl(app_id)
 );
-CREATE INDEX sec_app_clm_app_id_idx ON sec_app_clm_tbl USING (app_id);
+CREATE INDEX sec_app_clm_app_id_idx ON sec_app_clm_tbl USING btree (app_id);
 CREATE TABLE SEC_DEV_CLM_TBL
 (
 	clm_id uuid NOT NULL,
@@ -26,5 +26,5 @@ CREATE TABLE SEC_DEV_CLM_TBL
 	CONSTRAINT pk_sec_dev_clm_tbl PRIMARY KEY (clm_id),
 	CONSTRAINT fk_sec_dev_clm_tbl FOREIGN KEY (dev_id) REFERENCES sec_dev_tbl(dev_id)
 );--#!
-CREATE INDEX sec_dev_clm_dev_id_idx ON sec_dev_clm_tbl USING (dev_id);
+CREATE INDEX sec_dev_clm_dev_id_idx ON sec_dev_clm_tbl USING btree (dev_id);
 SELECT REG_PATCH('20220927-01'); 
