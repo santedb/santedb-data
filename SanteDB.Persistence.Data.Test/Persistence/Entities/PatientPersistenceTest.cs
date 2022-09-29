@@ -295,8 +295,20 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 base.TestQuery<Patient>(o => o.EthnicGroup.Mnemonic == "ETHNICITY-HispanicLatino", 1);
                 base.TestQuery<Patient>(o => o.NationalityKey == canadian, 1);
                 base.TestQuery<Patient>(o => o.ReligiousAffiliationKey == agnostic, 1);
-                base.TestQuery<Patient>(o => o.Names.Any(n => n.Component.Where(c => c.ComponentTypeKey == NameComponentKeys.Given).Any(c => c.Value == "Jennifer") && n.Component.Where(c => c.ComponentTypeKey == NameComponentKeys.Family).Any(c => c.Value == "Jones")), 1);
+                var results = base.TestQuery<Patient>(o => o.Names.Any(n => n.Component.Where(c => c.ComponentTypeKey == NameComponentKeys.Given).Any(c => c.Value == "Jennifer") && n.Component.Where(c => c.ComponentTypeKey == NameComponentKeys.Family).Any(c => c.Value == "Jones")), 1).AsResultSet();
+                // Test limiting and stuff
+                Assert.AreEqual(1, results.Count());
+                Assert.AreEqual(0, results.Skip(1).Count());
+                Assert.AreEqual(1, results.Take(1).Count());
+                Assert.AreEqual(afterInsert.VersionKey, results.Select(o => o.VersionKey).First());
+                Assert.AreEqual(afterInsert.VersionKey, results.OrderBy(o => o.VersionSequence).First().VersionKey);
+                Assert.AreEqual(afterInsert.VersionKey, results.OrderByDescending(o => o.VersionSequence).Select(o=>o.VersionKey).First());
+                Assert.AreEqual(afterInsert.VersionKey, results.OrderByDescending(o => o.VersionSequence).Skip(0).Take(1).Select(o=>o.VersionKey).First());
+                Assert.AreEqual(afterInsert.VersionKey, results.Distinct().OrderByDescending(o => o.VersionSequence).Skip(0).Take(1).Select(o=>o.VersionKey).First());
+                Assert.AreEqual(afterInsert.VersionKey, results.OrderByDescending(o => o.VersionSequence).Select(o=>o.VersionKey).Skip(0).Take(1).First());
 
+
+                //base.TestQuery<Patient>(o => o.Names.Any(n=>n.Component.Where(c=>c.ComponentTypeKey == NameComponentKeys.Family).Any(r=>r.Value == "Jones") && n.Component.Where(c=>c.ComponentTypeKey == NameComponentKeys.Given).Any(r=>r.Value == "Jennifer")), 1);
                 // Attempt to update
                 var afterUpdate = base.TestUpdate(afterInsert, o =>
                 {
