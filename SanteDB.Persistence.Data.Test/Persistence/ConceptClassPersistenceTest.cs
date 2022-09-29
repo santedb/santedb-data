@@ -133,7 +133,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 // Verify that the stateful query doesn't actually call query
                 Assert.AreEqual(5, asState.Skip(1).Take(5).Count());
-                Assert.AreEqual(5, asState.OrderBy(o => o.Mnemonic).Skip(1).Take(5).Count());
 
             }
         }

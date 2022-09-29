@@ -308,6 +308,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(afterInsert.VersionKey, results.OrderByDescending(o => o.VersionSequence).Select(o=>o.VersionKey).Skip(0).Take(1).First());
 
 
+
                 //base.TestQuery<Patient>(o => o.Names.Any(n=>n.Component.Where(c=>c.ComponentTypeKey == NameComponentKeys.Family).Any(r=>r.Value == "Jones") && n.Component.Where(c=>c.ComponentTypeKey == NameComponentKeys.Given).Any(r=>r.Value == "Jennifer")), 1);
                 // Attempt to update
                 var afterUpdate = base.TestUpdate(afterInsert, o =>

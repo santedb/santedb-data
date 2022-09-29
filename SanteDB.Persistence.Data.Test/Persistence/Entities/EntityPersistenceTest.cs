@@ -766,7 +766,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 var qid = Guid.NewGuid();
                 queryService.SetExpectedQueryStats(qid, 3);
                 var stateful = afterQuery.OrderByDescending(o => o.VersionSequence).AsStateful(qid);
-                Assert.Greater(stateful.First().VersionSequence, stateful.Skip(1).First().VersionSequence);
+                Assert.Greater(stateful.First().VersionSequence, stateful.Skip(1).Take(1).First().VersionSequence);
 
                 qid = Guid.NewGuid();
                 queryService.SetExpectedQueryStats(qid, 3);

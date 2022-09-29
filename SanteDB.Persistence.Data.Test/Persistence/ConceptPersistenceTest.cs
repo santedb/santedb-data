@@ -466,10 +466,33 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 Assert.AreEqual(2, stateful.Count());
 
+                // Test AsStateful Limiting and ordering after stateful query is created
+                stateful = result.AsResultSet().AsStateful(Guid.NewGuid());
+                Assert.AreEqual(2, stateful.Count());
+                Assert.AreEqual(1, stateful.Skip(1).Count());
+                Assert.AreEqual(1, stateful.Take(1).Count());
+                Assert.AreEqual(1, stateful.Skip(0).Take(1).Count());
+                Assert.AreEqual(1, stateful.Skip(1).Take(100).Count());
+
+                Assert.Throws<NotSupportedException>(() => stateful.OrderBy(o => o.VersionSequence).Skip(0).Count());
+                Assert.Throws<NotSupportedException>(() => stateful.OrderByDescending(o => o.VersionSequence).Skip(0).Count());
+                Assert.Throws<InvalidOperationException>(() => stateful.AsStateful(Guid.NewGuid()));
+
+                // Test AsStateful limiting and ordering on a sorted and skipped result set
+                stateful = result.AsResultSet().OrderBy(o => o.VersionSequence).Skip(0).Take(100).AsStateful(Guid.NewGuid());
+                Assert.AreEqual(2, stateful.Count());
+                Assert.AreEqual(1, stateful.Skip(1).Count());
+                Assert.AreEqual(1, stateful.Take(1).Count());
+                Assert.AreEqual(1, stateful.Skip(0).Take(1).Count());
+                Assert.AreEqual(1, stateful.Skip(1).Take(100).Count());
+
+
                 // Test that nested selectors work
                 var uuids = result.Select(o => o.Key);
                 Assert.AreEqual(after1.Key, uuids.First());
                 Assert.AreEqual(after2.Key, uuids.Last());
+
+
             }
         }
 
