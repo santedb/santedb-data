@@ -174,7 +174,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 .ToDictionary(o => o.Key ?? typeof(Object), o => o.First());
 
             // Apply defaults
-            if (this.m_validationConfiguration == null)
+            if (this.m_validationConfiguration?.Any() != true)
             {
                 this.m_validationConfiguration = new Dictionary<Type, AdoValidationPolicy>()
                 {
@@ -269,7 +269,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         context.CreateSqlStatement()
                         .SelectFrom(typeof(DbEntityIdentifier))
                         .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
-                        .And("NOT EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ? AND trg_ent_id = ent_id_tbl.ent_id OR trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL)", objectToVerify.Key, objectToVerify.Key)
+                        .And("NOT EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ? AND trg_ent_id = ent_id_tbl.ent_id OR trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL)", objectToVerify.Key, objectToVerify.Key) // Handles the case where the identifier is on a shared MASTER record for MDM
                     ).Any();
                     ownedByMe = context.Query<DbEntityIdentifier>(
                         context.CreateSqlStatement()

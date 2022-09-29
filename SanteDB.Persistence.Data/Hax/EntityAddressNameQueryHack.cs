@@ -76,8 +76,8 @@ namespace SanteDB.Persistence.Data.Hax
 
             var subQueryAlias = $"{queryPrefix}{scopedTables.First().TableName}";
 
-            whereClause.And($"{subQueryAlias}.{keyName} IN (");
-
+            whereClause.And($"{subQueryAlias}.{keyName} IN (SELECT {keyName} FROM ");
+            var sq = 0;
             foreach (var itm in queryFilter)
             {
                 var pred = QueryPredicate.Parse(itm.Key);
@@ -101,12 +101,20 @@ namespace SanteDB.Persistence.Data.Hax
 
                 // Filter based on type and prefix :)
                 whereClause
-                        .Append($" SELECT {queryPrefix}{cmpTblType}.{keyName} ")
-                            .Append($" FROM {cmpTblType} AS {queryPrefix}{cmpTblType} ")
-                            .Append(" WHERE ")
-                            .Append(builder.CreateSqlPredicate($"{queryPrefix}{cmpTblType}", "val", componentType.GetProperty(nameof(DbGenericNameComponent.Value)), itm.Value))
-                            .Append(guardFilter)
-                            .Append(" INTERSECT ");
+                        .Append($"(SELECT {queryPrefix}{cmpTblType}.{keyName} ")
+                        .Append($" FROM {cmpTblType} AS {queryPrefix}{cmpTblType} ")
+                        .Append(" WHERE ")
+                        .Append(builder.CreateSqlPredicate($"{queryPrefix}{cmpTblType}", "val", componentType.GetProperty(nameof(DbGenericNameComponent.Value)), itm.Value))
+                        .Append(guardFilter)
+                        .Append($") I{sq++}");
+                if(sq > 1)
+                {
+                    whereClause.Append($" USING ({keyName}) ").Append(" INNER JOIN ");
+                }
+                else
+                {
+                    whereClause.Append(" INNER JOIN ");
+                }
             }
             whereClause.RemoveLast();
             whereClause.Append($") ");

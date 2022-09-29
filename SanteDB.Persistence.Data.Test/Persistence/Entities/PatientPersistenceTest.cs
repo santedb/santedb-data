@@ -295,6 +295,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 base.TestQuery<Patient>(o => o.EthnicGroup.Mnemonic == "ETHNICITY-HispanicLatino", 1);
                 base.TestQuery<Patient>(o => o.NationalityKey == canadian, 1);
                 base.TestQuery<Patient>(o => o.ReligiousAffiliationKey == agnostic, 1);
+                base.TestQuery<Patient>(o => o.Names.Any(n => n.Component.Where(c => c.ComponentTypeKey == NameComponentKeys.Given).Any(c => c.Value == "Jennifer") && n.Component.Where(c => c.ComponentTypeKey == NameComponentKeys.Family).Any(c => c.Value == "Jones")), 1);
 
                 // Attempt to update
                 var afterUpdate = base.TestUpdate(afterInsert, o =>
