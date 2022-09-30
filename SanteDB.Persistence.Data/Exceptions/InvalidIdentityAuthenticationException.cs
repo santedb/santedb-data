@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2022-9-7
  */
+using SanteDB.Core.i18n;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -29,5 +30,6 @@ namespace SanteDB.Persistence.Data.Exceptions
     /// </summary>
     internal sealed class InvalidIdentityAuthenticationException : System.Security.Authentication.AuthenticationException
     {
+
     }
 }

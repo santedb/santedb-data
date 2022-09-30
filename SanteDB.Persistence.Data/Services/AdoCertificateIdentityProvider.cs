@@ -297,6 +297,16 @@ namespace SanteDB.Persistence.Data.Services
                     return retVal;
                 }
             }
+            catch (LockedIdentityAuthenticationException)
+            {
+                this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(authenticationCertificate.Subject, null, false));
+                throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_CERT_GENERAL));
+            }
+            catch (InvalidIdentityAuthenticationException)
+            {
+                this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(authenticationCertificate.Subject, null, false));
+                throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_CERT_GENERAL));
+            }
             catch (AuthenticationException)
             {
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(authenticationCertificate.Subject, null, false));
