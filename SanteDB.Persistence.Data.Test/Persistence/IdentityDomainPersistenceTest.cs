@@ -21,8 +21,7 @@
 
 using NUnit.Framework;
 using SanteDB.Core;
-using SanteDB.Core.Model;
-using SanteDB.Core.Exceptions;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -34,9 +33,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.BusinessRules;
 
 namespace SanteDB.Persistence.Data.Test.Persistence
 {
@@ -488,7 +484,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                         new EntityIdentifier(patientsOnly, "P0")
                     }
                 });
-                patient = base.TestQuery<Patient>(o => o.Identifiers.Any(i => i.Value == "P0"), 2).AsResultSet().OrderByDescending(o=>o.VersionSequence).First();
+                patient = base.TestQuery<Patient>(o => o.Identifiers.Any(i => i.Value == "P0"), 2).AsResultSet().OrderByDescending(o => o.VersionSequence).First();
                 Assert.AreEqual(1, patient.LoadProperty(o => o.Extensions).Count);
                 Assert.AreEqual(ExtensionTypeKeys.DataQualityExtension, patient.Extensions[0].ExtensionTypeKey);
                 var extension = patient.Extensions[0].GetValue<List<DetectedIssue>>();

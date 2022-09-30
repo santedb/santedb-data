@@ -18,17 +18,12 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Roles;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
@@ -57,13 +52,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
 
             var dbProvider = referenceObjects.OfType<DbProvider>().FirstOrDefault();
-            if(dbProvider == null)
+            if (dbProvider == null)
             {
                 this.m_tracer.TraceWarning("Using slow loading for DbProvider data on DbEntityVersion. Consider using the IDataPersistenceService<Provider> instead");
                 dbProvider = context.FirstOrDefault<DbProvider>(o => o.ParentKey == dbModel.VersionKey);
             }
 
-            switch(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     modelData.Specialty = modelData.Specialty.GetRelatedPersistenceService().Get(context, dbProvider.SpecialtyKey);

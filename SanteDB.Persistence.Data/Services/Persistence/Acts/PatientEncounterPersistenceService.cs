@@ -18,15 +18,12 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
@@ -62,7 +59,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             var retVal = base.DoUpdateModel(context, data);
 
             // Update special arrangements
-            if(data.SpecialArrangements != null)
+            if (data.SpecialArrangements != null)
             {
                 retVal.SpecialArrangements = base.UpdateModelVersionedAssociations(context, retVal, data.SpecialArrangements).ToList();
             }
@@ -82,9 +79,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         {
             data.DischargeDispositionKey = this.EnsureExists(context, data.DischargeDisposition)?.Key ?? data.DischargeDispositionKey;
             data.AdmissionSourceTypeKey = this.EnsureExists(context, data.AdmissionSourceType)?.Key ?? data.AdmissionSourceTypeKey;
-            if(data.SpecialArrangements != null)
+            if (data.SpecialArrangements != null)
             {
-                foreach(var itm in data.SpecialArrangements)
+                foreach (var itm in data.SpecialArrangements)
                 {
                     itm.ArrangementTypeKey = this.EnsureExists(context, itm.ArrangementType)?.Key ?? itm.ArrangementTypeKey;
                 }
@@ -97,13 +94,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         {
             var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             var dbEncounter = referenceObjects.OfType<DbPatientEncounter>().FirstOrDefault();
-            if(dbEncounter == null)
+            if (dbEncounter == null)
             {
                 this.m_tracer.TraceWarning("Using slow loading of encounter data (hint: use the appropriate persistence API)");
                 dbEncounter = context.FirstOrDefault<DbPatientEncounter>(o => o.ParentKey == dbModel.VersionKey);
             }
 
-            switch(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     retVal.DischargeDisposition = retVal.DischargeDisposition.GetRelatedPersistenceService().Get(context, dbEncounter.DischargeDispositionKey);
@@ -113,7 +110,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     goto case LoadMode.SyncLoad;
                 case LoadMode.SyncLoad:
                     retVal.SpecialArrangements = retVal.SpecialArrangements.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                   
+
                     break;
             }
 

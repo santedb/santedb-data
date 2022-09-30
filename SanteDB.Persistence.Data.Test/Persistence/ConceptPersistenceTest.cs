@@ -19,18 +19,15 @@
  * Date: 2022-9-7
  */
 using NUnit.Framework;
+using SanteDB.Core;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Security;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model;
-using SanteDB.Core;
 using System.Diagnostics.CodeAnalysis;
-using SanteDB.Core.Services;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.Test.Persistence
 {
@@ -533,7 +530,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 // Now obsolete
                 var afterObsolete = base.TestDelete(afterInsert, Core.Services.DeleteMode.LogicalDelete);
                 Assert.AreEqual(afterInsert.StatusConceptKey, afterObsolete.StatusConceptKey); // status does not change
-                
+
                 // Should not be returned in query results
                 afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08", 0).FirstOrDefault();
                 Assert.IsNull(afterQuery);

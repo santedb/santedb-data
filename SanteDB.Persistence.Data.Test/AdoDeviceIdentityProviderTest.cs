@@ -27,12 +27,10 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Authentication;
 using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Test
 {
@@ -264,7 +262,7 @@ namespace SanteDB.Persistence.Data.Test
             {
                 serviceProvider.Authenticate("TEST_DEV_008", "THIS_IS_A_SECRET");
             }
-            catch (Exception e)
+            catch
             {
                 Assert.Fail("Should have authenticated");
             }

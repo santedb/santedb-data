@@ -19,12 +19,10 @@
  * Date: 2022-9-7
  */
 using SanteDB.Core.Security.Claims;
-using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Security
 {
@@ -53,7 +51,7 @@ namespace SanteDB.Persistence.Data.Security
         /// <summary>
         /// Get all claims for this principal
         /// </summary>
-        public IEnumerable<IClaim> Claims => this.m_session.Claims.Union(this.Identities.SelectMany(r=>r.Claims));
+        public IEnumerable<IClaim> Claims => this.m_session.Claims.Union(this.Identities.SelectMany(r => r.Claims));
 
         /// <summary>
         /// Get all identities associated with this session

@@ -18,19 +18,11 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
-using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Entities;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
@@ -71,7 +63,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 case LoadMode.FullLoad:
                     modelData.SecurityDevice = modelData.SecurityDevice.GetRelatedPersistenceService().Get(context, dbDevice.SecurityDeviceKey);
                     modelData.SetLoaded(o => o.SecurityDevice);
-                    break;   
+                    break;
             }
 
             return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbDeviceEntity, DeviceEntity>(dbDevice), false, declaredOnly: true);

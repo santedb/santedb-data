@@ -21,7 +21,7 @@
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Extensions;
-using SanteDB.Core.Model;
+using SanteDB.Core.i18n;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Constants;
@@ -30,6 +30,7 @@ using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Acts;
 using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Extensibility;
@@ -37,11 +38,8 @@ using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Reflection;
-using SanteDB.Persistence.Data.Model;
 using System.Linq.Expressions;
-using SanteDB.Core.i18n;
+using System.Reflection;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
@@ -449,7 +447,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             if (this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var persistenceProvider) && persistenceProvider is IAdoClassMapper edps)
             {
                 var retVal = edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
-                if(retVal is TAct ta)
+                if (retVal is TAct ta)
                 {
                     return ta;
                 }

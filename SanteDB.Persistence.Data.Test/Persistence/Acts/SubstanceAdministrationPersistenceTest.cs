@@ -18,8 +18,8 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using NUnit.Framework;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security;
@@ -27,9 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Exceptions;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 {
@@ -47,7 +44,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
         [Test]
         public void TestPersistWithProper()
         {
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
                 var sbadm = new SubstanceAdministration()
                 {
@@ -66,7 +63,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 Assert.AreEqual(UnitOfMeasureKeys.Dose, afterInsert.DoseUnitKey);
                 Assert.IsNull(afterInsert.DoseUnit);
                 Assert.IsNotNull(afterInsert.LoadProperty(o => o.DoseUnit));
-                Assert.IsNotNull(afterInsert.LoadProperty(o => o.Route ));
+                Assert.IsNotNull(afterInsert.LoadProperty(o => o.Route));
                 Assert.IsNotNull(afterInsert.LoadProperty(o => o.Site));
                 Assert.IsTrue(afterInsert.IsNegated);
 
@@ -128,7 +125,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                     base.TestUpdate(afterQuery, o => o);
                     Assert.Fail("Should throw exception!");
                 }
-                catch(DataPersistenceException d) when (d.InnerException is KeyNotFoundException) { }
+                catch (DataPersistenceException d) when (d.InnerException is KeyNotFoundException) { }
                 catch
                 {
                     Assert.Fail("Incorrect exception type thrown");

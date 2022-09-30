@@ -20,8 +20,6 @@
  */
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
@@ -29,7 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
@@ -167,7 +164,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         switch (deletionMode)
                         {
                             case DeleteMode.LogicalDelete:
-                                if(obj.ObsoletionTime.HasValue)
+                                if (obj.ObsoletionTime.HasValue)
                                 {
                                     goto case DeleteMode.PermanentDelete;
                                 }

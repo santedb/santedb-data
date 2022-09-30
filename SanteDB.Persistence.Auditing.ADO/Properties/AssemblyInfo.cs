@@ -18,8 +18,3 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using SanteDB.Core.Attributes;
-using SanteDB.Core.Configuration;
-using SanteDB.Persistence.Auditing.ADO.Services;
-using System.Reflection;
-using System.Runtime.InteropServices;

@@ -38,7 +38,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
 using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -157,7 +156,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     // Peppered authentication
                     var pepperSecret = this.m_configuration.GetPepperCombos(deviceSecret).Select(o => this.m_hasher.ComputeHash(o));
-                    
+
                     // Pepper authentication
                     if (!context.Any<DbSecurityDevice>(a => a.PublicId.ToLowerInvariant() == deviceId.ToLower() && pepperSecret.Contains(a.DeviceSecret)))
                     {
@@ -289,7 +288,7 @@ namespace SanteDB.Persistence.Data.Services
                     var dbClaims = context.Query<DbDeviceClaim>(o => o.SourceKey == dev.Key &&
                        (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now));
                     var retVal = new AdoDeviceIdentity(dev);
-                    retVal.AddClaims(dbClaims.ToArray().Where(o=>!this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
+                    retVal.AddClaims(dbClaims.ToArray().Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
                     return retVal;
                 }
                 catch (Exception e)

@@ -76,10 +76,5 @@ namespace SanteDB.Persistence.Data.Model.Entities
             set;
         }
 
-        /// <summary>
-        /// Address sequence id
-        /// </summary>
-        //[Column("addr_seq_id"), ForeignKey(typeof(DbEntityAddress), nameof(DbEntityAddress.AddressSequenceId))]
-        //public decimal? AddressSequenceId { get; set; }
     }
 }

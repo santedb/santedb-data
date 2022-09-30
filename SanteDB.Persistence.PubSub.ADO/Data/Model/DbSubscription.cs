@@ -20,8 +20,6 @@
  */
 using SanteDB.OrmLite.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.PubSub.ADO.Data.Model
 {
@@ -76,7 +74,7 @@ namespace SanteDB.Persistence.PubSub.ADO.Data.Model
         /// <summary>
         /// The event
         /// </summary>
-        [Column("evt_id"),NotNull]
+        [Column("evt_id"), NotNull]
         public int Event { get; set; }
 
         /// <summary>

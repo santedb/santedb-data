@@ -27,11 +27,8 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Test.Persistence
 {
@@ -68,8 +65,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                     ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityRelationship>>().Insert(er.Clone() as EntityRelationship, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
                     Assert.Fail("Place -[Parent]-> Person should throw validation exception!");
                 }
-                catch(DataPersistenceException) { }
-                catch(DetectedIssueException) { }
+                catch (DataPersistenceException) { }
+                catch (DetectedIssueException) { }
                 catch
                 {
                     Assert.Fail("Wrong type of exception is thrown");

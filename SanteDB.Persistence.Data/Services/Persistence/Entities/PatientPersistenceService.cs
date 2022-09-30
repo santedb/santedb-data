@@ -18,17 +18,13 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Roles;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
@@ -63,7 +59,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
 
             var dbPatient = referenceObjects.OfType<DbPatient>().FirstOrDefault();
-            if(dbPatient == null)
+            if (dbPatient == null)
             {
                 this.m_tracer.TraceWarning("Using slow fetch of DbPatient for DbEntityVersion (consider using the appropriate persister class)");
                 dbPatient = context.FirstOrDefault<DbPatient>(o => o.ParentKey == dbModel.VersionKey);

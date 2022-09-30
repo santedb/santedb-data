@@ -18,13 +18,11 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.i18n;
 using SanteDB.Core.Security.Claims;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Security
 {

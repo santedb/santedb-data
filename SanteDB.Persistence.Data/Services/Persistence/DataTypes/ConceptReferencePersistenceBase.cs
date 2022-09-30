@@ -27,7 +27,6 @@ using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {

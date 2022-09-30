@@ -18,14 +18,11 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Map;
-using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -37,8 +34,6 @@ namespace SanteDB.Persistence.Data.Hax
     /// </summary>
     public class ConceptQueryHack : IQueryBuilderHack
     {
-        // Adhoc cache
-        private IAdhocCacheService m_adhocCache;
 
         // The mapper to be used
         private ModelMapper m_mapper;
@@ -62,11 +57,17 @@ namespace SanteDB.Persistence.Data.Hax
                 // Has this already been joined?
                 var mapType = property.DeclaringType;
                 if (mapType.IsAbstract)
+                {
                     mapType = tmodel;
+                }
+
                 var declType = TableMapping.Get(this.m_mapper.MapModelType(mapType));
                 var keyProperty = property.PropertyType == typeof(Guid) ? property : mapType.GetRuntimeProperty(property.Name + "Key");
                 var declProp = declType.GetColumn(this.m_mapper.MapModelProperty(mapType, declType.OrmType, keyProperty));
-                if (declProp.ForeignKey == null) return false; // No FK link
+                if (declProp.ForeignKey == null)
+                {
+                    return false; // No FK link
+                }
 
                 var tblMap = TableMapping.Get(this.m_mapper.MapModelType(property.PropertyType));
                 var fkTbl = TableMapping.Get(declProp.ForeignKey.Table);
@@ -85,7 +86,10 @@ namespace SanteDB.Persistence.Data.Hax
                 {
                     var fkKeyColumn = fkTbl.Columns.FirstOrDefault(o => o.ForeignKey?.Table == tblMap.OrmType && o.Name == tblMap.PrimaryKey.First().Name) ??
                         tblMap.Columns.FirstOrDefault(o => o.ForeignKey?.Table == fkTbl.OrmType && o.Name == fkTbl.PrimaryKey.First().Name);
-                    if (fkKeyColumn == null) return false; // couldn't find the FK link
+                    if (fkKeyColumn == null)
+                    {
+                        return false; // couldn't find the FK link
+                    }
 
                     // Now we want to filter our FK
                     var tblName = $"{queryPrefix}{declProp.Name}_{tblMap.TableName}";
@@ -96,13 +100,17 @@ namespace SanteDB.Persistence.Data.Hax
 
                     // Add obslt_utc version?
                     if (typeof(IDbBaseData).IsAssignableFrom(tblMap.OrmType))
+                    {
                         whereClause.And($"{tblName}.{tblMap.GetColumn(nameof(IDbBaseData.ObsoletionTime)).Name} IS NULL");
+                    }
                 }
 
                 return true;
             }
             else
+            {
                 return false;
+            }
         }
     }
 }

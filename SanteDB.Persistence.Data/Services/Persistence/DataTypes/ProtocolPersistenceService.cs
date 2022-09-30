@@ -18,14 +18,10 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
@@ -53,7 +49,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            switch(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     retVal.Narrative = retVal.Narrative.GetRelatedPersistenceService().Get(context, dbModel.NarrativeKey.GetValueOrDefault());

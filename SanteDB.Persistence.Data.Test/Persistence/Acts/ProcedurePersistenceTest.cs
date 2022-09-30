@@ -26,10 +26,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using SanteDB.Core.Model;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model.Entities;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 {
@@ -128,7 +124,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 // Un-Delete
                 afterUpdate = base.TestUpdate(afterQuery, o =>
                 {
-                    
+
                     return o;
                 });
 

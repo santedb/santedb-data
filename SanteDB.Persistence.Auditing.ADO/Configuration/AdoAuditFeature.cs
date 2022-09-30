@@ -22,10 +22,6 @@ using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
 using SanteDB.Persistence.Auditing.ADO.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Auditing.ADO.Configuration
 {
@@ -40,7 +36,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Configuration
         /// </summary>
         public AdoAuditFeature()
         {
-            
+
         }
 
         /// <summary>

@@ -18,9 +18,7 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core;
 using SanteDB.Core.Configuration;
-using SanteDB.Core.Exceptions;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite.Configuration;
 using SanteDB.OrmLite.Providers;
@@ -94,7 +92,7 @@ namespace SanteDB.Persistence.Data.Configuration
                 DataObjectExpiry = new TimeSpan(0, 1, 0),
                 Targets = AdoDataCachingPolicyTarget.ModelObjects
             };
-            
+
         }
 
         /// <summary>

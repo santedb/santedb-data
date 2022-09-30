@@ -38,7 +38,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
 using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -53,7 +52,7 @@ namespace SanteDB.Persistence.Data.Services
         {
             SanteDBClaimTypes.SanteDBOTAuthCode
         };
-        
+
         /// <summary>
         /// Gets the name of the service
         /// </summary>
@@ -300,12 +299,12 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         return null;
                     }
-                    var identity =  new AdoApplicationIdentity(app);
+                    var identity = new AdoApplicationIdentity(app);
                     var dbClaims = context.Query<DbApplicationClaim>(o => o.SourceKey == app.Key &&
                         (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now));
-    
+
                     identity.AddClaims(dbClaims.ToArray().Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
-                    
+
                     return identity;
                 }
                 catch (Exception e)
@@ -645,13 +644,13 @@ namespace SanteDB.Persistence.Data.Services
                     context.Open();
 
                     var dbApplication = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationName.ToLowerInvariant() && o.ObsoletionTime == null).FirstOrDefault();
-                    if(dbApplication == null)
+                    if (dbApplication == null)
                     {
                         throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = applicationName }));
                     }
 
                     var dbClaim = context.FirstOrDefault<DbApplicationClaim>(o => o.SourceKey == dbApplication.Key && o.ClaimType.ToLowerInvariant() == claim.Type.ToLowerInvariant());
-                    if(dbClaim == null)
+                    if (dbClaim == null)
                     {
                         dbClaim = new DbApplicationClaim()
                         {
@@ -661,7 +660,7 @@ namespace SanteDB.Persistence.Data.Services
                     dbClaim.ClaimType = claim.Type;
                     dbClaim.ClaimValue = claim.Value;
 
-                    if(expiry.HasValue)
+                    if (expiry.HasValue)
                     {
                         dbClaim.ClaimExpiry = DateTime.Now.Add(expiry.Value);
                     }
@@ -687,29 +686,29 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public void RemoveClaim(string applicationName, string claimType, IPrincipal principal)
         {
-            if(String.IsNullOrEmpty(applicationName))
+            if (String.IsNullOrEmpty(applicationName))
             {
                 throw new ArgumentNullException(nameof(applicationName));
             }
-            else if(String.IsNullOrEmpty(claimType))
+            else if (String.IsNullOrEmpty(claimType))
             {
                 throw new ArgumentNullException(nameof(claimType));
             }
-            else if(principal == null)
+            else if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal));
             }
 
             this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateApplication, principal);
 
-            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
                 {
                     context.Open();
 
                     var dbApplication = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationName.ToLowerInvariant() && o.ObsoletionTime == null).FirstOrDefault();
-                    if(dbApplication == null)
+                    if (dbApplication == null)
                     {
                         throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = applicationName }));
                     }
@@ -724,7 +723,7 @@ namespace SanteDB.Persistence.Data.Services
                         tx.Commit();
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.APP_CLAIM_GEN_ERR), e);
                 }

@@ -1,5 +1,4 @@
 ﻿using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Subscription;
 using SanteDB.Core.Services;

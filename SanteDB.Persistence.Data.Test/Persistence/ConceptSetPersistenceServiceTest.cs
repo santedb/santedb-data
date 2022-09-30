@@ -22,12 +22,8 @@ using NUnit.Framework;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SanteDB.Core.Model;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.Test.Persistence
 {

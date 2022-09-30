@@ -21,8 +21,6 @@
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.PubSub.ADO.Configuration
 {
@@ -37,7 +35,7 @@ namespace SanteDB.Persistence.PubSub.ADO.Configuration
         /// </summary>
         public AdoPubSubFeature() : base()
         {
-            
+
         }
 
         /// <summary>

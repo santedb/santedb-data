@@ -18,17 +18,10 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.i18n;
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
@@ -47,7 +40,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override ActProtocol BeforePersisting(DataContext context, ActProtocol data)
         {
-            data.ProtocolKey = this.EnsureExists(context, data.Protocol)?.Key ?? data.ProtocolKey; 
+            data.ProtocolKey = this.EnsureExists(context, data.Protocol)?.Key ?? data.ProtocolKey;
             return base.BeforePersisting(context, data);
         }
 
@@ -57,7 +50,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override ActProtocol DoConvertToInformationModel(DataContext context, DbActProtocol dbModel, params object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     retVal.Protocol = retVal.Protocol.GetRelatedPersistenceService().Get(context, dbModel.ProtocolKey);

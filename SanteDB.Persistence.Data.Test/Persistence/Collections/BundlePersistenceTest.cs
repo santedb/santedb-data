@@ -18,9 +18,9 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using NUnit.Framework;
 using SanteDB.Core;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.Constants;
@@ -34,8 +34,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Collections
 {
@@ -210,7 +208,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Collections
                 base.TestQuery<Organization>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Bundle Good Health Systems Technology")), 0);
                 base.TestQuery<Organization>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Bundle Good Health Systems Logistics")), 0);
                 base.TestQuery<Organization>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Bundle Good Health Systems Technology and Logistics")), 1);
-                base.TestQuery<Organization>(o => o.Relationships.Any(r=>r.RelationshipTypeKey == EntityRelationshipTypeKeys.Parent && r.TargetEntity.Names.Any(n => n.Component.Any(c => c.Value == "Bundle Good Health Systems"))), 1);
+                base.TestQuery<Organization>(o => o.Relationships.Any(r => r.RelationshipTypeKey == EntityRelationshipTypeKeys.Parent && r.TargetEntity.Names.Any(n => n.Component.Any(c => c.Value == "Bundle Good Health Systems"))), 1);
 
                 // Delete the relationship only
                 bundle = new Bundle()

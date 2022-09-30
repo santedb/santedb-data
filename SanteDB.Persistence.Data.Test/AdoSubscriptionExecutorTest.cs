@@ -6,14 +6,11 @@ using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
-using SanteDB.Core.TestFramework;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Test
 {
@@ -126,7 +123,7 @@ namespace SanteDB.Persistence.Data.Test
                 parameters.Add("_city", "Oddville");
                 resultSet = executor.Execute(Guid.Parse(TestSubscriptionRepository.AllPatientsOrPersonsEntitiesInCity), parameters) as IQueryResultSet<Entity>;
                 Assert.AreEqual(10, resultSet.Count());
-                
+
             }
         }
 

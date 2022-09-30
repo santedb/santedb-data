@@ -6,11 +6,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Jobs;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Test
 {
@@ -28,7 +24,7 @@ namespace SanteDB.Persistence.Data.Test
         [Test]
         public void TestBasicFreetextSearch()
         {
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
 
                 // Get the ADO freetext service

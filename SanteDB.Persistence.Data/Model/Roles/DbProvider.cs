@@ -31,7 +31,7 @@ namespace SanteDB.Persistence.Data.Model.Roles
     /// </summary>
     [Table("pvdr_tbl")]
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-	public class DbProvider : DbPersonSubTable
+    public class DbProvider : DbPersonSubTable
     {
 
         /// <summary>
@@ -56,11 +56,12 @@ namespace SanteDB.Persistence.Data.Model.Roles
         /// </summary>
         /// <value>The specialty.</value>
         [Column("spec_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-		public Guid SpecialtyKey {
-			get;
-			set;
-		}
+        public Guid SpecialtyKey
+        {
+            get;
+            set;
+        }
 
-	}
+    }
 }
 

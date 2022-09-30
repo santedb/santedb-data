@@ -20,14 +20,12 @@
  */
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
-using SanteDB.Core.Model.Map;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Hax
 {
@@ -59,7 +57,9 @@ namespace SanteDB.Persistence.Data.Hax
                 keyName = "name_id";
             }
             else
+            {
                 return false;
+            }
 
             // Not applicable for us if
             //  - Not a name or address
@@ -69,7 +69,9 @@ namespace SanteDB.Persistence.Data.Hax
                 predicate.Path != "component" ||
                 predicate.SubPath != "value" ||
                 !String.IsNullOrEmpty(whereClause.SQL))
+            {
                 return false;
+            }
 
             // Pop the last statement off
             // var fromClause = sqlStatement.RemoveLast();
@@ -89,11 +91,17 @@ namespace SanteDB.Persistence.Data.Hax
                     // Translate Guards to UUIDs
                     var guards = pred.Guard.Split('|');
                     for (int i = 0; i < guards.Length; i++)
+                    {
                         if (!Guid.TryParse(guards[i], out Guid _))
                         {
                             guards[i] = guardType.GetField(guards[i]).GetValue(null).ToString();
                         }
-                    if (guards.Any(o => o == null)) return false;
+                    }
+
+                    if (guards.Any(o => o == null))
+                    {
+                        return false;
+                    }
 
                     // Add to where clause
                     guardFilter = $"AND {queryPrefix}{cmpTblType}.typ_cd_id IN ({String.Join(",", guards.Select(o => $"'{o}'"))})";
@@ -107,7 +115,7 @@ namespace SanteDB.Persistence.Data.Hax
                         .Append(builder.CreateSqlPredicate($"{queryPrefix}{cmpTblType}", "val", componentType.GetProperty(nameof(DbGenericNameComponent.Value)), itm.Value))
                         .Append(guardFilter)
                         .Append($") I{sq++}");
-                if(sq > 1)
+                if (sq > 1)
                 {
                     whereClause.Append($" USING ({keyName}) ").Append(" INNER JOIN ");
                 }

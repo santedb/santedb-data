@@ -18,25 +18,20 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Query;
-using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.Persistence.Data.Model;
-using SanteDB.Persistence.Data.Model.Security;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
@@ -80,7 +75,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Perform query model
         /// </summary>
         protected override IQueryResultSet<TModel> DoQueryModel(Expression<Func<TModel, bool>> query) => new MappedQueryResultSet<TModel>(this).Where(query);
-        
+
         /// <summary>
         /// Convert <paramref name="model" /> to a <typeparamref name="TDbModel"/>
         /// </summary>
@@ -214,7 +209,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
                 if (domainExpression != null)
                 {
-                    foreach(var itm in context.Query<TDbModel>(domainExpression))
+                    foreach (var itm in context.Query<TDbModel>(domainExpression))
                     {
                         context.Delete(itm);
                         yield return itm;
@@ -224,7 +219,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     this.m_tracer.TraceVerbose("Will use slow query construction due to complex mapped fields");
                     var domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateWhere(expression);
-                    foreach(var itm in context.Query<TDbModel>(domainQuery.Build()))
+                    foreach (var itm in context.Query<TDbModel>(domainQuery.Build()))
                     {
                         context.Delete(itm);
                         yield return itm;
@@ -398,11 +393,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<TModelAssociation> UpdateModelAssociations<TModelAssociation>(DataContext context, TModel data, IEnumerable<TModelAssociation> associations)
             where TModelAssociation : IdentifiedData, ISimpleAssociation, new()
         {
-            if(context == null)
+            if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ARGUMENT_NULL);
             }
-            else if(associations == null)
+            else if (associations == null)
             {
                 return associations;
             }
@@ -434,7 +429,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key || existingKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
 
             // Which are new and which are not?
-            var removedRelationships = existing.Where(o => associations.Any(a=>a.Key == o && a.BatchOperation == Core.Model.DataTypes.BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a =>
+            var removedRelationships = existing.Where(o => associations.Any(a => a.Key == o && a.BatchOperation == Core.Model.DataTypes.BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a =>
             {
                 return persistenceService.Delete(context, a.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
             });

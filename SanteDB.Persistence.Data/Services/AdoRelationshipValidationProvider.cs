@@ -20,21 +20,17 @@
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
-using SanteDB.Core.i18n;
 using SanteDB.Core.Model.Acts;
-using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
-using SanteDB.Persistence.Data.Model.Concepts;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {

@@ -27,8 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Hax
 {
@@ -42,10 +40,10 @@ namespace SanteDB.Persistence.Data.Hax
         /// </summary>
         public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<string, string[]> queryFilter)
         {
-            if(typeof(SecurityUser) == tmodel && property.Name == nameof(SecurityUser.UserEntity))
+            if (typeof(SecurityUser) == tmodel && property.Name == nameof(SecurityUser.UserEntity))
             {
                 var userkey = TableMapping.Get(typeof(DbUserEntity)).GetColumn(nameof(DbUserEntity.SecurityUserKey), false);
-                var personSubSelect = builder.CreateQuery(typeof(UserEntity), queryFilter.ToDictionary(p => p.Key.Replace("userEntity.", ""), p=>p.Value), null, userkey);
+                var personSubSelect = builder.CreateQuery(typeof(UserEntity), queryFilter.ToDictionary(p => p.Key.Replace("userEntity.", ""), p => p.Value), null, userkey);
                 var userIdKey = TableMapping.Get(typeof(DbSecurityUser)).PrimaryKey.FirstOrDefault();
                 whereClause.And($"{userIdKey.Name} IN (").Append(personSubSelect).Append(")");
                 return true;

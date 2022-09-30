@@ -22,16 +22,11 @@ using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Extensions;
 using SanteDB.Core.i18n;
-using SanteDB.Core.Interfaces;
-using System.Reflection;
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
-using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -45,9 +40,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Text.RegularExpressions;
-using SanteDB.Persistence.Data.Model.Acts;
+using System.Reflection;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
@@ -379,7 +372,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 else
                 {
                     var existingValues = extension.GetValue<List<DetectedIssue>>();
-                    if(existingValues == null)
+                    if (existingValues == null)
                     {
                         throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.EXTENSION_INVALID_TYPE, new { extension = ExtensionTypeKeys.DataQualityExtensionName }));
                     }

@@ -18,15 +18,11 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
@@ -45,7 +41,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var retVal = base.DoInsertModel(context, data);
 
-            if(data.Services != null)
+            if (data.Services != null)
             {
                 retVal.Services = this.UpdateModelVersionedAssociations(context, retVal, data.Services).ToList();
                 retVal.SetLoaded(o => o.Services);

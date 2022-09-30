@@ -1,9 +1,7 @@
 ﻿using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
-using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
@@ -21,7 +19,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.Common;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace SanteDB.Persistence.Data.Services
@@ -99,9 +96,13 @@ namespace SanteDB.Persistence.Data.Services
 
             var subscription = ApplicationServiceContext.Current.GetService<IRepositoryService<SubscriptionDefinition>>()?.Get(subscriptionKey);
             if (subscription == null)
+            {
                 throw new KeyNotFoundException(subscriptionKey.ToString());
+            }
             else
+            {
                 return this.Execute(subscription, parameters);
+            }
         }
 
         /// <summary>
@@ -113,7 +114,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new InvalidOperationException(ErrorMessages.SUBSCRIPTION_MISSING_DEFINITION);
             }
-            else if(!this.m_allowedTypes.Contains(subscription.ResourceType))
+            else if (!this.m_allowedTypes.Contains(subscription.ResourceType))
             {
                 throw new InvalidOperationException(String.Format(ErrorMessages.SUBSCRIPTION_NOT_SUPPORTED_RESOURCE, String.Join(" or ", this.m_allowedTypes.Select(o => o.Name))));
             }
@@ -144,7 +145,9 @@ namespace SanteDB.Persistence.Data.Services
 
                 // No obsoletion time?
                 if (typeof(IBaseData).IsAssignableFrom(subscription.ResourceType) && !parameters.TryGetValue("obsoletionTime", out _))
+                {
                     parameters.Add("obsoletionTime", "null");
+                }
 
                 // Build the filter expression which is placed on the result set
                 var queryExpression = QueryExpressionParser.BuildLinqExpression(subscription.ResourceType, parameters);
@@ -167,9 +170,14 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         Guid uuid = Guid.Empty;
                         if (Guid.TryParse(qValue.First(), out uuid))
+                        {
                             arguments.AddRange(qValue.Select(v => Guid.Parse(v)).OfType<Object>());
+                        }
                         else
+                        {
                             arguments.AddRange(qValue);
+                        }
+
                         return String.Join(",", qValue.Select(v => "?"));
                     }
                     return "NULL";

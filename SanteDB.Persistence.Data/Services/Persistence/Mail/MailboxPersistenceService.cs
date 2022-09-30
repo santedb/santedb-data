@@ -2,10 +2,7 @@
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Mail;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Mail
 {
@@ -31,7 +28,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Mail
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            switch(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     retVal.Owner = retVal.Owner.GetRelatedPersistenceService().Get(context, dbModel.OwnerKey);

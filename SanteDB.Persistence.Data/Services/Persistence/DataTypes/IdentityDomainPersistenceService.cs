@@ -18,16 +18,12 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.DataType;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
@@ -58,8 +54,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
             retVal.AuthorityScopeXml = context.Query<DbIdentityDomainScope>(s => s.SourceKey == retVal.Key).Select(o => o.ScopeConceptKey).ToList();
-            
-            switch(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.SyncLoad:
                 case LoadMode.FullLoad:
@@ -86,7 +82,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                     ScopeConceptKey = o
                 })).Select(o => o.ScopeConceptKey).ToList();
             }
-            if(data.AssigningAuthority?.Any() == true)
+            if (data.AssigningAuthority?.Any() == true)
             {
                 retVal.AssigningAuthority = base.UpdateModelAssociations(context, retVal, data.AssigningAuthority).ToList();
             }

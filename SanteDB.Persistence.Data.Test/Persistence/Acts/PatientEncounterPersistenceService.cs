@@ -20,7 +20,6 @@
  */
 using NUnit.Framework;
 using SanteDB.Core.Exceptions;
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security;
@@ -29,8 +28,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 {
@@ -49,7 +46,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
         public void TestSimplePersistence()
         {
 
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
 
                 var encounter = new PatientEncounter()
@@ -144,7 +141,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                     base.TestUpdate(afterQuery, o => o);
                     Assert.Fail("Should have thrown exception");
                 }
-                catch(DataPersistenceException e) when (e.InnerException is KeyNotFoundException) { }
+                catch (DataPersistenceException e) when (e.InnerException is KeyNotFoundException) { }
                 catch
                 {
                     Assert.Fail("Threw wrong exception type");
@@ -162,7 +159,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
         public void TestWithSpecialArrangements()
         {
 
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
                 var encounter = new PatientEncounter()
                 {
@@ -188,7 +185,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 var afterQuery = base.TestQuery<PatientEncounter>(o => o.SpecialArrangements.Any(s => s.ArrangementTypeKey == NullReasonKeys.AskedUnknown) && o.StatusConceptKey == StatusKeys.Active, 1).First();
                 Assert.IsNull(afterQuery.SpecialArrangements);
 
-                using(DataPersistenceControlContext.Create(LoadMode.SyncLoad))
+                using (DataPersistenceControlContext.Create(LoadMode.SyncLoad))
                 {
                     afterQuery = base.TestQuery<PatientEncounter>(o => o.SpecialArrangements.Any(s => s.ArrangementTypeKey == NullReasonKeys.AskedUnknown) && o.StatusConceptKey == StatusKeys.Active, 1).First();
                     Assert.IsNotNull(afterQuery.SpecialArrangements);
@@ -221,7 +218,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 // Test update to remove
                 afterUpdate = base.TestUpdate(afterQuery, o =>
                 {
-                    o.SpecialArrangements.RemoveAll(x=>x.ArrangementTypeKey == NullReasonKeys.AskedUnknown);
+                    o.SpecialArrangements.RemoveAll(x => x.ArrangementTypeKey == NullReasonKeys.AskedUnknown);
                     return o;
                 });
                 Assert.AreEqual(1, afterUpdate.SpecialArrangements.Count);

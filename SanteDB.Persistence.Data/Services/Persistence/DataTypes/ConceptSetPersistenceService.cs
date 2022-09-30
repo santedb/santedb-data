@@ -21,12 +21,9 @@
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
@@ -54,7 +51,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         {
             var retVal = base.DoInsertModel(context, data);
 
-            if(data.ConceptsXml?.Any() == true)
+            if (data.ConceptsXml?.Any() == true)
             {
                 retVal.ConceptsXml = base.UpdateInternalAssociations(context, retVal.Key.Value, data.ConceptsXml.Select(o => new DbConceptSetConceptAssociation()
                 {
@@ -75,7 +72,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                 {
                     ConceptKey = o,
                     SourceKey = retVal.Key.Value
-                }), o=> o.SourceKey == data.Key).Select(o => o.ConceptKey).ToList();
+                }), o => o.SourceKey == data.Key).Select(o => o.ConceptKey).ToList();
             }
             return retVal;
         }

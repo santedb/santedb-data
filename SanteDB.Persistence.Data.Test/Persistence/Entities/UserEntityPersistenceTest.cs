@@ -24,14 +24,10 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model;
-using SanteDB.Core.Services;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 {

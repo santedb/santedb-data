@@ -30,7 +30,7 @@ namespace SanteDB.Persistence.Data.Model.Security
     /// </summary>
     [Table("sec_app_tbl")]
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-	public class DbSecurityApplication : DbNonVersionedBaseData
+    public class DbSecurityApplication : DbNonVersionedBaseData
     {
 
         /// <summary>
@@ -44,10 +44,11 @@ namespace SanteDB.Persistence.Data.Model.Security
         /// </summary>
         /// <value>The public identifier.</value>
         [Column("app_pub_id"), IgnoreCase]
-		public String PublicId {
-			get;
-			set;
-		}
+        public String PublicId
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Application authentication secret

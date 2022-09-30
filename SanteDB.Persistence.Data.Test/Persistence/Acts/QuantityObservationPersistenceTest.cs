@@ -19,18 +19,14 @@
  * Date: 2022-9-7
  */
 using NUnit.Framework;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security;
-using SanteDB.Core.Model;
-
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Exceptions;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 {

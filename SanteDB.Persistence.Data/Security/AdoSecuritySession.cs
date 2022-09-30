@@ -24,7 +24,6 @@ using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Security
 {
@@ -37,7 +36,7 @@ namespace SanteDB.Persistence.Data.Security
         /// <summary>
         /// Represents the session key
         /// </summary>
-        internal Guid Key { get;}
+        internal Guid Key { get; }
 
         /// <summary>
         /// Gets the identifier for the sesison

@@ -18,10 +18,8 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model.Constants;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Concepts;
-using SanteDB.Persistence.Data.Model.Roles;
 using System;
 
 namespace SanteDB.Persistence.Data.Model.Entities

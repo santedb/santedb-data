@@ -19,14 +19,9 @@
  * Date: 2022-9-7
  */
 using NUnit.Framework;
-using SanteDB.Caching.Memory;
 using SanteDB.Core;
-using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Core.TestFramework;
 using SanteDB.Persistence.Data.Services;
@@ -36,7 +31,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Test
 {
@@ -83,7 +77,7 @@ namespace SanteDB.Persistence.Data.Test
         {
             // Force load of the DLL
             this.m_localizationService = new TestLocalizationService();
-            var p = FirebirdSql.Data.FirebirdClient.FbCharset.Ascii;
+            FirebirdSql.Data.FirebirdClient.FbCharset.Ascii.ToString();
             TestApplicationContext.TestAssembly = typeof(DataPersistenceTest).Assembly;
             TestApplicationContext.Initialize(TestContext.CurrentContext.TestDirectory);
             this.m_serviceManager = ApplicationServiceContext.Current.GetService<IServiceManager>();
@@ -124,7 +118,11 @@ namespace SanteDB.Persistence.Data.Test
             // Assert equality
             foreach (var pi in typeof(TData).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
             {
-                if (IGNORE.Contains(pi.Name)) continue;
+                if (IGNORE.Contains(pi.Name))
+                {
+                    continue;
+                }
+
                 object source = pi.GetValue(objectToTest),
                     after = pi.GetValue(afterAction);
                 if (source != null && !(source is IdentifiedData || source is IList))

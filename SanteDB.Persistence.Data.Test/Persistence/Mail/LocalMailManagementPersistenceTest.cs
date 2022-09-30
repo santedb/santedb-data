@@ -6,11 +6,8 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Mail
 {
@@ -144,7 +141,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
             // As SYSTEM
             using (AuthenticationContext.EnterSystemContext())
             {
-                var mailboxes = mailService.GetMailboxes().Where(o=>o.Name== Mailbox.INBOX_NAME).FirstOrDefault();
+                var mailboxes = mailService.GetMailboxes().Where(o => o.Name == Mailbox.INBOX_NAME).FirstOrDefault();
                 var messages = mailService.GetMessages(mailboxes.Key.Value);
                 Assert.GreaterOrEqual(messages.Count(), 1);
                 Assert.AreEqual("Test from FOO", messages.First().Subject);

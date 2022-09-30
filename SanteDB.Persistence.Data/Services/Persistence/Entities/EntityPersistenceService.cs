@@ -18,21 +18,11 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.Model;
-using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Entities;
-using SanteDB.Persistence.Data.Model.Extensibility;
-using SanteDB.Persistence.Data.Model.Roles;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
@@ -45,7 +35,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc/>
         protected override void DoCopyVersionSubTableInternal(DataContext context, DbEntityVersion newVersion)
         {
-            if(this.TryGetSubclassPersister(newVersion.ClassConceptKey, out var persistenceService) && persistenceService is IEntityDerivedPersistenceService edps)
+            if (this.TryGetSubclassPersister(newVersion.ClassConceptKey, out var persistenceService) && persistenceService is IEntityDerivedPersistenceService edps)
             {
                 edps.DoCopyVersionSubTable(context, newVersion);
             }

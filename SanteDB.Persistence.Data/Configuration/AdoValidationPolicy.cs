@@ -19,7 +19,6 @@
  * Date: 2022-9-7
  */
 using SanteDB.Core.Configuration;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 

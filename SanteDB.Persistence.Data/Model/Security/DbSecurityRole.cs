@@ -28,8 +28,8 @@ namespace SanteDB.Persistence.Data.Model.Security
     /// </summary>
     [Table("sec_rol_tbl")]
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-	public class DbSecurityRole : DbNonVersionedBaseData
-	{
+    public class DbSecurityRole : DbNonVersionedBaseData
+    {
 
         /// <summary>
         /// Gets or sets the role id
@@ -42,21 +42,23 @@ namespace SanteDB.Persistence.Data.Model.Security
         /// </summary>
         /// <value>The name.</value>
         [Column("rol_name"), IgnoreCase]
-		public String Name {
-			get;
-			set;
-		}
+        public String Name
+        {
+            get;
+            set;
+        }
 
-		/// <summary>
-		/// Gets or sets the description.
-		/// </summary>
-		/// <value>The description.</value>
-		[Column("descr")]
-		public String Description {
-			get;
-			set;
-		}
+        /// <summary>
+        /// Gets or sets the description.
+        /// </summary>
+        /// <value>The description.</value>
+        [Column("descr")]
+        public String Description
+        {
+            get;
+            set;
+        }
 
-	}
+    }
 }
 

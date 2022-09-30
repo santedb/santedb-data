@@ -39,9 +39,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Security.Authentication;
-using System.Security.Cryptography;
 using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -73,7 +71,7 @@ namespace SanteDB.Persistence.Data.Services
 
         // Locale service
         private readonly ILocalizationService m_localizationService;
-        
+
         // Ad-hoc cache used to store session information
         private readonly IAdhocCacheService m_adhocCacheService;
 
@@ -234,7 +232,7 @@ namespace SanteDB.Persistence.Data.Services
             }
             else if (scope == null || scope.Length == 0)
             {
-                scope = new string[]{ "*" };
+                scope = new string[] { "*" };
             }
 
             // Must be claims principal
@@ -291,12 +289,12 @@ namespace SanteDB.Persistence.Data.Services
                             deviceId = claimsPrincipal.Identities.OfType<IDeviceIdentity>().FirstOrDefault(),
                             userId = claimsPrincipal.Identities.FirstOrDefault(o => !(o is IApplicationIdentity || o is IDeviceIdentity));
 
-                        
+
                         // Fetch the keys for the identities
                         Guid? applicationKey = null, deviceKey = null, userKey = null;
 
                         // Application
-                        switch(applicationId)
+                        switch (applicationId)
                         {
                             case AdoIdentity adoApplication:
                                 applicationKey = adoApplication.Sid;
@@ -312,7 +310,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         // Device
-                        switch(deviceId)
+                        switch (deviceId)
                         {
                             case AdoIdentity adoDevice:
                                 deviceKey = adoDevice.Sid;
@@ -324,9 +322,10 @@ namespace SanteDB.Persistence.Data.Services
                                 deviceKey = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceId.Name.ToLowerInvariant())?.Key;
                                 break;
                         }
-                        
+
                         // User
-                        switch(userId) {
+                        switch (userId)
+                        {
                             case AdoIdentity adoUser:
                                 userKey = adoUser.Sid;
                                 break;
@@ -337,7 +336,7 @@ namespace SanteDB.Persistence.Data.Services
                                 userKey = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userId.Name)?.Key;
                                 break;
                         }
-                       
+
 
                         // Establish time limit
                         var expiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.SessionLength, new TimeSpan(1, 0, 0)));
@@ -371,7 +370,9 @@ namespace SanteDB.Persistence.Data.Services
                         // Default = *
                         var sessionScopes = new List<string>();
                         if (scope == null || scope.Contains("*"))
+                        {
                             sessionScopes.AddRange(this.m_pdpService.GetEffectivePolicySet(principal).Select(c => c.Policy.Oid));
+                        }
 
                         // Explicitly set scopes
                         sessionScopes.AddRange(scope.Where(s => !"*".Equals(s)));
@@ -543,7 +544,7 @@ namespace SanteDB.Persistence.Data.Services
                             return new AdoSecuritySession(sessionId, null, dbSession, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key));
                         }
                     }
-                    catch(SecuritySessionException)
+                    catch (SecuritySessionException)
                     {
                         throw;
                     }

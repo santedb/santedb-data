@@ -18,16 +18,11 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
-using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
@@ -57,7 +52,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         {
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             var procedureData = referenceObjects.OfType<DbProcedure>().FirstOrDefault();
-            if(procedureData == null)
+            if (procedureData == null)
             {
                 this.m_tracer.TraceWarning("Using slow method of loading DbNarrative data from DbActVersion - Consider using the Narrative persistence service instead");
                 procedureData = context.FirstOrDefault<DbProcedure>(o => o.ParentKey == dbModel.VersionKey);

@@ -2,7 +2,6 @@
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
-using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
@@ -130,14 +129,22 @@ namespace SanteDB.Persistence.Data.Services
                                 {
                                     case DataInsert di:
                                         if (di.SkipIfExists && persistenceService.Exists(context, itm.Element.Key.Value))
+                                        {
                                             continue;
+                                        }
+
                                         persistenceService.Insert(context, di.Element);
                                         break;
                                     case DataUpdate du:
                                         if (du.InsertIfNotExists && !persistenceService.Exists(context, itm.Element.Key.Value))
+                                        {
                                             persistenceService.Insert(context, itm.Element);
+                                        }
                                         else
+                                        {
                                             persistenceService.Update(context, itm.Element);
+                                        }
+
                                         break;
                                     case DataDelete dd:
                                         persistenceService.Delete(context, dd.Element.Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);

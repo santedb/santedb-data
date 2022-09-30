@@ -21,9 +21,6 @@
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Model.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {

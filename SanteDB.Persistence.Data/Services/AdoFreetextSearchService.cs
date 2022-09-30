@@ -20,7 +20,6 @@
  */
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
-using SanteDB.Core.Event;
 using SanteDB.Core.Jobs;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Collection;
@@ -30,14 +29,10 @@ using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite.Providers;
-using SanteDB.Persistence.Data.Jobs;
 using SanteDB.Persistence.Data.Configuration;
+using SanteDB.Persistence.Data.Jobs;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -69,7 +64,10 @@ namespace SanteDB.Persistence.Data.Services
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_threadPool = threadPoolService;
 
-            if (this.m_configuration.Provider.GetFilterFunction("freetext") == null) return; // Freetext not supported
+            if (this.m_configuration.Provider.GetFilterFunction("freetext") == null)
+            {
+                return; // Freetext not supported
+            }
 
             var job = serviceManager.CreateInjected<AdoRebuildFreetextIndexJob>();
             jobManager.AddJob(job, JobStartType.TimerOnly);
@@ -108,9 +106,11 @@ namespace SanteDB.Persistence.Data.Services
             // Does the provider support freetext search clauses?
             var idps = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TEntity>>();
             if (idps == null)
+            {
                 throw new InvalidOperationException("Cannot find a UNION query repository service");
+            }
 
-            var searchTerm = String.Join(" and ", term.SelectMany(t=>t.Split(' ')));
+            var searchTerm = String.Join(" and ", term.SelectMany(t => t.Split(' ')));
             return idps.Query(o => o.FreetextSearch(searchTerm), AuthenticationContext.Current.Principal);
         }
 

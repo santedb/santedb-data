@@ -21,15 +21,11 @@
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Jobs;
-using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Jobs
 {
