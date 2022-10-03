@@ -590,7 +590,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     context.Open();
                     var results = new MappedQueryResultSet<AuditEventData>(this).Where(query);
 
-                    AuditUtil.AuditAuditLogUsed(ActionType.Read, OutcomeIndicator.Success, query.ToString(), results.Select(o => o.Key.Value).ToArray());
+                    ApplicationServiceContext.Current.GetAuditService().Audit().ForAuditLogUsed(ActionType.Read, OutcomeIndicator.Success, query.ToString(), results.Select(o => o.Key.Value).ToArray()).Send();
 
                     // Event args
                     var postEvtArgs = new QueryResultEventArgs<AuditEventData>(query, results, overrideAuthContext);
@@ -600,7 +600,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             }
             catch (Exception e)
             {
-                AuditUtil.AuditAuditLogUsed(ActionType.Read, OutcomeIndicator.EpicFail, query.ToString());
+                ApplicationServiceContext.Current.GetAuditService().Audit().ForAuditLogUsed(ActionType.Read, OutcomeIndicator.EpicFail, query.ToString()).Send();
                 this.m_traceSource.TraceError("Could not query audit {0}: {1}", query, e);
                 throw;
             }
