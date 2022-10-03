@@ -37,10 +37,8 @@ using SanteDB.Persistence.Data.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security;
 using System.Security.Authentication;
 using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -121,7 +119,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new ArgumentNullException(nameof(response), ErrorMessages.ARGUMENT_NULL);
             }
-            
+
 
             var preEvtArgs = new AuthenticatingEventArgs(userName);
             this.Authenticating?.Invoke(this, preEvtArgs);
@@ -263,11 +261,11 @@ namespace SanteDB.Persistence.Data.Services
         public IEnumerable<SecurityChallenge> Get(String userName, IPrincipal principal)
         {
 
-            if(String.IsNullOrEmpty(userName))
+            if (String.IsNullOrEmpty(userName))
             {
                 throw new ArgumentNullException(nameof(userName), ErrorMessages.ARGUMENT_NULL);
             }
-            else if(principal == null)
+            else if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ARGUMENT_NULL);
             }
@@ -315,11 +313,11 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public IEnumerable<SecurityChallenge> Get(Guid userKey, IPrincipal principal)
         {
-            if(userKey == default(Guid))
+            if (userKey == default(Guid))
             {
                 throw new ArgumentOutOfRangeException(nameof(userKey), ErrorMessages.ARGUMENT_OUT_OF_RANGE);
             }
-            else if(principal == null)
+            else if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ARGUMENT_NULL);
             }
@@ -367,15 +365,15 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public void Remove(String userName, Guid challengeKey, IPrincipal principal)
         {
-            if(String.IsNullOrEmpty(userName))
+            if (String.IsNullOrEmpty(userName))
             {
                 throw new ArgumentNullException(nameof(userName), ErrorMessages.ARGUMENT_NULL);
             }
-            else if(challengeKey == Guid.Empty)
+            else if (challengeKey == Guid.Empty)
             {
                 throw new ArgumentOutOfRangeException(nameof(challengeKey), ErrorMessages.ARGUMENT_OUT_OF_RANGE);
             }
-            else if (principal == null )
+            else if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ARGUMENT_NULL);
             }
@@ -420,11 +418,11 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new ArgumentOutOfRangeException(nameof(challengeKey), ErrorMessages.ARGUMENT_NULL);
             }
-            else if(String.IsNullOrEmpty(response))
+            else if (String.IsNullOrEmpty(response))
             {
                 throw new ArgumentNullException(nameof(response), ErrorMessages.ARGUMENT_NULL);
             }
-            else if(principal == null)
+            else if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ARGUMENT_NULL);
             }

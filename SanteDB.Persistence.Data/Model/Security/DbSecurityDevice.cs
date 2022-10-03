@@ -30,18 +30,19 @@ namespace SanteDB.Persistence.Data.Model.Security
     /// </summary>
     [Table("sec_dev_tbl")]
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-	public class DbSecurityDevice : DbNonVersionedBaseData
-	{
-		
-		/// <summary>
-		/// Gets or sets the public identifier.
-		/// </summary>
-		/// <value>The public identifier.</value>
-		[Column("dev_pub_id"), IgnoreCase]
-		public String PublicId {
-			get;
-			set;
-		}
+    public class DbSecurityDevice : DbNonVersionedBaseData
+    {
+
+        /// <summary>
+        /// Gets or sets the public identifier.
+        /// </summary>
+        /// <value>The public identifier.</value>
+        [Column("dev_pub_id"), IgnoreCase]
+        public String PublicId
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Device secret

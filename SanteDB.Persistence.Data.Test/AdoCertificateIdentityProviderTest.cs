@@ -26,11 +26,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Test
 {
@@ -45,7 +42,7 @@ namespace SanteDB.Persistence.Data.Test
         private X509Certificate2 GetCertificate()
         {
             return new X509Certificate2(X509Certificate2.CreateFromCertFile(
-                Path.Combine(Path.GetDirectoryName(typeof(AdoCertificateIdentityProviderTest).Assembly.Location), 
+                Path.Combine(Path.GetDirectoryName(typeof(AdoCertificateIdentityProviderTest).Assembly.Location),
                 "test.lumon.com.cer")));
         }
 
@@ -173,11 +170,11 @@ namespace SanteDB.Persistence.Data.Test
                 certService.Authenticate(this.GetCertificate());
                 Assert.Fail("Should have thrown exception");
             }
-            catch(AuthenticationException)
+            catch (AuthenticationException)
             {
 
             }
-            catch(Exception e) when (e.InnerException is AuthenticationException)
+            catch (Exception e) when (e.InnerException is AuthenticationException)
             {
 
             }

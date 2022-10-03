@@ -19,7 +19,6 @@
  * Date: 2022-9-7
  */
 using NUnit.Framework;
-using SanteDB.Core;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
@@ -27,9 +26,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 {
@@ -172,7 +168,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual("9999-99", (afterQuery as ManufacturedMaterial).LotNumber);
 
                 // Query back out with Material 
-                var afterMatQuery = base.TestQuery<Material>(o=> o.Names.Any(n => n.Component.Any(c => c.Value == "Dilbert Inc. Inactivated Polio Vaccine")), 1).AsResultSet().First();
+                var afterMatQuery = base.TestQuery<Material>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Dilbert Inc. Inactivated Polio Vaccine")), 1).AsResultSet().First();
                 Assert.IsNotNull(afterMatQuery);
                 Assert.AreEqual(Guid.Parse("9902267c-8f77-4233-bfd3-e6b068ab326a"), afterMatQuery.FormConceptKey);
                 Assert.AreEqual("9999-99", (afterMatQuery as ManufacturedMaterial).LotNumber);

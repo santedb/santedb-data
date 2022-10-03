@@ -29,7 +29,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
@@ -97,19 +96,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                 // Get maximum source key
                 var sourceKey = context.Query<TDbModel>(domainExpression).OrderByDescending(o => o.EffectiveVersionSequenceId).Select(o => o.SourceKey).FirstOrDefault();
-                if(sourceKey == Guid.Empty) // There is no need to delete related objects
+                if (sourceKey == Guid.Empty) // There is no need to delete related objects
                 {
                     yield break;
                 }
 
                 var sourceSequence = this.GetCurrentVersionSequenceForSource(context, sourceKey);
 
-                foreach (var itm in context.Query<TDbModel>(domainExpression)) {
+                foreach (var itm in context.Query<TDbModel>(domainExpression))
+                {
                     switch (deletionMode)
                     {
                         case DeleteMode.LogicalDelete:
-                                itm.ObsoleteVersionSequenceId = sourceSequence;
-                                context.Update(itm);
+                            itm.ObsoleteVersionSequenceId = sourceSequence;
+                            context.Update(itm);
                             break;
                         default:
                             context.Delete(itm);
@@ -204,7 +204,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 dbModel.EffectiveVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, dbModel.SourceKey);
             }
-            if(dbModel.ObsoleteVersionSequenceId.GetValueOrDefault() == Int32.MaxValue)
+            if (dbModel.ObsoleteVersionSequenceId.GetValueOrDefault() == Int32.MaxValue)
             {
                 dbModel.ObsoleteVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, dbModel.SourceKey);
             }

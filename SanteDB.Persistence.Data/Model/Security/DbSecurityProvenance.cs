@@ -27,8 +27,8 @@ namespace SanteDB.Persistence.Data.Model.Security
     /// Represents simple provenance
     /// </summary>
     [Table("sec_prov_tbl")]
-       [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
- public class DbSecurityProvenance : DbIdentified
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public class DbSecurityProvenance : DbIdentified
     {
         /// <summary>
         /// Gets or sets the key field

@@ -18,21 +18,18 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using NUnit.Framework;
+using SanteDB.Core;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Protocol;
 using SanteDB.Core.Security;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Exceptions;
-using SanteDB.Core;
-using SanteDB.Core.Services;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 {
@@ -110,10 +107,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 HandlerClass = typeof(DummyProtocolHandler),
                 Oid = "1.2.3.4.5.6",
                 Name = "Teapot Protocol",
-                Narrative = Narrative.DocumentFromString("Teapot" ,"en", "text/plain", "I'm a little teapot!")
+                Narrative = Narrative.DocumentFromString("Teapot", "en", "text/plain", "I'm a little teapot!")
             };
 
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
 
                 // Insert the protocol
@@ -177,7 +174,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                     base.TestUpdate(afterQuery, o => o);
                     Assert.Fail("Should have thrown exception");
                 }
-                catch(DataPersistenceException e) when (e.InnerException is KeyNotFoundException)
+                catch (DataPersistenceException e) when (e.InnerException is KeyNotFoundException)
                 {
 
                 }

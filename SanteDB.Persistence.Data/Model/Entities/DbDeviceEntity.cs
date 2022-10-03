@@ -19,7 +19,6 @@
  * Date: 2022-9-7
  */
 using SanteDB.OrmLite.Attributes;
-using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 

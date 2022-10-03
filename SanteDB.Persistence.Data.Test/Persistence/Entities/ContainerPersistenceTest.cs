@@ -19,7 +19,6 @@
  * Date: 2022-9-7
  */
 using NUnit.Framework;
-using SanteDB.Core;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
@@ -27,9 +26,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 {
@@ -70,7 +66,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(5, afterInsert.DiameterQuantity);
 
                 // Now we want to query
-                var afterQuery = base.TestQuery<Container>(o => o.Names.Any(n=>n.Component.Any(c=>c.Value == "OPV 100 Quantity")) && o.CapacityQuantity == 10, 1).AsResultSet().First();
+                var afterQuery = base.TestQuery<Container>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "OPV 100 Quantity")) && o.CapacityQuantity == 10, 1).AsResultSet().First();
                 Assert.IsNull(afterQuery.QuantityConcept);
                 Assert.AreEqual(10, afterQuery.CapacityQuantity);
                 Assert.AreEqual(10, afterQuery.HeightQuantity);
@@ -86,7 +82,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 });
                 afterQuery = base.TestQuery<Container>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "OPV 100 Quantity")) && o.CapacityQuantity == 10, 0).AsResultSet().FirstOrDefault();
                 afterQuery = base.TestQuery<Container>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "OPV 100 Quantity")) && o.CapacityQuantity == 20, 1).AsResultSet().FirstOrDefault();
-                
+
                 Assert.IsNull(afterQuery.QuantityConcept);
                 Assert.AreEqual(20, afterQuery.CapacityQuantity);
                 Assert.AreEqual(20, afterQuery.HeightQuantity);

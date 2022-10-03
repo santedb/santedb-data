@@ -24,9 +24,7 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
@@ -45,7 +43,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override Observation DoInsertModel(DataContext context, Observation data)
         {
-            switch(data.ValueType)
+            switch (data.ValueType)
             {
                 case "ST":
                     return (TextObservation)typeof(TextObservation).GetRelatedPersistenceService().Insert(context, data);
@@ -80,7 +78,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override Observation DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
             var obsData = referenceObjects.OfType<DbObservation>().FirstOrDefault();
-            if(obsData == null)
+            if (obsData == null)
             {
                 obsData = context.FirstOrDefault<DbObservation>(o => o.ParentKey == dbModel.VersionKey);
             }
@@ -101,5 +99,5 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             return mapper?.MapToModelInstanceEx(context, dbModel, referenceObjects) as Observation ??
                 base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
         }
-    } 
+    }
 }

@@ -27,10 +27,8 @@ using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -102,11 +100,13 @@ namespace SanteDB.Persistence.Data.Services
                         foreach (var rol in roleIds.SelectMany(r => userIds.ToArray().Select(u => new { U = u, R = r })))
                         {
                             if (!context.Any<DbSecurityUserRole>(r => r.RoleKey == rol.R && r.UserKey == rol.U))
+                            {
                                 context.Insert(new DbSecurityUserRole()
                                 {
                                     RoleKey = rol.R,
                                     UserKey = rol.U
                                 });
+                            }
                         }
 
                         tx.Commit();

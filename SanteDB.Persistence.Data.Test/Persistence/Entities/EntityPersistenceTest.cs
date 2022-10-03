@@ -19,22 +19,18 @@
  * Date: 2022-9-7
  */
 using NUnit.Framework;
+using SanteDB.Core;
+using SanteDB.Core.Extensions;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Query;
+using SanteDB.Core.Security;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model.Entities;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Security;
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Core.Extensions;
-using SanteDB.Core.Model.Query;
-using System.Threading;
 using System.Diagnostics.CodeAnalysis;
-using SanteDB.Core;
-using SanteDB.Core.Services;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 {
@@ -262,7 +258,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 var afterInsert = base.TestInsert(entity);
                 Assert.IsNotNull(afterInsert.CreationTime);
-                Assert.AreEqual(0, afterInsert.LoadProperty(o=>o.Tags).Count);
+                Assert.AreEqual(0, afterInsert.LoadProperty(o => o.Tags).Count);
 
                 // Test fetch
                 var fetched = base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 1).AsResultSet();
@@ -273,7 +269,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 var tagService = ApplicationServiceContext.Current.GetService<ITagPersistenceService>();
                 Assert.IsNotNull(tagService);
                 tagService.Save(afterInsert.Key.Value, new EntityTag("foo", "bars"));
-                
+
                 fetched = base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 1).AsResultSet();
                 afterFetch = fetched.First();
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Tags).Count);
@@ -342,7 +338,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 var fetch = base.TestQuery<Entity>(o => o.Identifiers.Where(g => g.IdentityDomain.DomainName == "TEST_3").Any(i => i.Value == "TEST3"), 1).AsResultSet();
                 var afterFetch = fetch.First();
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Identifiers).Count);
-                Assert.AreEqual("TEST_3", afterFetch.Identifiers[0].LoadProperty(o=>o.IdentityDomain).DomainName);
+                Assert.AreEqual("TEST_3", afterFetch.Identifiers[0].LoadProperty(o => o.IdentityDomain).DomainName);
             }
         }
 

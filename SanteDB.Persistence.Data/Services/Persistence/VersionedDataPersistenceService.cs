@@ -18,7 +18,6 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
@@ -26,11 +25,13 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.MappedResultSets;
+using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.DataType;
 using System;
@@ -38,12 +39,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Reflection;
-using SanteDB.Core.Model.Entities;
-using System.Collections.Concurrent;
-using SanteDB.Persistence.Data.Configuration;
+using System.Text.RegularExpressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
@@ -212,7 +209,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 validation.CheckDigit == AdoValidationEnforcement.Off &&
                 validation.Authority == AdoValidationEnforcement.Off &&
                 validation.Scope == AdoValidationEnforcement.Off)
+            {
                 yield break;
+            }
 
             foreach (var id in objectToVerify.Identifiers)
             {
@@ -223,7 +222,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     dbAuth = this.m_adhocCache?.Get<DbIdentityDomain>($"{DataConstants.AdhocAuthorityKey}{id.IdentityDomainKey}");
                     if (dbAuth == null)
+                    {
                         dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.Key == id.IdentityDomainKey);
+                    }
                 }
                 else if (id.Authority == null)
                 {
@@ -233,7 +234,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     dbAuth = this.m_adhocCache?.Get<DbIdentityDomain>($"{DataConstants.AdhocAuthorityKey}{id.Authority.Key}");
                     if (dbAuth == null)
+                    {
                         dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.Key == id.Authority.Key);
+                    }
                 }
                 else
                 {
@@ -242,7 +245,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     {
                         dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.DomainName == id.Authority.DomainName);
                         if (dbAuth != null)
+                        {
                             id.Authority.Key = dbAuth.Key;
+                        }
                     }
                 }
 
@@ -307,7 +312,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     scopes.Any() && !scopes.Any(s => s.ScopeConceptKey == classObject.ClassConceptKey) // This type of identifier is not allowed to be assigned to this type of object
                     && !ownedByOthers
                     && !ownedByMe) // Unless it was already associated to another type of object related to me
+                {
                     yield return new DetectedIssue(validation.Scope.ToPriority(), DataConstants.IdentifierInvalidTargetScope, $"Identifier of type {dbAuth.DomainName} cannot be assigned to object of type {classObject.ClassConceptKey}", DetectedIssueKeys.BusinessRuleViolationIssue);
+                }
 
                 // If the identity domain is unique, and we've been asked to raid identifier uq issues
                 if (dbAuth.IsUnique &&
@@ -341,7 +348,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     var nonMatch = !new Regex(dbAuth.ValidationRegex).IsMatch(id.Value);
                     if (nonMatch)
+                    {
                         yield return new DetectedIssue(validation.Format.ToPriority(), DataConstants.IdentifierPatternFormatFail, $"Identifier {id.Value} in domain {dbAuth.DomainName} failed format validation", DetectedIssueKeys.FormalConstraintIssue);
+                    }
                 }
 
                 if (validation.CheckDigit != Configuration.AdoValidationEnforcement.Off && !String.IsNullOrEmpty(dbAuth.CustomValidator))

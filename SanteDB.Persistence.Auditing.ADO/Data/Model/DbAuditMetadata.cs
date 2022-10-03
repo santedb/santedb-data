@@ -20,10 +20,6 @@
  */
 using SanteDB.OrmLite.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Auditing.ADO.Data.Model
 {
@@ -31,7 +27,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Data.Model
     /// Audit metadata
     /// </summary>
     [Table("aud_meta_tbl")]
-    public class DbAuditMetadata 
+    public class DbAuditMetadata
     {
         /// <summary>
         /// Identifier of the object

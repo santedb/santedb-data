@@ -50,7 +50,7 @@ namespace SanteDB.Persistence.Data.Hax
             if (typeof(Concept).IsAssignableFrom(property.PropertyType) && predicate.SubPath == "mnemonic")
             {
                 Regex removeRegex = null;
-                if (predicate.Path == "participationRole"  && property.DeclaringType == typeof(ActParticipation))
+                if (predicate.Path == "participationRole" && property.DeclaringType == typeof(ActParticipation))
                 {
                     columnName = "rol_cd_id";
                     scanType = typeof(ActParticipationKeys);
@@ -70,51 +70,75 @@ namespace SanteDB.Persistence.Data.Hax
                     removeRegex = new Regex(@"INNER\sJOIN\scd_tbl\s.*\(.*?rel_typ_cd_id.*");
                 }
                 else
+                {
                     return false;
+                }
 
                 // Now we scan
                 List<Object> qValues = new List<object>();
                 if (values is IEnumerable)
+                {
                     foreach (var i in values as IEnumerable)
                     {
                         var fieldInfo = scanType.GetRuntimeField(i.ToString());
-                        if (fieldInfo == null) return false;
+                        if (fieldInfo == null)
+                        {
+                            return false;
+                        }
+
                         qValues.Add(fieldInfo.GetValue(null));
                     }
+                }
                 else
                 {
                     var fieldInfo = scanType.GetRuntimeField(values.ToString());
-                    if (fieldInfo == null) return false;
+                    if (fieldInfo == null)
+                    {
+                        return false;
+                    }
+
                     qValues.Add(fieldInfo.GetValue(null));
                 }
 
                 // Now add to query
-                whereClause.And($"{columnName} IN ({String.Join(",", qValues.Select(o=>$"'{o}'").ToArray())})");
+                whereClause.And($"{columnName} IN ({String.Join(",", qValues.Select(o => $"'{o}'").ToArray())})");
 
                 // Remove the inner join 
                 var remStack = new Stack<SqlStatement>();
                 SqlStatement last;
-                while(sqlStatement.RemoveLast(out last))
+                while (sqlStatement.RemoveLast(out last))
                 {
                     var m = removeRegex.Match(last.SQL);
                     if (m.Success)
                     {
                         // The last thing we added was the 
                         if (m.Index == 0 && m.Length == last.SQL.Length)
+                        {
                             remStack.Pop();
+                        }
                         else
+                        {
                             sqlStatement.Append(last.SQL.Remove(m.Index, m.Length), last.Arguments.ToArray());
+                        }
+
                         break;
                     }
                     else
+                    {
                         remStack.Push(last);
+                    }
                 }
                 while (remStack.Count > 0)
+                {
                     sqlStatement.Append(remStack.Pop());
+                }
+
                 return true;
             }
             else
+            {
                 return false;
+            }
         }
     }
 }

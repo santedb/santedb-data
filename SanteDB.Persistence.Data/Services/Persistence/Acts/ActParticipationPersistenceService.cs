@@ -18,16 +18,11 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
@@ -63,9 +58,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             {
                 case LoadMode.FullLoad:
                     retVal.PlayerEntity = retVal.PlayerEntity.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
-                    retVal.SetLoaded(o=>o.PlayerEntity);
+                    retVal.SetLoaded(o => o.PlayerEntity);
                     retVal.Classification = retVal.Classification.GetRelatedPersistenceService().Get(context, dbModel.ClassificationKey.GetValueOrDefault());
-                    retVal.SetLoaded(o=>o.Classification);
+                    retVal.SetLoaded(o => o.Classification);
                     retVal.ParticipationRole = retVal.ParticipationRole.GetRelatedPersistenceService().Get(context, dbModel.ParticipationRoleKey);
                     retVal.SetLoaded(o => o.ParticipationRole);
                     break;

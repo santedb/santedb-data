@@ -20,7 +20,6 @@
  */
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Concepts;
-using SanteDB.Persistence.Data.Model.DataType;
 using System;
 
 namespace SanteDB.Persistence.Data.Model.Entities

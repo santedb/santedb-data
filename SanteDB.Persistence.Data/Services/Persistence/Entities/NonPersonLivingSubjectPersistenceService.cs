@@ -18,16 +18,11 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
@@ -55,7 +50,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             var nplsData = referenceObjects.OfType<DbNonPersonLivingSubject>().FirstOrDefault();
-            if(nplsData == null )
+            if (nplsData == null)
             {
                 this.m_tracer.TraceWarning("Using slow load of NonPersonLivingSubjectData to DbEntityVersion");
                 nplsData = context.FirstOrDefault<DbNonPersonLivingSubject>(o => o.ParentKey == modelData.VersionKey);

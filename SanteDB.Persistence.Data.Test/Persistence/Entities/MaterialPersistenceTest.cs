@@ -19,7 +19,6 @@
  * Date: 2022-9-7
  */
 using NUnit.Framework;
-using SanteDB.Core;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
@@ -27,9 +26,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 {
@@ -87,7 +83,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(1, afterInsert.Quantity);
 
                 // Now we want to query
-                var afterQuery = base.TestQuery<Material>(o => o.Names.Any(n=>n.Component.Any(c=>c.Value == "Oral Polio Vaccine")) && o.IsAdministrative == true && o.FormConcept.Mnemonic == "AdministrableDrugForm-OralDrops" && o.QuantityConcept.Mnemonic == "UnitOfMeasure-Dose", 1).AsResultSet().First();
+                var afterQuery = base.TestQuery<Material>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Oral Polio Vaccine")) && o.IsAdministrative == true && o.FormConcept.Mnemonic == "AdministrableDrugForm-OralDrops" && o.QuantityConcept.Mnemonic == "UnitOfMeasure-Dose", 1).AsResultSet().First();
                 Assert.AreEqual(new DateTime(2021, 01, 01), afterQuery.ExpiryDate);
                 Assert.IsTrue(afterQuery.IsAdministrative);
                 Assert.AreEqual(Guid.Parse("66cbce3a-2e77-401d-95d8-ee0361f4f076"), afterQuery.FormConceptKey);

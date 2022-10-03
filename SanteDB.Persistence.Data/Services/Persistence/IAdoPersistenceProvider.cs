@@ -19,14 +19,11 @@
  * Date: 2022-9-7
  */
 using SanteDB.Core.Model;
-using SanteDB.Core.Model.Acts;
-using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.Providers;
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
@@ -68,8 +65,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     }
 
     /// <summary>
-    /// Represents an ADO persistence provider for <paramref name="TModel"/>
+    /// Represents an ADO persistence provider for <typeparamref name="TModel"/>
     /// </summary>
+    /// <typeparam name="TModel">The type of model object that this class persists</typeparam>
     public interface IAdoPersistenceProvider<TModel> : IAdoPersistenceProvider
     {
 

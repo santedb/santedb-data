@@ -131,5 +131,5 @@ namespace SanteDB.Persistence.Data.Model
         [Column("upd_utc")]
         public DateTimeOffset? UpdatedTime { get; set; }
     }
-    
+
 }

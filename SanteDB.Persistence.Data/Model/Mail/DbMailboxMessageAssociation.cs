@@ -1,7 +1,5 @@
 ﻿using SanteDB.OrmLite.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Model.Mail
 {

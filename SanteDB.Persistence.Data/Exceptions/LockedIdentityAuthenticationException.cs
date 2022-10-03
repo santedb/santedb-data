@@ -19,8 +19,6 @@
  * Date: 2022-9-7
  */
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Exceptions
 {
@@ -46,7 +44,7 @@ namespace SanteDB.Persistence.Data.Exceptions
         /// <summary>
         /// Create with absolute lockout time
         /// </summary>
-        public LockedIdentityAuthenticationException(DateTimeOffset lockoutTime) : this(lockoutTime.Subtract( DateTimeOffset.Now))
+        public LockedIdentityAuthenticationException(DateTimeOffset lockoutTime) : this(lockoutTime.Subtract(DateTimeOffset.Now))
         { }
 
     }

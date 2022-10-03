@@ -20,7 +20,6 @@
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.PubSub;
@@ -35,7 +34,6 @@ using SanteDB.Persistence.PubSub.ADO.Configuration;
 using SanteDB.Persistence.PubSub.ADO.Data.Model;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security;
@@ -83,7 +81,7 @@ namespace SanteDB.Persistence.PubSub.ADO
 
         // Query persistence service
         private IQueryPersistenceService m_queryPersistence;
-        
+
         /// <summary>
         /// Creates a new instance of this pub-sub manager
         /// </summary>
@@ -156,7 +154,9 @@ namespace SanteDB.Persistence.PubSub.ADO
 
             var cached = this.m_cache?.GetCacheItem<PubSubChannelDefinition>(id);
             if (cached != null)
+            {
                 return cached;
+            }
 
             using (var conn = this.m_configuration.Provider.GetReadonlyConnection())
             {
@@ -165,7 +165,10 @@ namespace SanteDB.Persistence.PubSub.ADO
                     conn.Open();
                     var domainInstance = conn.FirstOrDefault<DbChannel>(o => o.Key == id);
                     if (domainInstance == null)
+                    {
                         throw new KeyNotFoundException($"Channel {id} not found");
+                    }
+
                     var retVal = this.MapInstance(conn, domainInstance);
                     this.m_cache?.Add(retVal);
                     return retVal;
@@ -221,7 +224,9 @@ namespace SanteDB.Persistence.PubSub.ADO
                     conn.Open();
                     var dbExisting = conn.FirstOrDefault<DbChannel>(o => o.Key == key);
                     if (dbExisting == null)
+                    {
                         throw new KeyNotFoundException($"Channel {key} not found");
+                    }
 
                     // Get the authorship
                     var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
@@ -253,7 +258,9 @@ namespace SanteDB.Persistence.PubSub.ADO
 
             var subscription = this.GetSubscription(key);
             if (subscription == null)
+            {
                 throw new KeyNotFoundException($"Subscription {key} not found");
+            }
 
             var preEvt = new DataPersistingEventArgs<PubSubSubscriptionDefinition>(subscription, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             this.UnSubscribing?.Invoke(this, preEvt);
@@ -271,7 +278,9 @@ namespace SanteDB.Persistence.PubSub.ADO
                     conn.Open();
                     var dbExisting = conn.FirstOrDefault<DbSubscription>(o => o.Key == key);
                     if (dbExisting == null)
+                    {
                         throw new KeyNotFoundException($"Subscription {key} not found");
+                    }
 
                     // Get the authorship
                     var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
@@ -366,12 +375,14 @@ namespace SanteDB.Persistence.PubSub.ADO
 
                         // Insert settings
                         foreach (var itm in channel.Settings)
+                        {
                             conn.Insert(new DbChannelSetting()
                             {
                                 ChannelKey = dbChannel.Key.Value,
                                 Name = itm.Name,
                                 Value = itm.Value
                             });
+                        }
 
                         tx.Commit();
                         channel = this.MapInstance(conn, dbChannel);
@@ -442,7 +453,9 @@ namespace SanteDB.Persistence.PubSub.ADO
                     {
                         var dbExisting = conn.FirstOrDefault<DbChannel>(o => o.Key == key);
                         if (dbExisting == null)
+                        {
                             throw new KeyNotFoundException($"Channel {key} not found");
+                        }
 
                         // Get the authorship
                         var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
@@ -460,7 +473,9 @@ namespace SanteDB.Persistence.PubSub.ADO
                         // Ensure that the scheme does not change
                         var oldUri = new Uri(dbExisting.Endpoint);
                         if (!endpoint.Scheme.Equals(oldUri.Scheme))
+                        {
                             throw new InvalidOperationException($"Cannot change dispatcher scheme from {oldUri.Scheme} to {endpoint.Scheme} - please remove this subscription and re-create it with the new dispatcher factory");
+                        }
 
                         dbExisting.Endpoint = endpoint.ToString();
                         dbExisting.Name = name;
@@ -470,12 +485,14 @@ namespace SanteDB.Persistence.PubSub.ADO
 
                         // Insert settings
                         foreach (var itm in settings)
+                        {
                             conn.Insert(new DbChannelSetting()
                             {
                                 ChannelKey = dbExisting.Key.Value,
                                 Name = itm.Key,
                                 Value = itm.Value
                             });
+                        }
 
                         var retVal = this.MapInstance(conn, dbExisting);
                         this.m_cache?.Add(retVal);
@@ -545,11 +562,13 @@ namespace SanteDB.Persistence.PubSub.ADO
                         if (subscription.Filter != null)
                         {
                             foreach (var itm in subscription.Filter)
+                            {
                                 conn.Insert(new DbSubscriptionFilter()
                                 {
                                     SubscriptionKey = dbSubscription.Key.Value,
                                     Filter = itm
                                 });
+                            }
                         }
 
                         tx.Commit();
@@ -583,7 +602,9 @@ namespace SanteDB.Persistence.PubSub.ADO
                     {
                         var dbExisting = conn.FirstOrDefault<DbSubscription>(o => o.Key == key);
                         if (dbExisting == null)
+                        {
                             throw new KeyNotFoundException($"Subscription {key} not found");
+                        }
 
                         // Get the authorship
                         var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
@@ -644,7 +665,9 @@ namespace SanteDB.Persistence.PubSub.ADO
                     conn.Open();
                     var dbExisting = conn.FirstOrDefault<DbSubscription>(o => o.Key == key);
                     if (dbExisting == null)
+                    {
                         throw new KeyNotFoundException($"Subscription {key} not found");
+                    }
 
                     var subscription = this.MapInstance(conn, dbExisting);
                     var preEvt = new DataPersistingEventArgs<PubSubSubscriptionDefinition>(subscription, TransactionMode.Commit, AuthenticationContext.Current.Principal);
@@ -704,9 +727,13 @@ namespace SanteDB.Persistence.PubSub.ADO
             this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.ReadPubSubSubscription);
             var cache = this.m_cache?.GetCacheItem<PubSubSubscriptionDefinition>(key);
             if (cache != null)
+            {
                 return cache;
+            }
             else
+            {
                 return this.FindSubscription(o => o.Key == key).FirstOrDefault();
+            }
         }
 
         /// <summary>

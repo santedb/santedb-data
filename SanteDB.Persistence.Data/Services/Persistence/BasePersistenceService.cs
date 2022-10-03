@@ -18,14 +18,11 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core;
-using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
-using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
@@ -37,14 +34,12 @@ using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model;
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
@@ -175,7 +170,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Fired before delete
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<TModel>> Deleting;
-        
+
         /// <summary>
         /// Fired when progress changes
         /// </summary>
@@ -359,7 +354,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-                foreach(var itm in this.DoDeleteAllInternal(context, expression, deleteMode))
+                foreach (var itm in this.DoDeleteAllInternal(context, expression, deleteMode))
                 {
                     this.m_dataCacheService?.Remove(this.DoConvertToInformationModel(context, itm));
                 }
@@ -447,7 +442,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 if (useCache)
                 {
                     retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
-                    if(!this.ValidateCacheItemLoadMode(retVal))
+                    if (!this.ValidateCacheItemLoadMode(retVal))
                     {
                         retVal = null;
                     }
@@ -574,7 +569,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             // Fetch from cache?
             TModel retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
-           
+
             if (retVal == null || versionKey.GetValueOrDefault() != Guid.Empty || !this.ValidateCacheItemLoadMode(retVal))
             {
                 // Try-fetch
@@ -740,7 +735,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Executes the specified query returning the query set
         /// </summary>
         public IQueryResultSet<TModel> Query(Expression<Func<TModel, bool>> query, IPrincipal principal)
-        { 
+        {
             if (query == null)
             {
                 throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
@@ -1056,12 +1051,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         public IdentifiedData Delete(DataContext context, Guid key, DeleteMode deleteMode) => this.DoDeleteModel(context, key, deleteMode);
 
         /// <summary>
-        /// <summary>
         /// Ensure that the object exists in the database
         /// </summary>
+        /// <remarks>This method will return the current data in the database for <paramref name="data"/> if it exists, otherwise it will create the object
+        /// and then return the created object. This is used when for inserting dependent objects.</remarks>
+        /// <param name="context">The context on which the exists statement should be performed</param>
+        /// <param name="data">The data which should be check for existence</param>
+        /// <returns>The data as it exists in the database</returns>
         protected TData EnsureExists<TData>(DataContext context, TData data)
             where TData : IdentifiedData, new()
         {
+
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
@@ -1092,10 +1092,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Delete the specified object
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="mode"></param>
-        /// <param name="principal"></param>
-        /// <param name="deletionMode"></param>
+        /// <remarks>The method of deletion is controlled by the current <see cref="DataPersistenceControlContext"/> or
+        /// within the configuration.</remarks>
+        /// <param name="key">The primary key of the object to delete</param>
+        /// <param name="mode">The method persistence operation</param>
+        /// <param name="principal">The principal which should be used to delete</param>
         /// <returns></returns>
         public TModel Delete(Guid key, TransactionMode mode, IPrincipal principal)
         {

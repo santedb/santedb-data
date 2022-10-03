@@ -18,7 +18,6 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.OrmLite;
 using SanteDB.OrmLite.Attributes;
 using System;
 
@@ -42,7 +41,7 @@ namespace SanteDB.Persistence.Data.Model
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbIdentified : IDbIdentified
     {
-     
+
 
         /// <summary>
         /// Gets or sets the key of the object
@@ -55,7 +54,7 @@ namespace SanteDB.Persistence.Data.Model
         /// </summary>
         public override bool Equals(object obj)
         {
-            if(obj is DbIdentified dbi)
+            if (obj is DbIdentified dbi)
             {
                 return dbi.Key.Equals(this.Key);
             }
@@ -68,5 +67,5 @@ namespace SanteDB.Persistence.Data.Model
         public override string ToString() => $"{this.GetType().Name} (K:{this.Key})";
     }
 
-    
+
 }

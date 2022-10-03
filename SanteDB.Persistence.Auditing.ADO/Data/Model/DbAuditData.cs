@@ -72,6 +72,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Data.Model
         [Column("cls_cd_id"), ForeignKey(typeof(DbAuditCode), nameof(DbAuditCode.Key)), AlwaysJoin]
         public Guid EventTypeCode { get; set; }
 
-        
+
     }
 }

@@ -27,12 +27,10 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Authentication;
 using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Test
 {
@@ -82,7 +80,7 @@ namespace SanteDB.Persistence.Data.Test
             {
                 Assert.AreEqual(PermissionPolicyIdentifiers.CreateApplication, e.PolicyId);
             }
-            catch (Exception e)
+            catch
             {
                 Assert.Fail("Should throw a policy violation exception");
             }
@@ -264,7 +262,7 @@ namespace SanteDB.Persistence.Data.Test
             {
                 serviceProvider.Authenticate("TEST_APP_008", "THIS_IS_A_SECRET");
             }
-            catch (Exception e)
+            catch
             {
                 Assert.Fail("Shoudl have authenticated");
             }
@@ -418,7 +416,7 @@ namespace SanteDB.Persistence.Data.Test
         {
             var service = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
             Assert.IsNull(service.GetIdentity("TEST_APP_12"));
-            
+
             var identity = service.CreateIdentity("TEST_APP_12", "@TESTPa$$w0rd", AuthenticationContext.SystemPrincipal);
 
             // Add a claim

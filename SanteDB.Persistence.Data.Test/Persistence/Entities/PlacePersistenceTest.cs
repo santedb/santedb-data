@@ -24,11 +24,8 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 {
@@ -47,7 +44,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
         public void TestInsertSimple()
         {
 
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
                 var place = new Place()
                 {
@@ -65,7 +62,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 var afterInsert = base.TestInsert(place);
                 Assert.AreEqual(1, afterInsert.LoadProperty(o => o.Names).Count);
-                Assert.AreEqual("Good Health Hospital", afterInsert.Names.First().LoadProperty(o=> o.Component).First().Value);
+                Assert.AreEqual("Good Health Hospital", afterInsert.Names.First().LoadProperty(o => o.Component).First().Value);
                 Assert.AreEqual(1, afterInsert.LoadProperty(o => o.Identifiers).Count);
                 Assert.AreEqual(IdentityDomainKeys.Gs1GlobalLocationNumber, afterInsert.Identifiers.First().IdentityDomainKey);
                 Assert.AreEqual("34943934943", afterInsert.Identifiers.First().Value);
@@ -166,7 +163,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // Test update
                 afterUpdate = base.TestUpdate(afterQuery, o =>
                 {
-                    o.LoadProperty(a => a.Services).RemoveAll(s=>s.ServiceConceptKey == service1);
+                    o.LoadProperty(a => a.Services).RemoveAll(s => s.ServiceConceptKey == service1);
                     return o;
                 });
 
@@ -176,6 +173,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
             }
         }
-        
+
     }
 }

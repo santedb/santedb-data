@@ -39,7 +39,6 @@ using System.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -110,7 +109,7 @@ namespace SanteDB.Persistence.Data.Services
 
             try
             {
-               
+
                 // Now insert into database
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
@@ -118,7 +117,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     // Enusre there is no active mapping
                     var existingMap = context.FirstOrDefault<DbCertificateMapping>(o => o.X509Thumbprint == authenticationCertificate.Thumbprint && o.ObsoletionTime == null);
-                   
+
                     // get the identity
                     var certificateRegistration = new DbCertificateMapping()
                     {
@@ -297,6 +296,16 @@ namespace SanteDB.Persistence.Data.Services
                     return retVal;
                 }
             }
+            catch (LockedIdentityAuthenticationException)
+            {
+                this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(authenticationCertificate.Subject, null, false));
+                throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_CERT_GENERAL));
+            }
+            catch (InvalidIdentityAuthenticationException)
+            {
+                this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(authenticationCertificate.Subject, null, false));
+                throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_CERT_GENERAL));
+            }
             catch (AuthenticationException)
             {
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(authenticationCertificate.Subject, null, false));
@@ -313,14 +322,14 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public IIdentity GetCertificateIdentity(X509Certificate2 authenticationCertificate)
         {
-            if(authenticationCertificate == null)
+            if (authenticationCertificate == null)
             {
                 throw new ArgumentNullException(nameof(authenticationCertificate), ErrorMessages.ARGUMENT_NULL);
             }
 
             try
             {
-                using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+                using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     context.Open();
 
@@ -335,11 +344,11 @@ namespace SanteDB.Persistence.Data.Services
 
                     // Return the appropriate type of data 
                     var authData = context.Query<CompositeResult<DbCertificateMapping, DbSecurityUser, DbSecurityApplication, DbSecurityDevice>>(authSql).FirstOrDefault();
-                    if(authData.Object1.SecurityUserKey.HasValue)
+                    if (authData.Object1.SecurityUserKey.HasValue)
                     {
                         return new AdoUserIdentity(authData.Object2);
                     }
-                    else if(authData.Object1.SecurityApplicationKey.HasValue)
+                    else if (authData.Object1.SecurityApplicationKey.HasValue)
                     {
                         return new AdoApplicationIdentity(authData.Object3);
                     }
@@ -364,25 +373,25 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public X509Certificate2 GetIdentityCertificate(IIdentity identityOfCertificte)
         {
-            if(identityOfCertificte == null)
+            if (identityOfCertificte == null)
             {
                 throw new ArgumentNullException(nameof(identityOfCertificte), ErrorMessages.ARGUMENT_NULL);
             }
 
             try
             {
-                using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+                using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     context.Open();
                     DbCertificateMapping retVal = null;
-                    if(identityOfCertificte is IDeviceIdentity did)
+                    if (identityOfCertificte is IDeviceIdentity did)
                     {
                         retVal = context.Query<DbCertificateMapping>(context.CreateSqlStatement<DbCertificateMapping>().SelectFrom()
                             .InnerJoin<DbCertificateMapping, DbSecurityDevice>(o => o.SecurityDeviceKey, o => o.Key)
                             .Where<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == did.Name.ToLowerInvariant() && o.ObsoletionTime == null)
                             .And<DbCertificateMapping>(o => o.ObsoletionTime == null)).FirstOrDefault();
                     }
-                    else if(identityOfCertificte is IApplicationIdentity aid)
+                    else if (identityOfCertificte is IApplicationIdentity aid)
                     {
                         retVal = context.Query<DbCertificateMapping>(context.CreateSqlStatement<DbCertificateMapping>().SelectFrom()
                            .InnerJoin<DbCertificateMapping, DbSecurityApplication>(o => o.SecurityApplicationKey, o => o.Key)
@@ -392,7 +401,7 @@ namespace SanteDB.Persistence.Data.Services
                     else
                     {
                         retVal = context.Query<DbCertificateMapping>(context.CreateSqlStatement<DbCertificateMapping>().SelectFrom()
-                           .InnerJoin<DbCertificateMapping, DbSecurityUser>(o => o.SecurityUserKey, o=>o.Key)
+                           .InnerJoin<DbCertificateMapping, DbSecurityUser>(o => o.SecurityUserKey, o => o.Key)
                            .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == identityOfCertificte.Name.ToLowerInvariant() && o.ObsoletionTime == null)
                            .And<DbCertificateMapping>(o => o.ObsoletionTime == null)).FirstOrDefault();
                     }
@@ -407,7 +416,7 @@ namespace SanteDB.Persistence.Data.Services
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceError("Could not find mapped identity using identity {0}- {1}", identityOfCertificte.Name, e);
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_CERT_GENERAL), e);
@@ -417,15 +426,15 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public bool RemoveIdentityMap(IIdentity identityToBeUnMapped, X509Certificate2 authenticationCertificate, IPrincipal authenticatedPrincipal)
         {
-            if(identityToBeUnMapped == null)
+            if (identityToBeUnMapped == null)
             {
                 throw new ArgumentNullException(nameof(identityToBeUnMapped), ErrorMessages.ARGUMENT_NULL);
             }
-            else if(authenticationCertificate == null)
+            else if (authenticationCertificate == null)
             {
                 throw new ArgumentNullException(nameof(authenticationCertificate), ErrorMessages.ARGUMENT_NULL);
             }
-            else if(authenticatedPrincipal == null)
+            else if (authenticatedPrincipal == null)
             {
                 throw new ArgumentNullException(nameof(authenticatedPrincipal), ErrorMessages.ARGUMENT_NULL);
             }
@@ -439,21 +448,22 @@ namespace SanteDB.Persistence.Data.Services
 
             try
             {
-                using(var context = this.m_configuration.Provider.GetWriteConnection())
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
 
                     context.Open();
 
                     // Lookup the certificate
                     DbCertificateMapping dbCertMapping = null;
-                    if(identityToBeUnMapped is IDeviceIdentity did) {
+                    if (identityToBeUnMapped is IDeviceIdentity did)
+                    {
                         dbCertMapping = context.Query<DbCertificateMapping>(context.CreateSqlStatement<DbCertificateMapping>().SelectFrom()
                             .InnerJoin<DbSecurityDevice>(o => o.SecurityDeviceKey, o => o.Key)
                             .Where<DbSecurityDevice>(o => o.ObsoletionTime == null && o.PublicId.ToLowerInvariant() == did.Name.ToLowerInvariant())
                             .And<DbCertificateMapping>(o => o.ObsoletionTime == null && o.X509Thumbprint == authenticationCertificate.Thumbprint))
                             .FirstOrDefault();
                     }
-                    else if(identityToBeUnMapped is IApplicationIdentity aid)
+                    else if (identityToBeUnMapped is IApplicationIdentity aid)
                     {
                         dbCertMapping = context.Query<DbCertificateMapping>(context.CreateSqlStatement<DbCertificateMapping>().SelectFrom()
                             .InnerJoin<DbSecurityApplication>(o => o.SecurityApplicationKey, o => o.Key)
@@ -470,7 +480,7 @@ namespace SanteDB.Persistence.Data.Services
                             .FirstOrDefault();
                     }
 
-                    if(dbCertMapping == null)
+                    if (dbCertMapping == null)
                     {
                         throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_NO_CERT_MAP, new { identity = identityToBeUnMapped.Name, cert = authenticationCertificate.Subject }));
                     }
@@ -481,7 +491,7 @@ namespace SanteDB.Persistence.Data.Services
                     return true;
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceError("Error removing identity mapping {0} with {1} - {2}", identityToBeUnMapped.Name, authenticationCertificate.Subject, e.Message);
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_CERT_CREATE_GEN, new { identity = identityToBeUnMapped.Name, subject = authenticationCertificate.Subject }), e);

@@ -23,7 +23,6 @@ using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Security
 {
@@ -63,14 +62,23 @@ namespace SanteDB.Persistence.Data.Security
             {
                 Type handlerType = Type.GetType(policy.Handler);
                 if (handlerType == null)
+                {
                     throw new InvalidOperationException("Cannot find policy handler");
+                }
+
                 var ci = handlerType.GetConstructor(Type.EmptyTypes);
                 if (ci == null)
+                {
                     throw new InvalidOperationException("Cannot find parameterless constructor");
+                }
+
                 this.m_handler = ci.Invoke(null) as IPolicyHandler;
                 if (this.m_handler == null)
+                {
                     throw new InvalidOperationException("Policy handler does not implement IPolicyHandler");
-                 s_handlers.Add(policy.Handler, this.m_handler);
+                }
+
+                s_handlers.Add(policy.Handler, this.m_handler);
             }
         }
 
@@ -102,7 +110,7 @@ namespace SanteDB.Persistence.Data.Security
         /// <summary>
         /// Is active?
         /// </summary>
-        public bool IsActive { get;  }
+        public bool IsActive { get; }
 
         /// <summary>
         /// Will never be null

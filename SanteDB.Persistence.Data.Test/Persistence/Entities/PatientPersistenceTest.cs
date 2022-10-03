@@ -18,11 +18,11 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
@@ -30,9 +30,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Model.Entities;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 {
@@ -302,10 +299,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(1, results.Take(1).Count());
                 Assert.AreEqual(afterInsert.VersionKey, results.Select(o => o.VersionKey).First());
                 Assert.AreEqual(afterInsert.VersionKey, results.OrderBy(o => o.VersionSequence).First().VersionKey);
-                Assert.AreEqual(afterInsert.VersionKey, results.OrderByDescending(o => o.VersionSequence).Select(o=>o.VersionKey).First());
-                Assert.AreEqual(afterInsert.VersionKey, results.OrderByDescending(o => o.VersionSequence).Skip(0).Take(1).Select(o=>o.VersionKey).First());
-                Assert.AreEqual(afterInsert.VersionKey, results.Distinct().OrderByDescending(o => o.VersionSequence).Skip(0).Take(1).Select(o=>o.VersionKey).First());
-                Assert.AreEqual(afterInsert.VersionKey, results.OrderByDescending(o => o.VersionSequence).Select(o=>o.VersionKey).Skip(0).Take(1).First());
+                Assert.AreEqual(afterInsert.VersionKey, results.OrderByDescending(o => o.VersionSequence).Select(o => o.VersionKey).First());
+                Assert.AreEqual(afterInsert.VersionKey, results.OrderByDescending(o => o.VersionSequence).Skip(0).Take(1).Select(o => o.VersionKey).First());
+                Assert.AreEqual(afterInsert.VersionKey, results.Distinct().OrderByDescending(o => o.VersionSequence).Skip(0).Take(1).Select(o => o.VersionKey).First());
+                Assert.AreEqual(afterInsert.VersionKey, results.OrderByDescending(o => o.VersionSequence).Select(o => o.VersionKey).Skip(0).Take(1).First());
 
 
 

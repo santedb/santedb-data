@@ -20,8 +20,6 @@
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
-using SanteDB.Core.i18n;
-using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -31,7 +29,6 @@ using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -125,7 +122,8 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public bool TryCreateService<TService>(out TService serviceInstance)
         {
-            if(this.TryCreateService(typeof(TService), out var strongInstance)) {
+            if (this.TryCreateService(typeof(TService), out var strongInstance))
+            {
                 serviceInstance = (TService)strongInstance;
                 return true;
             }

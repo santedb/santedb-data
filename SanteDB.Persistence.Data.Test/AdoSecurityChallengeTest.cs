@@ -25,12 +25,9 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Test
 {
@@ -48,7 +45,7 @@ namespace SanteDB.Persistence.Data.Test
         [Test]
         public void TestSetSecurityChallenge()
         {
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
                 var chlProvider = ApplicationServiceContext.Current.GetService<ISecurityChallengeService>();
                 var chlAuthenticator = ApplicationServiceContext.Current.GetService<ISecurityChallengeIdentityService>();
@@ -64,19 +61,19 @@ namespace SanteDB.Persistence.Data.Test
                 Assert.IsNotNull(chlRepository);
 
                 // Validate we have challenges
-                var challenges = chlRepository.Find(o => o.ObsoletionTime == null).Select(o=>o.Key);
+                var challenges = chlRepository.Find(o => o.ObsoletionTime == null).Select(o => o.Key);
                 Assert.Greater(challenges.Count(), 0);
 
                 // There are no challenges for administrator
-                Assert.AreEqual(0,chlProvider.Get(userName, AuthenticationContext.AnonymousPrincipal).Count());
-                
+                Assert.AreEqual(0, chlProvider.Get(userName, AuthenticationContext.AnonymousPrincipal).Count());
+
                 // We should not be able to add a challenge as non-administrator
                 try
                 {
                     chlProvider.Set(userName, challenges.First().Value, "TEST", AuthenticationContext.AnonymousPrincipal);
                     Assert.Fail("Should have thrown a security exception!");
                 }
-                catch(SecurityException) { }
+                catch (SecurityException) { }
                 catch
                 {
                     Assert.Fail("Expected a SecurityException to be thrown");
@@ -102,7 +99,7 @@ namespace SanteDB.Persistence.Data.Test
                     chlProvider.Remove(userName, challenges.First().Value, AuthenticationContext.AnonymousPrincipal);
                     Assert.Fail("Should have thrown exception");
                 }
-                catch(SecurityException)
+                catch (SecurityException)
                 {
 
                 }

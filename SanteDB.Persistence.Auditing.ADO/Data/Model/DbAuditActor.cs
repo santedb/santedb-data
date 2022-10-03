@@ -47,7 +47,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Data.Model
         /// </summary>
         [Column("usr_name")]
         public String UserName { get; set; }
-        
+
         /// <summary>
         /// Role code identifier
         /// </summary>

@@ -18,16 +18,11 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Entities;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
@@ -72,7 +67,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     retVal.Classification = retVal.Classification.GetRelatedPersistenceService().Get(context, dbModel.ClassificationKey.GetValueOrDefault());
                     retVal.SetLoaded(nameof(EntityRelationship.Classification));
                     retVal.RelationshipRole = retVal.RelationshipRole.GetRelatedPersistenceService().Get(context, dbModel.RelationshipRoleKey.GetValueOrDefault());
-                    retVal.SetLoaded(o=>o.RelationshipRole);
+                    retVal.SetLoaded(o => o.RelationshipRole);
                     retVal.RelationshipType = retVal.RelationshipType.GetRelatedPersistenceService().Get(context, dbModel.RelationshipTypeKey);
                     retVal.SetLoaded(o => o.RelationshipType);
 

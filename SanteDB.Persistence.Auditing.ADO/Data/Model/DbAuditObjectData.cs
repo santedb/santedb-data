@@ -19,7 +19,6 @@
  * Date: 2022-5-30
  */
 using SanteDB.OrmLite.Attributes;
-using System;
 
 namespace SanteDB.Persistence.Auditing.ADO.Data.Model
 {

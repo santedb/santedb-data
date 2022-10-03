@@ -18,15 +18,11 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
@@ -56,14 +52,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         {
             var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             var dbSubst = referenceObjects.OfType<DbSubstanceAdministration>().FirstOrDefault();
-            if(dbSubst == null)
+            if (dbSubst == null)
             {
                 this.m_tracer.TraceWarning("Using slow loading for substance administration (hint: use the correct persistence service instead)");
                 dbSubst = context.FirstOrDefault<DbSubstanceAdministration>(o => o.ParentKey == dbModel.VersionKey);
             }
 
             // Loading mode
-            switch(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     if (dbSubst != null)

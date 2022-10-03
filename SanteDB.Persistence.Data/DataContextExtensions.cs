@@ -41,11 +41,9 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Persistence.Data
 {
@@ -171,13 +169,13 @@ namespace SanteDB.Persistence.Data
         /// <summary>
         /// Get related persistence service from an enumerable
         /// </summary>
-        public static IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>(this IEnumerable<TRelated> me) where TRelated : IdentifiedData 
+        public static IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>(this IEnumerable<TRelated> me) where TRelated : IdentifiedData
             => GetRelatedPersistenceService(typeof(TRelated)) as IAdoPersistenceProvider<TRelated>;
-        
+
         /// <summary>
         /// Get related persistence service
         /// </summary>
-        public static IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>(this TRelated me) where TRelated : IdentifiedData 
+        public static IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>(this TRelated me) where TRelated : IdentifiedData
             => GetRelatedPersistenceService(typeof(TRelated)) as IAdoPersistenceProvider<TRelated>;
 
         /// <summary>
@@ -309,7 +307,7 @@ namespace SanteDB.Persistence.Data
                 }
                 else if (piValue is IList list)
                 {
-                    for(var i = 0; i < list.Count; i++)
+                    for (var i = 0; i < list.Count; i++)
                     {
                         list[i] = (list[i] as IdentifiedData)?.HarmonizeKeys(harmonizationMode) ?? list[i];
                     }
@@ -372,17 +370,25 @@ namespace SanteDB.Persistence.Data
 
                     // Set apporopriate property
                     if (ident is IDeviceIdentity)
+                    {
                         retVal.DeviceKey = sid;
+                    }
                     else if (ident is IApplicationIdentity)
+                    {
                         retVal.ApplicationKey = sid;
+                    }
                     else
+                    {
                         retVal.UserKey = sid;
+                    }
                 }
 
                 // Session identifier
                 var sidClaim = cprincipal?.FindFirst(SanteDBClaimTypes.SanteDBSessionIdClaim)?.Value;
                 if (!String.IsNullOrEmpty(sidClaim) && Guid.TryParse(sidClaim, out Guid sessionId))
+                {
                     retVal.SessionKey = sessionId;
+                }
 
                 // Pure application credential
                 if (!retVal.UserKey.HasValue && !retVal.DeviceKey.HasValue)
@@ -397,11 +403,17 @@ namespace SanteDB.Persistence.Data
             else // Establish the slow way - using identity name
             {
                 if (principal.Identity.Name == AuthenticationContext.SystemPrincipal.Identity.Name)
+                {
                     retVal.UserKey = Guid.Parse(AuthenticationContext.SystemUserSid);
+                }
                 else if (principal.Identity.Name == AuthenticationContext.AnonymousPrincipal.Identity.Name)
+                {
                     retVal.UserKey = Guid.Parse(AuthenticationContext.AnonymousUserSid);
+                }
                 else
+                {
                     retVal.UserKey = me.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == principal.Identity.Name.ToLowerInvariant())?.Key;
+                }
 
                 if (!retVal.UserKey.HasValue)
                 {

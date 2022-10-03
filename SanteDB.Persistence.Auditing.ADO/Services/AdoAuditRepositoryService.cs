@@ -18,36 +18,32 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using RestSrvr;
-using SanteDB.Core.Model;
+using SanteDB.BI.Model;
+using SanteDB.BI.Services;
 using SanteDB.Core;
-using SanteDB.Core.Model.Audit;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model.Audit;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Map;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.OrmLite.MappedResultSets;
+using SanteDB.OrmLite.Migration;
+using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Auditing.ADO.Configuration;
 using SanteDB.Persistence.Auditing.ADO.Data.Model;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
-using SanteDB.Core.Model.Query;
-using System.Diagnostics.Tracing;
-using SanteDB.BI.Services;
-using SanteDB.BI.Model;
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.OrmLite.Migration;
-using SanteDB.OrmLite.MappedResultSets;
-using SanteDB.OrmLite.Providers;
 
 namespace SanteDB.Persistence.Auditing.ADO.Services
 {
@@ -206,7 +202,10 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             {
                 this.m_traceSource.TraceError("Error validing map: {0}", e.Message);
                 foreach (var i in e.ValidationDetails)
+                {
                     this.m_traceSource.TraceError("{0}:{1} @ {2}", i.Level, i.Message, i.Location);
+                }
+
                 throw;
             }
         }
@@ -216,17 +215,28 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// </summary>
         private AuditCode ResolveCode(Guid key, String code, String codeSystem)
         {
-            if (key == Guid.Empty) return null;
+            if (key == Guid.Empty)
+            {
+                return null;
+            }
 
             var cacheItem = this.m_dataCachingService.GetCacheItem<Concept>(key);
             if (cacheItem == null)
             {
                 if (!String.IsNullOrEmpty(codeSystem))
+                {
                     cacheItem = this.m_conceptRepository.GetConceptByReferenceTerm(code, codeSystem);
+                }
+
                 if (cacheItem == null)
+                {
                     cacheItem = this.m_conceptRepository.GetConcept(code);
+                }
+
                 if (cacheItem != null)
+                {
                     this.m_dataCachingService.Add(cacheItem);
+                }
             }
             return new AuditCode(code, codeSystem)
             {
@@ -253,7 +263,9 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 };
 
                 if (res.Object1.EventTypeCode != null)
+                {
                     retVal.EventTypeCode = this.ResolveCode(res.Object1.EventTypeCode, res.Object2.Code, res.Object2.CodeSystem);
+                }
 
                 // Get actors and objects
                 if (!summary)
@@ -266,6 +278,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             .Build();
 
                     foreach (var itm in context.Query<CompositeResult<DbAuditActorAssociation, DbAuditActor, DbAuditCode>>(sql))
+                    {
                         retVal.Actors.Add(new AuditActorData()
                         {
                             UserName = itm.Object2.UserName,
@@ -274,6 +287,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             NetworkAccessPointId = itm.Object1.AccessPoint,
                             ActorRoleCode = new List<AuditCode>() { this.ResolveCode(itm.Object2.ActorRoleCode, itm.Object3.Code, itm.Object3.CodeSystem) }.OfType<AuditCode>().ToList()
                         });
+                    }
 
                     // Objects
                     sql = context.CreateSqlStatement<DbAuditObject>().SelectFrom(typeof(DbAuditObject), typeof(DbAuditCode))
@@ -326,6 +340,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             .Build();
 
                     foreach (var itm in context.Query<CompositeResult<DbAuditActorAssociation, DbAuditActor, DbAuditCode>>(sql))
+                    {
                         retVal.Actors.Add(new AuditActorData()
                         {
                             UserName = itm.Object2.UserName,
@@ -334,6 +349,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             NetworkAccessPointId = itm.Object1.AccessPoint,
                             ActorRoleCode = new List<AuditCode>() { this.ResolveCode(itm.Object2.ActorRoleCode, itm.Object3.Code, itm.Object3.CodeSystem) }.OfType<AuditCode>().ToList()
                         });
+                    }
                 }
 
                 this.m_dataCachingService.Add(retVal);
@@ -346,7 +362,10 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// </summary>
         private DbAuditCode GetOrCreateAuditCode(DataContext context, AuditCode messageCode)
         {
-            if (messageCode == null) return null;
+            if (messageCode == null)
+            {
+                return null;
+            }
 
             // Try to get from database
             lock (this.m_lockBox)
@@ -390,7 +409,9 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
                     var eventId = storageData.EventTypeCode;
                     if (eventId != null)
+                    {
                         dbAudit.EventTypeCode = this.GetOrCreateAuditCode(context, eventId).Key;
+                    }
 
                     dbAudit.CreationTime = DateTimeOffset.Now;
                     storageData.Key = Guid.NewGuid();
@@ -399,15 +420,20 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
                     // Insert secondary properties
                     if (storageData.Actors != null)
+                    {
                         foreach (var act in storageData.Actors)
                         {
                             var roleCode = this.GetOrCreateAuditCode(context, act.ActorRoleCode.FirstOrDefault());
 
                             DbAuditActor dbAct = null;
                             if (roleCode != null)
+                            {
                                 dbAct = context.FirstOrDefault<DbAuditActor>(o => o.UserName == act.UserName && o.ActorRoleCode == roleCode.Key);
+                            }
                             else
+                            {
                                 dbAct = context.FirstOrDefault<DbAuditActor>(o => o.UserName == act.UserName && o.ActorRoleCode == Guid.Empty);
+                            }
 
                             if (dbAct == null)
                             {
@@ -423,9 +449,11 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                                 AccessPoint = act.NetworkAccessPointId
                             });
                         }
+                    }
 
                     // Audit objects
                     if (storageData.AuditableObjects != null)
+                    {
                         foreach (var ao in storageData.AuditableObjects)
                         {
                             var dbAo = this.m_mapper.MapModelInstance<AuditableObject, DbAuditObject>(ao);
@@ -456,18 +484,22 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                                 }
                             }
                         }
+                    }
 
                     // metadata
                     if (storageData.Metadata != null)
+                    {
                         foreach (var meta in storageData.Metadata.Where(o => !String.IsNullOrEmpty(o.Value) && o.Key != AuditMetadataKey.CorrelationToken))
                         {
                             var kv = context.FirstOrDefault<DbAuditMetadataValue>(o => o.Value == meta.Value);
                             if (kv == null)
+                            {
                                 kv = context.Insert(new DbAuditMetadataValue()
                                 {
                                     // TODO: Make this a common extension function (to trim)
                                     Value = meta.Value.Substring(0, meta.Value.Length > 256 ? 256 : meta.Value.Length)
                                 });
+                            }
 
                             context.Insert(new DbAuditMetadata()
                             {
@@ -476,11 +508,16 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                                 ValueId = kv.Key
                             });
                         }
+                    }
 
                     if (mode == TransactionMode.Commit)
+                    {
                         tx.Commit();
+                    }
                     else
+                    {
                         tx.Rollback();
+                    }
 
                     var args = new DataPersistedEventArgs<AuditEventData>(storageData, mode, overrideAuthContext);
 
@@ -572,7 +609,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Execute a query
         /// </summary>
-        public IQueryResultSet<AuditEventData> Query(Expression<Func<AuditEventData, bool>> query, IPrincipal overrideAuthContext = null) 
+        public IQueryResultSet<AuditEventData> Query(Expression<Func<AuditEventData, bool>> query, IPrincipal overrideAuthContext = null)
         {
             // TODO: Refactor this with a yield IQueryResultSet iterator
             var preEvtData = new QueryRequestEventArgs<AuditEventData>(query, principal: overrideAuthContext);
@@ -637,7 +674,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// </summary>
         public AuditEventData ToModelInstance(DataContext context, object result)
         {
-            switch(result)
+            switch (result)
             {
                 case CompositeResult<DbAuditEventData, DbAuditCode> cr:
                     return this.ToModelInstance(context, cr);

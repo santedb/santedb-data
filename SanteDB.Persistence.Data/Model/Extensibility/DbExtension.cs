@@ -32,27 +32,29 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
     /// </summary>
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public abstract class DbExtension : DbVersionedAssociation
-	{
+    {
 
-		/// <summary>
-		/// Gets or sets the extension identifier.
-		/// </summary>
-		/// <value>The extension identifier.</value>
-		[Column ("ext_typ_id"), ForeignKey(typeof(DbExtensionType), nameof(DbExtensionType.Key))]
-		public Guid ExtensionTypeKey { 
-			get;
-			set;
-		}
+        /// <summary>
+        /// Gets or sets the extension identifier.
+        /// </summary>
+        /// <value>The extension identifier.</value>
+        [Column("ext_typ_id"), ForeignKey(typeof(DbExtensionType), nameof(DbExtensionType.Key))]
+        public Guid ExtensionTypeKey
+        {
+            get;
+            set;
+        }
 
-		/// <summary>
-		/// Gets or sets the value.
-		/// </summary>
-		/// <value>The value.</value>
-		[Column ("ext_val")]
-		public byte[] Value {
-			get;
-			set;
-		}
+        /// <summary>
+        /// Gets or sets the value.
+        /// </summary>
+        /// <value>The value.</value>
+        [Column("ext_val")]
+        public byte[] Value
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the display
@@ -62,12 +64,12 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
 
     }
 
-	/// <summary>
-	/// Entity extension.
-	/// </summary>
-	[Table ("ent_ext_tbl")]
-	public class DbEntityExtension : DbExtension
-	{
+    /// <summary>
+    /// Entity extension.
+    /// </summary>
+    [Table("ent_ext_tbl")]
+    public class DbEntityExtension : DbExtension
+    {
         /// <summary>
         /// Gets or sets the primary key
         /// </summary>
@@ -90,9 +92,9 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
     /// <summary>
     /// Act extensions
     /// </summary>
-    [Table ("act_ext_tbl")]
-	public class DbActExtension : DbExtension
-	{
+    [Table("act_ext_tbl")]
+    public class DbActExtension : DbExtension
+    {
         /// <summary>
         /// Get or sets the key
         /// </summary>

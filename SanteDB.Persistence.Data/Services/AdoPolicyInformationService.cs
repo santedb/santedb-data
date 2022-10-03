@@ -18,7 +18,6 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
@@ -40,7 +39,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -132,7 +130,7 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                             case IApplicationIdentity iaid:
                                 {
-                                    var sid = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == iaid.Name.ToLowerInvariant()).Select(o=>o.Key).First();
+                                    var sid = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == iaid.Name.ToLowerInvariant()).Select(o => o.Key).First();
                                     context.DeleteAll<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sid && policies.Contains(o.PolicyKey));
                                     context.InsertAll(policies.Select(o => new DbSecurityApplicationPolicy()
                                     {
@@ -179,7 +177,7 @@ namespace SanteDB.Persistence.Data.Services
                             case Entity entity:
                                 {
 
-                                    context.UpdateAll<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && policies.Contains(o.PolicyKey), o=>o.ObsoleteVersionSequenceId == entity.VersionSequence);
+                                    context.UpdateAll<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && policies.Contains(o.PolicyKey), o => o.ObsoleteVersionSequenceId == entity.VersionSequence);
                                     // Touch the entity version
                                     entity = this.m_entityPersistence.Touch(context, entity.Key.Value);
                                     context.InsertAll(policies.Select(o => new DbEntitySecurityPolicy()
@@ -192,7 +190,7 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                             case Act act:
                                 {
-                                    context.UpdateAll<DbActSecurityPolicy>(o => o.SourceKey == act.Key && policies.Contains(o.PolicyKey), o=> o.ObsoleteVersionSequenceId == act.VersionSequence);
+                                    context.UpdateAll<DbActSecurityPolicy>(o => o.SourceKey == act.Key && policies.Contains(o.PolicyKey), o => o.ObsoleteVersionSequenceId == act.VersionSequence);
                                     act = this.m_actPersistence.Touch(context, act.Key.Value);
                                     context.InsertAll(policies.Select(o => new DbActSecurityPolicy()
                                     {

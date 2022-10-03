@@ -18,17 +18,13 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
@@ -109,7 +105,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             // Relationships
             if (data.Relationships != null)
             {
-                retVal.Relationships = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationships).ToList(); 
+                retVal.Relationships = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationships).ToList();
                 retVal.SetLoaded(o => o.Relationships);
 
             }
@@ -161,9 +157,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             return retVal;
         }
 
-        /// <summary>
-        /// Convert the <paramref name="dbModel"/> to <typeparamref name="TModel"/>
-        /// </summary>
+        /// <inheritdoc/>
         protected override Concept DoConvertToInformationModel(DataContext context, DbConceptVersion dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);

@@ -18,18 +18,13 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
-using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.DataType;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
@@ -84,7 +79,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     retVal.SetLoaded(nameof(EntityIdentifier.IdentifierType));
                     goto case LoadMode.SyncLoad;
                 case LoadMode.SyncLoad:
-                    retVal.IdentityDomain = retVal.IdentityDomain.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects.OfType<DbIdentityDomain>().FirstOrDefault()) ?? 
+                    retVal.IdentityDomain = retVal.IdentityDomain.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects.OfType<DbIdentityDomain>().FirstOrDefault()) ??
                         retVal.IdentityDomain.GetRelatedPersistenceService().Get(context, dbModel.IdentityDomainKey);
                     retVal.SetLoaded(nameof(EntityIdentifier.IdentityDomain));
                     break;

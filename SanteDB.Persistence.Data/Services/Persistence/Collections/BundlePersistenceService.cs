@@ -18,33 +18,29 @@
  * User: fyfej
  * Date: 2022-9-7
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite.Providers;
+using SanteDB.Persistence.Data.Configuration;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
-using System.Text;
-using System.Linq;
-using SanteDB.Core.i18n;
-using SanteDB.Core.Diagnostics;
-using SanteDB.Persistence.Data.Configuration;
-using System.Data.Common;
-using SanteDB.Core.Exceptions;
-using SanteDB.Persistence.Data.Model.Entities;
-using SanteDB.Core.Model.Map;
-using SanteDB.OrmLite.Providers;
-using System.Collections;
-using SanteDB.Core.Security;
-using SanteDB.OrmLite;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 {
@@ -148,7 +144,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                         case ITargetedAssociation ta:
                             dependencies = new int[] { Array.FindIndex(resolved, i => i.Key == ta.TargetEntityKey), Array.FindIndex(resolved, i => i.Key == ta.SourceEntityKey) };
                             break;
-                        
+
                     }
 
                     // Scan dependencies and swap
@@ -168,7 +164,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             }
 
             // Could not order dependencies
-            if(swapped)
+            if (swapped)
             {
                 throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_CIRCULAR_DEPENDENCY));
             }
@@ -201,23 +197,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         /// <inheritdoc/>
         public Bundle Insert(Bundle data, TransactionMode transactionMode, IPrincipal principal)
         {
-            
-            if(data == null)
+
+            if (data == null)
             {
                 throw new ArgumentNullException(nameof(data), ErrorMessages.ARGUMENT_NULL);
             }
-            else if(data.Item == null || !data.Item.Any())
+            else if (data.Item == null || !data.Item.Any())
             {
                 throw new InvalidOperationException(ErrorMessages.SEQUENCE_NO_ELEMENTS);
             }
-            else if(principal == null)
+            else if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ARGUMENT_NULL);
             }
 
             var preEventArgs = new DataPersistingEventArgs<Bundle>(data, transactionMode, principal);
             this.Inserting?.Invoke(this, preEventArgs);
-            if(preEventArgs.Cancel)
+            if (preEventArgs.Cancel)
             {
                 this.m_tracer.TraceWarning("Pre-Persistence event on Bundle signals cancel");
                 return preEventArgs.Data;
@@ -225,10 +221,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
             try
             {
-                using(var context = this.m_configuration.Provider.GetWriteConnection())
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open();
-                    using(var tx = context.BeginTransaction())
+                    using (var tx = context.BeginTransaction())
                     {
                         context.EstablishProvenance(principal, null);
 
@@ -238,7 +234,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
                         data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
 
-                        if(transactionMode == TransactionMode.Commit)
+                        if (transactionMode == TransactionMode.Commit)
                         {
                             tx.Commit();
                         }
@@ -256,7 +252,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             {
                 throw e.TranslateDbException();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
             }
@@ -332,11 +328,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                             break;
                     }
                 }
-                catch(DbException e)
+                catch (DbException e)
                 {
                     throw new DataPersistenceException(String.Format(ErrorMessages.BUNDLE_PERSISTENCE_ERROR, i, data.Item[i]), e.TranslateDbException());
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     throw new DataPersistenceException(String.Format(ErrorMessages.BUNDLE_PERSISTENCE_ERROR, i, data.Item[i]), e);
                 }

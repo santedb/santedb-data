@@ -21,14 +21,10 @@
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Services;
-using SanteDB.OrmLite.Configuration;
-using SanteDB.OrmLite.Migration;
 using SanteDB.Persistence.Data.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Configuration.Features
 {

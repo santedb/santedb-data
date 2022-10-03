@@ -20,12 +20,7 @@
  */
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
-using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.Model.Acts;
 using SanteDB.Persistence.Data.Model.Extensibility;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {

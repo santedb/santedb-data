@@ -21,8 +21,6 @@
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Model.Sys
 {
@@ -87,7 +85,7 @@ namespace SanteDB.Persistence.Data.Model.Sys
         /// </summary>
         [Column("rel_cls")]
         public RelationshipTargetType RelationshipClassType { get; set; }
- 
+
     }
 
 }

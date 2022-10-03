@@ -29,29 +29,31 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// Represents a concept name
     /// </summary>
     [Table("cd_name_tbl")]
-	[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-	public class DbConceptName : DbConceptVersionedAssociation
-	{
-	
-		/// <summary>
-		/// Gets or sets the language.
-		/// </summary>
-		/// <value>The language.</value>
-		[Column("lang_cs")]
-		public String Language {
-			get;
-			set;
-		}
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public class DbConceptName : DbConceptVersionedAssociation
+    {
 
-		/// <summary>
-		/// Gets or sets the name.
-		/// </summary>
-		/// <value>The name.</value>
-		[Column("val")]
-		public String Name {
-			get;
-			set;
-		}
+        /// <summary>
+        /// Gets or sets the language.
+        /// </summary>
+        /// <value>The language.</value>
+        [Column("lang_cs")]
+        public String Language
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
+        /// <value>The name.</value>
+        [Column("val")]
+        public String Name
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the id of the name

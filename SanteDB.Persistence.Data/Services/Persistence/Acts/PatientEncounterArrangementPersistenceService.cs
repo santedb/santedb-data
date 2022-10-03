@@ -18,14 +18,10 @@
  * User: fyfej
  * Date: 2022-9-7
  */
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
@@ -47,13 +43,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             data.ArrangementTypeKey = this.EnsureExists(context, data.ArrangementType)?.Key ?? data.ArrangementTypeKey;
             return base.BeforePersisting(context, data);
         }
-    
+
         /// <inheritdoc/>
         protected override PatientEncounterArrangement DoConvertToInformationModel(DataContext context, DbPatientEncounterArrangement dbModel, params object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            if((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad)
+            if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad)
             {
                 retVal.ArrangementType = retVal.ArrangementType.GetRelatedPersistenceService().Get(context, dbModel.ArrangementTypeKey);
                 retVal.SetLoaded(o => o.ArrangementType);

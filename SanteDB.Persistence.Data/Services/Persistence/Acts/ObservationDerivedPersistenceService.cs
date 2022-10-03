@@ -23,11 +23,7 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Acts;
-using SanteDB.Core.Model;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
@@ -57,13 +53,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         {
             var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             var obsData = referenceObjects.OfType<DbObservation>().FirstOrDefault();
-            if(obsData == null)
+            if (obsData == null)
             {
                 this.m_tracer.TraceWarning("Using slow lookup of observation data from database");
                 obsData = context.FirstOrDefault<DbObservation>(o => o.ParentKey == dbModel.VersionKey);
             }
 
-            if((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad)
+            if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad)
             {
                 retVal.InterpretationConcept = retVal.InterpretationConcept.GetRelatedPersistenceService().Get(context, obsData.InterpretationConceptKey);
                 retVal.SetLoaded(o => o.InterpretationConcept);

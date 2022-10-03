@@ -25,8 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Docker
 {
@@ -88,10 +86,10 @@ namespace SanteDB.Persistence.Data.Docker
                     LoadStrategy = Core.Services.LoadMode.SyncLoad,
                     CachingPolicy = new AdoPersistenceCachingPolicy()
                     {
-                        DataObjectExpiry = new TimeSpan(0,0,30)
+                        DataObjectExpiry = new TimeSpan(0, 0, 30)
                     },
                     DeleteStrategy = Core.Services.DeleteMode.LogicalDelete,
-                    StrictKeyAgreement= true,
+                    StrictKeyAgreement = true,
                     MaxRequests = 1000,
                     VersioningPolicy = AdoVersioningPolicyFlags.FullVersioning,
                     Validation = new List<AdoValidationPolicy>()
@@ -109,15 +107,15 @@ namespace SanteDB.Persistence.Data.Docker
                 configuration.AddSection(configSection);
             }
 
-            if(settings.TryGetValue(LoadModeSetting, out string loadModeString) && Enum.TryParse(loadModeString, out Core.Services.LoadMode loadMode))
+            if (settings.TryGetValue(LoadModeSetting, out string loadModeString) && Enum.TryParse(loadModeString, out Core.Services.LoadMode loadMode))
             {
                 configSection.LoadStrategy = loadMode;
             }
-            if(settings.TryGetValue(DeleteModeSetting, out string deleteModeString) && Enum.TryParse(deleteModeString, out Core.Services.DeleteMode deleteMode))
+            if (settings.TryGetValue(DeleteModeSetting, out string deleteModeString) && Enum.TryParse(deleteModeString, out Core.Services.DeleteMode deleteMode))
             {
                 configSection.DeleteStrategy = deleteMode;
             }
-            if(settings.TryGetValue(VersioningPolicySetting, out string versionModeString) && Enum.TryParse(versionModeString, out AdoVersioningPolicyFlags versionMode))
+            if (settings.TryGetValue(VersioningPolicySetting, out string versionModeString) && Enum.TryParse(versionModeString, out AdoVersioningPolicyFlags versionMode))
             {
                 configSection.VersioningPolicy = versionMode;
             }
