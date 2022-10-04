@@ -808,6 +808,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 throw new ArgumentNullException(nameof(IdentifiedData.Key), ErrorMessages.ARGUMENT_NULL);
             }
+
+            // We now want to fetch the perssitence serivce of this
+            var persistenceService = typeof(TModelAssociation).GetRelatedPersistenceService() as IAdoPersistenceProvider<TModelAssociation>;
+            if (persistenceService == null)
+            {
+                throw new DataPersistenceException(String.Format(ErrorMessages.RELATED_OBJECT_NOT_AVAILABLE, typeof(TModelAssociation), typeof(TModel)));
+            }
+
             // Ensure either the relationship points to (key) (either source or target)
             associations = associations.Select(a =>
             {
@@ -816,16 +824,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     a.SourceEntityKey = data.Key;
                 }
-
+                if (!a.Key.HasValue && a.BatchOperation != BatchOperationType.Insert
+                    && this.TryGetKeyResolver<TModelAssociation>(out var keyResolver))
+                {
+                    a.Key = persistenceService.Query(context, keyResolver.GetKeyExpression(a)).Select(o => o.Key).FirstOrDefault();
+                }
                 return a;
             }).ToArray();
-
-            // We now want to fetch the perssitence serivce of this
-            var persistenceService = typeof(TModelAssociation).GetRelatedPersistenceService() as IAdoPersistenceProvider<TModelAssociation>;
-            if (persistenceService == null)
-            {
-                throw new DataPersistenceException(String.Format(ErrorMessages.RELATED_OBJECT_NOT_AVAILABLE, typeof(TModelAssociation), typeof(TModel)));
-            }
 
             // Next we want to perform a relationship query to establish what is being loaded and what is being persisted
             // TODO: Determine if this line performs better than selecting the entire object (I suspect it would - but need to check)
@@ -866,6 +871,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return a;
             });
 
+
             return updatedRelationships.Union(addedRelationships).ToArray();
         }
 
@@ -887,6 +893,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     a.SourceKey = sourceKey;
                 }
+                else if (a is IDbIdentified idi && idi.Key == Guid.Empty
+                    && this.TryGetKeyResolver<TAssociativeTable>(out var resolver))
+                {
+                    idi.Key = context.Query<TAssociativeTable>(resolver.GetKeyExpression(a)).Select<Guid>(nameof(IDbIdentified.Key)).FirstOrDefault();
+                }
+
                 return a;
             }).ToArray();
 
@@ -920,8 +932,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 itm.EffectiveVersionSequenceId = versionSequence;
                 context.Insert(itm);
             }
-
-            return existing.Where(o => !removeRelationships.Any(r => r.Equals(o))).Union(addRelationships);
+           
+                return existing.Except(removeRelationships).Union(addRelationships).ToArray();
         }
     }
 }

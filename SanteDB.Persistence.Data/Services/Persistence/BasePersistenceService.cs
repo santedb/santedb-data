@@ -661,7 +661,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                         data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty);
                         // Is this an update or insert?
-                        if (this.m_configuration.AutoUpdateExisting && data.Key.HasValue && this.Exists(context, data.Key.Value))
+                        if ((DataPersistenceControlContext.Current?.AutoUpdate ?? this.m_configuration.AutoUpdateExisting) && data.Key.HasValue && this.Exists(context, data.Key.Value))
                         {
                             this.m_tracer.TraceVerbose("Object {0} already exists - updating instead", data);
                             data = this.DoUpdateModel(context, data);

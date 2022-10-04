@@ -23,13 +23,15 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
     /// <summary>
     /// Concept relationship persistence service
     /// </summary>
-    public class ConceptRelationshipPersistenceService : ConceptReferencePersistenceBase<ConceptRelationship, DbConceptRelationship>
+    public class ConceptRelationshipPersistenceService : ConceptReferencePersistenceBase<ConceptRelationship, DbConceptRelationship>,
+        IAdoKeyResolver<ConceptRelationship>, IAdoKeyResolver<DbConceptRelationship>
     {
         /// <summary>
         /// Concept relationship persistence service
@@ -37,6 +39,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         public ConceptRelationshipPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<DbConceptRelationship, bool>> GetKeyExpression(DbConceptRelationship model) => o => o.SourceKey == model.SourceKey && o.TargetKey == model.TargetKey && o.ObsoleteVersionSequenceId == null;
+
+        /// <inheritdoc/>
+        public Expression<Func<ConceptRelationship, bool>> GetKeyExpression(ConceptRelationship model) => o => o.SourceEntityKey == model.SourceEntityKey && o.TargetConceptKey == model.TargetConceptKey && o.ObsoleteVersionSequenceId == null;
 
         /// <summary>
         /// Concept relationship persistence service

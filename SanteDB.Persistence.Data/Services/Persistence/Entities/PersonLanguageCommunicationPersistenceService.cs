@@ -21,17 +21,26 @@
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Model.Entities;
+using System;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
     /// <summary>
     /// Persistence service for language of communication
     /// </summary>
-    public class PersonLanguageCommunicationPersistenceService : EntityAssociationPersistenceService<PersonLanguageCommunication, DbPersonLanguageCommunication>
+    public class PersonLanguageCommunicationPersistenceService : EntityAssociationPersistenceService<PersonLanguageCommunication, DbPersonLanguageCommunication>,
+        IAdoKeyResolver<PersonLanguageCommunication>, IAdoKeyResolver<DbPersonLanguageCommunication>
     {
         /// <inheritdoc/>
         public PersonLanguageCommunicationPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<PersonLanguageCommunication, bool>> GetKeyExpression(PersonLanguageCommunication model) => o => o.LanguageCode == model.LanguageCode && o.SourceEntityKey == model.SourceEntityKey && o.ObsoleteVersionSequenceId == null;
+
+        /// <inheritdoc/>
+        public Expression<Func<DbPersonLanguageCommunication, bool>> GetKeyExpression(DbPersonLanguageCommunication model) => o => o.LanguageCode == model.LanguageCode && o.SourceKey == model.SourceKey && o.ObsoleteVersionSequenceId == null;
     }
 }

@@ -24,13 +24,14 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
     /// <summary>
     /// ConceptSet persistence services for ADO
     /// </summary>
-    public class ConceptSetPersistenceService : NonVersionedDataPersistenceService<ConceptSet, DbConceptSet>
+    public class ConceptSetPersistenceService : NonVersionedDataPersistenceService<ConceptSet, DbConceptSet>, IAdoKeyResolver<DbConceptSetConceptAssociation>
     {
         /// <summary>
         /// Creates a new instance of the concept set
@@ -86,5 +87,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             retVal.ConceptsXml = context.Query<DbConceptSetConceptAssociation>(o => o.SourceKey == dbModel.Key).Select(o => o.ConceptKey).ToList();
             return retVal;
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<DbConceptSetConceptAssociation, bool>> GetKeyExpression(DbConceptSetConceptAssociation model) => o => o.SourceKey == model.SourceKey && o.ConceptKey == model.ConceptKey;
     }
 }

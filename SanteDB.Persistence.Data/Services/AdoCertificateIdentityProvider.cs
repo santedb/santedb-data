@@ -209,7 +209,7 @@ namespace SanteDB.Persistence.Data.Services
                         .Join<DbCertificateMapping, DbSecurityUser>("LEFT", o => o.SecurityUserKey, o => o.Key)
                         .Join<DbCertificateMapping, DbSecurityApplication>("LEFT", o => o.SecurityApplicationKey, o => o.Key)
                         .Join<DbCertificateMapping, DbSecurityDevice>("LEFT", o => o.SecurityDeviceKey, o => o.Key)
-                        .Where<DbCertificateMapping>(o => o.X509Thumbprint == authenticationCertificate.Thumbprint && o.ObsoletionTime == null && o.Expiration > DateTime.Now)
+                        .Where<DbCertificateMapping>(o => o.X509Thumbprint == authenticationCertificate.Thumbprint && o.ObsoletionTime == null && o.Expiration > DateTimeOffset.Now)
                         .And<DbSecurityDevice>(o => o.ObsoletionTime == null)
                         .And<DbSecurityApplication>(o => o.ObsoletionTime == null)
                         .And<DbSecurityUser>(o => o.ObsoletionTime == null);

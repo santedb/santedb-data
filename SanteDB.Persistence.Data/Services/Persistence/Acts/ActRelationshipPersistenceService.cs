@@ -23,20 +23,26 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
 using System;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
     /// <summary>
     /// Persistence service between act and act relationship
     /// </summary>
-    public class ActRelationshipPersistenceService : ActAssociationPersistenceService<ActRelationship, DbActRelationship>
+    public class ActRelationshipPersistenceService : ActAssociationPersistenceService<ActRelationship, DbActRelationship>,
+        IAdoKeyResolver<ActRelationship>, IAdoKeyResolver<DbActRelationship>
     {
-        /// <summary>
-        /// DI constructor
-        /// </summary>
+        /// <inheritdoc/>
         public ActRelationshipPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<DbActRelationship, bool>> GetKeyExpression(DbActRelationship model) => o => o.SourceKey == model.SourceKey && o.RelationshipTypeKey == model.RelationshipTypeKey && o.TargetKey == model.TargetKey && o.ObsoleteVersionSequenceId == null;
+
+        /// <inheritdoc/>
+        public Expression<Func<ActRelationship, bool>> GetKeyExpression(ActRelationship model) => o => o.SourceEntityKey == model.SourceEntityKey && o.RelationshipTypeKey == model.RelationshipTypeKey && o.TargetActKey == model.TargetActKey && o.ObsoleteVersionSequenceId == null;
 
 
         /// <summary>

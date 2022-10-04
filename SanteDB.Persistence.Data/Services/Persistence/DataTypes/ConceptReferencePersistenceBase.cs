@@ -27,6 +27,7 @@ using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
@@ -43,7 +44,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         public ConceptReferencePersistenceBase(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
-
+     
         /// <summary>
         /// Get the most current version sequence from the database
         /// </summary>

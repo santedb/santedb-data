@@ -82,127 +82,137 @@
     <None Remove="SQL\PSQL\santedb-drop.sql" />
     <None Remove="SQL\PSQL\santedb-fn.sql" />
     <None Remove="SQL\PSQL\santedb-init.sql" />
-    <None Remove="SQL\Updates\00OIZ-PSQL.sql" />
-    <None Remove="SQL\Updates\20170721-PSQL.sql" />
-    <None Remove="SQL\Updates\20170725-PSQL.sql" />
-    <None Remove="SQL\Updates\20170803-PSQL.sql" />
-    <None Remove="SQL\Updates\20170804-PSQL.sql" />
-    <None Remove="SQL\Updates\20170913-PSQL.sql" />
-    <None Remove="SQL\Updates\20171003-PSQL.sql" />
-    <None Remove="SQL\Updates\20171011-PSQL.sql" />
-    <None Remove="SQL\Updates\20171016-PSQL.sql" />
-    <None Remove="SQL\Updates\20171023-PSQL.sql" />
-    <None Remove="SQL\Updates\20171030-PSQL.sql" />
-    <None Remove="SQL\Updates\20171108-PSQL.sql" />
-    <None Remove="SQL\Updates\20171124-PSQL.sql" />
-    <None Remove="SQL\Updates\20180126-PSQL.sql" />
-    <None Remove="SQL\Updates\20180131-PSQL.sql" />
-    <None Remove="SQL\Updates\20180211-PSQL.sql" />
-    <None Remove="SQL\Updates\20181112-PSQL.sql" />
-    <None Remove="SQL\Updates\20181113-PSQL.sql" />
-    <None Remove="SQL\Updates\20190322-PSQL.sql" />
-    <None Remove="SQL\Updates\20190522-PSQL.sql" />
-    <None Remove="SQL\Updates\20190625-FBSQL.sql" />
-    <None Remove="SQL\Updates\20200105-FBSQL.sql" />
-    <None Remove="SQL\Updates\20200105-PSQL.sql" />
-    <None Remove="SQL\Updates\20200320-PSQL.sql" />
-    <None Remove="SQL\Updates\20200522-PSQL.sql" />
-    <None Remove="SQL\Updates\20200812-FBSQL.sql" />
-    <None Remove="SQL\Updates\20200812-PSQL.sql" />
-    <None Remove="SQL\Updates\20200912-FBSQL.sql" />
-    <None Remove="SQL\Updates\20200912-PSQL.sql" />
-    <None Remove="SQL\Updates\20201029-PSQL.sql" />
-    <None Remove="SQL\Updates\20201109-PSQL.sql" />
-    <None Remove="SQL\Updates\20201128-FBSQL.sql" />
-    <None Remove="SQL\Updates\20201128-PSQL.sql" />
-    <None Remove="SQL\Updates\20201214-FBSQL.sql" />
-    <None Remove="SQL\Updates\20201214-PSQL.sql" />
-    <None Remove="SQL\Updates\20210107-PSQL.sql" />
-    <None Remove="SQL\Updates\20210116-FBSQL.sql" />
-    <None Remove="SQL\Updates\20210116-PSQL.sql" />
-    <None Remove="SQL\Updates\20210214-PSQL.sql" />
-    <None Remove="SQL\Updates\20210217-FBSQL.sql" />
-    <None Remove="SQL\Updates\20210409-FBSQL.sql" />
-    <None Remove="SQL\Updates\20210409-PSQL.sql" />
-    <None Remove="SQL\Updates\20210512-FBSQL.sql" />
-    <None Remove="SQL\Updates\20210512-PSQL.sql" />
-    <None Remove="SQL\Updates\20210514-FBSQL.sql" />
-    <None Remove="SQL\Updates\20210514-PSQL.sql" />
-    <None Remove="SQL\Updates\20210628-FBSQL.sql" />
-    <None Remove="SQL\Updates\20210628-PSQL.sql" />
-    <None Remove="SQL\Updates\20211103-FBSQL.sql" />
-    <None Remove="SQL\Updates\20211103-PSQL.sql" />
-    <None Remove="SQL\Updates\20211110-FBSQL.sql" />
-    <None Remove="SQL\Updates\20211110-PSQL.sql" />
-    <None Remove="SQL\Updates\20211111-FBSQL.sql" />
-    <None Remove="SQL\Updates\20211111-PSQL.sql" />
-    <None Remove="SQL\Updates\20211128-FBSQL.sql" />
-    <None Remove="SQL\Updates\20211201-FBSQL.sql" />
-    <None Remove="SQL\Updates\20211201-PSQL.sql" />
-    <None Remove="SQL\Updates\20211217-FBSQL.sql" />
-    <None Remove="SQL\Updates\20211217-PSQL.sql" />
-    <None Remove="SQL\Updates\20211218-FBSQL.sql" />
-    <None Remove="SQL\Updates\20211218-PSQL.sql" />
-    <None Remove="SQL\Updates\20211229-FBSQL.sql" />
-    <None Remove="SQL\Updates\20211229-PSQL.sql" />
-    <None Remove="SQL\Updates\20220112-PSQL.sql" />
-    <None Remove="SQL\Updates\20220414-FBSQL.sql" />
-    <None Remove="SQL\Updates\20220414-PSQL.sql" />
-    <None Remove="SQL\Updates\20220509-FBSQL.sql" />
-    <None Remove="SQL\Updates\20220509-PSQL.sql" />
-    <None Remove="SQL\Updates\20220530-FBSQL.sql" />
-    <None Remove="SQL\Updates\20220530-PSQL.sql" />
-    <None Remove="SQL\Updates\20220908-PSQL.sql" />
-    <None Remove="SQL\Updates\20220912-FBSQL.sql" />
-    <None Remove="SQL\Updates\20220927-FBSQL.sql" />
-    <None Remove="SQL\Updates\20220927-PSQL.sql" />
+    <None Remove="SQL\SQLITE\20221003.SQL" />
+    <None Remove="SQL\SQLITE\santedb-codes.sql" />
+    <None Remove="SQL\SQLITE\santedb-ddl.sql" />
+    <None Remove="SQL\SQLITE\santedb-init.sql" />
+    <None Remove="SQL\FBSQL\Updates\00OIZ-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20170721-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20170725-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20170803-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20170804-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20170913-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20171003-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20171011-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20171016-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20171023-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20171030-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20171108-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20171124-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20180126-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20180131-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20180211-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20181112-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20181113-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20190322-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20190522-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20190625-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20200105-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20200105-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20200320-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20200522-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20200812-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20200812-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20200912-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20200912-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20201029-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20201109-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20201128-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20201128-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20201214-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20201214-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20210107-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20210116-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20210116-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20210214-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20210217-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20210409-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20210409-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20210512-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20210512-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20210514-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20210514-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20210628-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20210628-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211103-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211103-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211110-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211110-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211111-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211111-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211128-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211201-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211201-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211217-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211217-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211218-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211218-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211229-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20211229-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20220112-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20220414-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20220414-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20220509-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20220509-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20220530-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20220530-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20220908-PSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20220912-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20220927-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20220927-PSQL.sql" />
   </ItemGroup>
   
   <ItemGroup>
     <EmbeddedResource Include="Map\ModelMap.xml" />
-    <EmbeddedResource Include="SQL\Updates\00OIZ-PSQL.sql">
+    <EmbeddedResource Include="SQL\SQLITE\20221003.sql" />
+    <EmbeddedResource Include="SQL\SQLITE\santedb-codes.sql" />
+    <EmbeddedResource Include="SQL\SQLITE\santedb-ddl.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SQL\SQLITE\santedb-init.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\00OIZ-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20200320-PSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20201029-PSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20201128-FBSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20200320-PSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20201029-PSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20201128-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20210512-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20210512-PSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20210628-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20210628-PSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20211103-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20211103-PSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20211111-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20211111-PSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20211128-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20211201-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20211201-PSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20211217-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20211217-PSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20211218-FBSQL.sql">
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20210512-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20210512-PSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20210628-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20210628-PSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20211103-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20211103-PSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20211111-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20211111-PSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20211128-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20211201-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20211201-PSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20211217-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20211217-PSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20211218-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20211110-FBSQL.sql">
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20211110-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20211218-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20211218-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20211110-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20211110-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20210514-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20210514-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20210514-FBSQL.sql">
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20210514-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20210414-FBSQL.sql">
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20210414-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20210414-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20210414-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\FBSQL\santedb-codes.sql">
@@ -230,133 +240,133 @@
     <EmbeddedResource Include="SQL\PSQL\santedb-init.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20170721-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20170721-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20170725-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20170725-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20170803-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20170803-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20170804-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20170804-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20170913-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20170913-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20171003-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20171003-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20171011-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20171011-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20171016-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20171016-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20171023-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20171023-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20171030-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20171030-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20171108-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20171108-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20171124-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20171124-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20180126-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20180126-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20180131-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20180131-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20180211-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20180211-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20181112-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20181112-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20181113-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20181113-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20190322-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20190322-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20190522-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20190522-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20190625-FBSQL.sql">
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20190625-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20200105-FBSQL.sql">
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20200105-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20200105-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20200105-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20200522-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20200522-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20200812-FBSQL.sql">
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20200812-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20200812-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20200812-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20200912-FBSQL.sql">
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20200912-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20200912-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20200912-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20201109-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20201109-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20201128-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20201128-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20201214-FBSQL.sql">
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20201214-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20201214-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20201214-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20210107-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20210107-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20210116-FBSQL.sql">
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20210116-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20210116-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20210116-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20210409-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20210409-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20210214-PSQL.sql">
+    <EmbeddedResource Include="SQL\PSQL\Updates\20210214-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20210409-FBSQL.sql">
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20210409-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20210217-FBSQL.sql">
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20210217-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\Updates\20220112-PSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20220908-PSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20220927-PSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20220927-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20220912-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20220530-PSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20220530-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20220509-PSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20220509-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20220414-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20211229-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20220414-PSQL.sql" />
-    <EmbeddedResource Include="SQL\Updates\20211229-PSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20220112-PSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20220908-PSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20220927-PSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20220927-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20220912-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20220530-PSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20220530-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20220509-PSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20220509-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20220414-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20211229-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20220414-PSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20211229-PSQL.sql" />
   </ItemGroup>
   
   <ItemGroup>

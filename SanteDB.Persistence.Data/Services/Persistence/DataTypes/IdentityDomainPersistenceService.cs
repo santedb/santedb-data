@@ -24,13 +24,14 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.DataType;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
     /// <summary>
     /// Assigning authority persistence service
     /// </summary>
-    public class IdentityDomainPersistenceService : NonVersionedDataPersistenceService<IdentityDomain, DbIdentityDomain>
+    public class IdentityDomainPersistenceService : NonVersionedDataPersistenceService<IdentityDomain, DbIdentityDomain>, IAdoKeyResolver<DbIdentityDomainScope>
     {
         /// <summary>
         /// Assigning authority configuration manager
@@ -113,5 +114,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 
             return retVal;
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<DbIdentityDomainScope, bool>> GetKeyExpression(DbIdentityDomainScope model) => o => o.SourceKey == model.SourceKey && o.ScopeConceptKey == model.ScopeConceptKey;
     }
 }

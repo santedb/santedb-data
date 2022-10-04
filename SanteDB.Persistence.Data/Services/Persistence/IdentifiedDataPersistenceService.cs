@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2022-9-7
  */
+using SanteDB.Core;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
@@ -28,6 +29,7 @@ using SanteDB.OrmLite;
 using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.Persistence.Data.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -44,11 +46,33 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         where TModel : IdentifiedData, new()
         where TDbModel : class, IDbIdentified, new()
     {
+
+        // Exists providers
+        private readonly ConcurrentDictionary<Type, IAdoKeyResolver> m_keyResolvers = new ConcurrentDictionary<Type, IAdoKeyResolver>();
+
         /// <summary>
         /// Creates a new injected version of the IdentifiedDataPersistenceService
         /// </summary>
         public IdentifiedDataPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
+        }
+
+        /// <summary>
+        /// Get the key resolver for <typeparamref name="TTarget"/>
+        /// </summary>
+        /// <typeparam name="TTarget">Target of the key resolver</typeparam>
+        /// <returns>The key resolver if one exists</returns>
+        protected bool TryGetKeyResolver<TTarget>(out IAdoKeyResolver<TTarget> resolver)
+        {
+            if (this.m_keyResolvers.TryGetValue(typeof(TTarget), out var tresolver))
+            {
+                resolver = tresolver as IAdoKeyResolver<TTarget>;
+                return resolver != null;
+            }
+            var candidate = ApplicationServiceContext.Current.GetService<IAdoKeyResolver<TTarget>>();
+            this.m_keyResolvers.TryAdd(typeof(TTarget), candidate);
+            resolver = tresolver as IAdoKeyResolver<TTarget>;
+            return resolver != null;
         }
 
         /// <summary>
@@ -173,7 +197,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             try
             {
 #endif
-                return context.Insert(dbModel);
+                if (DataPersistenceControlContext.Current?.AutoUpdate ?? this.m_configuration.AutoUpdateExisting)
+                {
+                    if (context.Exists<TDbModel>(dbModel))
+                    {
+                        return context.Update(dbModel);
+                    }
+                    else
+                    {
+                        return context.Insert(dbModel);
+                    }
+                }
+                else
+                {
+                    return context.Insert(dbModel);
+                }
 #if DEBUG
             }
             finally
@@ -406,6 +444,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(IdentifiedData.Key), ErrorMessages.ARGUMENT_NULL);
             }
 
+            // We now want to fetch the perssitence serivce of this
+            var persistenceService = typeof(TModelAssociation).GetRelatedPersistenceService() as IAdoPersistenceProvider<TModelAssociation>;
+            if (persistenceService == null)
+            {
+                throw new DataPersistenceException(String.Format(ErrorMessages.RELATED_OBJECT_NOT_AVAILABLE, typeof(TModelAssociation), typeof(TModel)));
+            }
+
             // Ensure either the relationship points to (key) (either source or target)
             associations = associations.Select(a =>
             {
@@ -414,18 +459,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     a.SourceEntityKey = data.Key;
                 }
+                if (!a.Key.HasValue && a.BatchOperation != Core.Model.DataTypes.BatchOperationType.Insert
+                    && this.TryGetKeyResolver<TModelAssociation>(out var keyResolver))
+                {
+                    a.Key = persistenceService.Query(context, keyResolver.GetKeyExpression(a)).Select(o => o.Key).FirstOrDefault();
+                }
                 return a;
             }).ToArray();
-
-            // We now want to fetch the perssitence serivce of this
-            var persistenceService = typeof(TModelAssociation).GetRelatedPersistenceService() as IAdoPersistenceProvider<TModelAssociation>;
-            if (persistenceService == null)
-            {
-                throw new DataPersistenceException(String.Format(ErrorMessages.RELATED_OBJECT_NOT_AVAILABLE, typeof(TModelAssociation), typeof(TModel)));
-            }
-
-            // Next we want to perform a relationship query to establish what is being loaded and what is being persisted
             var existingKeys = associations.Select(k => k.Key).ToArray();
+            // Next we want to perform a relationship query to establish what is being loaded and what is being persisted
             var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key || existingKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
 
             // Which are new and which are not?
@@ -446,7 +488,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return a;
             });
 
-            return updatedRelationships.Union(addedRelationships).Except(removedRelationships).ToArray();
+            return updatedRelationships.Except(removedRelationships).Union(addedRelationships).ToArray();
         }
 
         /// <summary>
@@ -470,6 +512,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 if (a.SourceKey == Guid.Empty)
                 {
                     a.SourceKey = sourceKey;
+                }
+                else if (a is IDbIdentified idi && idi.Key == Guid.Empty
+                    && this.TryGetKeyResolver<TAssociativeTable>(out var resolver))
+                {
+                    idi.Key = context.Query<TAssociativeTable>(resolver.GetKeyExpression(a)).Select<Guid>(nameof(IDbIdentified.Key)).FirstOrDefault();
                 }
                 return a;
             }).ToArray();
@@ -503,7 +550,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 context.Insert(itm);
             }
 
-            return existing.Where(o => !removeRelationships.Any(r => r.Equals(o))).Union(addRelationships);
+            return existing.Except(removeRelationships).Union(addRelationships).ToArray();
         }
     }
 }

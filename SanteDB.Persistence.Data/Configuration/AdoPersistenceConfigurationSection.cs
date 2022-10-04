@@ -22,6 +22,7 @@ using SanteDB.Core.Configuration;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite.Configuration;
 using SanteDB.OrmLite.Providers;
+using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -57,6 +58,13 @@ namespace SanteDB.Persistence.Data.Configuration
         AssociationVersioning = 2,
 
         /// <summary>
+        /// When a resource is touched even if no data is changed, a new version should be created, this behavior will result in multiple creation/obsoletion 
+        /// entries for a resource. 
+        /// </summary>
+        [XmlEnum("version-touch")]
+        VersionOnTouch = 4,
+
+        /// <summary>
         /// Default flags
         /// </summary>
         [XmlEnum("default")]
@@ -73,9 +81,6 @@ namespace SanteDB.Persistence.Data.Configuration
     {
         // Random
         private Random m_random = new Random();
-
-        // Data provider
-        private IDbProvider m_dbp;
 
         // PEPPER CHARS DEFAULT
         private const string PEPPER_CHARS = "0ABcDEfgILqZ~k";

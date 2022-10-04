@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.Data.Initialization;
+﻿using SanteDB.Core;
+using SanteDB.Core.Data.Initialization;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
@@ -9,6 +10,7 @@ using SanteDB.Persistence.Data.Model.Sys;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -121,14 +123,12 @@ namespace SanteDB.Persistence.Data.Services
                             this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)i / (float)dataset.Action.Count, String.Format(UserMessages.PROCESSING, dataset.Id)));
                             var persistenceService = itm.Element.GetType().GetRelatedPersistenceService();
 
-                            itm.Element.Key = itm.Element.Key ?? Guid.NewGuid();
-
                             try
                             {
                                 switch (itm)
                                 {
                                     case DataInsert di:
-                                        if (di.SkipIfExists && persistenceService.Exists(context, itm.Element.Key.Value))
+                                        if (di.SkipIfExists && persistenceService.Exists(context, itm.Element.Key.GetValueOrDefault()))
                                         {
                                             continue;
                                         }
@@ -136,7 +136,7 @@ namespace SanteDB.Persistence.Data.Services
                                         persistenceService.Insert(context, di.Element);
                                         break;
                                     case DataUpdate du:
-                                        if (du.InsertIfNotExists && !persistenceService.Exists(context, itm.Element.Key.Value))
+                                        if (du.InsertIfNotExists && !persistenceService.Exists(context, itm.Element.Key.GetValueOrDefault()))
                                         {
                                             persistenceService.Insert(context, itm.Element);
                                         }
@@ -174,6 +174,32 @@ namespace SanteDB.Persistence.Data.Services
                                 context.ExecuteNonQuery(context.CreateSqlStatement(itm.QueryText));
                             }
                         }
+
+                        if(dataset.ServiceExec?.Any() == true)
+                        {
+                            this.m_tracer.TraceInfo("Executing post-install service actions for {0}...", dataset.Id);
+                            foreach(var svc in dataset.ServiceExec)
+                            {
+                                var serviceType = Type.GetType(svc.ServiceType);
+                                if(serviceType == null)
+                                {
+                                    throw new InvalidOperationException(String.Format(ErrorMessages.TYPE_NOT_FOUND, svc.ServiceType));
+                                }
+                                var serviceInstance = ApplicationServiceContext.Current.GetService(serviceType);
+                                if(serviceInstance == null)
+                                {
+                                    throw new InvalidOperationException(String.Format(ErrorMessages.SERVICE_NOT_FOUND, serviceType));
+                                }
+                                var method = serviceType.GetRuntimeMethod(svc.Method, svc.Arguments.Select(o => o.GetType()).ToArray());
+                                if(method == null)
+                                {
+                                    throw new EntryPointNotFoundException(String.Format(ErrorMessages.METHOD_NOT_FOUND, $"{svc.Method}({String.Join(",", svc.Arguments.Select(o => o.GetType()))})"));
+                                }
+                                method.Invoke(serviceInstance, svc.Arguments.ToArray());
+
+                            }
+                        }
+
                         context.Insert(new DbPatch() { ApplyDate = DateTimeOffset.Now, PatchId = patchId, Description = dataset.Id });
                         tx.Commit();
                         return true;

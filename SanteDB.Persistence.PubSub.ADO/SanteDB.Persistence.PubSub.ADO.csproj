@@ -60,11 +60,13 @@
     <None Remove="Data\Map\ModelMap.xml" />
     <None Remove="Data\Update\20210311-FBSQL.sql" />
     <None Remove="Data\Update\20210311-PSQL.sql" />
+    <None Remove="Data\Update\20221004-SQLITE.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Data\Map\ModelMap.xml" />
     <EmbeddedResource Include="Data\Update\20210311-FBSQL.sql" />
+    <EmbeddedResource Include="Data\Update\20221004-SQLITE.sql" />
     <EmbeddedResource Include="Data\Update\20210311-PSQL.sql" />
   </ItemGroup>
 

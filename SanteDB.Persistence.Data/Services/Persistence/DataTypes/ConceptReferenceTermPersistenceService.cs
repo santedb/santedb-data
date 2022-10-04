@@ -23,13 +23,15 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
     /// <summary>
     /// Concept to Reference term persistence service
     /// </summary>
-    public class ConceptReferenceTermPersistenceService : ConceptReferencePersistenceBase<ConceptReferenceTerm, DbConceptReferenceTerm>
+    public class ConceptReferenceTermPersistenceService : ConceptReferencePersistenceBase<ConceptReferenceTerm, DbConceptReferenceTerm>,
+        IAdoKeyResolver<ConceptReferenceTerm>, IAdoKeyResolver<DbConceptReferenceTerm>
     {
         /// <summary>
         /// Concept reference term persistence
@@ -37,6 +39,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         public ConceptReferenceTermPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<DbConceptReferenceTerm, bool>> GetKeyExpression(DbConceptReferenceTerm model) => o => o.SourceKey == model.SourceKey && o.TargetKey == model.TargetKey && o.ObsoleteVersionSequenceId == null;
+
+        /// <inheritdoc/>
+        public Expression<Func<ConceptReferenceTerm, bool>> GetKeyExpression(ConceptReferenceTerm model) => o => o.SourceEntityKey == model.SourceEntityKey && o.ReferenceTermKey == model.ReferenceTermKey && o.ObsoleteVersionSequenceId == null;
 
         /// <summary>
         /// Prepare references for this object

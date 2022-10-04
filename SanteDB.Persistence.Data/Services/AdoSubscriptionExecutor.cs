@@ -156,10 +156,10 @@ namespace SanteDB.Persistence.Data.Services
 
                 // We want to build a query that is appropriate for the resource type so the definition will become
                 // SELECT [columns for type] FROM (definition from subscription logic here) AS [tablename] WHERE [filter provided by caller];
-                var query = new QueryBuilder(this.m_modelMapper, persistenceInstance.Provider).CreateQuery(subscription.ResourceType, queryExpression).Build();
+                var query = new QueryBuilder(this.m_modelMapper, persistenceInstance.Provider.StatementFactory).CreateQuery(subscription.ResourceType, queryExpression).Build();
 
                 // Now we want to remove the portions of the built query statement after FROM and before WHERE as the definition in the subscription will be the source of our selection
-                SqlStatement domainQuery = new SqlStatement(m_configuration.Provider, query.SQL.Substring(0, query.SQL.IndexOf(" FROM ")));
+                SqlStatement domainQuery = new SqlStatement(m_configuration.Provider.StatementFactory, query.SQL.Substring(0, query.SQL.IndexOf(" FROM ")));
 
                 // Append our query
                 var definitionQuery = definition.Definition;
@@ -168,10 +168,13 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     if (parameters.TryGetValue(o.Groups[1].Value, out var qValue))
                     {
-                        Guid uuid = Guid.Empty;
-                        if (Guid.TryParse(qValue.First(), out uuid))
+                        if (Guid.TryParse(qValue.First(), out var uuid))
                         {
                             arguments.AddRange(qValue.Select(v => Guid.Parse(v)).OfType<Object>());
+                        }
+                        else if(DateTime.TryParse(qValue.First(), out var dt))
+                        {
+                            arguments.AddRange(qValue.Select(v => DateTime.Parse(v)).OfType<Object>());
                         }
                         else
                         {

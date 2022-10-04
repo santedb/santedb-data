@@ -21,13 +21,16 @@
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Model.Extensibility;
+using System;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
     /// <summary>
     /// A tag persistence service for ActTags
     /// </summary>
-    public class ActTagPersistenceService : BaseEntityDataPersistenceService<ActTag, DbActTag>
+    public class ActTagPersistenceService : BaseEntityDataPersistenceService<ActTag, DbActTag>,
+        IAdoKeyResolver<ActTag>, IAdoKeyResolver<DbActTag>
     {
         /// <summary>
         /// Create a DI injected instance of the act tag persistence service
@@ -35,5 +38,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         public ActTagPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCaching = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCaching, queryPersistence)
         {
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<DbActTag, bool>> GetKeyExpression(DbActTag model) => o => o.SourceKey == model.SourceKey && o.TagKey == model.TagKey && o.ObsoletionTime == null;
+
+        /// <inheritdoc/>
+        public Expression<Func<ActTag, bool>> GetKeyExpression(ActTag model) => o => o.SourceEntityKey == model.SourceEntityKey && o.TagKey == model.TagKey && o.ObsoletionTime == null;
     }
 }

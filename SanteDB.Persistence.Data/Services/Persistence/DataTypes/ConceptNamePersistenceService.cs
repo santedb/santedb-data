@@ -29,11 +29,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
     /// </summary>
     public class ConceptNamePersistenceService : ConceptReferencePersistenceBase<ConceptName, DbConceptName>
     {
+
         /// <summary>
         /// Creates a DI instance of the concept name
         /// </summary>
         public ConceptNamePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
+
+        
     }
 }

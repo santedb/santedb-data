@@ -23,13 +23,15 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
 using System;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
     /// <summary>
     /// A persistence service which handles entity relationships
     /// </summary>
-    public class EntityRelationshipPersistenceService : EntityAssociationPersistenceService<EntityRelationship, DbEntityRelationship>
+    public class EntityRelationshipPersistenceService : EntityAssociationPersistenceService<EntityRelationship, DbEntityRelationship>,
+        IAdoKeyResolver<EntityRelationship>, IAdoKeyResolver<DbEntityRelationship>
     {
         /// <summary>
         /// Entity relationship persistence service
@@ -37,6 +39,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         public EntityRelationshipPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<EntityRelationship, bool>> GetKeyExpression(EntityRelationship model) => o => o.SourceEntityKey == model.SourceEntityKey && o.TargetEntityKey == model.TargetEntityKey && o.RelationshipTypeKey == model.RelationshipTypeKey && o.ObsoleteVersionSequenceId == null;
+
+        /// <inheritdoc/>
+        public Expression<Func<DbEntityRelationship, bool>> GetKeyExpression(DbEntityRelationship model) => o => o.SourceKey == model.SourceKey && o.TargetKey == model.TargetKey && o.RelationshipTypeKey == model.RelationshipTypeKey && o.ObsoleteVersionSequenceId == null;
 
         /// <summary>
         /// Prepare references

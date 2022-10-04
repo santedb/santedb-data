@@ -236,7 +236,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
     /// Persistence service that is responsible for the storing and retrieving of acts
     /// </summary>
     /// <typeparam name="TAct">The model type of act</typeparam>
-    public abstract class ActDerivedPersistenceService<TAct> : VersionedDataPersistenceService<TAct, DbActVersion, DbAct>, IAdoClassMapper, IActDerivedPersistenceService
+    public abstract class ActDerivedPersistenceService<TAct> : VersionedDataPersistenceService<TAct, DbActVersion, DbAct>, IAdoClassMapper, IActDerivedPersistenceService,
+        IAdoKeyResolver<DbActSecurityPolicy>
         where TAct : Act, IVersionedData, new()
     {
 
@@ -493,10 +494,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
             if (data.Policies != null)
             {
-                retVal.Policies = this.UpdateInternalAssociations(context, retVal.Key.Value, data.Policies.Select(o => new DbActSecurityPolicy()
+                retVal.Policies = this.UpdateInternalVersoinedAssociations(context, retVal.Key.Value, retVal.VersionSequence.Value, data.Policies.Select(o => new DbActSecurityPolicy()
                 {
                     PolicyKey = o.PolicyKey.Value
-                }), o => o.SourceKey == retVal.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
+                })).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
             }
 
             if (data.Relationships != null)
@@ -562,10 +563,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
             if (data.Policies != null)
             {
-                retVal.Policies = this.UpdateInternalAssociations(context, retVal.Key.Value, data.Policies.Select(o => new DbActSecurityPolicy()
+                retVal.Policies = this.UpdateInternalVersoinedAssociations(context, retVal.Key.Value, retVal.VersionSequence.Value, data.Policies.Select(o => new DbActSecurityPolicy()
                 {
                     PolicyKey = o.PolicyKey.Value
-                }), o => o.SourceKey == retVal.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
+                })).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
             }
 
             if (data.Relationships != null)
@@ -606,5 +607,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// </summary>
         object IAdoClassMapper.MapToModelInstanceEx(DataContext context, object dbModel, params object[] referenceObjects) => this.DoConvertToInformationModelEx(context, (DbActVersion)dbModel, referenceObjects);
 
+        /// <inheritdoc/>
+        public Expression<Func<DbActSecurityPolicy, bool>> GetKeyExpression(DbActSecurityPolicy model) => o => o.SourceKey == model.SourceKey && o.PolicyKey == model.PolicyKey && o.ObsoleteVersionSequenceId == null;
     }
 }

@@ -23,13 +23,15 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
 using System;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
     /// <summary>
     /// Persistence service between act and act relationship
     /// </summary>
-    public class ActParticipationPersistenceService : ActAssociationPersistenceService<ActParticipation, DbActParticipation>
+    public class ActParticipationPersistenceService : ActAssociationPersistenceService<ActParticipation, DbActParticipation>,
+        IAdoKeyResolver<ActParticipation>, IAdoKeyResolver<DbActParticipation>
     {
         /// <summary>
         /// DI constructor
@@ -37,6 +39,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         public ActParticipationPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<DbActParticipation, bool>> GetKeyExpression(DbActParticipation model) => o => o.SourceKey == model.SourceKey && o.ParticipationRoleKey == model.ParticipationRoleKey && o.TargetKey == model.TargetKey && o.ObsoleteVersionSequenceId == null;
+
+        /// <inheritdoc/>
+        public Expression<Func<ActParticipation, bool>> GetKeyExpression(ActParticipation model) => o => o.SourceEntityKey == model.SourceEntityKey && o.ParticipationRoleKey == model.ParticipationRoleKey && o.PlayerEntityKey == model.PlayerEntityKey && o.ObsoleteVersionSequenceId == null;
 
 
         /// <inheritdoc/>

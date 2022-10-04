@@ -237,7 +237,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// <summary>
     /// Persistence service that is responsible for storing and retrieving entities
     /// </summary>
-    public abstract class EntityDerivedPersistenceService<TEntity> : VersionedDataPersistenceService<TEntity, DbEntityVersion, DbEntity>, IAdoClassMapper, IEntityDerivedPersistenceService
+    public abstract class EntityDerivedPersistenceService<TEntity> : VersionedDataPersistenceService<TEntity, DbEntityVersion, DbEntity>, IAdoClassMapper, IEntityDerivedPersistenceService,
+        IAdoKeyResolver<DbEntitySecurityPolicy>
         where TEntity : Entity, IVersionedData, new()
     {
 
@@ -583,10 +584,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
             if (data.Policies != null)
             {
-                retVal.Policies = this.UpdateInternalAssociations(context, retVal.Key.Value, data.Policies.Select(o => new DbEntitySecurityPolicy()
+                retVal.Policies = this.UpdateInternalVersoinedAssociations(context, retVal.Key.Value, retVal.VersionSequence.Value, data.Policies.Select(o => new DbEntitySecurityPolicy()
                 {
                     PolicyKey = o.PolicyKey.Value
-                }), o => o.SourceKey == retVal.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
+                })).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
             }
 
             if (data.Relationships != null)
@@ -615,5 +616,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         object IAdoClassMapper.MapToModelInstanceEx(DataContext context, object dbModel, params object[] referenceObjects) => this.DoConvertToInformationModelEx(context, (DbEntityVersion)dbModel, referenceObjects);
 
+        /// <inheritdoc/>
+        public Expression<Func<DbEntitySecurityPolicy, bool>> GetKeyExpression(DbEntitySecurityPolicy model) => o => o.SourceKey == model.SourceKey && o.PolicyKey == model.PolicyKey && o.ObsoleteVersionSequenceId == null;
     }
 }

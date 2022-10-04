@@ -21,19 +21,26 @@
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Model.Extensibility;
+using System;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
     /// <summary>
     /// Entity tag persistence
     /// </summary>
-    public class EntityTagPersistenceService : BaseEntityDataPersistenceService<EntityTag, DbEntityTag>
+    public class EntityTagPersistenceService : BaseEntityDataPersistenceService<EntityTag, DbEntityTag>,
+        IAdoKeyResolver<EntityTag>, IAdoKeyResolver<DbEntityTag>
     {
-        /// <summary>
-        /// Create DI injected tag persistence service
-        /// </summary>
+        /// <inheritdoc/>
         public EntityTagPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<EntityTag, bool>> GetKeyExpression(EntityTag model) => o => o.SourceEntityKey == model.SourceEntityKey && o.TagKey  == model.TagKey && o.ObsoletionTime == null;
+
+        /// <inheritdoc/>
+        public Expression<Func<DbEntityTag, bool>> GetKeyExpression(DbEntityTag model) => o => o.SourceKey == model.SourceKey && o.TagKey == model.TagKey && o.ObsoletionTime == null;
     }
 }

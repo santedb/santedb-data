@@ -22,18 +22,27 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.DataType;
+using System;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
     /// <summary>
     /// Assigning authority persistence
     /// </summary>
-    public class AssigningAuthorityPersistenceService : BaseEntityDataPersistenceService<AssigningAuthority, DbAssigningAuthority>
+    public class AssigningAuthorityPersistenceService : BaseEntityDataPersistenceService<AssigningAuthority, DbAssigningAuthority>,
+        IAdoKeyResolver<AssigningAuthority>, IAdoKeyResolver<DbAssigningAuthority>
     {
         /// <inheritdoc/>
         public AssigningAuthorityPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<DbAssigningAuthority, bool>> GetKeyExpression(DbAssigningAuthority model) => o => o.SourceKey == model.SourceKey && o.AssigningApplicationKey == model.AssigningApplicationKey && o.ObsoletionTime == null;
+
+        /// <inheritdoc/>
+        public Expression<Func<AssigningAuthority, bool>> GetKeyExpression(AssigningAuthority model) => o => o.SourceEntityKey == model.SourceEntityKey && o.AssigningApplicationKey == model.AssigningApplicationKey && o.ObsoletionTime == null;
 
         /// <inheritdoc/>
         protected override AssigningAuthority BeforePersisting(DataContext context, AssigningAuthority data)

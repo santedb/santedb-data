@@ -64,7 +64,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_threadPool = threadPoolService;
 
-            if (this.m_configuration.Provider.GetFilterFunction("freetext") == null)
+            if (this.m_configuration.Provider.StatementFactory.GetFilterFunction("freetext") == null)
             {
                 return; // Freetext not supported
             }
@@ -119,7 +119,7 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public void ReIndex<TEntity>(TEntity entity) where TEntity : IdentifiedData
         {
-            if (this.m_configuration.Provider.GetFilterFunction("freetext") != null)
+            if (this.m_configuration.Provider.StatementFactory.GetFilterFunction("freetext") != null)
             {
                 // TODO: Detect type and reindex based on type
                 this.m_threadPool.QueueUserWorkItem(p =>

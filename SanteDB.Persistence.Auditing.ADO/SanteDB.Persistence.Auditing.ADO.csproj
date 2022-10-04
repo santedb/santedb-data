@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project  Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   
   <PropertyGroup Condition="'$(VersionNumber)' == ''">
     <VersionNumber>3.0-debug</VersionNumber>
@@ -59,6 +59,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Data\SQL\AuditDB\SQLITE\audit_repo.sql" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Data\Map\ModelMap.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -68,6 +71,7 @@
     <EmbeddedResource Include="Data\SQL\AuditDB\PSQL\audit_repo.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\AuditDB\SQLITE\audit_repo.sql" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Jobs\" />
