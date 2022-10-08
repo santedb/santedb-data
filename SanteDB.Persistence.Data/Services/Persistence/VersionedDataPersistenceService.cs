@@ -737,27 +737,28 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected override Expression<Func<TModel, bool>> ApplyDefaultQueryFilters(Expression<Func<TModel, bool>> query)
         {
 
-            // First - we determine if the query has an explicit status concept set
-            if (typeof(IHasState).IsAssignableFrom(typeof(TModel)) && !query.ToString().Contains(nameof(IHasState.StatusConceptKey)))
-            {
-                var statusKeyProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IHasState.StatusConceptKey)));
-                statusKeyProperty = Expression.MakeMemberAccess(statusKeyProperty, statusKeyProperty.Type.GetProperty("Value"));
+            //// First - we determine if the query has an explicit status concept set
+            /// We don't need this anymore since we are using HEAD versions
+            //if (typeof(IHasState).IsAssignableFrom(typeof(TModel)) && !query.ToString().Contains(nameof(IHasState.StatusConceptKey)))
+            //{
+            //    var statusKeyProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IHasState.StatusConceptKey)));
+            //    statusKeyProperty = Expression.MakeMemberAccess(statusKeyProperty, statusKeyProperty.Type.GetProperty("Value"));
 
-                Expression obsoleteFilter = null;
-                foreach (var itm in StatusKeys.InactiveStates)
-                {
-                    var condition = Expression.MakeBinary(ExpressionType.NotEqual, statusKeyProperty, Expression.Constant(itm));
-                    if (obsoleteFilter == null)
-                    {
-                        obsoleteFilter = condition;
-                    }
-                    else
-                    {
-                        obsoleteFilter = Expression.AndAlso(condition, obsoleteFilter);
-                    }
-                }
-                query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, obsoleteFilter), query.Parameters);
-            }
+            //    Expression obsoleteFilter = null;
+            //    foreach (var itm in StatusKeys.InactiveStates)
+            //    {
+            //        var condition = Expression.MakeBinary(ExpressionType.NotEqual, statusKeyProperty, Expression.Constant(itm));
+            //        if (obsoleteFilter == null)
+            //        {
+            //            obsoleteFilter = condition;
+            //        }
+            //        else
+            //        {
+            //            obsoleteFilter = Expression.AndAlso(condition, obsoleteFilter);
+            //        }
+            //    }
+            //    query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, obsoleteFilter), query.Parameters);
+            //}
 
             // Is there any class concept key
             if (m_classKeyMap != null && !query.ToString().Contains(nameof(IHasClassConcept.ClassConceptKey)))
