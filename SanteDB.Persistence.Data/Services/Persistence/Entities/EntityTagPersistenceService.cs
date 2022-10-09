@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Extensibility;
 using System;
 using System.Linq.Expressions;
@@ -42,5 +43,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
         /// <inheritdoc/>
         public Expression<Func<DbEntityTag, bool>> GetKeyExpression(DbEntityTag model) => o => o.SourceKey == model.SourceKey && o.TagKey == model.TagKey && o.ObsoletionTime == null;
+
+        /// <inheritdoc/>
+        protected override DbEntityTag DoInsertInternal(DataContext context, DbEntityTag dbModel)
+        {
+            if (dbModel.TagKey.StartsWith("$"))
+                return dbModel;
+            else 
+                return base.DoInsertInternal(context, dbModel);
+        }
     }
 }

@@ -371,7 +371,7 @@ namespace SanteDB.Persistence.Data.Services
                         var sessionScopes = new List<string>();
                         if (scope == null || scope.Contains("*"))
                         {
-                            sessionScopes.AddRange(this.m_pdpService.GetEffectivePolicySet(principal).Select(c => c.Policy.Oid));
+                            sessionScopes.AddRange(this.m_pdpService.GetEffectivePolicySet(principal).Where(o=>o.Rule == Core.Model.Security.PolicyGrantType.Grant).Select(c => c.Policy.Oid));
                         }
 
                         // Explicitly set scopes

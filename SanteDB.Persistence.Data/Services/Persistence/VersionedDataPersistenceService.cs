@@ -226,42 +226,42 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.Key == id.IdentityDomainKey);
                     }
                 }
-                else if (id.Authority == null)
+                else if (id.IdentityDomain == null)
                 {
                     throw new InvalidOperationException(String.Format(ErrorMessages.DEPENDENT_PROPERTY_NULL, "Authority"));
                 }
-                else if (id.Authority.Key.HasValue) // Attempt lookup in adhoc cache then by db
+                else if (id.IdentityDomain.Key.HasValue) // Attempt lookup in adhoc cache then by db
                 {
-                    dbAuth = this.m_adhocCache?.Get<DbIdentityDomain>($"{DataConstants.AdhocAuthorityKey}{id.Authority.Key}");
+                    dbAuth = this.m_adhocCache?.Get<DbIdentityDomain>($"{DataConstants.AdhocAuthorityKey}{id.IdentityDomain.Key}");
                     if (dbAuth == null)
                     {
-                        dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.Key == id.Authority.Key);
+                        dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.Key == id.IdentityDomain.Key);
                     }
                 }
                 else
                 {
-                    dbAuth = this.m_adhocCache?.Get<DbIdentityDomain>($"{DataConstants.AdhocAuthorityKey}{id.Authority.DomainName}");
+                    dbAuth = this.m_adhocCache?.Get<DbIdentityDomain>($"{DataConstants.AdhocAuthorityKey}{id.IdentityDomain.DomainName}");
                     if (dbAuth == null)
                     {
-                        dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.DomainName == id.Authority.DomainName);
+                        dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.DomainName == id.IdentityDomain.DomainName);
                         if (dbAuth != null)
                         {
-                            id.Authority.Key = dbAuth.Key;
+                            id.IdentityDomain.Key = dbAuth.Key;
                         }
                     }
                 }
 
                 if (dbAuth == null)
                 {
-                    if (!this.m_configuration.AutoInsertChildren || id.Authority == null) // we're not inserting it and it doesn't exist - raise the alarm!
+                    if (!this.m_configuration.AutoInsertChildren || id.IdentityDomain == null) // we're not inserting it and it doesn't exist - raise the alarm!
                     {
-                        yield return new DetectedIssue(DetectedIssuePriorityType.Error, DataConstants.IdentifierDomainNotFound, $"Missing assigning authority with ID {String.Join(",", objectToVerify.Identifiers.Select(o => o.Authority.Key))}", DetectedIssueKeys.SafetyConcernIssue);
+                        yield return new DetectedIssue(DetectedIssuePriorityType.Error, DataConstants.IdentifierDomainNotFound, $"Missing assigning authority with ID {String.Join(",", objectToVerify.Identifiers.Select(o => o.IdentityDomain.Key))}", DetectedIssueKeys.SafetyConcernIssue);
                     }
                     continue;
                 }
                 else
                 {
-                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityKey}{id.Authority.Key}", dbAuth, new TimeSpan(0, 5, 0));
+                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityKey}{id.IdentityDomain.Key}", dbAuth, new TimeSpan(0, 5, 0));
                     this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityKey}{dbAuth.DomainName}", dbAuth, new TimeSpan(0, 5, 0));
                 }
 
@@ -273,13 +273,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     ownedByOthers = context.Query<DbEntityIdentifier>(
                         context.CreateSqlStatement()
                         .SelectFrom(typeof(DbEntityIdentifier))
-                        .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
+                        .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.IdentityDomain.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
                         .And("NOT EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ? AND trg_ent_id = ent_id_tbl.ent_id OR trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL)", objectToVerify.Key, objectToVerify.Key) // Handles the case where the identifier is on a shared MASTER record for MDM
                     ).Any();
                     ownedByMe = context.Query<DbEntityIdentifier>(
                         context.CreateSqlStatement()
                         .SelectFrom(typeof(DbEntityIdentifier))
-                        .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null)
+                        .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.IdentityDomain.Key && o.ObsoleteVersionSequenceId == null)
                         .And("(ent_id = ? OR EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ?  AND trg_ent_id = ent_id_tbl.ent_id) OR (trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL))", objectToVerify.Key, objectToVerify.Key, objectToVerify.Key)
                     ).Any();
                 }
@@ -288,13 +288,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     ownedByOthers = context.Query<DbActIdentifier>(
                         context.CreateSqlStatement()
                         .SelectFrom(typeof(DbActIdentifier))
-                        .Where<DbActIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
+                        .Where<DbActIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.IdentityDomain.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
                         .And("NOT EXISTS (SELECT 1 FROM act_rel_tbl WHERE (src_act_id = ? AND trg_act_id = act_id_tbl.act_id OR trg_act_id = ? AND src_act_id = act_id_tbl.act_id) AND obslt_vrsn_seq_id IS NULL)", objectToVerify.Key, objectToVerify.Key)
                     ).Any();
                     ownedByMe = context.Query<DbActIdentifier>(
                         context.CreateSqlStatement()
                         .SelectFrom(typeof(DbActIdentifier))
-                        .Where<DbActIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null)
+                        .Where<DbActIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.IdentityDomain.Key && o.ObsoleteVersionSequenceId == null)
                         .And("(act_id = ? OR EXISTS (SELECT 1 FROM act_rel_tbl WHERE (src_act_id = ?  AND trg_act_id = act_id_tbl.act_id) OR (trg_act_id = ? AND src_act_id = act_id_tbl.act_id) AND obslt_vrsn_seq_id IS NULL))", objectToVerify.Key, objectToVerify.Key, objectToVerify.Key)
                     ).Any();
 
@@ -785,7 +785,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
             }
 
-            // Ensure that we always apply HEAD filter
+            // Ensure that we always apply HEAD filter if not applied
             var headProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedData.IsHeadVersion)));
             return base.ApplyDefaultQueryFilters(Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, headProperty, Expression.Constant(true))), query.Parameters[0]));
 
