@@ -391,41 +391,59 @@ namespace SanteDB.Persistence.Data
                 }
 
                 // Pure application credential
-                //if (!retVal.UserKey.HasValue && !retVal.DeviceKey.HasValue)
-                //{
-                //    retVal.UserKey = Guid.Parse(AuthenticationContext.SystemUserSid);
-                //}
-                //if (retVal.ApplicationKey == Guid.Empty)
-                //{
-                //    retVal.ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid); // System application SID fallback
-                //}
-            }
-            else // Establish the slow way - using identity name
-            {
-                if (principal.Identity.Name == AuthenticationContext.SystemPrincipal.Identity.Name)
+                if (!retVal.UserKey.HasValue && !retVal.DeviceKey.HasValue)
                 {
                     retVal.UserKey = Guid.Parse(AuthenticationContext.SystemUserSid);
                 }
-                else if (principal.Identity.Name == AuthenticationContext.AnonymousPrincipal.Identity.Name)
+                if (retVal.ApplicationKey == Guid.Empty)
                 {
-                    retVal.UserKey = Guid.Parse(AuthenticationContext.AnonymousUserSid);
+                    retVal.ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid); // System application SID fallback
                 }
-                else
+            }
+            else // Establish the slow way - using identity name
+            {
+                switch(principal.Identity)
                 {
-                    retVal.UserKey = me.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == principal.Identity.Name.ToLowerInvariant())?.Key;
+                    case IDeviceIdentity di:
+                        retVal.DeviceKey = me.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == di.Name.ToLowerInvariant()).Select(o=>o.Key).First();
+                        retVal.ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid);
+                        break;
+                    case IApplicationIdentity ai:
+                        retVal.ApplicationKey = me.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == ai.Name.ToLowerInvariant()).Select(o => o.Key).First();
+                        retVal.UserKey = Guid.Parse(AuthenticationContext.SystemUserSid);
+                        break;
+                    default:
+
+                        if (principal.Identity.Name == AuthenticationContext.SystemPrincipal.Identity.Name)
+                        {
+                            retVal.UserKey = Guid.Parse(AuthenticationContext.SystemUserSid);
+
+                        }
+                        else if (principal.Identity.Name == AuthenticationContext.AnonymousPrincipal.Identity.Name)
+                        {
+                            retVal.UserKey = Guid.Parse(AuthenticationContext.AnonymousUserSid);
+                        }
+                        else
+                        {
+                            retVal.UserKey = me.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == principal.Identity.Name.ToLowerInvariant())?.Key;
+                        }
+                        retVal.ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid);
+
+                        if (!retVal.UserKey.HasValue)
+                        {
+                            throw new SecurityException(s_localizationService.GetString(ErrorMessageStrings.SEC_PROVENANCE_UNK_ID));
+                        }
+                        break;
                 }
 
-                if (!retVal.UserKey.HasValue)
-                {
-                    throw new SecurityException(s_localizationService.GetString(ErrorMessageStrings.SEC_PROVENANCE_UNK_ID));
-                }
             }
 
             // insert the provenance object
             try
             {
-                if (retVal.UserKey.ToString() == AuthenticationContext.SystemUserSid ||
-                    retVal.UserKey.ToString() == AuthenticationContext.AnonymousUserSid)
+                if ((retVal.UserKey.ToString() == AuthenticationContext.SystemUserSid ||
+                    retVal.UserKey.ToString() == AuthenticationContext.AnonymousUserSid) &&
+                    retVal.ApplicationKey.ToString() == AuthenticationContext.SystemApplicationSid)
                 {
                     retVal.Key = me.ContextId = retVal.UserKey.Value;
                 }
