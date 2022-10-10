@@ -391,14 +391,14 @@ namespace SanteDB.Persistence.Data
                 }
 
                 // Pure application credential
-                if (!retVal.UserKey.HasValue && !retVal.DeviceKey.HasValue)
-                {
-                    retVal.UserKey = Guid.Parse(AuthenticationContext.SystemUserSid);
-                }
-                if (retVal.ApplicationKey == Guid.Empty)
-                {
-                    retVal.ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid); // System application SID fallback
-                }
+                //if (!retVal.UserKey.HasValue && !retVal.DeviceKey.HasValue)
+                //{
+                //    retVal.UserKey = Guid.Parse(AuthenticationContext.SystemUserSid);
+                //}
+                //if (retVal.ApplicationKey == Guid.Empty)
+                //{
+                //    retVal.ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid); // System application SID fallback
+                //}
             }
             else // Establish the slow way - using identity name
             {
