@@ -46,7 +46,7 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         internal AdoRelationshipValidationRule(DbRelationshipValidationRule rule)
         {
-
+            this.Key = rule.Key;
             this.SourceClassKey = rule.SourceClassKey;
             this.TargetClassKey = rule.TargetClassKey;
             this.RelationshipTypeKey = rule.RelationshipTypeKey;
@@ -56,13 +56,18 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// Create a new validation rule 
         /// </summary>
-        internal AdoRelationshipValidationRule(Guid sourceClassKey, Guid targetClassKey, Guid relationshipType, String description)
+        internal AdoRelationshipValidationRule(Guid? sourceClassKey, Guid? targetClassKey, Guid relationshipType, String description)
         {
             this.SourceClassKey = sourceClassKey;
             this.TargetClassKey = targetClassKey;
             this.RelationshipTypeKey = relationshipType;
             this.Description = description;
         }
+
+        /// <summary>
+        /// The identified key of the relationship.
+        /// </summary>
+        public Guid? Key { get; }
 
         /// <summary>
         /// Gets the source classification key
@@ -109,6 +114,10 @@ namespace SanteDB.Persistence.Data.Services
             this.m_pepService = pepService;
         }
 
+        private RelationshipTargetType GetRelationshipTargetType<TRelationship>() where TRelationship : ITargetedAssociation
+            => typeof(TRelationship) == typeof(EntityRelationship) ? RelationshipTargetType.EntityRelationship :
+                            typeof(TRelationship) == typeof(ActRelationship) ? RelationshipTargetType.ActRelationship : RelationshipTargetType.ActParticipation;
+
         /// <summary>
         /// Gets the service name
         /// </summary>
@@ -133,8 +142,7 @@ namespace SanteDB.Persistence.Data.Services
                         RelationshipTypeKey = relationshipTypeKey,
                         SourceClassKey = sourceClassKey,
                         TargetClassKey = targetClassKey,
-                        RelationshipClassType = typeof(TRelationship) == typeof(EntityRelationship) ? RelationshipTargetType.EntityRelationship :
-                            typeof(TRelationship) == typeof(ActRelationship) ? RelationshipTargetType.ActRelationship : RelationshipTargetType.ActParticipation
+                        RelationshipClassType = GetRelationshipTargetType<TRelationship>()
                     };
 
                     return new AdoRelationshipValidationRule(context.Insert(dbInstance));
@@ -151,14 +159,39 @@ namespace SanteDB.Persistence.Data.Services
             }
         }
 
+        /// <inheritdoc />
+        public IRelationshipValidationRule GetRuleByKey<TRelationship>(Guid key) where TRelationship : ITargetedAssociation
+        {
+            if (key == Guid.Empty)
+            {
+                return null;
+            }
+
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                var tclass = GetRelationshipTargetType<TRelationship>();
+                context.Open();
+
+                var rule = context.Query<DbRelationshipValidationRule>(r => r.RelationshipClassType == tclass && r.Key == key).FirstOrDefault();
+
+                if (null == rule)
+                {
+                    return null;
+                }
+                else
+                {
+                    return new AdoRelationshipValidationRule(rule);
+                }
+            }
+        }
+
         /// <inheritdoc/>
         public IEnumerable<IRelationshipValidationRule> GetValidRelationships<TRelationship>()
             where TRelationship : ITargetedAssociation
         {
             using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
-                var tclass = typeof(TRelationship) == typeof(EntityRelationship) ? RelationshipTargetType.EntityRelationship :
-                            typeof(TRelationship) == typeof(ActRelationship) ? RelationshipTargetType.ActRelationship : RelationshipTargetType.ActParticipation;
+                var tclass = GetRelationshipTargetType<TRelationship>();
                 context.Open();
 
                 foreach (var itm in context.Query<DbRelationshipValidationRule>(o => o.RelationshipClassType == tclass))
@@ -174,13 +207,39 @@ namespace SanteDB.Persistence.Data.Services
         {
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
-                var tclass = typeof(TRelationship) == typeof(EntityRelationship) ? RelationshipTargetType.EntityRelationship :
-                           typeof(TRelationship) == typeof(ActRelationship) ? RelationshipTargetType.ActRelationship : RelationshipTargetType.ActParticipation;
+                var tclass = GetRelationshipTargetType<TRelationship>();
                 context.Open();
 
                 foreach (var itm in context.Query<DbRelationshipValidationRule>(o => (o.SourceClassKey == sourceClassKey || o.SourceClassKey == null) && o.RelationshipClassType == tclass))
                 {
                     yield return new AdoRelationshipValidationRule(itm);
+                }
+            }
+        }
+
+        public void RemoveRuleByKey<TRelationship>(Guid key) where TRelationship: ITargetedAssociation
+        {
+            if (key == Guid.Empty)
+            {
+                return;
+            }
+
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    var tclass = GetRelationshipTargetType<TRelationship>();
+                    context.Open();
+
+                    context.DeleteAll<DbRelationshipValidationRule>(r => r.RelationshipClassType == tclass && r.Key == key);
+                }
+                catch(DbException dbex)
+                {
+                    throw dbex.TranslateDbException();
+                }
+                catch(Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
+                {
+                    throw new DataPersistenceException($"Error removing validation rule with id {key}", ex);
                 }
             }
         }
@@ -197,8 +256,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
-                    var tclass = typeof(TRelationship) == typeof(EntityRelationship) ? RelationshipTargetType.EntityRelationship :
-                           typeof(TRelationship) == typeof(ActRelationship) ? RelationshipTargetType.ActRelationship : RelationshipTargetType.ActParticipation;
+                    var tclass = GetRelationshipTargetType<TRelationship>();
                     context.DeleteAll<DbRelationshipValidationRule>(o => o.SourceClassKey == sourceClassKey && o.TargetClassKey == targetClassKey && o.RelationshipTypeKey == relationshipTypeKey && o.RelationshipClassType == tclass);
                 }
                 catch (DbException e)
@@ -207,7 +265,7 @@ namespace SanteDB.Persistence.Data.Services
                 }
                 catch (Exception e)
                 {
-                    throw new DataPersistenceException($"Error creating validation rule {sourceClassKey}-[{relationshipTypeKey}]->{targetClassKey}", e);
+                    throw new DataPersistenceException($"Error removing validation rule {sourceClassKey}-[{relationshipTypeKey}]->{targetClassKey}", e);
                 }
             }
         }
