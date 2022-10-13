@@ -28,4 +28,5 @@ CREATE TABLE SEC_DEV_CLM_TBL
 );
 CREATE INDEX sec_dev_clm_dev_id_idx ON sec_dev_clm_tbl USING btree (dev_id);
 ALTER TABLE sec_pol_tbl ALTER pol_name TYPE VARCHAR(128);
+
 SELECT REG_PATCH('20220927-01'); 

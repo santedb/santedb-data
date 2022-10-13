@@ -384,8 +384,8 @@ namespace SanteDB.Persistence.PubSub.ADO
                             });
                         }
 
-                        tx.Commit();
                         channel = this.MapInstance(conn, dbChannel);
+                        tx.Commit();
 
                         this.m_cache?.Add(channel);
                         return channel;
@@ -571,9 +571,9 @@ namespace SanteDB.Persistence.PubSub.ADO
                             }
                         }
 
-                        tx.Commit();
 
                         subscription = this.MapInstance(conn, dbSubscription);
+                        tx.Commit();
                         this.Subscribed?.Invoke(this, new DataPersistedEventArgs<PubSubSubscriptionDefinition>(subscription, TransactionMode.Commit, AuthenticationContext.Current.Principal));
                         this.m_cache?.Add(subscription);
                         return subscription;
@@ -640,7 +640,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                         tx.Commit();
                         this.Subscribed?.Invoke(this, new DataPersistedEventArgs<PubSubSubscriptionDefinition>(retVal, TransactionMode.Commit, AuthenticationContext.Current.Principal));
 
-                        return this.MapInstance(conn, dbExisting);
+                        return retVal;
                     }
                 }
                 catch (Exception e)
