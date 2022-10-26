@@ -467,7 +467,7 @@ namespace SanteDB.Persistence.Data.Services
                         var dbClaims = context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key).ToList();
 
                         // Validate - Override sessions cannot be extended
-                        if (dbClaims.Any(c => c.ClaimType == SanteDBClaimTypes.SanteDBOverrideClaim && c.ClaimValue == "true"))
+                        if (dbClaims.Any(c => c.ClaimType == SanteDBClaimTypes.SanteDBOverrideClaim && c.ClaimValue == "true" || c.ClaimType == SanteDBClaimTypes.PurposeOfUse && c.ClaimValue == PurposeOfUseKeys.SecurityAdmin.ToString()))
                         {
                             throw new SecurityException(this.m_localizationService.GetString(ErrorMessageStrings.ELEVATED_SESSION_NO_EXTENSION));
                         }

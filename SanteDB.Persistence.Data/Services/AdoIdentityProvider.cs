@@ -845,5 +845,71 @@ namespace SanteDB.Persistence.Data.Services
                 }
             }
         }
+
+        /// <inheritdoc/>
+        public IPrincipal ReAuthenticate(IPrincipal principal)
+        {
+            if(principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal), ErrorMessages.ARGUMENT_NULL);
+            }
+            else if (!principal.Identity.IsAuthenticated || !(principal is IClaimsPrincipal claimsPrincipal))
+            {
+                throw new SecurityException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_REAUTH_NOT_ALLOWED));
+            }
+
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.Login, principal); // Re-validate
+
+            // Create an ADO principal off this principal
+            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == principal.Identity.Name.ToLowerInvariant() && o.ObsoletionTime == null);
+
+                    if(dbUser == null)
+                    {
+                        throw new InvalidIdentityAuthenticationException();
+                    }
+                    else if (dbUser.Lockout > DateTimeOffset.Now)
+                    {
+                        throw new LockedIdentityAuthenticationException(dbUser.Lockout.Value);
+                    }
+
+                    dbUser.UpdatedTime = dbUser.LastLoginTime = DateTimeOffset.Now;
+                    dbUser.UpdatedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
+
+                    context.Update(dbUser);
+
+                    var claims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Key && o.ClaimExpiry < DateTimeOffset.Now).ToList();
+
+                    // Establish ID
+                    var identity = new AdoUserIdentity(dbUser, "LOCAL");
+
+                    // Get roles
+                    var roleSql = context.CreateSqlStatement<DbSecurityRole>()
+                        .SelectFrom()
+                        .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
+                        .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key);
+                    identity.AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
+
+                    // Establish additional claims
+                    identity.AddClaims(claims.Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
+
+                    // Create principal
+                    var retVal = new AdoClaimsPrincipal(identity);
+                    this.m_pepService.Demand(PermissionPolicyIdentifiers.Login, retVal);
+
+                    // Fire authentication
+                    this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(retVal.Identity.Name, retVal, true));
+                    return retVal;
+                }
+                catch(AuthenticationException e)
+                {
+                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_INVALID));
+                }
+            }
+        }
     }
 }
