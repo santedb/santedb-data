@@ -223,6 +223,155 @@ namespace SanteDB.Persistence.Data.Services
             }
         }
 
+        private void ValidateIdentity(IClaimsIdentity identity, OrmLite.DataContext dataContext)
+        {
+            if (null == identity || identity.IsAuthenticated != true)
+            {
+                throw new AuthenticationException(m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_GENERAL));
+            }
+
+            var name = identity.Name.ToLowerInvariant();
+
+            if (identity is IDeviceIdentity)
+            {
+                var device = dataContext.FirstOrDefault<DbSecurityDevice>(d => d.PublicId.ToLowerInvariant() == name);
+
+                if (null == device)
+                {
+                    throw new AuthenticationException(m_localizationService.GetString(ErrorMessageStrings.AUTH_DEV_INVALID));
+                }
+
+                if (device.Lockout.GetValueOrDefault() > DateTimeOffset.Now)
+                {
+                    throw new AuthenticationException(m_localizationService.GetString(ErrorMessageStrings.AUTH_DEV_LOCKED));
+                }
+            }
+            else if (identity is IApplicationIdentity)
+            {
+                var app = dataContext.FirstOrDefault<DbSecurityApplication>(a => a.PublicId.ToLowerInvariant() == name);
+
+                if (null == app)
+                {
+                    throw new AuthenticationException(m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_INVALID));
+                }
+
+                if (app.Lockout.GetValueOrDefault() > DateTimeOffset.Now)
+                {
+                    throw new AuthenticationException(m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_LOCKED));
+                }
+            }
+            else
+            {
+                var user = dataContext.FirstOrDefault<DbSecurityUser>(u => u.UserName.ToLowerInvariant() == name);
+
+                if (null == user)
+                {
+                    throw new AuthenticationException(m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_INVALID));
+                }
+                if (user.Lockout.GetValueOrDefault() > DateTimeOffset.Now)
+                {
+                    throw new AuthenticationException(m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED));
+                }
+            }
+        }
+
+        public IPrincipal Authenticate(string applicationId, IPrincipal authenticationContext)
+        {
+            if (String.IsNullOrEmpty(applicationId))
+            {
+                throw new ArgumentNullException(nameof(applicationId), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+            if (null == authenticationContext)
+            {
+                throw new ArgumentNullException(nameof(authenticationContext), m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+            // Notify login
+            var preAuthenticateArgs = new AuthenticatingEventArgs(applicationId);
+            this.Authenticating?.Invoke(this, preAuthenticateArgs);
+            if (preAuthenticateArgs.Cancel)
+            {
+                // Did the callee override?
+                if (preAuthenticateArgs.Success)
+                {
+                    return preAuthenticateArgs.Principal;
+                }
+                else
+                {
+                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_CANCELLED));
+                }
+            }
+
+            if (authenticationContext?.Identity?.IsAuthenticated != true)
+            {
+                throw new AuthenticationException(m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_GENERAL));
+            }
+
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    // Query for application matching application ID
+                    var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationId.ToLowerInvariant() && o.ObsoletionTime == null);
+                    if (app == null)
+                    {
+                        throw new InvalidIdentityAuthenticationException();
+                    }
+
+                    // Locked?
+                    if (app.Lockout.GetValueOrDefault() > DateTimeOffset.Now)
+                    {
+                        throw new LockedIdentityAuthenticationException(app.Lockout.Value);
+                    }
+
+                    //Check that the incoming identity is valid
+                    ValidateIdentity(authenticationContext.Identity as IClaimsIdentity, context);
+
+                    app.LastAuthentication = DateTimeOffset.Now;
+
+                    // Construct an identity and login
+                    var identity = new AdoApplicationIdentity(app, "ONBEHALFOF");
+                    var retVal = new AdoClaimsPrincipal(identity);
+
+                    var dbClaims = context.Query<DbApplicationClaim>(o => o.SourceKey == app.Key &&
+                           (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now));
+                    identity.AddClaims(dbClaims.ToArray().Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
+
+                    // Demand login as a service
+                    this.m_pepService.Demand(PermissionPolicyIdentifiers.LoginAsService, retVal);
+
+                    context.Update(app);
+
+                    this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(applicationId, retVal, true));
+
+                    return retVal;
+                }
+                catch (LockedIdentityAuthenticationException)
+                {
+                    this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(applicationId, null, false));
+                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_LOCKED));
+                }
+                catch (InvalidIdentityAuthenticationException)
+                {
+                    this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(applicationId, null, false));
+                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_INVALID));
+                }
+                catch (AuthenticationException)
+                {
+                    this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(applicationId, null, false));
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(applicationId, null, false));
+                    this.m_tracer.TraceError("Could not authenticate application {0} - {1}", applicationId, e);
+                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_GENERAL), e);
+                }
+            }
+        }
+
         /// <summary>
         /// Change the specified application identity's secret
         /// </summary>
