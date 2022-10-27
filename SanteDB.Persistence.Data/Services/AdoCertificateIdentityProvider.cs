@@ -285,7 +285,7 @@ namespace SanteDB.Persistence.Data.Services
                     }
 
 
-                    authenticatedIdentity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.AuthenticationCertificate, authenticationCertificate.Subject));
+                    authenticatedIdentity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.AuthenticationCertificateSubject, authenticationCertificate.Subject));
 
                     // Create principal
                     var retVal = new AdoClaimsPrincipal(authenticatedIdentity);

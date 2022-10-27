@@ -505,6 +505,36 @@ namespace SanteDB.Persistence.Data.Services
             }
         }
 
+        /// <inheritdoc />
+        /// <exception cref="ArgumentException">User guid is empty or invalid</exception>
+        /// <exception cref="DataPersistenceException">An error occurred with the data persistence layer.</exception>
+        public ISession[] GetUserSessions(Guid user)
+        {
+            if (user == Guid.Empty)
+            {
+                throw new ArgumentException(m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_RANGE), nameof(user));
+            }
+
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var now = DateTimeOffset.Now;
+
+                    return context.Query<DbSession>(
+                        session => session.UserKey == user && session.NotAfter >= now
+                        ).Select(s=>new AdoSecuritySession(s.Key.ToByteArray(), null, s, context.Query<DbSessionClaim>(sc=>sc.SessionKey == s.Key))).ToArray();
+                }
+                catch(Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
+                {
+                    this.m_tracer.TraceError("Error getting session data {0}", ex);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_GEN_ERR), ex);
+                }
+            }
+        }
+
         /// <summary>
         /// Get the specified session
         /// </summary>
