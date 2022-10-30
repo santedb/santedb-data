@@ -30,7 +30,7 @@ namespace SanteDB.Persistence.Data.Security
     /// <summary>
     /// Represents a claims identity which is based on a DbSecurityUser
     /// </summary>
-    internal sealed class AdoUserIdentity : AdoIdentity
+    internal class AdoUserIdentity : AdoIdentity
     {
         // The user which is stored in this identity
         private readonly DbSecurityUser m_securityUser;

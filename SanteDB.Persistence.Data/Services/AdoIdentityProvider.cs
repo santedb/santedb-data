@@ -45,7 +45,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// An identity provider implemented for .NET
     /// </summary>
-    public class AdoIdentityProvider : IIdentityProviderService
+    public class AdoIdentityProvider : ILocalIdentityProviderService
     {
 
         // Secret claims which should not be disclosed 
@@ -909,6 +909,35 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_INVALID));
                 }
+            }
+        }
+
+        /// <inheritdoc/>
+        public AuthenticationMethod GetAuthenticationMethods(string userName)
+        {
+            if(String.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentNullException(nameof(userName));
+            }
+
+            try
+            {
+                using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+                {
+                    context.Open();
+                    if(context.Any<DbSecurityUser>(o=>o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null))
+                    {
+                        return AuthenticationMethod.Local;
+                    }
+                    else
+                    {
+                        return (AuthenticationMethod)0;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.USR_GEN_ERR), e);
             }
         }
     }

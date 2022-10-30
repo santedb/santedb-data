@@ -216,7 +216,7 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     this.m_traceSource.TraceError("Error padding policies to {0} : {1}", securable, e);
-                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_ASSIGN, new { target = securable, policyOids = String.Join(",", policyOids) }), e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_ASSIGN, new { securable = securable, policyOids = String.Join(",", policyOids) }), e);
                 }
             }
         }

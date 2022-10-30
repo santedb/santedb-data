@@ -44,7 +44,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// An implementation of the device identity provider
     /// </summary>
-    public class AdoDeviceIdentityProvider : IDeviceIdentityProviderService
+    public class AdoDeviceIdentityProvider : ILocalDeviceIdentityProviderService
     {
 
 

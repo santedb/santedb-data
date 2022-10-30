@@ -239,7 +239,7 @@ namespace SanteDB.Persistence.Data.Services
                         authData.Object2.UpdatedTime = authData.Object2.LastLoginTime = DateTimeOffset.Now;
                         authData.Object2.UpdatedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
                         context.Update(authData.Object2);
-                        authenticatedIdentity = new AdoUserIdentity(authData.Object2, "CERTIFICATE");
+                        authenticatedIdentity = new AdoUserCertificateIdentity(authData.Object2, authenticationCertificate);
 
                         // Claims to add to the principal
                         var claims = context.Query<DbUserClaim>(o => o.SourceKey == authData.Object1.SecurityUserKey && o.ClaimExpiry < DateTimeOffset.Now).ToList();
@@ -253,19 +253,6 @@ namespace SanteDB.Persistence.Data.Services
                         (authenticatedIdentity as AdoUserIdentity).AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
 
                     }
-                    else if (authData.Object1.SecurityApplicationKey.HasValue)
-                    {
-                        if (authData.Object3.Lockout.GetValueOrDefault() > DateTimeOffset.Now)
-                        {
-                            throw new LockedIdentityAuthenticationException(authData.Object3.Lockout.Value);
-                        }
-
-                        // Update the last login
-                        authData.Object3.UpdatedTime = authData.Object3.LastAuthentication = DateTimeOffset.Now;
-                        authData.Object3.UpdatedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
-                        context.Update(authData.Object3);
-                        authenticatedIdentity = new AdoApplicationIdentity(authData.Object3, "CERTIFICATE");
-                    }
                     else if (authData.Object1.SecurityDeviceKey.HasValue)
                     {
                         if (authData.Object4.Lockout.GetValueOrDefault() > DateTimeOffset.Now)
@@ -277,7 +264,7 @@ namespace SanteDB.Persistence.Data.Services
                         authData.Object4.UpdatedTime = authData.Object4.LastAuthentication = DateTimeOffset.Now;
                         authData.Object4.UpdatedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
                         context.Update(authData.Object4);
-                        authenticatedIdentity = new AdoDeviceIdentity(authData.Object4, "CERTIFICATE");
+                        authenticatedIdentity = new AdoDeviceCertificateIdentity(authData.Object4, authenticationCertificate);
                     }
                     else
                     {

@@ -78,5 +78,6 @@ namespace SanteDB.Persistence.Data.Security
         /// Get the SID of this object
         /// </summary>
         internal override Guid Sid => this.m_device.Key;
+
     }
 }

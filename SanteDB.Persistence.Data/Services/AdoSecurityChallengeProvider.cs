@@ -45,7 +45,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// Represents a callenge service which uses the ADO.NET tables
     /// </summary>
-    public class AdoSecurityChallengeProvider : ISecurityChallengeService, ISecurityChallengeIdentityService
+    public class AdoSecurityChallengeProvider : ILocalSecurityChallengeService, ILocalSecurityChallengeIdentityService
     {
 
         // Tracer

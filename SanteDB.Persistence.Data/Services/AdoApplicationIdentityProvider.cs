@@ -44,7 +44,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// Application identity provider that uses the database to authenticate applications
     /// </summary>
-    public class AdoApplicationIdentityProvider : IApplicationIdentityProviderService
+    public class AdoApplicationIdentityProvider : ILocalApplicationIdentityProviderService
     {
 
         // Secret claims which should not be disclosed 
