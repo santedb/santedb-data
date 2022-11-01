@@ -45,7 +45,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// A PIP service which stores data in the database
     /// </summary>
-    public class AdoPolicyInformationService : IPolicyInformationService
+    public class AdoPolicyInformationService : ILocalPolicyInformationService
     {
         /// <summary>
         /// Gets the service name
@@ -119,7 +119,7 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             case SecurityRole sr:
                                 {
-                                    context.DeleteAll<DbSecurityRolePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sr.Key && policies.Contains(o.PolicyKey));
+                                    context.DeleteAll<DbSecurityRolePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sr.Key);
                                     context.InsertAll(policies.Select(o => new DbSecurityRolePolicy()
                                     {
                                         GrantType = (int)rule,
@@ -131,7 +131,7 @@ namespace SanteDB.Persistence.Data.Services
                             case IApplicationIdentity iaid:
                                 {
                                     var sid = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == iaid.Name.ToLowerInvariant()).Select(o => o.Key).First();
-                                    context.DeleteAll<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sid && policies.Contains(o.PolicyKey));
+                                    context.DeleteAll<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sid);
                                     context.InsertAll(policies.Select(o => new DbSecurityApplicationPolicy()
                                     {
                                         GrantType = (int)rule,
@@ -142,7 +142,7 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                             case SecurityApplication sa:
                                 {
-                                    context.DeleteAll<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sa.Key && policies.Contains(o.PolicyKey));
+                                    context.DeleteAll<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sa.Key);
                                     context.InsertAll(policies.Select(o => new DbSecurityApplicationPolicy()
                                     {
                                         GrantType = (int)rule,
@@ -154,7 +154,7 @@ namespace SanteDB.Persistence.Data.Services
                             case IDeviceIdentity idid:
                                 {
                                     var sid = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == idid.Name.ToLowerInvariant()).Select(o => o.Key).First();
-                                    context.DeleteAll<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sid && policies.Contains(o.PolicyKey));
+                                    context.DeleteAll<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sid);
                                     context.InsertAll(policies.Select(o => new DbSecurityDevicePolicy()
                                     {
                                         GrantType = (int)rule,
@@ -165,7 +165,7 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                             case SecurityDevice sd:
                                 {
-                                    context.DeleteAll<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sd.Key && policies.Contains(o.PolicyKey));
+                                    context.DeleteAll<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sd.Key);
                                     context.InsertAll(policies.Select(o => new DbSecurityDevicePolicy()
                                     {
                                         GrantType = (int)rule,
@@ -612,15 +612,15 @@ namespace SanteDB.Persistence.Data.Services
 
                         if (securable is SecurityRole sr)
                         {
-                            context.DeleteAll<DbSecurityRolePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sr.Key && policies.Contains(o.PolicyKey));
+                            context.DeleteAll<DbSecurityRolePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sr.Key);
                         }
                         else if (securable is SecurityApplication sa)
                         {
-                            context.DeleteAll<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sa.Key && policies.Contains(o.PolicyKey));
+                            context.DeleteAll<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sa.Key);
                         }
                         else if (securable is SecurityDevice sd)
                         {
-                            context.DeleteAll<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sd.Key && policies.Contains(o.PolicyKey));
+                            context.DeleteAll<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sd.Key);
                         }
                         else if (securable is Entity entity)
                         {
@@ -644,8 +644,48 @@ namespace SanteDB.Persistence.Data.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_traceSource.TraceError("Error padding policies to {0} : {1}", securable, e);
+                    this.m_traceSource.TraceError("Error removing policies from {0} : {1}", securable, e);
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_ASSIGN, new { securable = securable, policyOids = String.Join(";", oid) }), e);
+                }
+            }
+        }
+
+        ///<inheritdoc />
+        public void CreatePolicy(IPolicy policy, IPrincipal principal)
+        {
+            if (null == policy)
+            {
+                throw new ArgumentNullException(nameof(policy), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+            if (null == principal)
+            {
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+            this.m_policyEnforcement.Demand(PermissionPolicyIdentifiers.AlterPolicy, principal);
+
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+                    context.EstablishProvenance(principal, null);
+
+                    var dbpolicy = new DbSecurityPolicy();
+
+                    dbpolicy.CanOverride = policy.CanOverride;
+                    dbpolicy.IsPublic = true;
+                    dbpolicy.Key = policy.Key;
+                    dbpolicy.Name = policy.Name;
+                    dbpolicy.Oid = policy.Oid;
+
+                    dbpolicy = context.Insert(dbpolicy);
+                }
+                catch(Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
+                {
+                    this.m_traceSource.TraceError("Error creating policy {0} : {1}", policy.Oid, ex);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_GEN), ex);
                 }
             }
         }
