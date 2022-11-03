@@ -106,6 +106,7 @@ namespace SanteDB.Persistence.Data.Services
 
             // Demand access to the alter identity permission
             this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, authenticatedPrincipal);
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.AssignCertificateToIdentity, authenticatedPrincipal);
 
             try
             {
