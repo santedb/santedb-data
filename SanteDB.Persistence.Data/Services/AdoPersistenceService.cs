@@ -18,9 +18,12 @@
  * User: fyfej
  * Date: 2022-9-7
  */
+using SanteDB.BI.Model;
+using SanteDB.BI.Services;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Map;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.Migration;
@@ -55,7 +58,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// ADO Persistence service
         /// </summary>
-        public AdoPersistenceService(IConfigurationManager configManager, IServiceManager serviceManager)
+        public AdoPersistenceService(IConfigurationManager configManager, IServiceManager serviceManager, IBiMetadataRepository biMetadataRepository = null)
         {
             this.m_configuration = configManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
@@ -74,7 +77,49 @@ namespace SanteDB.Persistence.Data.Services
             }
             serviceManager.AddServiceProvider(typeof(TagPersistenceService));
             serviceManager.AddServiceProvider(typeof(AdoRelationshipValidationProvider));
-            // TODO: Initialize further classes here
+
+            // Add this to the BI layer
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                // Add audits as a BI data source
+                biMetadataRepository?
+                    .Insert(new BiDataSourceDefinition()
+                    {
+                        IsSystemObject = true,
+                        ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                        MetaData = new BiMetadata()
+                        {
+                            Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
+                            Status = BiDefinitionStatus.Active,
+                            Demands = new List<string>()
+                            {
+                                PermissionPolicyIdentifiers.ReadClinicalData
+                            }
+                        },
+                        Id = "org.santedb.bi.dataSource.main",
+                        Name = "main",
+                        ProviderType = typeof(OrmBiDataProvider)
+                    });
+
+                biMetadataRepository?
+                    .Insert(new BiDataSourceDefinition()
+                    {
+                        IsSystemObject = true,
+                        ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                        MetaData = new BiMetadata()
+                        {
+                            Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
+                            Status = BiDefinitionStatus.Active,
+                            Demands = new List<string>()
+                            {
+                                PermissionPolicyIdentifiers.UnrestrictedAdministration
+                            }
+                        },
+                        Id = "org.santedb.bi.dataSource.admin",
+                        Name = "admin",
+                        ProviderType = typeof(OrmBiDataProvider)
+                    });
+            };
         }
 
         /// <summary>
