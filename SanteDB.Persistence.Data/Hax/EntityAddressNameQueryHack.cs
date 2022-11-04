@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Map;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
 using System;
@@ -34,6 +35,17 @@ namespace SanteDB.Persistence.Data.Hax
     /// </summary>
     public class EntityAddressNameQueryHack : IQueryBuilderHack
     {
+        // The mapper
+        private ModelMapper m_mapper;
+
+        /// <summary>
+        /// CTOR taking mapper as parm
+        /// </summary>
+        public EntityAddressNameQueryHack(ModelMapper map)
+        {
+            this.m_mapper = map;
+        }
+
         /// <summary>
         /// Hack the query
         /// </summary>

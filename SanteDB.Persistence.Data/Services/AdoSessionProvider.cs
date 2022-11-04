@@ -92,7 +92,7 @@ namespace SanteDB.Persistence.Data.Services
             SanteDBClaimTypes.DefaultRoleClaimType,
             SanteDBClaimTypes.Email,
             SanteDBClaimTypes.Expiration,
-            SanteDBClaimTypes.IsPersistent,
+            SanteDBClaimTypes.TemporarySession,
             SanteDBClaimTypes.Name,
             SanteDBClaimTypes.NameIdentifier,
             SanteDBClaimTypes.SanteDBApplicationIdentifierClaim,
@@ -347,6 +347,10 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             expiration = DateTimeOffset.Now.AddSeconds(120); //TODO: Need to set this somewhere as a configuration setting. This means they have ~2 minutes to click on a password reset.
                         }
+                        else if(claimsPrincipal.FindFirst(SanteDBClaimTypes.TemporarySession)?.Value == "true")
+                        {
+                            expiration = DateTimeOffset.Now.AddSeconds(60); //TODO: Need to set this somewhere as a configuration setting. This means they have ~2 minutes to click on a password reset.
+                        }
 
                         // Create sessoin data
                         var refreshToken = Guid.NewGuid();
@@ -467,7 +471,7 @@ namespace SanteDB.Persistence.Data.Services
                         var dbClaims = context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key).ToList();
 
                         // Validate - Override sessions cannot be extended
-                        if (dbClaims.Any(c => c.ClaimType == SanteDBClaimTypes.SanteDBOverrideClaim && c.ClaimValue == "true" || c.ClaimType == SanteDBClaimTypes.PurposeOfUse && c.ClaimValue == PurposeOfUseKeys.SecurityAdmin.ToString()))
+                        if (dbClaims.Any(c => (c.ClaimType == SanteDBClaimTypes.TemporarySession || c.ClaimType == SanteDBClaimTypes.SanteDBOverrideClaim) && c.ClaimValue == "true" || c.ClaimType == SanteDBClaimTypes.PurposeOfUse && c.ClaimValue == PurposeOfUseKeys.SecurityAdmin.ToString()))
                         {
                             throw new SecurityException(this.m_localizationService.GetString(ErrorMessageStrings.ELEVATED_SESSION_NO_EXTENSION));
                         }

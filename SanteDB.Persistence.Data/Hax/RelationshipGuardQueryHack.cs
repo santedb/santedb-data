@@ -22,6 +22,7 @@ using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Map;
 using SanteDB.OrmLite;
 using System;
 using System.Collections;
@@ -37,7 +38,16 @@ namespace SanteDB.Persistence.Data.Hax
     /// </summary>
     public class RelationshipGuardQueryHack : IQueryBuilderHack
     {
+        // The mapper
+        private ModelMapper m_mapper;
 
+        /// <summary>
+        /// CTOR taking mapper as parm
+        /// </summary>
+        public RelationshipGuardQueryHack(ModelMapper map)
+        {
+            this.m_mapper = map;
+        }
         /// <summary>
         /// Hack query builder based on clause
         /// </summary>
