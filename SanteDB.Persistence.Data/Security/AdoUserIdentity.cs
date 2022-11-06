@@ -18,8 +18,14 @@
  * User: fyfej
  * Date: 2022-9-7
  */
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security.Claims;
+using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Exceptions;
+using SanteDB.Persistence.Data.Model.Concepts;
+using SanteDB.Persistence.Data.Model.DataType;
+using SanteDB.Persistence.Data.Model.Entities;
+using SanteDB.Persistence.Data.Model.Roles;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
@@ -73,7 +79,7 @@ namespace SanteDB.Persistence.Data.Security
         {
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.NameIdentifier, this.m_securityUser.Key.ToString()));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Name, this.m_securityUser.UserName));
-            this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Sid, this.m_securityUser.Key.ToString()));
+            this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SecurityId, this.m_securityUser.Key.ToString()));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Actor, this.m_securityUser.UserClass.ToString()));
             if (!String.IsNullOrEmpty(this.m_securityUser.Email) && this.m_securityUser.EmailConfirmed)
             {
@@ -97,5 +103,60 @@ namespace SanteDB.Persistence.Data.Security
         /// Get the SID of this object
         /// </summary>
         internal override Guid Sid => this.m_securityUser.Key;
+
+        /// <summary>
+        /// Add XSPA claims
+        /// </summary>
+        internal void AddXspaClaims(DataContext contextForReadingAdditionalData)
+        {
+            var cdrEntitySql = contextForReadingAdditionalData.CreateSqlStatement<DbEntityVersion>().SelectFrom()
+                    .InnerJoin<DbEntityVersion, DbUserEntity>(o => o.VersionKey, o => o.ParentKey)
+                    .Where<DbUserEntity>(o => o.SecurityUserKey == this.Sid)
+                    .And<DbEntityVersion>(o => o.IsHeadVersion);
+
+            var cdrEntityId = contextForReadingAdditionalData.Query<DbEntityVersion>(cdrEntitySql).Select(o => o.Key).First();
+            this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.CdrEntityId, cdrEntityId.ToString()));
+
+            var organizationId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.AssignedEntity && o.ObsoleteVersionSequenceId == null).Select(o => o.SourceKey).FirstOrDefault();
+            if (organizationId != Guid.Empty)
+            {
+                this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaOrganizationIdClaim, organizationId.ToString()));
+            }
+
+            var facilityId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation && o.ObsoleteVersionSequenceId == null).Select(o => o.SourceKey).FirstOrDefault();
+            if (facilityId != Guid.Empty && this.FindFirst(SanteDBClaimTypes.XspaFacilityClaim) == null)
+            {
+                this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaFacilityClaim, facilityId.ToString()));
+            }
+
+            var subjectNameSql = contextForReadingAdditionalData.CreateSqlStatement<DbEntityNameComponent>().SelectFrom()
+                .InnerJoin<DbEntityName>(o => o.SourceKey, o => o.Key)
+                .Where<DbEntityName>(o => o.SourceKey == cdrEntityId && o.ObsoleteVersionSequenceId == null && (o.UseConceptKey == NameUseKeys.OfficialRecord))
+                .OrderBy<DbEntityNameComponent>(o => o.OrderSequence);
+
+            var nameValue = String.Join(" ", contextForReadingAdditionalData.Query<DbEntityNameComponent>(subjectNameSql).Select(o => o.Value));
+            if (!String.IsNullOrEmpty(nameValue))
+            {
+                this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaSubjectNameClaim, nameValue));
+            }
+
+            var subjectRoleSql = contextForReadingAdditionalData.CreateSqlStatement<DbEntityRelationship>().SelectFrom(typeof(DbReferenceTerm), typeof(DbCodeSystem))
+                .InnerJoin<DbEntityVersion>(o => o.TargetKey, o => o.Key)
+                .InnerJoin<DbEntityVersion, DbProvider>(o => o.VersionKey, o => o.ParentKey)
+                .InnerJoin<DbProvider, DbConceptVersion>(o => o.SpecialtyKey, o => o.Key)
+                .Join<DbConceptVersion, DbConceptReferenceTerm>("LEFT", o => o.Key, o => o.SourceKey)
+                .InnerJoin<DbConceptReferenceTerm, DbReferenceTerm>(o => o.TargetKey, o => o.Key)
+                .InnerJoin<DbReferenceTerm, DbCodeSystem>(o => o.CodeSystemKey, o => o.Key)
+                .Where<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.EquivalentEntity && o.ClassificationKey == RelationshipClassKeys.PlayedRoleLink && o.ObsoleteVersionSequenceId == null)
+                .And<DbEntityVersion>(o => o.ObsoletionTime == null)
+                .And<DbConceptReferenceTerm>(o => o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs && o.ObsoleteVersionSequenceId == null);
+
+            foreach (var cd in contextForReadingAdditionalData.Query<CompositeResult<DbReferenceTerm, DbCodeSystem>>(subjectRoleSql))
+            {
+                this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaUserRoleClaim, $"{cd.Object1.Mnemonic}^{cd.Object2.Oid}"));
+            }
+
+            // TODO: Retrieve NPI claim value
+        }
     }
 }

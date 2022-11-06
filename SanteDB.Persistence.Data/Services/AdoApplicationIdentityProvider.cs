@@ -275,6 +275,7 @@ namespace SanteDB.Persistence.Data.Services
             }
         }
 
+        /// <inheritdoc/>
         public IPrincipal Authenticate(string applicationId, IPrincipal authenticationContext)
         {
             if (String.IsNullOrEmpty(applicationId))
@@ -338,7 +339,6 @@ namespace SanteDB.Persistence.Data.Services
                     var dbClaims = context.Query<DbApplicationClaim>(o => o.SourceKey == app.Key &&
                            (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now));
                     identity.AddClaims(dbClaims.ToArray().Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
-
                     // Demand login as a service
                     this.m_pepService.Demand(PermissionPolicyIdentifiers.LoginAsService, retVal);
 

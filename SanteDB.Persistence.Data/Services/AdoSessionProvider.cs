@@ -32,6 +32,7 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Exceptions;
+using SanteDB.Persistence.Data.Model.Concepts;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
 using System;
@@ -99,8 +100,7 @@ namespace SanteDB.Persistence.Data.Services
             SanteDBClaimTypes.SanteDBDeviceIdentifierClaim,
             SanteDBClaimTypes.SanteDBOTAuthCode,
             SanteDBClaimTypes.SanteDBSessionIdClaim,
-            SanteDBClaimTypes.Sid,
-            SanteDBClaimTypes.SubjectId,
+            SanteDBClaimTypes.SecurityId,
             SanteDBClaimTypes.Telephone
         };
 
@@ -300,7 +300,7 @@ namespace SanteDB.Persistence.Data.Services
                                 applicationKey = adoApplication.Sid;
                                 break;
                             case IClaimsIdentity claimApplication:
-                                applicationKey = Guid.Parse(claimApplication.FindFirst(SanteDBClaimTypes.Sid)?.Value ?? claimApplication.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim)?.Value);
+                                applicationKey = Guid.Parse(claimApplication.FindFirst(SanteDBClaimTypes.SecurityId)?.Value ?? claimApplication.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim)?.Value);
                                 break;
                             case IIdentity idApplication:
                                 applicationKey = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationId.Name.ToLowerInvariant())?.Key;
@@ -316,7 +316,7 @@ namespace SanteDB.Persistence.Data.Services
                                 deviceKey = adoDevice.Sid;
                                 break;
                             case IClaimsIdentity claimDevice:
-                                deviceKey = Guid.Parse(claimDevice.FindFirst(SanteDBClaimTypes.Sid)?.Value ?? claimDevice.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim)?.Value);
+                                deviceKey = Guid.Parse(claimDevice.FindFirst(SanteDBClaimTypes.SecurityId)?.Value ?? claimDevice.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim)?.Value);
                                 break;
                             case IIdentity idDevice:
                                 deviceKey = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceId.Name.ToLowerInvariant())?.Key;
@@ -330,7 +330,7 @@ namespace SanteDB.Persistence.Data.Services
                                 userKey = adoUser.Sid;
                                 break;
                             case IClaimsIdentity claimUser:
-                                userKey = Guid.Parse(claimUser.FindFirst(SanteDBClaimTypes.Sid)?.Value);
+                                userKey = Guid.Parse(claimUser.FindFirst(SanteDBClaimTypes.SecurityId)?.Value);
                                 break;
                             case IIdentity idUser:
                                 userKey = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userId.Name)?.Key;
@@ -338,33 +338,44 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
 
-                        // Establish time limit
-                        var expiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.SessionLength, new TimeSpan(1, 0, 0)));
-                        // User is not really logging in, they are attempting to change their password only
-                        if (scope?.Contains(PermissionPolicyIdentifiers.LoginPasswordOnly) == true &&
-                            (purpose?.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true ||
-                            claimsPrincipal.FindFirst(SanteDBClaimTypes.PurposeOfUse)?.Value.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true))
-                        {
-                            expiration = DateTimeOffset.Now.AddSeconds(120); //TODO: Need to set this somewhere as a configuration setting. This means they have ~2 minutes to click on a password reset.
-                        }
-                        else if(claimsPrincipal.FindFirst(SanteDBClaimTypes.TemporarySession)?.Value == "true")
-                        {
-                            expiration = DateTimeOffset.Now.AddSeconds(60); //TODO: Need to set this somewhere as a configuration setting. This means they have ~2 minutes to click on a password reset.
-                        }
-
-                        // Create sessoin data
-                        var refreshToken = Guid.NewGuid();
+                        // Create refresh data
+                        var refreshToken = new byte[32];
+                        System.Security.Cryptography.RandomNumberGenerator.Create().GetBytes(refreshToken);
                         var dbSession = new DbSession()
                         {
                             ApplicationKey = applicationKey.GetValueOrDefault(),
                             DeviceKey = deviceKey,
                             UserKey = userKey,
                             NotBefore = DateTimeOffset.Now,
-                            NotAfter = expiration,
                             RemoteEndpoint = remoteEp,
                             RefreshExpiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.RefreshLength, new TimeSpan(1, 0, 0))),
-                            RefreshToken = this.m_passwordHashingService.ComputeHash(refreshToken.ToString())
+                            RefreshToken = this.m_passwordHashingService.ComputeHash(refreshToken).HexEncode().ToLower()
                         };
+
+                        // Is the original principal already a session principal from another service? If so we should use its expiration
+                        if (principal is ITokenPrincipal itp)
+                        {
+                            dbSession.NotAfter = itp.ExpiresAt;
+
+                        }
+                        else
+                        {
+                            // Establish time limit
+                            dbSession.NotAfter = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.SessionLength, new TimeSpan(1, 0, 0)));
+                            // User is not really logging in, they are attempting to change their password only
+                            if (scope?.Contains(PermissionPolicyIdentifiers.LoginPasswordOnly) == true &&
+                                (purpose?.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true ||
+                                claimsPrincipal.FindFirst(SanteDBClaimTypes.PurposeOfUse)?.Value.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true))
+                            {
+                                dbSession.NotAfter = DateTimeOffset.Now.AddSeconds(120); //TODO: Need to set this somewhere as a configuration setting. This means they have ~2 minutes to click on a password reset.
+                            }
+                            else if (claimsPrincipal.FindFirst(SanteDBClaimTypes.TemporarySession)?.Value == "true")
+                            {
+                                dbSession.NotAfter = DateTimeOffset.Now.AddSeconds(60); //TODO: Need to set this somewhere as a configuration setting. This means they have ~2 minutes to click on a password reset.
+                            }
+
+                        }
+                       
 
                         dbSession = context.Insert(dbSession);
 
@@ -392,6 +403,11 @@ namespace SanteDB.Persistence.Data.Services
                         // POU?
                         if (!String.IsNullOrEmpty(purpose))
                         {
+                            // Convert POU from Guid (which it should be) to a MNEMONIC
+                            if (Guid.TryParse(purpose, out var purposeId))
+                            {
+                                purpose = context.Query<DbConceptVersion>(o => o.StatusConceptKey == purposeId && o.ObsoletionTime == null).Select(o => o.Mnemonic).First();
+                            }
                             claims.Add(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, purpose));
                         }
 
@@ -414,7 +430,7 @@ namespace SanteDB.Persistence.Data.Services
 
                         //var signedToken = dbSession.Key.ToByteArray().Concat(m_dataSigningService.SignData(dbSession.Key.ToByteArray())).ToArray();
                         //var signedRefresh = refreshToken.ToByteArray().Concat(m_dataSigningService.SignData(refreshToken.ToByteArray())).ToArray();
-                        var session = new AdoSecuritySession(dbSession.Key.ToByteArray(), refreshToken.ToByteArray(), dbSession, dbClaims);
+                        var session = new AdoSecuritySession(dbSession.Key.ToByteArray(), refreshToken, dbSession, dbClaims);
 
                         this.m_adhocCacheService?.Add(this.CreateCacheKey(session.Key), session, dbSession.RefreshExpiration.Subtract(DateTimeOffset.Now));
 
@@ -647,7 +663,9 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             if (authenticated)
                             {
-                                identities[0] = new AdoUserIdentity(dbSession.Object3, "SESSION");
+                                var uid = new AdoUserIdentity(dbSession.Object3, "SESSION");
+                                uid.AddXspaClaims(context);
+                                identities[0] = uid;
                             }
                             else
                             {

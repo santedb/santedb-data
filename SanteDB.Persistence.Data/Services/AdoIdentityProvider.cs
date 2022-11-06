@@ -333,6 +333,7 @@ namespace SanteDB.Persistence.Data.Services
 
                             // Establish additional claims
                             identity.AddClaims(claims.Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
+                            identity.AddXspaClaims(context);
 
                             // Create principal
                             var retVal = new AdoClaimsPrincipal(identity);

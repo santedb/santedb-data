@@ -102,7 +102,7 @@ namespace SanteDB.Persistence.Data.Test
             Assert.IsTrue(sesPrincipal.Identities.OfType<IApplicationIdentity>().Any());
             Assert.IsNotNull(sesPrincipal.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim));
             Assert.IsNotNull(sesPrincipal.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim));
-            Assert.AreEqual(3, sesPrincipal.FindAll(SanteDBClaimTypes.Sid).Count());
+            Assert.AreEqual(3, sesPrincipal.FindAll(SanteDBClaimTypes.SecurityId).Count());
             Assert.AreEqual(userPrincipal.Identity.Name, sesPrincipal.FindFirst(SanteDBClaimTypes.Name).Value);
 
             // Should hit cache
@@ -113,7 +113,7 @@ namespace SanteDB.Persistence.Data.Test
             Assert.IsTrue(sesPrincipal.Identities.OfType<IApplicationIdentity>().Any());
             Assert.IsNotNull(sesPrincipal.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim));
             Assert.IsNotNull(sesPrincipal.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim));
-            Assert.AreEqual(3, sesPrincipal.FindAll(SanteDBClaimTypes.Sid).Count());
+            Assert.AreEqual(3, sesPrincipal.FindAll(SanteDBClaimTypes.SecurityId).Count());
             Assert.AreEqual(userPrincipal.Identity.Name, sesPrincipal.FindFirst(SanteDBClaimTypes.Name).Value);
 
 

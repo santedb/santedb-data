@@ -361,7 +361,7 @@ namespace SanteDB.Persistence.Data
                     {
                         sid = Guid.Parse(cIdentity.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim)?.Value ??
                             cIdentity.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim)?.Value ??
-                            cIdentity.FindFirst(SanteDBClaimTypes.Sid)?.Value);
+                            cIdentity.FindFirst(SanteDBClaimTypes.SecurityId)?.Value);
                     }
                     else
                     {

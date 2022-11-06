@@ -21,6 +21,7 @@
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
+using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Exceptions;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
@@ -69,7 +70,7 @@ namespace SanteDB.Persistence.Data.Security
         /// </summary>
         private void InitializeClaims()
         {
-            this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Sid, this.m_device.Key.ToString()));
+            this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SecurityId, this.m_device.Key.ToString()));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim, this.m_device.Key.ToString()));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Actor, ActorTypeKeys.Device.ToString()));
         }

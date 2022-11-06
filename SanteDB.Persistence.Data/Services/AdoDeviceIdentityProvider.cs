@@ -183,7 +183,6 @@ namespace SanteDB.Persistence.Data.Services
                     var dbClaims = context.Query<DbDeviceClaim>(o => o.SourceKey == dev.Key &&
                            (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now));
                     identity.AddClaims(dbClaims.ToArray().Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
-
                     // demand login
                     this.m_pepService.Demand(PermissionPolicyIdentifiers.LoginAsService, retVal);
 

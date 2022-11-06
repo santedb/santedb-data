@@ -59,9 +59,11 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// </summary>
         public string ServiceName => "ADO.NET Audit Repository";
 
-        public IDbProvider Provider => throw new NotImplementedException();
+        /// <inheritdoc/>
+        public IDbProvider Provider { get; }
 
-        public IQueryPersistenceService QueryPersistence => throw new NotImplementedException();
+        /// <inheritdoc/>
+        public IQueryPersistenceService QueryPersistence { get; }
 
         // Lock object
         private object m_lockBox = new object();
@@ -154,10 +156,12 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Create new audit repository service
         /// </summary>
-        public AdoAuditRepositoryService(IConfigurationManager configurationManager,
+        public AdoAuditRepositoryService(
+            IConfigurationManager configurationManager,
             IDataCachingService dataCachingService,
             IBiMetadataRepository biMetadataRepository,
             IConceptRepositoryService conceptRepository,
+            IQueryPersistenceService queryPersistence,
             IAdhocCacheService adhocCacheService = null)
         {
             this.m_configuration = configurationManager.GetSection<AdoAuditConfigurationSection>();
@@ -167,6 +171,8 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
             try
             {
+                this.Provider = this.m_configuration.Provider;
+                this.QueryPersistence = queryPersistence;
                 this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Audit.ADO");
 
 
@@ -625,7 +631,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     context.Open();
                     var results = new MappedQueryResultSet<AuditEventData>(this).Where(query);
 
-                    ApplicationServiceContext.Current.GetAuditService().Audit().ForAuditLogUsed(ActionType.Read, OutcomeIndicator.Success, query.ToString(), results.Select(o => o.Key.Value).ToArray()).Send();
+                    ApplicationServiceContext.Current.GetAuditService().Audit().ForAuditLogUsed(ActionType.Read, OutcomeIndicator.Success, query.ToString()).Send();
 
                     // Event args
                     var postEvtArgs = new QueryResultEventArgs<AuditEventData>(query, results, overrideAuthContext);
