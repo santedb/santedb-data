@@ -58,6 +58,49 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
+        /// Ensure that the object exists in the database
+        /// </summary>
+        /// <remarks>This method will return the current data in the database for <paramref name="data"/> if it exists, otherwise it will create the object
+        /// and then return the created object. This is used when for inserting dependent objects.</remarks>
+        /// <param name="context">The context on which the exists statement should be performed</param>
+        /// <param name="data">The data which should be check for existence</param>
+        /// <returns>The data as it exists in the database</returns>
+        protected TData EnsureExists<TData>(DataContext context, TData data)
+            where TData : IdentifiedData, new()
+        {
+
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+            else if (data == default(TData))
+            {
+                return default(TData);
+            }
+
+            var persistenceService = typeof(TData).GetRelatedPersistenceService() as IAdoPersistenceProvider<TData>;
+            if (!data.Key.HasValue || !persistenceService.Exists(context, data.Key.Value))
+            {
+                if (this.TryGetKeyResolver<TData>(out var keyResolver))
+                {
+                    return persistenceService.Query(context, keyResolver.GetKeyExpression(data)).FirstOrDefault();
+                }
+                else if (this.m_configuration.AutoInsertChildren)
+                {
+                    return persistenceService.Insert(context, data);
+                }
+                else
+                {
+                    throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.RELATED_OBJECT_NOT_FOUND, new { name = typeof(TData).Name, source = data.Key }));
+                }
+            }
+            else
+            {
+                return data;
+            }
+        }
+
+        /// <summary>
         /// Get the key resolver for <typeparamref name="TTarget"/>
         /// </summary>
         /// <typeparam name="TTarget">Target of the key resolver</typeparam>

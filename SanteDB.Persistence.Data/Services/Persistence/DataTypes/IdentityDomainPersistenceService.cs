@@ -31,7 +31,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
     /// <summary>
     /// Assigning authority persistence service
     /// </summary>
-    public class IdentityDomainPersistenceService : NonVersionedDataPersistenceService<IdentityDomain, DbIdentityDomain>, IAdoKeyResolver<DbIdentityDomainScope>
+    public class IdentityDomainPersistenceService : NonVersionedDataPersistenceService<IdentityDomain, DbIdentityDomain>, IAdoKeyResolver<DbIdentityDomainScope>,
+        IAdoKeyResolver<IdentityDomain>
     {
         /// <summary>
         /// Assigning authority configuration manager
@@ -117,5 +118,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 
         /// <inheritdoc/>
         public Expression<Func<DbIdentityDomainScope, bool>> GetKeyExpression(DbIdentityDomainScope model) => o => o.SourceKey == model.SourceKey && o.ScopeConceptKey == model.ScopeConceptKey;
+
+        /// <inheritdoc/>
+        public Expression<Func<IdentityDomain, bool>> GetKeyExpression(IdentityDomain model) => o => o.DomainName == model.DomainName && o.ObsoletionTime == null;
     }
 }

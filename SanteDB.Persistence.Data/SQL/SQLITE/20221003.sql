@@ -231,6 +231,9 @@ INSERT INTO rel_VRFY_SYSTBL (trg_cls_cd_id, rel_typ_cd_id, src_cls_cd_id, err_de
 -- OPTIONAL
 INSERT INTO rel_VRFY_SYSTBL (trg_cls_cd_id, rel_typ_cd_id, src_cls_cd_id, err_desc) VALUES ((x'55BD087C424DCD4992F86388D6C4183F'), (x'13953CB41C1CD04E92DB55A904C122E6'), (x'46A8E29DF2DDBC4E902E84508C5089EA'), 'Person=[Employee]=>Organization'); --#! 
 
+-- MATERIAL -> INSTANCE -> MANUFACTURED MATERIAL
+-- OPTIONAL
+insert into rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) values (x'40A745ACC7B0254484D8B3F8A41FEF9F',x'BE7390D38F0F0E44B8C87034CC138A95',x'86C2FEFAD5890B429085054ACA9D1EEF','Material==[Instance]==>ManufacturedMaterial');--#!
 
 
 -- MISSING POLICY IDENTIFIERS
