@@ -120,6 +120,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         public Expression<Func<DbIdentityDomainScope, bool>> GetKeyExpression(DbIdentityDomainScope model) => o => o.SourceKey == model.SourceKey && o.ScopeConceptKey == model.ScopeConceptKey;
 
         /// <inheritdoc/>
-        public Expression<Func<IdentityDomain, bool>> GetKeyExpression(IdentityDomain model) => o => o.DomainName == model.DomainName && o.ObsoletionTime == null;
+        public Expression<Func<IdentityDomain, bool>> GetKeyExpression(IdentityDomain model) => o => (o.DomainName == model.DomainName || o.Oid == model.Oid) && o.ObsoletionTime == null;
     }
 }

@@ -43,13 +43,13 @@ namespace SanteDB.Persistence.Data.Model.DataType
         /// <summary>
         /// Gets or sets the short HL7 code of the AA
         /// </summary>
-        [Column("nsid")]
+        [Column("nsid"), NotNull]
         public String DomainName { get; set; }
 
         /// <summary>
         /// Gets or sets the OID of the AA
         /// </summary>
-        [Column("oid")]
+        [Column("oid"), NotNull]
         public String Oid { get; set; }
 
         /// <summary>

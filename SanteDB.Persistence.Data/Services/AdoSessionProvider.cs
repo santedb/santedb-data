@@ -250,7 +250,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 purpose = claimsPrincipal.FindFirst(SanteDBClaimTypes.PurposeOfUse).Value;
             }
-
+           
             // Validate override permission for the user
             if (isOverride)
             {
@@ -289,6 +289,8 @@ namespace SanteDB.Persistence.Data.Services
                             deviceId = claimsPrincipal.Identities.OfType<IDeviceIdentity>().FirstOrDefault(),
                             userId = claimsPrincipal.Identities.FirstOrDefault(o => !(o is IApplicationIdentity || o is IDeviceIdentity));
 
+                        // Claims to be added to session
+                        var claims = new List<IClaim>();
 
                         // Fetch the keys for the identities
                         Guid? applicationKey = null, deviceKey = null, userKey = null;
@@ -365,22 +367,16 @@ namespace SanteDB.Persistence.Data.Services
                             // User is not really logging in, they are attempting to change their password only
                             if (scope?.Contains(PermissionPolicyIdentifiers.LoginPasswordOnly) == true &&
                                 (purpose?.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true ||
-                                claimsPrincipal.FindFirst(SanteDBClaimTypes.PurposeOfUse)?.Value.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true))
+                                claimsPrincipal.FindFirst(SanteDBClaimTypes.PurposeOfUse)?.Value.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true) ||
+                                isOverride)
                             {
                                 dbSession.NotAfter = DateTimeOffset.Now.AddSeconds(120); //TODO: Need to set this somewhere as a configuration setting. This means they have ~2 minutes to click on a password reset.
                             }
-                            else if (claimsPrincipal.FindFirst(SanteDBClaimTypes.TemporarySession)?.Value == "true")
-                            {
-                                dbSession.NotAfter = DateTimeOffset.Now.AddSeconds(60); //TODO: Need to set this somewhere as a configuration setting. This means they have ~2 minutes to click on a password reset.
-                            }
-
+                            
                         }
                        
 
                         dbSession = context.Insert(dbSession);
-
-                        // Claims to be added to session
-                        var claims = new List<IClaim>();
 
                         // Default = *
                         var sessionScopes = new List<string>();

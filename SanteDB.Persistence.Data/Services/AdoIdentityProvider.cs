@@ -31,6 +31,7 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Exceptions;
+using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
 using System;
@@ -334,6 +335,20 @@ namespace SanteDB.Persistence.Data.Services
                             // Establish additional claims
                             identity.AddClaims(claims.Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
                             identity.AddXspaClaims(context);
+
+
+                            // Add the default language 
+                            var prefLangSql = context.CreateSqlStatement<DbPersonLanguageCommunication>().SelectFrom()
+                                .InnerJoin<DbEntityVersion>(o => o.SourceKey, o => o.Key)
+                                .InnerJoin<DbEntityVersion, DbUserEntity>(o => o.VersionKey, o => o.ParentKey)
+                                .Where<DbUserEntity>(o => o.SecurityUserKey == dbUser.Key)
+                                .And<DbPersonLanguageCommunication>(o => o.IsPreferred == true)
+                                .And<DbEntityVersion>(o => o.IsHeadVersion);
+                            var preferredLanguage = context.Query<DbPersonLanguageCommunication>(prefLangSql).Select(o => o.LanguageCode).FirstOrDefault();
+                            if (!String.IsNullOrEmpty(preferredLanguage))
+                            {
+                                identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Language, preferredLanguage));
+                            }
 
                             // Create principal
                             var retVal = new AdoClaimsPrincipal(identity);

@@ -828,7 +828,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 if (!a.Key.HasValue && a.BatchOperation != BatchOperationType.Insert
                     && this.TryGetKeyResolver<TModelAssociation>(out var keyResolver))
                 {
-                    a.Key = persistenceService.Query(context, keyResolver.GetKeyExpression(a)).Select(o => o.Key).FirstOrDefault();
+                    a.Key = persistenceService.Query(context, keyResolver.GetKeyExpression(a)).Select(o => o.Key).SingleOrDefault();
                 }
                 return a;
             }).ToArray();
@@ -897,7 +897,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 else if (a is IDbIdentified idi && idi.Key == Guid.Empty
                     && this.TryGetKeyResolver<TAssociativeTable>(out var resolver))
                 {
-                    idi.Key = context.Query<TAssociativeTable>(resolver.GetKeyExpression(a)).Select<Guid>(nameof(IDbIdentified.Key)).FirstOrDefault();
+                    idi.Key = context.Query<TAssociativeTable>(resolver.GetKeyExpression(a)).Select<Guid>(nameof(IDbIdentified.Key)).SingleOrDefault();
                 }
 
                 return a;

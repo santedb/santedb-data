@@ -27,7 +27,6 @@ CREATE TABLE SEC_DEV_CLM_TBL
 	CONSTRAINT fk_sec_dev_clm_tbl FOREIGN KEY (dev_id) REFERENCES sec_dev_tbl(dev_id)
 );--#!
 CREATE INDEX sec_dev_clm_dev_id_idx ON sec_dev_clm_tbl (dev_id);--#!
-UPDATE ent_vrsn_tbl SET cls_cd_id = char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684') WHERE ent_id = char_to_uuid('b55f0836-40e6-4ee2-9522-27e3f8bfe532');--#!
 
 SELECT REG_PATCH('20220927-01') FROM RDB$DATABASE; --#!
 

@@ -83,7 +83,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 if (this.TryGetKeyResolver<TData>(out var keyResolver))
                 {
-                    return persistenceService.Query(context, keyResolver.GetKeyExpression(data)).FirstOrDefault();
+                    return persistenceService.Query(context, keyResolver.GetKeyExpression(data)).SingleOrDefault();
                 }
                 else if (this.m_configuration.AutoInsertChildren)
                 {
@@ -114,7 +114,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             var candidate = ApplicationServiceContext.Current.GetService<IAdoKeyResolver<TTarget>>();
             this.m_keyResolvers.TryAdd(typeof(TTarget), candidate);
-            resolver = tresolver as IAdoKeyResolver<TTarget>;
+            resolver = candidate as IAdoKeyResolver<TTarget>;
             return resolver != null;
         }
 
@@ -505,7 +505,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 if (!a.Key.HasValue && a.BatchOperation != Core.Model.DataTypes.BatchOperationType.Insert
                     && this.TryGetKeyResolver<TModelAssociation>(out var keyResolver))
                 {
-                    a.Key = persistenceService.Query(context, keyResolver.GetKeyExpression(a)).Select(o => o.Key).FirstOrDefault();
+                    a.Key = persistenceService.Query(context, keyResolver.GetKeyExpression(a)).Select(o => o.Key).SingleOrDefault();
                 }
                 return a;
             }).ToArray();
@@ -559,7 +559,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 else if (a is IDbIdentified idi && idi.Key == Guid.Empty
                     && this.TryGetKeyResolver<TAssociativeTable>(out var resolver))
                 {
-                    idi.Key = context.Query<TAssociativeTable>(resolver.GetKeyExpression(a)).Select<Guid>(nameof(IDbIdentified.Key)).FirstOrDefault();
+                    idi.Key = context.Query<TAssociativeTable>(resolver.GetKeyExpression(a)).Select<Guid>(nameof(IDbIdentified.Key)).SingleOrDefault();
                 }
                 return a;
             }).ToArray();
