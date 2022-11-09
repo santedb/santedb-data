@@ -342,7 +342,7 @@ namespace SanteDB.Persistence.Data.Services
                                 .InnerJoin<DbEntityVersion>(o => o.SourceKey, o => o.Key)
                                 .InnerJoin<DbEntityVersion, DbUserEntity>(o => o.VersionKey, o => o.ParentKey)
                                 .Where<DbUserEntity>(o => o.SecurityUserKey == dbUser.Key)
-                                .And<DbPersonLanguageCommunication>(o => o.IsPreferred == true)
+                                .And<DbPersonLanguageCommunication>(o => o.IsPreferred == true && o.ObsoleteVersionSequenceId == null)
                                 .And<DbEntityVersion>(o => o.IsHeadVersion);
                             var preferredLanguage = context.Query<DbPersonLanguageCommunication>(prefLangSql).Select(o => o.LanguageCode).FirstOrDefault();
                             if (!String.IsNullOrEmpty(preferredLanguage))
