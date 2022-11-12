@@ -46,8 +46,12 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// An identity provider implemented for .NET
     /// </summary>
-    public class AdoIdentityProvider : ILocalIdentityProviderService
+    public class AdoIdentityProvider : IIdentityProviderService, ILocalServiceProvider<IIdentityProviderService>
     {
+
+
+        /// <inheritdoc/>
+        public IIdentityProviderService LocalProvider => this;
 
         // Secret claims which should not be disclosed 
         private readonly String[] m_nonIdentityClaims =

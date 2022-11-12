@@ -45,7 +45,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// A PIP service which stores data in the database
     /// </summary>
-    public class AdoPolicyInformationService : ILocalPolicyInformationService
+    public class AdoPolicyInformationService : IPolicyInformationService, ILocalServiceProvider<IPolicyInformationService>
     {
         /// <summary>
         /// Gets the service name
@@ -70,6 +70,9 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         private readonly Tracer m_traceSource = Tracer.GetTracer(typeof(AdoPolicyInformationService));
         private readonly IAdoPersistenceProvider<Entity> m_entityPersistence;
+
+        /// <inheritdoc/>
+        public IPolicyInformationService LocalProvider => this;
 
         /// <summary>
         /// Create new policy info service

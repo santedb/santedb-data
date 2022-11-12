@@ -44,8 +44,11 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// An implementation of the device identity provider
     /// </summary>
-    public class AdoDeviceIdentityProvider : ILocalDeviceIdentityProviderService
+    public class AdoDeviceIdentityProvider : IDeviceIdentityProviderService, ILocalServiceProvider<IDeviceIdentityProviderService>
     {
+
+        /// <inheritdoc/>
+        public IDeviceIdentityProviderService LocalProvider => this;
 
 
         // Secret claims which should not be disclosed in an IIdentity 
