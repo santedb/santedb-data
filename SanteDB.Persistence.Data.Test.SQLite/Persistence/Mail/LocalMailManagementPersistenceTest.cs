@@ -76,7 +76,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Mail
                 Assert.AreEqual(0, messages.Where(s => s.Target.Body == "This is a test").Count());
                 Assert.AreEqual("This is another test", messages.Where(s => s.Target.Flags == MailMessageFlags.LowPriority).First().LoadProperty(o => o.Target).Subject);
 
-                Assert.AreEqual(MailMessageFlags.HighPriority, messages.OrderByDescending(o => o.MailStatusFlag).First().MailStatusFlag);
+                Assert.AreEqual(MailStatusFlags.Unread, messages.OrderByDescending(o => o.MailStatusFlag).First().MailStatusFlag);
 
             }
 

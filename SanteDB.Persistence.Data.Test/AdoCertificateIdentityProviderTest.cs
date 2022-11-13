@@ -149,10 +149,13 @@ namespace SanteDB.Persistence.Data.Test
             Assert.IsNotNull(certService);
             var userService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
             Assert.IsNotNull(userService);
+            var roleService = ApplicationServiceContext.Current.GetService<IRoleProviderService>();
+            Assert.IsNotNull(roleService);
 
             // Create a random user
             var userIdentity = userService.CreateIdentity("TEST_ADO_X509_04", "@TeST123!", AuthenticationContext.SystemPrincipal);
             Assert.IsNotNull(userIdentity);
+            roleService.AddUsersToRoles(new String[] { userIdentity.Name }, new string[] { "USERS" }, AuthenticationContext.SystemPrincipal);
 
             // Assign the certificate to the identity
             certService.AddIdentityMap(userIdentity, this.GetCertificate(), AuthenticationContext.SystemPrincipal);

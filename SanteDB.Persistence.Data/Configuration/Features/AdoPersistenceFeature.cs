@@ -41,6 +41,11 @@ namespace SanteDB.Persistence.Data.Configuration.Features
         }
 
         /// <summary>
+        /// Auto-setup
+        /// </summary>
+        public override FeatureFlags Flags => FeatureFlags.AutoSetup;
+
+        /// <summary>
         /// Create installation tasks
         /// </summary>
         public override IEnumerable<IConfigurationTask> CreateInstallTasks()
@@ -78,7 +83,8 @@ namespace SanteDB.Persistence.Data.Configuration.Features
                 typeof(AdoSecurityChallengeProvider),
                 typeof(AdoRoleProvider),
                 typeof(AdoSubscriptionExecutor),
-                typeof(AdoSessionProvider)
+                typeof(AdoSessionProvider),
+                typeof(AdoPolicyInformationService)
             };
 
             /// <summary>
