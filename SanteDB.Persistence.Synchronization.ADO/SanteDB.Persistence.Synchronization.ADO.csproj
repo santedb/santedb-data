@@ -1,0 +1,99 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Condition="'$(VersionNumber)' == ''">
+    <VersionNumber>3.0-debug</VersionNumber>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PackageId>SanteDB.Persistence.Data.Synchronization</PackageId>
+    <Title>SanteDB.Persistence.Data.Synchronization</Title>
+    <Version>$(VersionNumber)</Version>
+    <Description>SanteDB iCDR Database Synchronization Repository</Description>
+    <Authors>SanteSuite Contributors</Authors>
+    <PackageTags>SanteDB</PackageTags>
+    <RepositoryUrl>https://github.com/santedb/santedb-data</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IncludeSymbols>true</IncludeSymbols>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Product>SanteDB</Product>
+    <Copyright>Copyright (C) 2015-2022 SanteSuite Contributors (See: NOTICES)</Copyright>
+    <Company>SanteSuite Contributors</Company>
+    <PackageIconUrl>http://santesuite.org/assets/img/logo.png</PackageIconUrl>
+    <PackageProjectUrl>http://santesuite.org</PackageProjectUrl>
+    <BaseOutputPath>..\bin\</BaseOutputPath>
+  </PropertyGroup>
+  <Choose>
+    <When Condition="$(SolutionName.Contains('-ext'))">
+      <ItemGroup>
+        <ProjectReference Include="..\..\restsrvr\RestSrvr\RestSrvr.csproj">
+          <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
+          <Name>RestSrvr</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
+          <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
+          <Name>SanteDB.Core.Api</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
+          <Project>{39E61451-F4FE-493D-B754-5F06EB284AAC}</Project>
+          <Name>SanteDB.Core.Applets</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
+          <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
+          <Name>SanteDB.Core.Model</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
+          <Project>{786BD0EE-1806-4158-BA45-80249AC6DFE7}</Project>
+          <Name>SanteDB.Rest.Common</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\..\santedb-orm\SanteDB.OrmLite\SanteDB.OrmLite.csproj">
+          <Project>{407c87e6-a1f3-45e6-b883-a8176b350817}</Project>
+          <Name>SanteDB.OrmLite</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
+          <Project>{284CE885-78E0-48EA-A2E4-6957AD66EAB5}</Project>
+          <Name>SanteDB.Docker.Core</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\..\santedb-dc-core\SanteDB.Client.Disconnected\SanteDB.Client.Disconnected.csproj" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="RestSrvr" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Api" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Model" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Rest.Common" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.OrmLite" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Docker.Core" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Client.Disconnected" Version="$(VersionNumber)" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+  <ItemGroup>
+    <None Remove="Data\SQL\PSQL\sync_repo.sql" />
+    <None Remove="Data\SQL\SQLITE\sync_repo.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Data\SQL\PSQL\sync_repo.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\SQLITE\sync_repo.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <!--<ItemGroup>
+    <ProjectReference Include="..\..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj">
+      <Project>{ca7b81dc-b789-4af6-a079-ec84259c101a}</Project>
+      <Name>SanteDB.Core.i18n</Name>
+    </ProjectReference>
+  </ItemGroup>-->
+  <ItemGroup>
+    <None Include="..\SanteDB.licenseheader">
+      <Link>SanteDB.licenseheader</Link>
+    </None>
+  </ItemGroup>
+</Project>
