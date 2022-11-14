@@ -51,7 +51,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
     /// Represents a service which is responsible for the storage of audits
     /// </summary>
     /// TODO: Change this to wrapped call method
-    [ServiceProvider("ADO.NET Audit Repository")]
+    [ServiceProvider("ADO.NET Audit Repository", Configuration = typeof(AdoAuditConfigurationSection))]
     public class AdoAuditRepositoryService : IDataPersistenceService<AuditEventData>, IMappedQueryProvider<AuditEventData>
     {
         /// <summary>
@@ -151,6 +151,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
         public event EventHandler<DataPersistingEventArgs<AuditEventData>> Deleting;
 
+
 #pragma warning restore CS0067
 
         /// <summary>
@@ -162,6 +163,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             IBiMetadataRepository biMetadataRepository,
             IConceptRepositoryService conceptRepository,
             IQueryPersistenceService queryPersistence,
+            IServiceManager serviceManager,
             IAdhocCacheService adhocCacheService = null)
         {
             this.m_configuration = configurationManager.GetSection<AdoAuditConfigurationSection>();
@@ -173,7 +175,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             {
                 this.Provider = this.m_configuration.Provider;
                 this.QueryPersistence = queryPersistence;
-                this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Audit.ADO");
+                this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Audit.ADO", serviceManager.NotifyStartupProgress);
 
 
                     using (AuthenticationContext.EnterSystemContext())

@@ -45,6 +45,7 @@ namespace SanteDB.Persistence.Data.Services
     /// HDSI query expression: <c>id=:(freetext|$term)</c> and uses SanteDB's extended filter function (see an example
     /// of <see href="https://help.santesuite.org/developers/server-plugins/custom-algorithms#implementing-custom-idbfilterfunction">implementing a custom IDbFilterFunction</see></para>
     /// </remarks>
+    [ServiceProvider("ADO.NET Freetext Service", Configuration = typeof(AdoPersistenceConfigurationSection))]
     public class AdoFreetextSearchService : IFreetextSearchService
     {
         private readonly AdoPersistenceConfigurationSection m_configuration;

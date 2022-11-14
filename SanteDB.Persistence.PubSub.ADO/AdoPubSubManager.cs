@@ -43,8 +43,8 @@ namespace SanteDB.Persistence.PubSub.ADO
     /// <summary>
     /// Represents a pub/sub manager which stores definitions in a database
     /// </summary>
-    [ServiceProvider("ADO.NET Pub/Sub Subscription Manager")]
-    public class AdoPubSubManager : IPubSubManagerService, IMappedQueryProvider<PubSubChannelDefinition>, IMappedQueryProvider<PubSubSubscriptionDefinition>
+    [ServiceProvider("ADO.NET Pub/Sub Subscription Manager", Configuration = typeof(AdoPubSubConfigurationSection))]
+    public class AdoPubSubManager : IPubSubManagerService, IMappedQueryProvider<PubSubChannelDefinition>, IMappedQueryProvider<PubSubSubscriptionDefinition>, IReportProgressChanged
     {
         /// <summary>
         /// Gets the service name for this service
@@ -98,7 +98,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             this.m_policyEnforcementService = policyEnforcementService;
             this.m_securityRepository = securityRepository;
             this.m_serviceManager = serviceManager;
-            this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.PubSub.ADO");
+            this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.PubSub.ADO", serviceManager.NotifyStartupProgress);
             this.m_queryPersistence = queryPersistence;
         }
 
@@ -144,6 +144,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// Fired after deactivation
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<PubSubSubscriptionDefinition>> DeActivated;
+        public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
 
         /// <summary>
         /// Retrieve the specified channel by ID

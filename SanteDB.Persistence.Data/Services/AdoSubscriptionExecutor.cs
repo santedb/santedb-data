@@ -26,6 +26,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// An implementation of the <see cref="ISubscriptionExecutor"/> which uses an ADO persistence layer
     /// </summary>
+    [ServiceProvider("ADO.NET Subscription Executor", Configuration = typeof(AdoPersistenceConfigurationSection))]
     public class AdoSubscriptionExecutor : ISubscriptionExecutor
     {
         // Parameter regex

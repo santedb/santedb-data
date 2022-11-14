@@ -19,6 +19,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// A <see cref="IDatasetInstallerService"/> which can install datasets in ADO.NET persistence layer
     /// </summary>
+    [ServiceProvider("ADO.NET Dataset Installer", Configuration = typeof(AdoPersistenceConfigurationSection))]
     public class AdoDatasetInstallerService : IDatasetInstallerService, IReportProgressChanged
     {
 

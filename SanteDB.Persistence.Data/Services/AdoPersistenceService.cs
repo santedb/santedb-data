@@ -38,7 +38,8 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// A daemon service which registers the other persistence services
     /// </summary>
-    public class AdoPersistenceService : ISqlDataPersistenceService, IServiceFactory
+    [ServiceProvider("ADO.NET Persistence Service", Configuration = typeof(AdoPersistenceConfigurationSection))]
+    public class AdoPersistenceService : ISqlDataPersistenceService, IServiceFactory, IReportProgressChanged
     {
         // Gets the configuration
         private AdoPersistenceConfigurationSection m_configuration;
@@ -56,6 +57,11 @@ namespace SanteDB.Persistence.Data.Services
         private IList<IAdoPersistenceProvider> m_services = new List<IAdoPersistenceProvider>();
 
         /// <summary>
+        /// Progress has changed
+        /// </summary>
+        public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
+
+        /// <summary>
         /// ADO Persistence service
         /// </summary>
         public AdoPersistenceService(IConfigurationManager configManager, IServiceManager serviceManager, IBiMetadataRepository biMetadataRepository = null)
@@ -66,7 +72,7 @@ namespace SanteDB.Persistence.Data.Services
             QueryBuilder.AddQueryHacks(serviceManager.CreateAll<IQueryBuilderHack>(this.m_mapper));
 
             // Upgrade the schema
-            this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Data");
+            this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Data", serviceManager.NotifyStartupProgress);
 
             // Iterate and register ADO data persistence services
             foreach (var pservice in serviceManager.CreateInjectedOfAll<IAdoPersistenceProvider>())
@@ -74,6 +80,10 @@ namespace SanteDB.Persistence.Data.Services
                 pservice.Provider = this.m_configuration.Provider;
                 serviceManager.AddServiceProvider(pservice);
                 this.m_services.Add(pservice);
+                if(pservice is IReportProgressChanged irpc) // Cascade these status updates
+                {
+                    irpc.ProgressChanged += (o, e) => this.ProgressChanged?.Invoke(o, e);
+                }
             }
             serviceManager.AddServiceProvider(typeof(TagPersistenceService));
             serviceManager.AddServiceProvider(typeof(AdoRelationshipValidationProvider));
