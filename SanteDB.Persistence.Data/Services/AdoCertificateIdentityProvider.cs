@@ -240,7 +240,7 @@ namespace SanteDB.Persistence.Data.Services
                         authData.Object2.UpdatedTime = authData.Object2.LastLoginTime = DateTimeOffset.Now;
                         authData.Object2.UpdatedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
                         context.Update(authData.Object2);
-                        authenticatedIdentity = new AdoUserIdentity(authData.Object2);
+                        authenticatedIdentity = new AdoUserIdentity(authData.Object2, "X509");
 
                         // Claims to add to the principal
                         var claims = context.Query<DbUserClaim>(o => o.SourceKey == authData.Object1.SecurityUserKey && o.ClaimExpiry < DateTimeOffset.Now).ToList();
@@ -265,7 +265,7 @@ namespace SanteDB.Persistence.Data.Services
                         authData.Object4.UpdatedTime = authData.Object4.LastAuthentication = DateTimeOffset.Now;
                         authData.Object4.UpdatedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
                         context.Update(authData.Object4);
-                        authenticatedIdentity = new AdoDeviceIdentity(authData.Object4);
+                        authenticatedIdentity = new AdoDeviceIdentity(authData.Object4, "X509");
                     }
                     else
                     {

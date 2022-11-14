@@ -458,7 +458,6 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(refreshToken), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            var refreshTokenId = new Guid(refreshToken);
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
@@ -468,7 +467,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     using (var tx = context.BeginTransaction())
                     {
-                        var refreshHash = this.m_passwordHashingService.ComputeHash(refreshTokenId.ToString());
+                        var refreshHash = this.m_passwordHashingService.ComputeHash(refreshToken).HexEncode().ToLowerInvariant();
                         var dbSession = context.SingleOrDefault<DbSession>(o => o.RefreshToken == refreshHash);
 
                         if (dbSession == null)
@@ -489,8 +488,9 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         // Generate a new session for this
-                        refreshTokenId = Guid.NewGuid();
-                        dbSession.RefreshToken = this.m_passwordHashingService.ComputeHash(refreshTokenId.ToString());
+                        var newRefreshToken = new byte[32];
+                        System.Security.Cryptography.RandomNumberGenerator.Create().GetBytes(newRefreshToken);
+                        dbSession.RefreshToken = this.m_passwordHashingService.ComputeHash(newRefreshToken).HexEncode().ToLowerInvariant();
                         dbSession.RefreshExpiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.RefreshLength, new TimeSpan(1, 0, 0)));
                         dbSession.NotAfter = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.SessionLength, new TimeSpan(1, 0, 0)));
                         dbSession.NotBefore = DateTimeOffset.Now;
@@ -500,7 +500,7 @@ namespace SanteDB.Persistence.Data.Services
 
                         //var signedToken = dbSession.Key.ToByteArray().Concat(m_dataSigningService.SignData(dbSession.Key.ToByteArray())).ToArray();
                         //var signedRefresh = refreshTokenId.ToByteArray().Concat(m_dataSigningService.SignData(refreshTokenId.ToByteArray())).ToArray();
-                        var session = new AdoSecuritySession(dbSession.Key.ToByteArray(), refreshTokenId.ToByteArray(), dbSession, dbClaims);
+                        var session = new AdoSecuritySession(dbSession.Key.ToByteArray(), newRefreshToken, dbSession, dbClaims);
                         this.Extended?.Invoke(this, new SessionEstablishedEventArgs(null, session, true, false,
                             session.FindFirst(SanteDBClaimTypes.PurposeOfUse).Value,
                             session.Find(SanteDBClaimTypes.SanteDBScopeClaim).Select(o => o.Value).ToArray()));

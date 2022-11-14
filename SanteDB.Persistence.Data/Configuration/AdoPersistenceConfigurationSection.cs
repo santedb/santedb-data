@@ -210,14 +210,9 @@ namespace SanteDB.Persistence.Data.Configuration
         /// </summary>
         public IEnumerable<String> GetPepperCombos(String secret)
         {
-            if (String.IsNullOrEmpty(this.Pepper))
-            {
-                return new String[] { secret }.Union(PEPPER_CHARS.Select(p => $"{secret}{p}"));
-            }
-            else
-            {
-                return new String[] { secret }.Union(this.Pepper.Select(p => $"{secret}{p}"));
-            }
+            var pepperSource = !String.IsNullOrEmpty(this.Pepper) ? this.Pepper : PEPPER_CHARS;
+            var pepper = Enumerable.Range(0, secret.Length / 2).Select(o => secret.Substring(o, 2) + $"{pepperSource}{pepperSource.Reverse()}".Substring(o % pepperSource.Length, (o+1)%5)).ToArray();
+            return new String[] { secret }.Union(pepperSource.Select(p => $"{secret}{p}")).Union(pepper.Select(o => $"{secret}{o}"));
         }
 
         /// <summary>
@@ -225,14 +220,9 @@ namespace SanteDB.Persistence.Data.Configuration
         /// </summary>
         public String AddPepper(String secret)
         {
-            if (String.IsNullOrEmpty(this.Pepper))
-            {
-                return $"{secret}{PEPPER_CHARS[m_random.Next(PEPPER_CHARS.Length - 1)]}";
-            }
-            else
-            {
-                return $"{secret}{this.Pepper[m_random.Next(this.Pepper.Length - 1)]}";
-            }
+            var pepperSource = !String.IsNullOrEmpty(this.Pepper) ? this.Pepper : PEPPER_CHARS;
+            var pepper = Enumerable.Range(0, secret.Length / 2).Select(o => secret.Substring(o, 2) + $"{pepperSource}{pepperSource.Reverse()}".Substring(o % pepperSource.Length, (o + 1) % 5)).ToArray();
+            return $"{secret}{pepper[this.m_random.Next(pepper.Length)]}";
         }
     }
 }

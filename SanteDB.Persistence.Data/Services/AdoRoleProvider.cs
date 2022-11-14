@@ -35,8 +35,12 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// A role provider which uses the ADO.NET classes
     /// </summary>
-    public class AdoRoleProvider : ILocalRoleProviderService
+    public class AdoRoleProvider : IRoleProviderService, ILocalServiceProvider<IRoleProviderService>
     {
+
+        /// <inheritdoc/>
+        public IRoleProviderService LocalProvider => this;
+
         /// <summary>
         /// Get the service name
         /// </summary>

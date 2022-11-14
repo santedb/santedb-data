@@ -77,6 +77,7 @@ namespace SanteDB.Persistence.Data.Services
             }
             serviceManager.AddServiceProvider(typeof(TagPersistenceService));
             serviceManager.AddServiceProvider(typeof(AdoRelationshipValidationProvider));
+            serviceManager.AddServiceProvider(typeof(AdoDatasetInstallerService));
 
             // Add this to the BI layer
             using (AuthenticationContext.EnterSystemContext())

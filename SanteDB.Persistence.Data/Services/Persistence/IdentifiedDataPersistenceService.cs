@@ -83,7 +83,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 if (this.TryGetKeyResolver<TData>(out var keyResolver))
                 {
-                    return persistenceService.Query(context, keyResolver.GetKeyExpression(data)).SingleOrDefault();
+                    var existing = persistenceService.Query(context, keyResolver.GetKeyExpression(data)).SingleOrDefault();
+                    if(existing != null)
+                    {
+                        return existing;
+                    }
+                    else
+                    {
+                        return persistenceService.Insert(context, data);
+                    }
                 }
                 else if (this.m_configuration.AutoInsertChildren)
                 {
