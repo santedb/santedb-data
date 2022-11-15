@@ -36,7 +36,7 @@ namespace SanteDB.Persistence.Data.Test
                 {
                     new SubscriptionClientDefinition()
                     {
-                        Mode = SubscriptionModeType.Subscription,
+                        Mode = SubscriptionModeType.Partial,
                         IgnoreModifiedOn =true,
                         Resource = "Entity",
                         Trigger = SubscriptionTriggerType.Always,

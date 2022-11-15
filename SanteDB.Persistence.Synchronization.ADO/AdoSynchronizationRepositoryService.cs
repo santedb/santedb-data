@@ -43,7 +43,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
         /// <summary>
         /// Creates a new instance for the repository from Dependency Injection.
         /// </summary>
-        public AdoSynchronizationRepositoryService(IDbProvider provider, IQueryPersistenceService queryPersistence, IConfigurationManager configurationManager, IDataCachingService dataCachingService, IAdhocCacheService adhocCache)
+        public AdoSynchronizationRepositoryService(IQueryPersistenceService queryPersistence, IConfigurationManager configurationManager, IDataCachingService dataCachingService, IAdhocCacheService adhocCache)
         {
             _Tracer = new Tracer(nameof(AdoSynchronizationRepositoryService));
             _Configuration = configurationManager.GetSection<AdoSynchronizationConfigurationSection>();
