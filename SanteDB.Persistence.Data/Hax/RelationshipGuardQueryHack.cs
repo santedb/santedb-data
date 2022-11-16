@@ -116,7 +116,7 @@ namespace SanteDB.Persistence.Data.Hax
                 // Remove the inner join 
                 var remStack = new Stack<SqlStatement>();
                 SqlStatement last;
-                while (sqlStatement.RemoveLast(out last))
+                while (sqlStatement.RemoveLast(out last) != null && last != null)
                 {
                     var m = removeRegex.Match(last.SQL);
                     if (m.Success)
