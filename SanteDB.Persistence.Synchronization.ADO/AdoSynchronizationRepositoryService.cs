@@ -120,7 +120,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
         }
 
         /// <inheritdoc />
-        public void Save(Type modelType, string filter, string eTag, DateTime since)
+        public void Save(Type modelType, string filter, string eTag, DateTime? since)
         {
             var modeltypename = GetModelTypeName(modelType);
 
@@ -195,14 +195,16 @@ namespace SanteDB.Persistence.Synchronization.ADO
 
         /// <inheritdoc />
         public void CompleteQuery(Type modelType, string filter, Guid queryId)
-        {
-            var modeltypename = GetModelTypeName(modelType);
+            => CompleteQuery(GetModelTypeName(modelType), filter, queryId);
 
+        /// <inheritdoc />
+        public void CompleteQuery(string modelType, string filter, Guid queryId)
+        {
             ValidateQueryId(queryId);
 
-            using (var conn = _Provider.GetWriteConnection())
+            using(var conn = _Provider.GetWriteConnection())
             {
-                conn.DeleteAll<Model.DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == queryId);
+                conn.DeleteAll<Model.DbSynchronizationLogEntry>(e=>e.ResourceType == modelType && e.Filter == filter && e.QueryId == queryId);
             }
         }
 
@@ -213,7 +215,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
 
             using (var conn = _Provider.GetReadonlyConnection())
             {
-                return conn.Query<Model.DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == null).FirstOrDefault();
+                return conn.Query<Model.DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId != null).FirstOrDefault();
             }
         }
 
