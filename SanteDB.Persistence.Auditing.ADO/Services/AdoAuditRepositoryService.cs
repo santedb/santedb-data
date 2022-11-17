@@ -663,7 +663,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<AuditEventData, bool>> query)
         {
             var sql = this.m_builder.CreateQuery(query).Build();
-            return context.Query<CompositeResult<DbAuditEventData, DbAuditCode>>(sql);
+            return context.Query<CompositeResult<DbAuditCode, DbAuditEventData>>(sql);
         }
 
         /// <summary>

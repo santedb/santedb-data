@@ -136,9 +136,7 @@ namespace SanteDB.Persistence.Data.Hax
                     whereClause.Append(" INNER JOIN ");
                 }
             }
-            whereClause.RemoveLast();
-            whereClause.Append($") ");
-            whereClause.And($"{subQueryAlias}.obslt_vrsn_seq_id IS NULL");
+            whereClause.RemoveLast(out _).Append($") ").And($"{subQueryAlias}.obslt_vrsn_seq_id IS NULL");
 
             return true;
         }
