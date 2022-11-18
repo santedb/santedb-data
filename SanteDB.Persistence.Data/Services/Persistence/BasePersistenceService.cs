@@ -265,6 +265,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 throw new ArgumentNullException(nameof(data), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
+            else if(data.IsEmpty()) // No sense in persisting an empty data object
+            {
+                return data;
+            }
 
             data = this.BeforePersisting(context, data);
 

@@ -31,20 +31,20 @@ namespace SanteDB.Persistence.Data.Exceptions
         /// <summary>
         /// Gets the time until lockout is cleared
         /// </summary>
-        public TimeSpan TimeUntilLockout { get; }
+        public DateTimeOffset TimeLockExpires { get; }
 
         /// <summary>
         /// Create with time until lockout
         /// </summary>
-        public LockedIdentityAuthenticationException(TimeSpan timeToUnlock) : base($"Account is locked for {timeToUnlock}")
+        public LockedIdentityAuthenticationException(DateTimeOffset timeToUnlock) : base($"Account is locked for {timeToUnlock}")
         {
-            this.TimeUntilLockout = timeToUnlock;
+            this.TimeLockExpires = timeToUnlock;
         }
 
         /// <summary>
         /// Create with absolute lockout time
         /// </summary>
-        public LockedIdentityAuthenticationException(DateTimeOffset lockoutTime) : this(lockoutTime.Subtract(DateTimeOffset.Now))
+        public LockedIdentityAuthenticationException(TimeSpan lockoutTime) : this(DateTimeOffset.Now.Add(lockoutTime))
         { }
 
     }

@@ -329,4 +329,15 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 alter table sub_adm_tbl alter rte_cd_id set default '61d8f65c-747e-4a99-982f-a42ac5437473';
 alter table sub_adm_tbl alter dos_unt_cd_id set default '61d8f65c-747e-4a99-982f-a42ac5437473';
 
+
+
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), 'B43C9513-1C1C-4ED0-92DB-55A904C122E6', '6a2b00ba-501b-4523-b57c-f96d8ae44684', '7c08bd55-4d42-49cd-92f8-6388d6c4183f', 'UserEntity=[Employee]=>Organization', 3);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), '455F1772-F580-47E8-86BD-B5CE25D351F9', '6a2b00ba-501b-4523-b57c-f96d8ae44684', 'ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c', 'UserEntity=[DedicatedServiceDeliveryLocation]=>ServiceDeliveryLocation', 3);--#!
+
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), '77B7A04B-C065-4FAF-8EC0-2CDAD4AE372B', '1373ff04-a6ef-420a-b1d0-4a07465fe8e8', '6a2b00ba-501b-4523-b57c-f96d8ae44684', 'Device=[AssignedEntity]=>UserEntity', 3);--#!
+
+
 SELECT REG_PATCH('20220509-01'); --#!

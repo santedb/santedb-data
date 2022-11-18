@@ -19,6 +19,7 @@
  * Date: 2022-9-7
  */
 using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
@@ -364,7 +365,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
                         catch (LockedIdentityAuthenticationException e)
                         {
-                            throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED), e);
+                            throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED, new { time = e.TimeLockExpires }), e);
                         }
                         catch (InvalidIdentityAuthenticationException) when (dbUser != null)
                         {
@@ -422,7 +423,7 @@ namespace SanteDB.Persistence.Data.Services
             }
             else if (!this.m_passwordValidator.Validate(newPassword))
             {
-                throw new SecurityException(this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_COMPLEXITY));
+                throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "password.complexity", this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_COMPLEXITY), DetectedIssueKeys.SecurityIssue, null);
             }
             else if (principal == null)
             {
@@ -453,7 +454,7 @@ namespace SanteDB.Persistence.Data.Services
                         // Password reuse policy?
                         if (this.m_securityConfiguration.GetSecurityPolicy<bool>(SecurityPolicyIdentification.PasswordHistory) && this.m_configuration.GetPepperCombos(newPassword).Any(o => this.m_passwordHashingService.ComputeHash(o) == dbUser.Password))
                         {
-                            throw new SecurityException(this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_HISTORY));
+                            throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "password.history", this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_HISTORY), DetectedIssueKeys.SecurityIssue, null);
                         }
                         dbUser.Password = this.m_passwordHashingService.ComputeHash(this.m_configuration.AddPepper(newPassword));
                         dbUser.UpdatedByKey = context.EstablishProvenance(principal, null);
@@ -467,7 +468,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         // Abandon all sessions for this user
-                        foreach (var ses in context.Query<DbSession>(o => o.UserKey == dbUser.Key))
+                        foreach (var ses in context.Query<DbSession>(o => o.UserKey == dbUser.Key && o.NotAfter >= DateTimeOffset.Now))
                         {
                             ses.NotAfter = DateTimeOffset.Now;
                             context.Update(ses);

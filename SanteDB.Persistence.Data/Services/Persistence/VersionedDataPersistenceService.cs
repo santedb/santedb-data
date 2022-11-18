@@ -858,14 +858,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
             }
 
-            var addedRelationships = associations.Where(o => o.BatchOperation != BatchOperationType.Delete && (!o.Key.HasValue || !existing.Contains(o.Key))).Select(a =>
+            var addedRelationships = associations.Where(o => !o.IsEmpty() && o.BatchOperation != BatchOperationType.Delete && (!o.Key.HasValue || !existing.Contains(o.Key))).Select(a =>
            {
                a.EffectiveVersionSequenceId = data.VersionSequence;
                a = persistenceService.Insert(context, a);
                a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
                return a;
            });
-            var updatedRelationships = associations.Where(o => o.BatchOperation != BatchOperationType.Delete && o.Key.HasValue && existing.Contains(o.Key)).Select(a =>
+            var updatedRelationships = associations.Where(o => !o.IsEmpty() && o.BatchOperation != BatchOperationType.Delete && o.Key.HasValue && existing.Contains(o.Key)).Select(a =>
             {
                 a = persistenceService.Update(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
