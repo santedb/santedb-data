@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+using SanteDB.Core.Model.Audit;
 using SanteDB.OrmLite.Attributes;
 using System;
 
@@ -40,19 +41,19 @@ namespace SanteDB.Persistence.Auditing.ADO.Data.Model
         /// Outcome of the event
         /// </summary>
         [Column("outc_cs")]
-        public int Outcome { get; set; }
+        public OutcomeIndicator Outcome { get; set; }
 
         /// <summary>
         /// The action performed
         /// </summary>
         [Column("act_cs")]
-        public int ActionCode { get; set; }
+        public ActionType ActionCode { get; set; }
 
         /// <summary>
         /// The type of action performed
         /// </summary>
         [Column("typ_cs")]
-        public int EventIdentifier { get; set; }
+        public EventIdentifierType EventIdentifier { get; set; }
 
         /// <summary>
         /// The time of the event
