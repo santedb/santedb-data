@@ -293,9 +293,6 @@ INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_de
 -- OPTIONAL
 INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (x'487EEFF3B7D83040B431AFF7E0E1CB76',x'46A8E29DF2DDBC4E902E84508C5089EA',x'B0B0F48CE584224185FE6AFA8240C218', 'Person ==[Birthplace]==> State'); --#!
 
--- DEVICE IS ASSIGNED TO USER
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-VALUES ((randomblob(16)), x'04FF7313EFA60A42B1D04A07465FE8E8',x'4BA0B77765C0AF4F8EC02CDAD4AE372B',x'BA002B6A1B502345B57CF96D8AE44684','Device=[AssignedEntity]=>UserEntity', 1);
 
 -- OPTIONAL
 INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (x'487EEFF3B7D83040B431AFF7E0E1CB76',x'6F9CCDBAA93F1E48963637457962804D',x'754FDD79E8682247A7F58BC2E08F5CD6', 'Patient ==[Birthplace]==> CityOrTown'); --#!
@@ -466,11 +463,7 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 VALUES ((randomblob(16)), (x'AD29BF6C51ACC948885ACFE3026ECF6E'), null, (x'D8FE046B64C19C46910BF824C2BDA4F0'), '*=[Attender]=>HealthcareProvider', 3); --#!
 
 -- OPTIONAL
-
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-VALUES ((randomblob(16)), x'BA002B6A1B502345B57CF96D8AE44684',x'72175F4580F5E84786BDB5CE25D351F9',x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C','UserEntity=[DedicatedServiceDeliveryLocation]=>ServiceDeliveryLocation', 1);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-VALUES ((randomblob(16)), x'BA002B6A1B502345B57CF96D8AE44684',x'13953CB41C1CD04E92DB55A904C122E6',x'55BD087C424DCD4992F86388D6C4183F','UserEntity=[Employee]=>Organization', 1);--#!
+-- DEVICE IS ASSIGNED TO USER
 		
 -- OPTIONAL
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)

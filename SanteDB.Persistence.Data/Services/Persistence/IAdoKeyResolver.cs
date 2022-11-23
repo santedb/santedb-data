@@ -21,7 +21,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// The key resolver service is used when related entities are persisted in a context where only one of a particular relationship can exist at the same time.
     /// The <see cref="GetKeyExpression(TModel)"/> is intended to return the LINQ expression to filter the existing dataset to determine if the specified object already exists.
     /// The <typeparamref name="TModel"/> should always be an <see cref="IDbIdentified"/> instance which has an actual primary key (surrogate key) and should not be used on 
-    /// objects which have composite keys. If using this resolver implementation to resolve a <see cref="IIdentifiedData"/> instance then the same applies.
+    /// objects which have composite keys. If using this resolver implementation to resolve a <see cref="IAnnotatedResource"/> instance then the same applies.
     /// </remarks>
     public interface IAdoKeyResolver<TModel> : IAdoKeyResolver
     {
