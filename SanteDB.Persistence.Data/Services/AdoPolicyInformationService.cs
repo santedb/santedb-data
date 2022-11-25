@@ -370,6 +370,18 @@ namespace SanteDB.Persistence.Data.Services
                         // Security Device
                         switch (securable)
                         {
+                            case SecurityUser su:
+                                {
+                                    results = context.Query<CompositeResult<DbSecurityRolePolicy, DbSecurityPolicy>>(
+                                        context.CreateSqlStatement<DbSecurityRolePolicy>()
+                                            .SelectFrom(typeof(DbSecurityRolePolicy), typeof(DbSecurityPolicy))
+                                            .InnerJoin<DbSecurityPolicy>(o=>o.PolicyKey, o=>o.Key)
+                                            .InnerJoin<DbSecurityRolePolicy, DbSecurityUserRole>(o=>o.SourceKey, o=>o.RoleKey)
+                                            .Where<DbSecurityUserRole>(o=>o.UserKey == su.Key)
+                                        ).ToArray()
+                                        .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
+                                    break;
+                                }
                             case SecurityDevice sd:
                                 {
                                     results = context.Query<CompositeResult<DbSecurityDevicePolicy, DbSecurityPolicy>>(

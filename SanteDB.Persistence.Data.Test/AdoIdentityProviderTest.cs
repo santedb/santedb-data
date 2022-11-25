@@ -95,7 +95,7 @@ namespace SanteDB.Persistence.Data.Test
                 var pcpl = service.Authenticate("TEST_03", "@TESTPa$$w0rd");
                 Assert.Fail("Should not authenticate");
             }
-            catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED))
+            catch (AuthenticationException e) when (e.Message.StartsWith(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED)))
             { }
             catch (Exception e) { Assert.Fail($"Invalid exception thrown. Expected AuthenticationException with message {ErrorMessageStrings.AUTH_USR_LOCKED} but got {e.GetType().Name} with message {e.Message}"); }
 
@@ -120,7 +120,7 @@ namespace SanteDB.Persistence.Data.Test
             {
                 service.Authenticate("TEST_04", "@TESTPa$$w0rd");
             }
-            catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED))
+            catch (AuthenticationException e) when (e.Message.StartsWith(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED)))
             {
             }
             catch (Exception e) { Assert.Fail($"Invalid exception thrown. Expected AuthenticationException with message {ErrorMessageStrings.AUTH_USR_LOCKED} but got {e.GetType().Name} with message {e.Message}"); }
