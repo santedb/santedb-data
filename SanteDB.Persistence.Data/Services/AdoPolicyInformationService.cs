@@ -673,7 +673,7 @@ namespace SanteDB.Persistence.Data.Services
                 try
                 {
                     context.Open();
-                    context.EstablishProvenance(principal, null);
+                    
 
                     var dbpolicy = new DbSecurityPolicy();
 
@@ -682,6 +682,7 @@ namespace SanteDB.Persistence.Data.Services
                     dbpolicy.Key = policy.Key;
                     dbpolicy.Name = policy.Name;
                     dbpolicy.Oid = policy.Oid;
+                    dbpolicy.CreatedByKey = context.EstablishProvenance(principal, null);
 
                     dbpolicy = context.Insert(dbpolicy);
                 }
