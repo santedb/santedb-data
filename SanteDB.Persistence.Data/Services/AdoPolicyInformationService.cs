@@ -122,6 +122,16 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             case SecurityRole sr:
                                 {
+                                    if (null == sr.Key)
+                                    {
+                                        sr.Key = context.Query<DbSecurityRole>(r => r.Name == sr.Name).FirstOrDefault()?.Key;
+
+                                        if (null == sr.Key)
+                                        {
+                                            throw new ArgumentException("Role does not exist.", nameof(securable));
+                                        }
+                                    }
+                                    
                                     context.DeleteAll<DbSecurityRolePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sr.Key);
                                     context.InsertAll(policies.Select(o => new DbSecurityRolePolicy()
                                     {
@@ -129,6 +139,7 @@ namespace SanteDB.Persistence.Data.Services
                                         SourceKey = sr.Key.Value,
                                         PolicyKey = o
                                     }));
+
                                     break;
                                 }
                             case IApplicationIdentity iaid:
@@ -375,9 +386,9 @@ namespace SanteDB.Persistence.Data.Services
                                     results = context.Query<CompositeResult<DbSecurityRolePolicy, DbSecurityPolicy>>(
                                         context.CreateSqlStatement<DbSecurityRolePolicy>()
                                             .SelectFrom(typeof(DbSecurityRolePolicy), typeof(DbSecurityPolicy))
-                                            .InnerJoin<DbSecurityPolicy>(o=>o.PolicyKey, o=>o.Key)
-                                            .InnerJoin<DbSecurityRolePolicy, DbSecurityUserRole>(o=>o.SourceKey, o=>o.RoleKey)
-                                            .Where<DbSecurityUserRole>(o=>o.UserKey == su.Key)
+                                            .InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
+                                            .InnerJoin<DbSecurityRolePolicy, DbSecurityUserRole>(o => o.SourceKey, o => o.RoleKey)
+                                            .Where<DbSecurityUserRole>(o => o.UserKey == su.Key)
                                         ).ToArray()
                                         .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
                                     break;
@@ -685,7 +696,7 @@ namespace SanteDB.Persistence.Data.Services
                 try
                 {
                     context.Open();
-                    context.EstablishProvenance(principal, null);
+
 
                     var dbpolicy = new DbSecurityPolicy();
 
@@ -694,10 +705,11 @@ namespace SanteDB.Persistence.Data.Services
                     dbpolicy.Key = policy.Key;
                     dbpolicy.Name = policy.Name;
                     dbpolicy.Oid = policy.Oid;
+                    dbpolicy.CreatedByKey = context.EstablishProvenance(principal, null);
 
                     dbpolicy = context.Insert(dbpolicy);
                 }
-                catch(Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
+                catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
                 {
                     this.m_traceSource.TraceError("Error creating policy {0} : {1}", policy.Oid, ex);
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_GEN), ex);

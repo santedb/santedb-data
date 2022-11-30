@@ -411,7 +411,8 @@ namespace SanteDB.Persistence.Data.Services
         /// <param name="userName">The user who's password is being changed</param>
         /// <param name="newPassword">The new password to set</param>
         /// <param name="principal">The principal which is setting the password</param>
-        public void ChangePassword(string userName, string newPassword, IPrincipal principal)
+        /// <param name="force">True to bypass validation for the password change. False otherwise.</param>
+        public void ChangePassword(string userName, string newPassword, IPrincipal principal, bool force = false)
         {
             if (String.IsNullOrEmpty(userName))
             {
@@ -421,7 +422,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new ArgumentNullException(nameof(userName), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            else if (!this.m_passwordValidator.Validate(newPassword))
+            else if (!force && !this.m_passwordValidator.Validate(newPassword))
             {
                 throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "password.complexity", this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_COMPLEXITY), DetectedIssueKeys.SecurityIssue, null);
             }
@@ -452,7 +453,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         // Password reuse policy?
-                        if (this.m_securityConfiguration.GetSecurityPolicy<bool>(SecurityPolicyIdentification.PasswordHistory) && this.m_configuration.GetPepperCombos(newPassword).Any(o => this.m_passwordHashingService.ComputeHash(o) == dbUser.Password))
+                        if (!force && this.m_securityConfiguration.GetSecurityPolicy<bool>(SecurityPolicyIdentification.PasswordHistory) && this.m_configuration.GetPepperCombos(newPassword).Any(o => this.m_passwordHashingService.ComputeHash(o) == dbUser.Password))
                         {
                             throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "password.history", this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_HISTORY), DetectedIssueKeys.SecurityIssue, null);
                         }

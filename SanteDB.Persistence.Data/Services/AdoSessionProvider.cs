@@ -539,9 +539,12 @@ namespace SanteDB.Persistence.Data.Services
 
                     var now = DateTimeOffset.Now;
 
-                    return context.Query<DbSession>(
-                        session => session.UserKey == user && session.NotAfter >= now
-                        ).Select(s=>new AdoSecuritySession(s.Key.ToByteArray(), null, s, context.Query<DbSessionClaim>(sc=>sc.SessionKey == s.Key))).ToArray();
+                    var sessions = context.Query<DbSession>(
+                        s => s.UserKey == user && s.NotAfter >= now
+                        )?.ToList();
+
+                    return sessions
+                        .Select(s=>new AdoSecuritySession(s.Key.ToByteArray(), null, s, context.Query<DbSessionClaim>(sc=>sc.SessionKey == s.Key))).ToArray();
                 }
                 catch(Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
                 {
