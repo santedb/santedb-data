@@ -25,13 +25,14 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
     /// <summary>
     /// Persistence service for concepts
     /// </summary>
-    public class ConceptPersistenceService : VersionedDataPersistenceService<Concept, DbConceptVersion, DbConcept>
+    public class ConceptPersistenceService : VersionedDataPersistenceService<Concept, DbConceptVersion, DbConcept>, IAdoKeyResolver<Concept>
     {
         /// <summary>
         /// Creates a DI instance of hte conept persistence service
@@ -190,5 +191,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override void DoCopyVersionSubTableInternal(DataContext context, DbConceptVersion newVersion)
         {
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<Concept, bool>> GetKeyExpression(Concept model) => o => o.ObsoletionTime == null && o.Mnemonic == model.Mnemonic;
     }
 }

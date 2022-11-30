@@ -275,15 +275,15 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
                     VipStatusKey = boardMember,
                     EthnicGroupKey = hispanic,
                     LivingArrangementKey = alone,
-                    MultipleBirthOrder = 3,
+                    MultipleBirthOrder = 9,
                     NationalityKey = canadian
                 };
 
                 var afterInsert = base.TestInsert(patient);
                 Assert.IsNotNull(afterInsert.VersionKey);
 
-                base.TestQuery<Patient>(o => o.MultipleBirthOrder == 3, 1);
-                base.TestQuery<Patient>(o => o.MultipleBirthOrder == 2, 0);
+                base.TestQuery<Patient>(o => o.MultipleBirthOrder == 9, 1);
+                base.TestQuery<Patient>(o => o.MultipleBirthOrder == 10, 0);
                 base.TestQuery<Patient>(o => o.MaritalStatusKey == commonlaw, 1);
                 base.TestQuery<Patient>(o => o.MaritalStatus.Mnemonic == "MaritalStatus-Married", 0);
                 base.TestQuery<Patient>(o => o.MaritalStatus.Mnemonic == "MaritalStatus-CommonLaw", 1);
@@ -310,7 +310,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
                 // Attempt to update
                 var afterUpdate = base.TestUpdate(afterInsert, o =>
                 {
-                    o.MultipleBirthOrder = 4;
+                    o.MultipleBirthOrder = 10;
                     o.DeceasedDate = DateTime.Now;
                     o.DeceasedDatePrecision = DatePrecision.Day;
                     o.VipStatusKey = null;
@@ -320,8 +320,8 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
                     return o;
                 });
 
-                base.TestQuery<Patient>(o => o.MultipleBirthOrder == 3, 0);
-                base.TestQuery<Patient>(o => o.MultipleBirthOrder == 4, 1);
+                base.TestQuery<Patient>(o => o.MultipleBirthOrder == 9, 0);
+                base.TestQuery<Patient>(o => o.MultipleBirthOrder == 10, 1);
                 base.TestQuery<Patient>(o => o.MaritalStatusKey == commonlaw, 0);
                 base.TestQuery<Patient>(o => o.MaritalStatus.Mnemonic == "NullFlavor-Masked", 1);
                 base.TestQuery<Patient>(o => o.VipStatusKey == boardMember, 0);

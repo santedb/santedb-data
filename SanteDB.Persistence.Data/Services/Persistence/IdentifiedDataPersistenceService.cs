@@ -69,42 +69,49 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             where TData : IdentifiedData, new()
         {
 
-            if (context == null)
+            try
             {
-                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
-            }
-            else if (data == default(TData))
-            {
-                return default(TData);
-            }
-
-            var persistenceService = typeof(TData).GetRelatedPersistenceService() as IAdoPersistenceProvider<TData>;
-            if (!data.Key.HasValue || !persistenceService.Exists(context, data.Key.Value))
-            {
-                if (this.TryGetKeyResolver<TData>(out var keyResolver))
+                if (context == null)
                 {
-                    var existing = persistenceService.Query(context, keyResolver.GetKeyExpression(data)).SingleOrDefault();
-                    if(existing != null)
+                    throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+                }
+                else if (data == default(TData))
+                {
+                    return default(TData);
+                }
+
+                var persistenceService = typeof(TData).GetRelatedPersistenceService() as IAdoPersistenceProvider<TData>;
+                if (!data.Key.HasValue || !persistenceService.Exists(context, data.Key.Value))
+                {
+                    if (this.TryGetKeyResolver<TData>(out var keyResolver))
                     {
-                        return existing;
+                        var existing = persistenceService.Query(context, keyResolver.GetKeyExpression(data)).SingleOrDefault();
+                        if (existing != null)
+                        {
+                            return existing;
+                        }
+                        else
+                        {
+                            return persistenceService.Insert(context, data);
+                        }
                     }
-                    else
+                    else if (this.m_configuration.AutoInsertChildren)
                     {
                         return persistenceService.Insert(context, data);
                     }
-                }
-                else if (this.m_configuration.AutoInsertChildren)
-                {
-                    return persistenceService.Insert(context, data);
+                    else
+                    {
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.RELATED_OBJECT_NOT_FOUND, new { name = typeof(TData).Name, source = data.Key }));
+                    }
                 }
                 else
                 {
-                    throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.RELATED_OBJECT_NOT_FOUND, new { name = typeof(TData).Name, source = data.Key }));
+                    return data;
                 }
             }
-            else
+            catch(Exception e)
             {
-                return data;
+                throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_DEPENDENT_ENSURE_ERROR, new { dataObject = data.ToString() }), e);
             }
         }
 

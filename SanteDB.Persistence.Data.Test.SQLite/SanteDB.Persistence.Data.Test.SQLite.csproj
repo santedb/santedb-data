@@ -8,6 +8,10 @@
   <PropertyGroup Condition="'$(VersionNumber)' == ''">
     <VersionNumber>3.0-debug</VersionNumber>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Resources\Patients.csv" />
+    <None Remove="Resources\SimpleDataMap.xml" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="7.0.0" />
@@ -63,6 +67,8 @@
     </ProjectReference>
 	</ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Patients.csv" />
+    <EmbeddedResource Include="Resources\SimpleDataMap.xml" />
     <EmbeddedResource Include="TestConfig.xml" />
   </ItemGroup>
   <ItemGroup>

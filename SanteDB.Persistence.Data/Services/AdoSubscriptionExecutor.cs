@@ -30,7 +30,7 @@ namespace SanteDB.Persistence.Data.Services
     public class AdoSubscriptionExecutor : ISubscriptionExecutor
     {
         // Parameter regex
-        private readonly Regex m_parmRegex = new Regex(@"\$\{([\w_][\-\d\w\._]*?)\}", RegexOptions.Multiline);
+        private static readonly Regex m_parmRegex = new Regex(@"\$\{([\w_][\-\d\w\._]*?)\}", RegexOptions.Multiline | RegexOptions.Compiled);
 
         // Allowed target types
         private readonly Type[] m_allowedTypes = new Type[]
@@ -165,7 +165,7 @@ namespace SanteDB.Persistence.Data.Services
                 // Append our query
                 var definitionQuery = definition.Definition;
                 var arguments = new List<Object>();
-                definitionQuery = this.m_parmRegex.Replace(definitionQuery, (o) =>
+                definitionQuery = m_parmRegex.Replace(definitionQuery, (o) =>
                 {
                     if (parameters.TryGetValue(o.Groups[1].Value, out var qValue))
                     {
