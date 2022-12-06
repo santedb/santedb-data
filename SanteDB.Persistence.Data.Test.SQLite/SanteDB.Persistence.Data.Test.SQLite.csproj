@@ -9,6 +9,7 @@
     <VersionNumber>3.0-debug</VersionNumber>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Resources\BadPatients.csv" />
     <None Remove="Resources\Patients.csv" />
     <None Remove="Resources\SimpleDataMap.xml" />
   </ItemGroup>
@@ -67,6 +68,7 @@
     </ProjectReference>
 	</ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\BadPatients.csv" />
     <EmbeddedResource Include="Resources\Patients.csv" />
     <EmbeddedResource Include="Resources\SimpleDataMap.xml" />
     <EmbeddedResource Include="TestConfig.xml" />

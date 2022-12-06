@@ -83,8 +83,10 @@
     <None Remove="SQL\PSQL\santedb-fn.sql" />
     <None Remove="SQL\PSQL\santedb-init.sql" />
     <None Remove="SQL\PSQL\Updates\20221027-PSQL.sql" />
+    <None Remove="SQL\PSQL\Updates\20221130-PSQL.sql" />
     <None Remove="SQL\SQLITE\20221003.SQL" />
     <None Remove="SQL\SQLITE\20221027.sql" />
+    <None Remove="SQL\SQLITE\20221130.sql" />
     <None Remove="SQL\SQLITE\santedb-codes.sql" />
     <None Remove="SQL\SQLITE\santedb-ddl.sql" />
     <None Remove="SQL\SQLITE\santedb-init.sql" />
@@ -166,8 +168,12 @@
   
   <ItemGroup>
     <EmbeddedResource Include="Map\ModelMap.xml" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20221130-PSQL.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\SQLITE\20221003.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20221027.sql" />
+    <EmbeddedResource Include="SQL\SQLITE\20221130.sql" />
     <EmbeddedResource Include="SQL\SQLITE\santedb-codes.sql" />
     <EmbeddedResource Include="SQL\SQLITE\santedb-ddl.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

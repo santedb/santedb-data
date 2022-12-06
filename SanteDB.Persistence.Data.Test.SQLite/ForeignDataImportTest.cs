@@ -35,33 +35,38 @@ namespace SanteDB.Persistence.Data.Test.SQLite
                 var patientPersistence = ApplicationServiceContext.Current.GetService<IRepositoryService<Patient>>();
                 var identityDomainPersistence = ApplicationServiceContext.Current.GetService<IRepositoryService<IdentityDomain>>();
                 var placePersistenceService = ApplicationServiceContext.Current.GetService<IRepositoryService<Place>>();
-
-                placePersistenceService.Insert(new Place()
+                if (!placePersistenceService.Find(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Clinic1"))).Any())
                 {
-                    ClassConceptKey = EntityClassKeys.ServiceDeliveryLocation,
-                    Names = new List<EntityName>()
+                    placePersistenceService.Insert(new Place()
+                    {
+                        ClassConceptKey = EntityClassKeys.ServiceDeliveryLocation,
+                        Names = new List<EntityName>()
                     {
                         new EntityName(NameUseKeys.OfficialRecord, "Clinic1")
                     }
-                });
-                placePersistenceService.Insert(new Place()
-                {
-                    ClassConceptKey = EntityClassKeys.ServiceDeliveryLocation,
-                    Names = new List<EntityName>()
+                    });
+                    placePersistenceService.Insert(new Place()
+                    {
+                        ClassConceptKey = EntityClassKeys.ServiceDeliveryLocation,
+                        Names = new List<EntityName>()
                     {
                         new EntityName(NameUseKeys.OfficialRecord, "Hospital1")
                     }
-                });
-                placePersistenceService.Insert(new Place()
-                {
-                    ClassConceptKey = EntityClassKeys.ServiceDeliveryLocation,
-                    Names = new List<EntityName>()
+                    });
+                    placePersistenceService.Insert(new Place()
+                    {
+                        ClassConceptKey = EntityClassKeys.ServiceDeliveryLocation,
+                        Names = new List<EntityName>()
                     {
                         new EntityName(NameUseKeys.OfficialRecord, "Hospital2")
                     }
-                });
-                identityDomainPersistence.Insert(new IdentityDomain("MRN_I", "Medical Record Number", "2.25.04949330393"));
-                identityDomainPersistence.Insert(new IdentityDomain("INSURANCE_I", "Insurnace Number", "2.25.9494384383"));
+                    });
+                }
+                if (!identityDomainPersistence.Find(o => o.DomainName == "MRN_I").Any())
+                {
+                    identityDomainPersistence.Insert(new IdentityDomain("MRN_I", "Medical Record Number", "2.25.04949330393"));
+                    identityDomainPersistence.Insert(new IdentityDomain("INSURANCE_I", "Insurnace Number", "2.25.9494384383"));
+                }
 
                 var serviceManager = ApplicationServiceContext.Current.GetService<IServiceManager>();
                 var beforePatientCount = patientPersistence.Find(o => o.ObsoletionTime == null).Count();
