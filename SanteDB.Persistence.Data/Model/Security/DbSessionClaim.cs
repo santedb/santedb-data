@@ -55,6 +55,8 @@ namespace SanteDB.Persistence.Data.Model.Security
         [Column("clm_val"), NotNull]
         public String ClaimValue { get; set; }
 
+        /// <inheritdoc/>
+        public override string ToString() => $"{this.ClaimType}={this.ClaimValue}";
 
     }
 }

@@ -221,10 +221,8 @@ namespace SanteDB.Persistence.Data.Services
                         }
                         tx.Commit();
 
-                        if (securable is IdentifiedData id)
-                        {
-                            this.m_adhocCache?.Remove($"pip.{id.Type}.{id.Key}.{id.Tag}");
-                        }
+                        this.m_adhocCache?.RemoveAll("pdp.*");
+                        this.m_adhocCache?.RemoveAll("pip.*");
                     }
                 }
                 catch (Exception e)
@@ -662,10 +660,9 @@ namespace SanteDB.Persistence.Data.Services
                         }
                         tx.Commit();
 
-                        if (securable is IdentifiedData id)
-                        {
-                            this.m_adhocCache?.Remove($"pip.{id.GetType().Name}.{id.Key}.{id.Tag}");
-                        }
+                        this.m_adhocCache?.RemoveAll("pdp.*");
+                        this.m_adhocCache?.RemoveAll("pip.*");
+
                     }
                 }
                 catch (Exception e)
