@@ -76,7 +76,7 @@ namespace SanteDB.Persistence.Data.Services
         private readonly IPolicyEnforcementService m_pepService;
 
         // TFA generator
-        private readonly ITfaRelayService m_tfaRelay;
+        private readonly ITfaService m_tfaRelay;
 
         // The password validator
         private readonly IPasswordValidatorService m_passwordValidator;
@@ -92,7 +92,7 @@ namespace SanteDB.Persistence.Data.Services
             IPasswordHashingService passwordHashingService,
             IPolicyEnforcementService policyEnforcementService,
             IPasswordValidatorService passwordValidator,
-            ITfaRelayService twoFactorSecretGenerator = null)
+            ITfaService twoFactorSecretGenerator = null)
         {
             this.m_configuration = configuration.GetSection<AdoPersistenceConfigurationSection>();
             this.m_securityConfiguration = configuration.GetSection<SecurityConfigurationSection>();

@@ -56,7 +56,7 @@ namespace SanteDB.Persistence.Data.Services
         private readonly SecurityConfigurationSection m_securityConfiguration;
         private readonly IPasswordHashingService m_passwordHashingService;
         private readonly IPolicyEnforcementService m_pepService;
-        private readonly ITfaRelayService m_tfaRelay;
+        //private readonly ITfaRelayService m_tfaRelay;
         private readonly ILocalizationService m_localizationService;
 
         /// <summary>
@@ -66,13 +66,13 @@ namespace SanteDB.Persistence.Data.Services
             ILocalizationService localizationService,
             IPasswordHashingService passwordHashingService,
             IPolicyEnforcementService policyEnforcementService,
-            ITfaRelayService twoFactorSecretGenerator = null)
+            ITfaService twoFactorSecretGenerator = null)
         {
             this.m_configuration = configuration.GetSection<AdoPersistenceConfigurationSection>();
             this.m_securityConfiguration = configuration.GetSection<SecurityConfigurationSection>();
             this.m_passwordHashingService = passwordHashingService;
             this.m_pepService = policyEnforcementService;
-            this.m_tfaRelay = twoFactorSecretGenerator;
+            //this.m_tfaRelay = twoFactorSecretGenerator;
             this.m_localizationService = localizationService;
         }
 

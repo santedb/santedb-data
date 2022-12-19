@@ -65,7 +65,7 @@ namespace SanteDB.Persistence.Data.Services
         // Localization service
         private readonly ILocalizationService m_localizationService;
         private readonly IPasswordHashingService m_passwordHashingService;
-        private readonly ITfaRelayService m_tfaRelay;
+        private readonly ITfaService m_tfaRelay;
 
         // Policy enforcement
         private IPolicyEnforcementService m_policyEnforcementService;
@@ -77,7 +77,7 @@ namespace SanteDB.Persistence.Data.Services
         /// DI constructor for ADO CHallenge
         /// </summary>
         public AdoSecurityChallengeProvider(IConfigurationManager configurationManager, IPolicyEnforcementService pepService, ILocalizationService localizationService,
-            IPasswordHashingService passwordHashingService, ITfaRelayService tfaRelayService)
+            IPasswordHashingService passwordHashingService, ITfaService tfaRelayService)
         {
             this.m_policyEnforcementService = pepService;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
