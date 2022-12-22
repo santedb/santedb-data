@@ -311,7 +311,7 @@ namespace SanteDB.Persistence.Data.Services
                                 dbUser.TwoFactorMechnaismKey.HasValue)
                             {
                                 this.m_tfaRelay.SendSecret(dbUser.TwoFactorMechnaismKey.Value, new AdoUserIdentity(dbUser));
-                                throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ));
+                                throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ));
                             }
 
                             // TFA supplied?
