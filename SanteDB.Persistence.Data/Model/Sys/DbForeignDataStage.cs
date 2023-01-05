@@ -25,6 +25,12 @@ namespace SanteDB.Persistence.Data.Model.Sys
         public String Name { get; set; }
 
         /// <summary>
+        /// Gets or sets the name of the staged data
+        /// </summary>
+        [Column("DESCR"), NotNull]
+        public String Description { get; set; }
+
+        /// <summary>
         /// Gets or sets the status
         /// </summary>
         [Column("STS_CS"), NotNull]

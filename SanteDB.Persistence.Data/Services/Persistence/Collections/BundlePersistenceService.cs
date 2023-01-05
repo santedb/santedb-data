@@ -164,10 +164,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             }
 
             // Could not order dependencies
-            if (swapped)
-            {
-                throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_CIRCULAR_DEPENDENCY));
-            }
+            //if (swapped)
+            //{
+            //    throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_CIRCULAR_DEPENDENCY));
+            //}
 
             return new Bundle(resolved);
         }

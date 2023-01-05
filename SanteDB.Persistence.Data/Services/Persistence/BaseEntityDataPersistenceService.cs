@@ -26,6 +26,7 @@ using SanteDB.Persistence.Data.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
@@ -44,6 +45,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public BaseEntityDataPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
+        }
+
+        /// <summary>
+        /// Return sql statement for version filter
+        /// </summary>
+        public override SqlStatement GetCurrentVersionFilter(string tableAlias)
+        {
+            var tableMap = TableMapping.Get(typeof(TDbModel));
+            var obsltCol = tableMap.GetColumn(nameof(DbBaseData.ObsoletionTime));
+            return new SqlStatement(this.Provider.StatementFactory, $"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
         }
 
         /// <inheritdoc/>
@@ -100,7 +111,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Obsolete all objects
         /// </summary>
-        protected override IEnumerable<TDbModel> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
+        protected override IEnumerable<Guid> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
         {
             if (context == null)
             {
@@ -131,55 +142,37 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 if (domainExpression != null)
                 {
 
-                    foreach (var obj in context.Query(domainExpression))
+                    // TODO: Find a more memory efficient way to do this - perhaps we can delay run?
+                    var returnKeys = context.Query(domainExpression).Select(o => o.Key).ToList();
+                    switch (deletionMode)
                     {
-                        switch (deletionMode)
-                        {
-                            case DeleteMode.LogicalDelete:
-                                // If logically deleting a logically deleted object it is perma delete
-                                if (obj.ObsoletionTime.HasValue)
-                                {
-                                    goto case DeleteMode.PermanentDelete;
-                                }
-                                obj.ObsoletedByKey = context.ContextId;
-                                obj.ObsoletionTime = DateTimeOffset.Now;
-                                context.Update(obj);
-                                break;
-                            case DeleteMode.PermanentDelete:
-                                this.DoDeleteReferencesInternal(context, obj.Key);
-                                context.Delete(obj);
-                                break;
-                        }
-                        yield return obj;
-
+                        case DeleteMode.LogicalDelete:
+                            context.UpdateAll<TDbModel>(domainExpression, o => o.ObsoletedByKey == context.ContextId, o => o.ObsoletionTime == DateTimeOffset.Now);
+                            break;
+                        case DeleteMode.PermanentDelete:
+                            returnKeys.ForEach(o => this.DoDeleteReferencesInternal(context, o));
+                            context.DeleteAll<TDbModel>(domainExpression);
+                            break;
                     }
+                    return returnKeys;
                 }
                 else
                 {
                     this.m_tracer.TraceVerbose("Will use slow query construction due to complex mapped fields");
                     var domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(expression);
 
-                    foreach (var obj in context.Query<TDbModel>(domainQuery))
+                    var returnKeys = context.Query<TDbModel>(domainQuery).Select(o => o.Key).ToList();
+                    switch (deletionMode)
                     {
-                        switch (deletionMode)
-                        {
-                            case DeleteMode.LogicalDelete:
-                                if (obj.ObsoletionTime.HasValue)
-                                {
-                                    goto case DeleteMode.PermanentDelete;
-                                }
-                                obj.ObsoletedByKey = context.ContextId;
-                                obj.ObsoletionTime = DateTimeOffset.Now;
-                                context.Update(obj);
-                                break;
-                            case DeleteMode.PermanentDelete:
-                                this.DoDeleteReferencesInternal(context, obj.Key);
-                                context.Delete(obj);
-                                break;
-                        }
-                        yield return obj;
+                        case DeleteMode.LogicalDelete:
+                            context.UpdateAll<TDbModel>(domainQuery, o => o.ObsoletedByKey == context.ContextId, o => o.ObsoletionTime == DateTimeOffset.Now);
+                            break;
+                        case DeleteMode.PermanentDelete:
+                            returnKeys.ForEach(o => this.DoDeleteReferencesInternal(context, o));
+                            context.DeleteAll<TDbModel>(domainQuery);
+                            break;
                     }
-
+                    return returnKeys;
                 }
 
 #if DEBUG

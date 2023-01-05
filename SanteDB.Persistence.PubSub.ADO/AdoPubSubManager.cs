@@ -841,5 +841,25 @@ namespace SanteDB.Persistence.PubSub.ADO
             return results.Skip(offset).Take(count);
         }
 
+        /// <summary>
+        /// Return sql statement for version filter
+        /// </summary>
+        SqlStatement IMappedQueryProvider<PubSubSubscriptionDefinition>.GetCurrentVersionFilter(string tableAlias)
+        {
+            var tableMap = TableMapping.Get(typeof(DbSubscription));
+            var obsltCol = tableMap.GetColumn(nameof(DbSubscription.ObsoletionTime));
+            return new SqlStatement(this.Provider.StatementFactory, $"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
+        }
+
+        /// <summary>
+        /// Return sql statement for version filter
+        /// </summary>
+        SqlStatement IMappedQueryProvider<PubSubChannelDefinition>.GetCurrentVersionFilter(string tableAlias)
+        {
+            var tableMap = TableMapping.Get(typeof(DbChannel));
+            var obsltCol = tableMap.GetColumn(nameof(DbChannel.ObsoletionTime));
+            return new SqlStatement(this.Provider.StatementFactory, $"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
+        }
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Data.Import;
 using SanteDB.Core.Data.Import.Definition;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Model.Sys;
@@ -34,11 +35,18 @@ namespace SanteDB.Persistence.Data.ForeignData
             this.ModifiedOn = foreignDataStage.UpdatedTime ?? foreignDataStage.CreationTime;
             this.Tag = foreignDataStage.Key.ToString();
             this.Key = foreignDataStage.Key;
-            this.Issues = issues.Select(o => new DetectedIssue(o.Priority, o.LogicalId, o.Text, o.IssueTypeKey));
+            this.Issues = issues.Select(o => new DetectedIssue(o.Priority, o.LogicalId, o.Text, o.IssueTypeKey)).ToList();
             this.m_streamManager = dataStreamManager;
             this.m_rejectKey = foreignDataStage.RejectStreamKey;
             this.m_sourceKey = foreignDataStage.SourceStreamKey;
             this.ForeignDataMapKey = foreignDataStage.ForeignDataMapKey;
+            this.CreatedByKey = foreignDataStage.CreatedByKey;
+            this.CreationTime = foreignDataStage.CreationTime;
+            this.ObsoletedByKey = foreignDataStage.ObsoletedByKey;
+            this.ObsoletionTime = foreignDataStage.ObsoletionTime;
+            this.UpdatedByKey = foreignDataStage.UpdatedByKey;
+            this.UpdatedTime = foreignDataStage.UpdatedTime;
+            this.Description = foreignDataStage.Description;
         }
 
         /// <inheritdoc/>
@@ -63,9 +71,55 @@ namespace SanteDB.Persistence.Data.ForeignData
         public Guid ForeignDataMapKey { get; }
 
         /// <inheritdoc/>
+        public Guid? CreatedByKey { get; }
+        
+        /// <inheritdoc/>
+        public Guid? ObsoletedByKey { get;  }
+
+        /// <inheritdoc/>
+        public DateTimeOffset CreationTime { get; }
+        
+        /// <inheritdoc/>
+        public DateTimeOffset? ObsoletionTime { get; }
+
+        /// <inheritdoc/>
+        public Guid? UpdatedByKey { get; }
+
+        /// <inheritdoc/>
+        public DateTimeOffset? UpdatedTime { get; }
+
+        /// <inheritdoc/>
+        public string Description { get; }
+
+        public void AddAnnotation<T>(T annotation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAnnotatedResource CopyAnnotations(IAnnotatedResource other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<T> GetAnnotations<T>()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
         public Stream GetRejectStream() => this.m_rejectKey.HasValue ? this.m_streamManager.Get(this.m_rejectKey.Value) : null;
 
         /// <inheritdoc/>
         public Stream GetSourceStream() => this.m_streamManager.Get(this.m_sourceKey);
+
+        public void RemoveAnnotation(object annotation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveAnnotations<T>()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -71,19 +71,19 @@ namespace SanteDB.Persistence.Data.Test.SQLite
                 // Test - cannot find map
                 using (var fds = typeof(AdoForeignDataManagerTest).Assembly.GetManifestResourceStream("SanteDB.Persistence.Data.Test.SQLite.Resources.BadPatients.csv"))
                 {
-                    var fdi = foreignDataManager.Stage(fds, "badpatients.csv", Guid.NewGuid());
+                    var fdi = foreignDataManager.Stage(fds, "badpatients.csv", "test", Guid.NewGuid());
                     Assert.AreEqual(1, fdi.Issues.Count());
                     foreignDataManager.Delete(fdi.Key.Value);
 
                     fds.Seek(0, System.IO.SeekOrigin.Begin);
-                    fdi = foreignDataManager.Stage(fds, "badpatients.csv", Guid.Parse("4ABA7190-B975-4623-92A2-7EF105E0C428"));
+                    fdi = foreignDataManager.Stage(fds, "badpatients.csv", "test", Guid.Parse("4ABA7190-B975-4623-92A2-7EF105E0C428"));
                     Assert.AreEqual(10, fdi.Issues.Count());
 
 
                 }
                 using (var fds = typeof(AdoForeignDataManagerTest).Assembly.GetManifestResourceStream("SanteDB.Persistence.Data.Test.SQLite.Resources.Patients.csv"))
                 {
-                    var fdi = foreignDataManager.Stage(fds, "patients.csv", Guid.Parse("4ABA7190-B975-4623-92A2-7EF105E0C428"));
+                    var fdi = foreignDataManager.Stage(fds, "patients.csv", "test", Guid.Parse("4ABA7190-B975-4623-92A2-7EF105E0C428"));
                     Assert.AreEqual("patients.csv", fdi.Name);
                     Assert.IsNotNull(fdi.Issues);
                     Assert.AreEqual(0, fdi.Issues.Count());

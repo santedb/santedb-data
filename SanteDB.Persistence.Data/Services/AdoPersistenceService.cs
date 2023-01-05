@@ -41,6 +41,16 @@ namespace SanteDB.Persistence.Data.Services
     [ServiceProvider("ADO.NET Persistence Service", Configuration = typeof(AdoPersistenceConfigurationSection))]
     public class AdoPersistenceService : ISqlDataPersistenceService, IServiceFactory, IReportProgressChanged
     {
+
+        private readonly Type[] m_serviceFactoryTypes = new Type[]
+        {
+            typeof(AdoForeignDataManager),
+            typeof(AdoSubscriptionExecutor),
+            typeof(AdoRelationshipValidationProvider),
+            typeof(AdoFreetextSearchService),
+            typeof(AdoDatasetInstallerService)
+        };
+
         // Gets the configuration
         private AdoPersistenceConfigurationSection m_configuration;
 
@@ -192,6 +202,12 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public bool TryCreateService(Type serviceType, out object serviceInstance)
         {
+            var knownServiceType = this.m_serviceFactoryTypes.FirstOrDefault(o => serviceType.IsAssignableFrom(o));
+            if(knownServiceType != null)
+            {
+                serviceInstance = this.m_serviceManager.CreateInjected(knownServiceType);
+                return true;
+            }
             serviceInstance = this.m_services.FirstOrDefault(o => serviceType.IsAssignableFrom(o.GetType()));
             return serviceInstance != null;
         }

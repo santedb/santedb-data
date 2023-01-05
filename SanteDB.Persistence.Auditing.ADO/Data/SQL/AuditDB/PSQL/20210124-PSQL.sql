@@ -68,3 +68,4 @@ CREATE SEQUENCE aud_obj_dat_seq START WITH 1 INCREMENT BY 1;
 );
 
 CREATE INDEX aud_obj_obj_dat_id_idx ON aud_obj_dat_tbl(obj_id);
+create index aud_meta_val_val_idx on aud_meta_val_cdtbl(val);

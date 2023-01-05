@@ -96,6 +96,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     mapper = typeof(CodedObservation).GetRelatedPersistenceService() as IAdoClassMapper;
                     break;
             }
+
+            if(referenceObjects.Length == 0)
+            {
+                referenceObjects = mapper.GetReferencedObjects(context, dbModel);
+            }
             return mapper?.MapToModelInstanceEx(context, dbModel, referenceObjects) as Observation ??
                 base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
         }

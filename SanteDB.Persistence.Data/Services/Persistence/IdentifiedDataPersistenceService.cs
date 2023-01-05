@@ -90,18 +90,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         {
                             return existing;
                         }
-                        else
+                        else if(DataPersistenceControlContext.Current?.AutoInsertChildren ?? this.m_configuration.AutoInsertChildren)
                         {
                             return persistenceService.Insert(context, data);
                         }
+                        else
+                        {
+                            throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.RELATED_OBJECT_NOT_FOUND, new { name = typeof(TData).Name, source = data }));
+                        }
                     }
-                    else if (this.m_configuration.AutoInsertChildren)
+                    else if (DataPersistenceControlContext.Current?.AutoInsertChildren ?? this.m_configuration.AutoInsertChildren)
                     {
                         return persistenceService.Insert(context, data);
                     }
                     else
                     {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.RELATED_OBJECT_NOT_FOUND, new { name = typeof(TData).Name, source = data.Key }));
+                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.RELATED_OBJECT_NOT_FOUND, new { name = typeof(TData).Name, source = data }));
                     }
                 }
                 else
@@ -211,14 +215,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <param name="versionKey">The version key</param>
         /// <param name="allowCache">True if loading data from the ad-hoc caching service is allowed</param>
         /// <returns>The database model</returns>
-        protected override TDbModel DoGetInternal(DataContext context, Guid key, Guid? versionKey, bool allowCache = false)
+        protected override object DoGetInternal(DataContext context, Guid key, Guid? versionKey, bool allowCache = false)
         {
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            TDbModel retVal = default(TDbModel);
+            object retVal = default(TDbModel);
             var cacheKey = this.GetAdHocCacheKey(key);
             if (allowCache && (this.m_configuration?.CachingPolicy?.Targets & Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects) == Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects)
             {
@@ -226,11 +230,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             if (retVal == null)
             {
-                retVal = context.FirstOrDefault<TDbModel>(o => o.Key == key);
+                retVal = context.Query<TDbModel>(o => o.Key == key).FirstOrDefault();
 
                 if ((this.m_configuration?.CachingPolicy?.Targets & Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects) == Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects)
                 {
-                    this.m_adhocCache.Add<TDbModel>(cacheKey, retVal, this.m_configuration.CachingPolicy?.DataObjectExpiry);
+                    this.m_adhocCache.Add(cacheKey, retVal, this.m_configuration.CachingPolicy?.DataObjectExpiry);
                 }
             }
 
@@ -283,7 +287,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Obsolete all objects
         /// </summary>
-        protected override IEnumerable<TDbModel> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deleteMode)
+        protected override IEnumerable<Guid> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deleteMode)
         {
             if (context == null)
             {
@@ -305,21 +309,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
                 if (domainExpression != null)
                 {
-                    foreach (var itm in context.Query<TDbModel>(domainExpression))
-                    {
-                        context.Delete(itm);
-                        yield return itm;
-                    }
+                    var returnKeys = context.Query<TDbModel>(domainExpression).Select(o => o.Key).ToArray();
+                    context.DeleteAll<TDbModel>(domainExpression);
+                    return returnKeys;
                 }
                 else
                 {
                     this.m_tracer.TraceVerbose("Will use slow query construction due to complex mapped fields");
                     var domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateWhere(expression);
-                    foreach (var itm in context.Query<TDbModel>(domainQuery.Build()))
-                    {
-                        context.Delete(itm);
-                        yield return itm;
-                    }
+                    var returnKeys = context.Query<TDbModel>(domainExpression).Select(o => o.Key).ToArray();
+                    context.DeleteAll<TDbModel>(domainExpression);
+                    return returnKeys;
                 }
 
 #if DEBUG

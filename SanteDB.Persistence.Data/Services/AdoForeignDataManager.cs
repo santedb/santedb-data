@@ -1,6 +1,7 @@
 ﻿using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Data.Import;
 using SanteDB.Core.Data.Import.Definition;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
@@ -40,6 +41,7 @@ namespace SanteDB.Persistence.Data.Services
         private readonly IRepositoryService<ForeignDataMap> m_foreignDataMapRepository;
         private readonly ModelMapper m_modelMapper;
         private readonly IQueryPersistenceService m_queryPersistenceService;
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoForeignDataManager));
 
         /// <summary>
         /// Creates a new ADO session identity provider with injected configuration manager
@@ -59,9 +61,27 @@ namespace SanteDB.Persistence.Data.Services
             this.m_queryPersistenceService = queryPersistence;
             this.m_streamManager = foreignDataStreamManager;
             this.m_importService = importService;
+            
             this.m_foreignDataMapRepository = foreignDataMapRepository;
             this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
             
+            // Reset the state of running jobs
+            try
+            {
+                using(var context = this.m_configuration.Provider.GetWriteConnection())
+                {
+                    context.Open();
+                    foreach(var rj in context.Query<DbForeignDataStage>(o=>o.Status == ForeignDataStatus.Running).ToArray())
+                    {
+                        rj.Status = ForeignDataStatus.Staged;
+                        context.Update(rj);
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                this.m_tracer.TraceError("Error resetting job status: {0}", e);
+            }
         }
 
         /// <inheritdoc/>
@@ -111,6 +131,7 @@ namespace SanteDB.Persistence.Data.Services
                         existing.SourceStreamKey = Guid.Empty;
                         context.Update(existing);
                         var issues = context.Query<DbForeignDataIssue>(o => o.SourceKey == foreignDataId).ToArray();
+                        context.DeleteAll<DbForeignDataIssue>(o => o.SourceKey == foreignDataId);
                         tx.Commit();
 
                         return new AdoForeignDataSubmission(existing, issues, this.m_streamManager);
@@ -167,73 +188,104 @@ namespace SanteDB.Persistence.Data.Services
                     if (ForeignDataImportUtil.Current.TryGetDataFormat(Path.GetExtension(existing.Name), out var dataFormat))
                     {
                         existing.Status = ForeignDataStatus.CompletedSuccessfully;
-
-
-                        using (var rejectStream = new MemoryStream())
+                        try
                         {
-                            using (var sourceFile = dataFormat.Open(this.m_streamManager.Get(existing.SourceStreamKey)))
-                            using (var rejectFile = dataFormat.Open(rejectStream))
+                            using (var rejectStream = new MemoryStream())
                             {
-                                var subsetNames = sourceFile.GetSubsetNames().ToArray();
-
-                                // Callback function for status of this import
-                                var progressPerSubset = 1 / (float)subsetNames.Length;
-                                var currentSubsetOffset = 0;
-                                EventHandler<ProgressChangedEventArgs> progressRelay = (o, e) => this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(currentSubsetOffset * progressPerSubset + e.Progress * progressPerSubset, String.Format(UserMessages.IMPORTING_NAME, existing.Name)));
-                                if(this.m_importService is IReportProgressChanged irpc)
+                                using (var sourceFile = dataFormat.Open(this.m_streamManager.Get(existing.SourceStreamKey)))
+                                using (var rejectFile = dataFormat.Open(rejectStream))
                                 {
-                                    irpc.ProgressChanged += progressRelay;
-                                }
+                                    var subsetNames = sourceFile.GetSubsetNames().ToArray();
 
-                                for (currentSubsetOffset = 0; currentSubsetOffset < subsetNames.Length; currentSubsetOffset++)
-                                {
-                                    var sourceName = subsetNames[currentSubsetOffset];
-                                    var map = foreignDataMap.Maps.FirstOrDefault(o => (o.Source ?? String.Empty) == sourceName);
-                                    if (map != null)
+                                    // Callback function for status of this import
+                                    var progressPerSubset = 1 / (float)subsetNames.Length;
+                                    var currentSubsetOffset = 0;
+                                    EventHandler<ProgressChangedEventArgs> progressRelay = (o, e) => this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(currentSubsetOffset * progressPerSubset + e.Progress * progressPerSubset, $"{String.Format(UserMessages.IMPORTING_NAME, existing.Name)} ({e.State})"));
+                                    if (this.m_importService is IReportProgressChanged irpc)
                                     {
-                                        using (var reader = sourceFile.CreateReader(sourceName))
-                                        using (var rejectWriter = rejectFile.CreateWriter(sourceName))
-                                        {
-                                            var issues = this.m_importService.Import(map, reader, rejectWriter, TransactionMode.Commit).ToArray();
-
-                                            foreach (var itm in issues)
-                                            {
-                                                context.Insert(new DbForeignDataIssue()
-                                                {
-                                                    IssueTypeKey = itm.TypeKey,
-                                                    Key = Guid.NewGuid(),
-                                                    SourceKey = foreignDataId,
-                                                    LogicalId = itm.Id,
-                                                    Priority = itm.Priority,
-                                                    Text = itm.Text
-                                                });
-
-                                                if (itm.Priority != DetectedIssuePriorityType.Information)
-                                                {
-                                                    existing.Status = ForeignDataStatus.CompletedWithErrors;
-                                                }
-                                            }
-
-                                        }
+                                        irpc.ProgressChanged += progressRelay;
                                     }
-                                } // end processing the 
 
-                                if (this.m_importService is IReportProgressChanged irpc2)
-                                {
-                                    irpc2.ProgressChanged -= progressRelay;
-                                }
+                                    for (currentSubsetOffset = 0; currentSubsetOffset < subsetNames.Length; currentSubsetOffset++)
+                                    {
+                                        var sourceName = subsetNames[currentSubsetOffset];
+                                        var map = foreignDataMap.Maps.FirstOrDefault(o => (o.Source ?? String.Empty) == sourceName);
+                                        if (map != null)
+                                        {
+                                            using (var reader = sourceFile.CreateReader(sourceName))
+                                            using (var rejectWriter = rejectFile.CreateWriter(sourceName))
+                                            {
+                                                var issues = this.m_importService.Import(map, reader, rejectWriter, TransactionMode.Commit).ToArray();
 
-                                // Reject stream
-                                if (rejectStream.Position > 0)
-                                {
-                                    rejectStream.Seek(0, SeekOrigin.Begin);
-                                    existing.RejectStreamKey = this.m_streamManager.Add(rejectStream);
+                                                foreach (var itm in issues)
+                                                {
+                                                    if (itm != null)
+                                                    {
+                                                        context.Insert(new DbForeignDataIssue()
+                                                        {
+                                                            IssueTypeKey = itm.TypeKey,
+                                                            Key = Guid.NewGuid(),
+                                                            SourceKey = foreignDataId,
+                                                            LogicalId = itm.Id,
+                                                            Priority = itm.Priority,
+                                                            Text = itm.Text
+                                                        });
+                                                    }
+
+                                                    if (itm.Priority != DetectedIssuePriorityType.Information)
+                                                    {
+                                                        existing.Status = ForeignDataStatus.CompletedWithErrors;
+                                                    }
+                                                }
+
+                                            }
+                                        }
+                                    } // end processing the 
+
+                                    if (this.m_importService is IReportProgressChanged irpc2)
+                                    {
+                                        irpc2.ProgressChanged -= progressRelay;
+                                    }
+
+                                    // Reject stream
+                                    if (rejectStream.Position > 0)
+                                    {
+                                        rejectStream.Seek(0, SeekOrigin.Begin);
+                                        existing.RejectStreamKey = this.m_streamManager.Add(rejectStream);
+                                    }
                                 }
-                                existing.UpdatedByKey = context.ContextId;
-                                existing.UpdatedTime = DateTimeOffset.Now;
-                                existing = context.Update(existing);
                             }
-
+                        }
+                        catch(Exception e)
+                        {
+                            var exceptionString = String.Empty;
+                            var ce = e;
+                            while(ce != null)
+                            {
+                                exceptionString += ce.Message;
+                                ce = ce.InnerException;
+                                if(ce != null)
+                                {
+                                    exceptionString += ". CAUSE: ";
+                                }
+                            }
+                            existing.Status = ForeignDataStatus.CompletedWithErrors;
+                            context.Insert(new DbForeignDataIssue()
+                            {
+                                IssueTypeKey = DetectedIssueKeys.OtherIssue,
+                                Key = Guid.NewGuid(),
+                                SourceKey = foreignDataId,
+                                LogicalId = "fatal",
+                                Priority = DetectedIssuePriorityType.Error,
+                                Text = exceptionString
+                            });
+                            this.m_tracer.TraceError("Could not execute import for {0} - {1}", foreignDataId, e);
+                        }
+                        finally
+                        {
+                            existing.UpdatedByKey = context.ContextId;
+                            existing.UpdatedTime = DateTimeOffset.Now;
+                            existing = context.Update(existing);
                         }
                     }
                     else
@@ -293,6 +345,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
+                    context.Open();
                     var existing = context.Query<DbForeignDataStage>(o => o.Key == foreignDataId && o.ObsoletionTime == null).FirstOrDefault();
                     if (existing == null)
                     {
@@ -317,7 +370,8 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public Expression MapExpression<TReturn>(Expression<Func<IForeignDataSubmission, TReturn>> sortExpression)
         {
-            throw new NotImplementedException();
+            return this.m_modelMapper.MapModelExpression<IForeignDataSubmission, DbForeignDataStage, TReturn>(sortExpression, false);
+
         }
 
         /// <summary>
@@ -349,12 +403,14 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         case ForeignDataStatus.Rejected:
                         case ForeignDataStatus.CompletedSuccessfully:
-                        case ForeignDataStatus.CompletedWithErrors:
                         case ForeignDataStatus.Running:
                             throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.FOREIGN_DATA_INVALID_STATE));
+                        case ForeignDataStatus.CompletedWithErrors:
                         case ForeignDataStatus.Staged:
                             using (var tx = context.BeginTransaction())
                             {
+                                context.EstablishProvenance(AuthenticationContext.Current.Principal);
+                                context.DeleteAll<DbForeignDataIssue>(o => o.SourceKey == foreignDataId);
                                 var issues = this.ValidateInternal(context, existing).ToArray();
                                 tx.Commit();
                                 return new AdoForeignDataSubmission(existing, issues.ToArray(), this.m_streamManager);
@@ -375,7 +431,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public IForeignDataSubmission Stage(Stream inputStream, string name, Guid foreignDataMapKey)
+        public IForeignDataSubmission Stage(Stream inputStream, string name, string description, Guid foreignDataMapKey)
         {
             if (inputStream == null)
             {
@@ -407,6 +463,7 @@ namespace SanteDB.Persistence.Data.Services
                             CreatedByKey = context.EstablishProvenance(AuthenticationContext.Current.Principal),
                             CreationTime = DateTimeOffset.Now,
                             Name = name,
+                            Description = description,
                             Status = ForeignDataStatus.Staged,
                             SourceStreamKey = sourceFileKey,
                             ForeignDataMapKey = foreignDataMapKey
@@ -459,7 +516,8 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.FOREIGN_DATA_INVALID_STATE));
             }
-            else if (stageDataRecord.Status != ForeignDataStatus.Staged)
+            else if (stageDataRecord.Status != ForeignDataStatus.Staged &&
+                stageDataRecord.Status != ForeignDataStatus.CompletedWithErrors)
             {
                 yield break;
             }
@@ -546,6 +604,17 @@ namespace SanteDB.Persistence.Data.Services
             stageDataRecord.UpdatedByKey = context.ContextId;
             context.Update(stageDataRecord);
 
+        }
+
+
+        /// <summary>
+        /// Return sql statement for version filter
+        /// </summary>
+        public SqlStatement GetCurrentVersionFilter(string tableAlias)
+        {
+            var tableMap = TableMapping.Get(typeof(DbForeignDataStage));
+            var obsltCol = tableMap.GetColumn(nameof(DbForeignDataStage.ObsoletionTime));
+            return new SqlStatement(this.Provider.StatementFactory, $"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
         }
     }
 }

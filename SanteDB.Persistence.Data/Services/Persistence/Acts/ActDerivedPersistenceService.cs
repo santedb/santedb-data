@@ -447,6 +447,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         {
             if (this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var persistenceProvider) && persistenceProvider is IAdoClassMapper edps)
             {
+
+                if (referenceObjects.Length == 0)
+                {
+                    referenceObjects = edps.GetReferencedObjects(context, dbModel);
+                }
                 var retVal = edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
                 if (retVal is TAct ta)
                 {
@@ -609,5 +614,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
         /// <inheritdoc/>
         public Expression<Func<DbActSecurityPolicy, bool>> GetKeyExpression(DbActSecurityPolicy model) => o => o.SourceKey == model.SourceKey && o.PolicyKey == model.PolicyKey && o.ObsoleteVersionSequenceId == null;
+
+        /// <inheritdoc/>
+        public object[] GetReferencedObjects(DataContext context, object dbModel)
+        {
+            if (dbModel is DbActVersion act)
+            {
+                return (this.ExecuteQueryOrm(context, o => o.Key == act.Key && o.VersionKey == act.VersionKey).FirstOrDefault() as CompositeResult)?.Values;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(dbModel), String.Format(ErrorMessages.ARGUMENT_INVALID_TYPE, typeof(Act), dbModel.GetType()));
+            }
+        }
+
     }
 }

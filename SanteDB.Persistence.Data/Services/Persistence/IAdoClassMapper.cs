@@ -42,5 +42,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The converted object</returns>
         object MapToModelInstanceEx(DataContext context, object dbModel, params object[] referenceObjects);
 
+        /// <summary>
+        /// Get referenced objects for the specified model object
+        /// </summary>
+        /// <param name="context">The context on which the objects should be loaded</param>
+        /// <param name="dbModel">The model object</param>
+        /// <returns>The referenced objects</returns>
+        object[] GetReferencedObjects(DataContext context, object dbModel);
     }
 }

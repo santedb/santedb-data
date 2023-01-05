@@ -431,25 +431,25 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                         {
                             var roleCode = this.GetOrCreateAuditCode(context, act.ActorRoleCode.FirstOrDefault());
 
-                            DbAuditActor dbAct = null;
+                            long? dbAct = null;
                             if (roleCode != null)
                             {
-                                dbAct = context.FirstOrDefault<DbAuditActor>(o => o.UserName == act.UserName && o.ActorRoleCode == roleCode.Key);
+                                dbAct = context.Query<DbAuditActor>(o => o.UserName == act.UserName && o.ActorRoleCode == roleCode.Key).Select(o=>o.Key).FirstOrDefault();
                             }
                             else
                             {
-                                dbAct = context.FirstOrDefault<DbAuditActor>(o => o.UserName == act.UserName && o.ActorRoleCode == Guid.Empty);
+                                dbAct = context.Query<DbAuditActor>(o => o.UserName == act.UserName && o.ActorRoleCode == Guid.Empty).Select(o => o.Key).FirstOrDefault();
                             }
 
-                            if (dbAct == null)
+                            if (dbAct == default(long))
                             {
-                                dbAct = this.m_mapper.MapModelInstance<AuditActorData, DbAuditActor>(act);
-                                dbAct.ActorRoleCode = roleCode?.Key ?? Guid.Empty;
-                                dbAct = context.Insert(dbAct);
+                                var actor = this.m_mapper.MapModelInstance<AuditActorData, DbAuditActor>(act);
+                                actor.ActorRoleCode = roleCode?.Key ?? Guid.Empty;
+                                dbAct= context.Insert(actor).Key;
                             }
                             context.Insert(new DbAuditActorAssociation()
                             {
-                                TargetKey = dbAct.Key,
+                                TargetKey = dbAct.GetValueOrDefault(),
                                 SourceKey = dbAudit.Key,
                                 UserIsRequestor = act.UserIsRequestor,
                                 AccessPoint = act.NetworkAccessPointId
@@ -497,21 +497,21 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     {
                         foreach (var meta in storageData.Metadata.Where(o => !String.IsNullOrEmpty(o.Value) && o.Key != AuditMetadataKey.CorrelationToken))
                         {
-                            var kv = context.FirstOrDefault<DbAuditMetadataValue>(o => o.Value == meta.Value);
-                            if (kv == null)
+                            var kv = context.Query<DbAuditMetadataValue>(o => o.Value == meta.Value).Select(o => o.Key).FirstOrDefault() ;
+                            if (kv == default(long))
                             {
                                 kv = context.Insert(new DbAuditMetadataValue()
                                 {
                                     // TODO: Make this a common extension function (to trim)
                                     Value = meta.Value.Substring(0, meta.Value.Length > 256 ? 256 : meta.Value.Length)
-                                });
+                                }).Key;
                             }
 
                             context.Insert(new DbAuditMetadata()
                             {
                                 AuditId = dbAudit.Key,
                                 MetadataKey = (int)meta.Key,
-                                ValueId = kv.Key
+                                ValueId = kv
                             });
                         }
                     }
@@ -703,6 +703,13 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             return this.m_mapper.MapModelExpression<AuditEventData, DbAuditEventData, TReturn>(sortExpression);
         }
 
+        /// <summary>
+        /// Return sql statement for version filter
+        /// </summary>
+        public SqlStatement GetCurrentVersionFilter(string tableAlias)
+        {
+            return new SqlStatement(this.Provider.StatementFactory, this.Provider.StatementFactory.CreateSqlKeyword(SqlKeyword.True));
+        }
 #pragma warning restore CS0067
     }
 }

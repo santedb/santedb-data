@@ -30,6 +30,7 @@ using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Entities;
@@ -109,9 +110,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             // Perform sub query
             return base.DoQueryInternalAs<CompositeResult<DbEntityVersion, TDbEntitySubTable, TDbTopLevelTable>>(context, query, (o) =>
             {
-                var columns = TableMapping.Get(typeof(TDbEntitySubTable)).Columns.Union(
-                        TableMapping.Get(typeof(DbEntityVersion)).Columns, new ColumnMapping.ColumnComparer()
-                        ).Union(TableMapping.Get(typeof(TDbTopLevelTable)).Columns, new ColumnMapping.ColumnComparer());
+                var columns =
+                TableMapping.Get(typeof(TDbTopLevelTable)).Columns.Union(
+                        TableMapping.Get(typeof(TDbEntitySubTable)).Columns, new ColumnMapping.ColumnComparer()
+                        ).Union(TableMapping.Get(typeof(DbEntityVersion)).Columns, new ColumnMapping.ColumnComparer());
                 var retVal = context.CreateSqlStatement().SelectFrom(typeof(DbEntityVersion), columns.ToArray())
                     .InnerJoin<DbEntityVersion, TDbEntitySubTable>(q => q.VersionKey, q => q.ParentKey)
                     .InnerJoin<TDbEntitySubTable, TDbTopLevelTable>(q => q.ParentKey, q => q.ParentKey);
@@ -464,6 +466,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             if (this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var subClassProvider) && subClassProvider is IAdoClassMapper edps)
             {
+                if(referenceObjects.Length == 0)
+                {
+                    this.m_tracer.TraceWarning($"Fetching referenced objects - consider calling IDataPersistences<{typeof(TEntity).Name}> in the future");
+                    referenceObjects = edps.GetReferencedObjects(context, dbModel);
+                }
                 return (TEntity)edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
             }
             else
@@ -618,5 +625,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
         /// <inheritdoc/>
         public Expression<Func<DbEntitySecurityPolicy, bool>> GetKeyExpression(DbEntitySecurityPolicy model) => o => o.SourceKey == model.SourceKey && o.PolicyKey == model.PolicyKey && o.ObsoleteVersionSequenceId == null;
+
+        /// <inheritdoc/>
+        public object[] GetReferencedObjects(DataContext context, object dbModel)
+        {
+            if(dbModel is DbEntityVersion ent)
+            {
+                return (this.ExecuteQueryOrm(context, o => o.Key == ent.Key && o.VersionKey == ent.VersionKey).FirstOrDefault() as CompositeResult)?.Values;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(dbModel), String.Format(ErrorMessages.ARGUMENT_INVALID_TYPE, typeof(Entity), dbModel.GetType()));
+            }
+        }
     }
 }

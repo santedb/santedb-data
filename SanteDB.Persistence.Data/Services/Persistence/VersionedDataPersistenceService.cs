@@ -31,6 +31,7 @@ using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.MappedResultSets;
+using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.DataType;
@@ -253,7 +254,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                 if (dbAuth == null)
                 {
-                    if (!this.m_configuration.AutoInsertChildren || id.IdentityDomain == null) // we're not inserting it and it doesn't exist - raise the alarm!
+                    if (!(DataPersistenceControlContext.Current?.AutoInsertChildren ?? this.m_configuration.AutoInsertChildren) || id.IdentityDomain == null) // we're not inserting it and it doesn't exist - raise the alarm!
                     {
                         yield return new DetectedIssue(DetectedIssuePriorityType.Error, DataConstants.IdentifierDomainNotFound, $"Missing assigning authority with ID {String.Join(",", objectToVerify.Identifiers.Select(o => o.IdentityDomain.Key))}", DetectedIssueKeys.SafetyConcernIssue);
                     }
@@ -372,14 +373,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Perform a GET internal
         /// </summary>
-        protected override TDbModel DoGetInternal(DataContext context, Guid key, Guid? versionKey, bool allowCache = false)
+        protected override object DoGetInternal(DataContext context, Guid key, Guid? versionKey, bool allowCache = false)
         {
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            TDbModel retVal = default(TDbModel);
+            object retVal = default(TDbModel);
 
 #if DEBUG
             var sw = new Stopwatch();
@@ -403,14 +404,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                         if ((this.m_configuration?.CachingPolicy?.Targets & Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects) == Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects)
                         {
-                            this.m_adhocCache.Add<TDbModel>(cacheKey, retVal, this.m_configuration.CachingPolicy?.DataObjectExpiry);
+                            this.m_adhocCache.Add(cacheKey, retVal, this.m_configuration.CachingPolicy?.DataObjectExpiry);
                         }
                     }
                 }
                 else
                 {
                     // Fetch the object
-                    retVal = context.FirstOrDefault<TDbModel>(o => o.Key == key && o.VersionKey == versionKey);
+                    retVal = this.ExecuteQueryOrm(context, o => o.Key == key && o.VersionKey == versionKey).FirstOrDefault();
                 }
 
 #if DEBUG
@@ -555,7 +556,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Obsolete all objects
         /// </summary>
-        protected override IEnumerable<TDbModel> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
+        protected override IEnumerable<Guid> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
         {
             if (context == null)
             {
@@ -603,13 +604,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     {
                         case DeleteMode.LogicalDelete:
                             context.UpdateAll(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId);
-                            foreach (var newVersion in context.Query<TDbModel>(o => o.ObsoletionTime != null && o.ObsoletedByKey == context.ContextId))
+                            foreach (var newVersion in context.Query<TDbModel>(o => o.ObsoletionTime != null && o.ObsoletedByKey == context.ContextId).Select(o=>o.Key))
                             {
                                 yield return newVersion;
                             }
                             yield break;
                         case DeleteMode.PermanentDelete:
-                            foreach (var existing in context.Query<TDbModel>(domainExpression))
+                            foreach (var existing in context.Query<TDbModel>(domainExpression).ToArray())
                             {
                                 this.DoDeleteReferencesInternal(context, existing.Key);
                                 this.DoDeleteReferencesInternal(context, existing.VersionKey);
@@ -625,7 +626,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                                 context.DeleteAll<TDbKeyModel>(o => o.Key == existing.Key);
                                 this.m_dataCacheService.Remove(existing.Key);
-
+                                yield return existing.Key;
                             }
                             break;
                     }
@@ -734,6 +735,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <inheritdoc/>
+        public override SqlStatement GetCurrentVersionFilter(string tableAlias)
+        {
+            var tableMap = TableMapping.Get(typeof(TDbModel));
+            var headColumn = tableMap.GetColumn(nameof(DbVersionedData.IsHeadVersion));
+            return base.GetCurrentVersionFilter(tableAlias).And($"{tableAlias ?? tableMap.TableName}.{headColumn.Name} = {this.Provider.StatementFactory.CreateSqlKeyword(SqlKeyword.True)}");
+        }
+
+        /// <inheritdoc/>
         protected override Expression<Func<TModel, bool>> ApplyDefaultQueryFilters(Expression<Func<TModel, bool>> query)
         {
 
@@ -761,7 +770,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             //}
 
             // Is there any class concept key
-            if (m_classKeyMap != null && !query.ToString().Contains(nameof(IHasClassConcept.ClassConceptKey)))
+            var queryString = query.ToString();
+            if (m_classKeyMap != null && !queryString.Contains(nameof(IHasClassConcept.ClassConceptKey)))
             {
                 var classKeyProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IHasClassConcept.ClassConceptKey)));
                 classKeyProperty = Expression.MakeMemberAccess(classKeyProperty, classKeyProperty.Type.GetProperty("Value"));
@@ -786,8 +796,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
             // Ensure that we always apply HEAD filter if not applied
-            var headProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedData.IsHeadVersion)));
-            return base.ApplyDefaultQueryFilters(Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, headProperty, Expression.Constant(true))), query.Parameters[0]));
+
+            if (!queryString.Contains(nameof(IVersionedData.IsHeadVersion)) && !queryString.Contains(nameof(IVersionedData.VersionKey)))
+            {
+                var headProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedData.IsHeadVersion)));
+                query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, headProperty, Expression.Constant(true))), query.Parameters[0]);
+            }
+            return base.ApplyDefaultQueryFilters(query);
 
         }
 

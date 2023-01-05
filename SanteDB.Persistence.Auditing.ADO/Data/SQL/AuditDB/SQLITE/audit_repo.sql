@@ -100,3 +100,4 @@ CREATE INDEX aud_meta_aud_id_idx ON aud_meta_tbl(aud_id);
 );
 
 CREATE INDEX AUD_OBJ_OBJ_DAT_ID_IDX ON AUD_OBJ_DAT_TBL(OBJ_ID);
+create index aud_meta_val_val_idx on aud_meta_val_cdtbl(val);

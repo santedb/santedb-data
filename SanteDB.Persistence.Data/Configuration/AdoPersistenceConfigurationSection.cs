@@ -79,6 +79,9 @@ namespace SanteDB.Persistence.Data.Configuration
     [ExcludeFromCodeCoverage]
     public class AdoPersistenceConfigurationSection : OrmConfigurationBase, IConfigurationSection
     {
+        // 
+        private bool m_legacyPepper = false;
+
         // Random
         private Random m_random = new Random();
 
@@ -128,6 +131,28 @@ namespace SanteDB.Persistence.Data.Configuration
         public int MaxRequests { get; set; }
 
         /// <summary>
+        /// Use legacy peppering algorithm
+        /// </summary>
+        [XmlAttribute("legacyPepper")]
+        [Category("Security")]
+        [DisplayName("Use Legacy Peppering")]
+        [Description("When set will include legacy pepper combinations when authenticating (slower, but compatible)")]
+        public bool LegacyPepper
+        {
+            get => this.m_legacyPepper;
+            set {
+                this.m_legacyPepper = value;
+                this.LegacyPepperSpecified = true;
+            }
+        }
+
+        /// <summary>
+        /// True if pepper is specified
+        /// </summary>
+        [XmlIgnore, Browsable(false)]
+        public bool LegacyPepperSpecified { get; set; }
+
+        /// <summary>
         /// When true, indicates that inserts can allow keyed inserts
         /// </summary>
         [XmlAttribute("autoUpdateExisting")]
@@ -140,7 +165,7 @@ namespace SanteDB.Persistence.Data.Configuration
         /// Gets or sets strict key enforcement behavior
         /// </summary>
         [XmlAttribute("keyValidation")]
-        [Category("strictKeyAgreement")]
+        [Category("Data Quality")]
         [DisplayName("Key / Data Agreement")]
         [Description("When a key property and a data property disagree (i.e. identifier.AuthorityKey <> identifier.Authority.Key) - the persistence layer should refuse to persist (when false, the key is taken over the property value)")]
         public bool StrictKeyAgreement { get; set; }
@@ -172,19 +197,19 @@ namespace SanteDB.Persistence.Data.Configuration
         /// <summary>
         /// Max page size
         /// </summary>
-        [XmlElement("maxPageSize")]
+        [XmlElement("maxPageSize"), Category("Performance"), DisplayName("Maximum Results per Page")]
         public int? MaxPageSize { get; set; }
 
         /// <summary>
         /// Identiifes the caching policy
         /// </summary>
-        [XmlElement("caching"), Category("performance"), DisplayName("Caching Policy"), Description("Identifies the data caching policy for the database layer")]
+        [XmlElement("caching"), Category("Performance"), DisplayName("Caching Policy"), Description("Identifies the data caching policy for the database layer")]
         public AdoPersistenceCachingPolicy CachingPolicy { get; set; }
 
         /// <summary>
         /// Gets or sets the loading strategy
         /// </summary>
-        [XmlAttribute("loadStrategy"), Category("performance"), DisplayName("Load Strategy"), Description("Sets the loading strategy - Quick = No extended loading of properties , Sync = Only synchornization/serialization properties are deep loaded, Full = All properties are loaded")]
+        [XmlAttribute("loadStrategy"), Category("Performance"), DisplayName("Load Strategy"), Description("Sets the loading strategy - Quick = No extended loading of properties , Sync = Only synchornization/serialization properties are deep loaded, Full = All properties are loaded")]
         public LoadMode LoadStrategy { get; set; }
 
         /// <summary>
@@ -196,13 +221,13 @@ namespace SanteDB.Persistence.Data.Configuration
         /// <summary>
         /// Gets or sets the deletion strategy
         /// </summary>
-        [XmlAttribute("deleteStrategy"), Category("behavior"), DisplayName("Delete Strategy"), Description("Sets the default deletion strategy for the persistence layer. LogicalDelete = Set state to Inactive and obsolete time, ObsoleteDelete = Set state to Obsolete and obsolete time, NullifyDelete = Set state to nullify and obsolete time, Versioned Delete = Create a new version with an obsolete time (won't be returned by any calls), Permanent Delete = Purge the data and related data (CASCADES)")]
+        [XmlAttribute("deleteStrategy"), Category("Behavior"), DisplayName("Delete Strategy"), Description("Sets the default deletion strategy for the persistence layer. LogicalDelete = Set state to Inactive and obsolete time, ObsoleteDelete = Set state to Obsolete and obsolete time, NullifyDelete = Set state to nullify and obsolete time, Versioned Delete = Create a new version with an obsolete time (won't be returned by any calls), Permanent Delete = Purge the data and related data (CASCADES)")]
         public DeleteMode DeleteStrategy { get; set; }
 
         /// <summary>
         /// Fast deletion mode
         /// </summary>
-        [XmlAttribute("fastDelete"), Category("behavior"), DisplayName("Fast Delete"), Description("When true, the DELETE verb will not return the full object rather a summary object")]
+        [XmlAttribute("fastDelete"), Category("Behavior"), DisplayName("Fast Delete"), Description("When true, the DELETE verb will not return the full object rather a summary object")]
         public bool FastDelete { get; set; }
 
         /// <summary>
@@ -211,8 +236,13 @@ namespace SanteDB.Persistence.Data.Configuration
         public IEnumerable<String> GetPepperCombos(String secret)
         {
             var pepperSource = !String.IsNullOrEmpty(this.Pepper) ? this.Pepper : PEPPER_CHARS;
-            var pepper = Enumerable.Range(0, secret.Length / 2).Select(o => secret.Substring(o, 2) + $"{pepperSource}{pepperSource.Reverse()}".Substring(o % pepperSource.Length, (o+1)%5)).ToArray();
-            return new String[] { secret }.Union(pepperSource.Select(p => $"{secret}{p}")).Union(pepper.Select(o => $"{secret}{o}"));
+            IEnumerable<String> pepperCombos = new String[] { secret };
+            if (!this.LegacyPepperSpecified || this.LegacyPepper)
+            {
+                var pepper = Enumerable.Range(0, secret.Length / 2).Select(o => secret.Substring(o, 2) + $"{pepperSource}{pepperSource.Reverse()}".Substring(o % pepperSource.Length, (o + 1) % 5)).ToArray();
+                pepperCombos = pepperCombos.Union(pepperSource.Select(p => $"{secret}{p}")).Union(pepper.Select(o => $"{secret}{o}"));
+            }
+            return pepperCombos.Union(Enumerable.Range(0, pepperSource.Length).Select(o => secret.Insert(o % secret.Length, pepperSource[o].ToString()))).ToArray();
         }
 
         /// <summary>
@@ -221,8 +251,8 @@ namespace SanteDB.Persistence.Data.Configuration
         public String AddPepper(String secret)
         {
             var pepperSource = !String.IsNullOrEmpty(this.Pepper) ? this.Pepper : PEPPER_CHARS;
-            var pepper = Enumerable.Range(0, secret.Length / 2).Select(o => secret.Substring(o, 2) + $"{pepperSource}{pepperSource.Reverse()}".Substring(o % pepperSource.Length, (o + 1) % 5)).ToArray();
-            return $"{secret}{pepper[this.m_random.Next(pepper.Length)]}";
+            var nextPepper = this.m_random.Next(pepperSource.Length);
+            return secret.Insert(nextPepper % secret.Length, pepperSource[nextPepper].ToString());
         }
     }
 }

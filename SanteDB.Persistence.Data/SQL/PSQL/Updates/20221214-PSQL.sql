@@ -1,7 +1,7 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20221214-01" name="Update:20221214-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20221214-02" name="Update:20221214-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
  *	<summary>Update: Convert refresh FTI to procedures</summary>
- *	<isInstalled>select ck_patch('20221214-01')</isInstalled>
+ *	<isInstalled>select ck_patch('20221214-02')</isInstalled>
  * </feature>
  */
 
@@ -72,4 +72,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT REG_PATCH('20221214-01'); 
+drop index sec_dev_pub_id_idx;
+create index sec_dev_pub_id_idx on sec_dev_tbl(lower(dev_pub_id));
+
+drop index sec_usr_name_pwd_idx;
+create index sec_usr_name_pwd_idx on sec_usr_tbl (lower(usr_name), passwd);
+
+ALTER TABLE FD_STG_SYSTBL ADD DESCR TEXT;
+SELECT REG_PATCH('20221214-02'); 

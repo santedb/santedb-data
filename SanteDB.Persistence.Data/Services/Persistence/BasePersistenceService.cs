@@ -189,7 +189,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Perform an internal get operation
         /// </summary>
-        protected abstract TDbModel DoGetInternal(DataContext context, Guid key, Guid? versionKey, bool allowCache = false);
+        /// <remarks>
+        /// This method returns an instance of <see cref="CompositeResult"/> if reference objects are to be loaded via the <see cref="ExecuteQueryOrm(DataContext, Expression{Func{TModel, bool}})"/>
+        /// </remarks>
+        protected abstract object DoGetInternal(DataContext context, Guid key, Guid? versionKey, bool allowCache = false);
 
         /// <summary>
         /// Convert to a database model
@@ -230,7 +233,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Perform an obsoletion for all objects matching <paramref name="expression"/>
         /// </summary>
-        protected abstract IEnumerable<TDbModel> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deleteMode);
+        protected abstract IEnumerable<Guid> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deleteMode);
 
         /// <summary>
         /// Called before the object is persisted - this allows implementations to change the object before being persisted
@@ -360,7 +363,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 #endif
                 foreach (var itm in this.DoDeleteAllInternal(context, expression, deleteMode))
                 {
-                    this.m_dataCacheService?.Remove(this.DoConvertToInformationModel(context, itm));
+                    this.m_dataCacheService?.Remove(itm);
                 }
 #if DEBUG
             }
@@ -462,12 +465,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     }
                     else
                     {
-                        retVal = this.DoConvertToInformationModel(context, dbInstance);
+                        retVal = this.ToModelInstance(context, dbInstance);
                     }
 
                     // Add the cache object if caching is allowed on this query and if the load strategy used is less than the load strategy which would have already 
                     // been used to load it before
-                    if (useCache && !versionKey.HasValue)
+                    if (useCache && versionKey.GetValueOrDefault() != Guid.Empty)
                     {
                         this.m_dataCacheService?.Add(retVal);
                     }
@@ -558,6 +561,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The fetched object</returns>
         public virtual TModel Get(Guid key, Guid? versionKey, IPrincipal principal)
         {
+
             if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
@@ -586,6 +590,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         // Is there an ad-hoc version from the database?
                         retVal = this.DoGetModel(context, key, versionKey, true);
                         retVal?.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
+
                     }
                     catch (DbException e)
                     {
@@ -1238,5 +1243,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Perform a delete of the specified object
         /// </summary>
         public object Delete(Guid id) => this.Delete(id, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+
+        /// <inheritdoc/>
+        public virtual SqlStatement GetCurrentVersionFilter(string tableAlias) => new SqlStatement(this.Provider.StatementFactory, this.Provider.StatementFactory.CreateSqlKeyword(SqlKeyword.True));
     }
 }

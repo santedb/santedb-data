@@ -58,7 +58,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Obsolete all objects
         /// </summary>
-        protected override IEnumerable<TDbModel> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
+        protected override IEnumerable<Guid> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
         {
             if (context == null)
             {
@@ -103,18 +103,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                 var sourceSequence = this.GetCurrentVersionSequenceForSource(context, sourceKey);
 
-                foreach (var itm in context.Query<TDbModel>(domainExpression))
+                var keyReturn = context.Query<TDbModel>(domainExpression).Select(o => o.Key).ToArray();
+                switch (deletionMode)
                 {
-                    switch (deletionMode)
-                    {
-                        case DeleteMode.LogicalDelete:
-                            itm.ObsoleteVersionSequenceId = sourceSequence;
-                            context.Update(itm);
-                            break;
-                        default:
-                            context.Delete(itm);
-                            break;
-                    }
+                    case DeleteMode.LogicalDelete:
+                        context.UpdateAll<TDbModel>(domainExpression, o => o.ObsoleteVersionSequenceId == sourceSequence);
+                        break;
+                    default:
+                        context.DeleteAll<TDbModel>(domainExpression);
+                        break;
+                }
+                
+                foreach(var itm in keyReturn)
+                {
                     yield return itm;
                 }
 #if DEBUG
