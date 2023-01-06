@@ -188,26 +188,40 @@
     <EmbeddedResource Include="SQL\PSQL\Updates\20200320-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20201029-PSQL.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20201128-FBSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\FBSQL\Updates\20210512-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20210512-FBSQL.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20210512-PSQL.sql" />
-    <EmbeddedResource Include="SQL\FBSQL\Updates\20210628-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20210628-FBSQL.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20210628-PSQL.sql" />
-    <EmbeddedResource Include="SQL\FBSQL\Updates\20211103-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20211103-FBSQL.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20211103-PSQL.sql" />
-    <EmbeddedResource Include="SQL\FBSQL\Updates\20211111-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20211111-FBSQL.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20211111-PSQL.sql" />
-    <EmbeddedResource Include="SQL\FBSQL\Updates\20211128-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\FBSQL\Updates\20211201-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20211128-FBSQL.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20211201-FBSQL.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20211201-PSQL.sql" />
-    <EmbeddedResource Include="SQL\FBSQL\Updates\20211217-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20211217-FBSQL.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20211217-PSQL.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20211218-FBSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\FBSQL\Updates\20211110-FBSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20211218-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -219,10 +233,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\FBSQL\Updates\20210514-FBSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\FBSQL\Updates\20210414-FBSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20210414-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -236,7 +250,9 @@
     <EmbeddedResource Include="SQL\FBSQL\santedb-fn.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\FBSQL\santedb-init.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\santedb-init.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\santedb-codes.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -307,10 +323,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\FBSQL\Updates\20190625-FBSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\FBSQL\Updates\20200105-FBSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20200105-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -319,13 +335,13 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\FBSQL\Updates\20200812-FBSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20200812-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\FBSQL\Updates\20200912-FBSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20200912-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -337,7 +353,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\FBSQL\Updates\20201214-FBSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20201214-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -346,7 +362,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\FBSQL\Updates\20210116-FBSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20210116-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -358,22 +374,34 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\FBSQL\Updates\20210409-FBSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\FBSQL\Updates\20210217-FBSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20220112-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20220908-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20220927-PSQL.sql" />
-    <EmbeddedResource Include="SQL\FBSQL\Updates\20220927-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\FBSQL\Updates\20220912-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20220927-FBSQL.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20220912-FBSQL.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20220530-PSQL.sql" />
-    <EmbeddedResource Include="SQL\FBSQL\Updates\20220530-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20220530-FBSQL.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20220509-PSQL.sql" />
-    <EmbeddedResource Include="SQL\FBSQL\Updates\20220509-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\FBSQL\Updates\20220414-FBSQL.sql" />
-    <EmbeddedResource Include="SQL\FBSQL\Updates\20211229-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20220509-FBSQL.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20220414-FBSQL.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20211229-FBSQL.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20220414-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20211229-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20221027-PSQL.sql" />

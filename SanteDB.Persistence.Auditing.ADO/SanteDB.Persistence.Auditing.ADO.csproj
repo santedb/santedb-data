@@ -44,7 +44,9 @@
     <EmbeddedResource Include="Data\SQL\AuditDB\PSQL\audit_repo.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Data\SQL\AuditDB\SQLITE\audit_repo.sql" />
+    <EmbeddedResource Include="Data\SQL\AuditDB\SQLITE\audit_repo.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Jobs\" />
