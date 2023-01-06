@@ -79,7 +79,6 @@
     <None Remove="SQL\FBSQL\santedb-init.sql" />
     <None Remove="SQL\PSQL\santedb-codes.sql" />
     <None Remove="SQL\PSQL\santedb-ddl.sql" />
-    <None Remove="SQL\PSQL\santedb-drop.sql" />
     <None Remove="SQL\PSQL\santedb-fn.sql" />
     <None Remove="SQL\PSQL\santedb-init.sql" />
     <None Remove="SQL\PSQL\Updates\20221027-PSQL.sql" />
@@ -244,9 +243,6 @@
     <EmbeddedResource Include="SQL\PSQL\santedb-ddl.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\PSQL\santedb-drop.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\santedb-fn.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -389,5 +385,11 @@
   
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader" Link="SanteDB.licenseheader" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="SQL\PSQL\santedb-drop.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

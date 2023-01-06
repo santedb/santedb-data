@@ -23,6 +23,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
         /// <inheritdoc/>
         public IEnumerable<Type> GetServices() => new Type[]
                     {
+                        typeof(AdoPersistenceService),
                         typeof(UpstreamSynchronizationService),
                         typeof(AdoIdentityProvider),
                         typeof(AdoRoleProvider),
