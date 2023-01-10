@@ -412,6 +412,7 @@ namespace SanteDB.Persistence.Data.Services
                                 context.EstablishProvenance(AuthenticationContext.Current.Principal);
                                 context.DeleteAll<DbForeignDataIssue>(o => o.SourceKey == foreignDataId);
                                 var issues = this.ValidateInternal(context, existing).ToArray();
+                                
                                 tx.Commit();
                                 return new AdoForeignDataSubmission(existing, issues.ToArray(), this.m_streamManager);
                             }
@@ -529,6 +530,7 @@ namespace SanteDB.Persistence.Data.Services
             var foreignDataMap = this.m_foreignDataMapRepository.Get(stageDataRecord.ForeignDataMapKey);
             if (foreignDataMap == null)
             {
+                stageDataRecord.Status = ForeignDataStatus.Rejected;
                 yield return context.Insert(new DbForeignDataIssue()
                 {
                     Priority = DetectedIssuePriorityType.Error,
