@@ -97,11 +97,11 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         string[] lroles = roles.Select(o => o.ToLowerInvariant()).ToArray(), lusers = users.Select(o => o.ToLowerInvariant()).ToArray();
 
-                        var roleIds = context.Query<DbSecurityRole>(o => lroles.Contains(o.Name.ToLowerInvariant())).Select(o => o.Key);
-                        var userIds = context.Query<DbSecurityUser>(o => lusers.Contains(o.UserName.ToLowerInvariant())).Select(o => o.Key);
+                        var roleIds = context.Query<DbSecurityRole>(o => lroles.Contains(o.Name.ToLowerInvariant())).Select(o => o.Key).ToArray();
+                        var userIds = context.Query<DbSecurityUser>(o => lusers.Contains(o.UserName.ToLowerInvariant())).Select(o => o.Key).ToArray();
 
                         // Add
-                        foreach (var rol in roleIds.SelectMany(r => userIds.ToArray().Select(u => new { U = u, R = r })))
+                        foreach (var rol in roleIds.SelectMany(r => userIds.Select(u => new { U = u, R = r })))
                         {
                             if (!context.Any<DbSecurityUserRole>(r => r.RoleKey == rol.R && r.UserKey == rol.U))
                             {
@@ -310,11 +310,11 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         string[] lroles = roles.Select(o => o.ToLowerInvariant()).ToArray(), lusers = users.Select(o => o.ToLowerInvariant()).ToArray();
 
-                        var roleIds = context.Query<DbSecurityRole>(o => lroles.Contains(o.Name.ToLowerInvariant())).Select(o => o.Key);
-                        var userIds = context.Query<DbSecurityUser>(o => lusers.Contains(o.UserName.ToLowerInvariant())).Select(o => o.Key);
+                        var roleIds = context.Query<DbSecurityRole>(o => lroles.Contains(o.Name.ToLowerInvariant())).Select(o => o.Key).ToList();
+                        var userIds = context.Query<DbSecurityUser>(o => lusers.Contains(o.UserName.ToLowerInvariant())).Select(o => o.Key).ToArray();
 
                         // Add
-                        foreach (var rol in roleIds.SelectMany(r => userIds.ToArray().Select(u => new { U = u, R = r })))
+                        foreach (var rol in roleIds.SelectMany(r => userIds.Select(u => new { U = u, R = r })))
                         {
                             context.DeleteAll<DbSecurityUserRole>(o => o.UserKey == rol.U && o.RoleKey == rol.R);
                         }
