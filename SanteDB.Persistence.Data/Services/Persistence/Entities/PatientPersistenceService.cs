@@ -58,7 +58,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
 
-            var dbPatient = referenceObjects.OfType<DbPatient>().FirstOrDefault();
+            var dbPatient = referenceObjects?.OfType<DbPatient>()?.FirstOrDefault();
             if (dbPatient == null)
             {
                 this.m_tracer.TraceWarning("Using slow fetch of DbPatient for DbEntityVersion (consider using the appropriate persister class)");

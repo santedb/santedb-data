@@ -49,13 +49,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override Container DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var containerData = referenceObjects.OfType<DbContainer>().FirstOrDefault();
+            var containerData = referenceObjects?.OfType<DbContainer>().FirstOrDefault();
             if (containerData == null)
             {
                 this.m_tracer.TraceWarning("Using slow join to DbContainer from DbEntityVersion");
                 containerData = context.FirstOrDefault<DbContainer>(o => o.ParentKey == dbModel.VersionKey);
             }
-            var materialData = referenceObjects.OfType<DbMaterial>().FirstOrDefault();
+            var materialData = referenceObjects?.OfType<DbMaterial>().FirstOrDefault();
             if (materialData == null)
             {
                 this.m_tracer.TraceWarning("Using slow join to DbMaterial from DbEntityVersion");

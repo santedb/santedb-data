@@ -52,7 +52,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
 
-            var userData = referenceObjects.OfType<DbUserEntity>().FirstOrDefault();
+            var userData = referenceObjects?.OfType<DbUserEntity>().FirstOrDefault();
             if (userData == null)
             {
                 this.m_tracer.TraceWarning("Will use slow loading method for DbUserEntity from DbEntityVersion");

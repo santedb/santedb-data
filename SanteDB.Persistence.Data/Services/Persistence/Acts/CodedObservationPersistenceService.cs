@@ -50,7 +50,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override CodedObservation DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var obsData = referenceObjects.OfType<DbCodedObservation>().FirstOrDefault();
+            var obsData = referenceObjects?.OfType<DbCodedObservation>().FirstOrDefault();
             if (obsData == null)
             {
                 this.m_tracer.TraceWarning("Performing slow load of coded observation data from database");

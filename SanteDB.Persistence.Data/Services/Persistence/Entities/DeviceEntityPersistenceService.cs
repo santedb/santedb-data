@@ -51,7 +51,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
 
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var dbDevice = referenceObjects.OfType<DbDeviceEntity>().FirstOrDefault();
+            var dbDevice = referenceObjects?.OfType<DbDeviceEntity>().FirstOrDefault();
             if (dbDevice == null)
             {
                 this.m_tracer.TraceWarning("Using slow cross reference of device");

@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override Organization DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var organizationData = referenceObjects.OfType<DbOrganization>().FirstOrDefault();
+            var organizationData = referenceObjects?.OfType<DbOrganization>().FirstOrDefault();
             if (organizationData == null)
             {
                 this.m_tracer.TraceWarning("Using slow join to DbOrganization from DbEntityVersion");

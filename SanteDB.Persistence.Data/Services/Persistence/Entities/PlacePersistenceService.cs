@@ -69,7 +69,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
 
-            var placeData = referenceObjects.OfType<DbPlace>().FirstOrDefault();
+            var placeData = referenceObjects?.OfType<DbPlace>().FirstOrDefault();
             if (placeData == null)
             {
                 this.m_tracer.TraceWarning("Using slow join to DbPlace from DbEntityVersion");

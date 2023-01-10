@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override TextObservation DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var obsData = referenceObjects.OfType<DbTextObservation>().FirstOrDefault();
+            var obsData = referenceObjects?.OfType<DbTextObservation>().FirstOrDefault();
             if (obsData == null)
             {
                 this.m_tracer.TraceWarning("Using slow loading for text observation data");

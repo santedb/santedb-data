@@ -51,7 +51,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
 
-            var dbProvider = referenceObjects.OfType<DbProvider>().FirstOrDefault();
+            var dbProvider = referenceObjects?.OfType<DbProvider>().FirstOrDefault();
             if (dbProvider == null)
             {
                 this.m_tracer.TraceWarning("Using slow loading for DbProvider data on DbEntityVersion. Consider using the IDataPersistenceService<Provider> instead");

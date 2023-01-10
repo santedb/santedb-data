@@ -433,7 +433,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
                     if (dbModel.GeoTagKey.HasValue)
                     {
-                        var dbGeoTag = referenceObjects.OfType<DbGeoTag>().FirstOrDefault();
+                        var dbGeoTag = referenceObjects?.OfType<DbGeoTag>().FirstOrDefault();
                         if (dbGeoTag == null)
                         {
                             this.m_tracer.TraceWarning("Using slow geo-tag reference of device");

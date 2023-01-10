@@ -52,7 +52,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override TModel DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var obsData = referenceObjects.OfType<DbObservation>().FirstOrDefault();
+            var obsData = referenceObjects?.OfType<DbObservation>().FirstOrDefault();
             if (obsData == null)
             {
                 this.m_tracer.TraceWarning("Using slow lookup of observation data from database");

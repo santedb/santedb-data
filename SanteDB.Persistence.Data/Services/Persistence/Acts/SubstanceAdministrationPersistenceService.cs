@@ -51,7 +51,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override SubstanceAdministration DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var dbSubst = referenceObjects.OfType<DbSubstanceAdministration>().FirstOrDefault();
+            var dbSubst = referenceObjects?.OfType<DbSubstanceAdministration>().FirstOrDefault();
             if (dbSubst == null)
             {
                 this.m_tracer.TraceWarning("Using slow loading for substance administration (hint: use the correct persistence service instead)");

@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override Narrative DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var narrativeData = referenceObjects.OfType<DbNarrative>().FirstOrDefault();
+            var narrativeData = referenceObjects?.OfType<DbNarrative>().FirstOrDefault();
             if (narrativeData == null)
             {
                 this.m_tracer.TraceWarning("Using slow method of loading DbNarrative data from DbActVersion - Consider using the Narrative persistence service instead");

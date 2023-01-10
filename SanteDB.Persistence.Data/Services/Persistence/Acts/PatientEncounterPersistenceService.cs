@@ -93,7 +93,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override PatientEncounter DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var dbEncounter = referenceObjects.OfType<DbPatientEncounter>().FirstOrDefault();
+            var dbEncounter = referenceObjects?.OfType<DbPatientEncounter>().FirstOrDefault();
             if (dbEncounter == null)
             {
                 this.m_tracer.TraceWarning("Using slow loading of encounter data (hint: use the appropriate persistence API)");

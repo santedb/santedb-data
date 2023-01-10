@@ -50,7 +50,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override QuantityObservation DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var obsData = referenceObjects.OfType<DbQuantityObservation>().FirstOrDefault();
+            var obsData = referenceObjects?.OfType<DbQuantityObservation>().FirstOrDefault();
             if (obsData == null)
             {
                 this.m_tracer.TraceWarning("Using slow loading of observation data");

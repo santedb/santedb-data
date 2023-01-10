@@ -49,14 +49,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             // Get data material
-            var manufacturedMaterialData = referenceObjects.OfType<DbManufacturedMaterial>().FirstOrDefault();
+            var manufacturedMaterialData = referenceObjects?.OfType<DbManufacturedMaterial>().FirstOrDefault();
             if (manufacturedMaterialData == null)
             {
                 this.m_tracer.TraceWarning("Using slow join to DbMaterial from DbEntityVersion");
                 manufacturedMaterialData = context.FirstOrDefault<DbManufacturedMaterial>(o => o.ParentKey == dbModel.VersionKey);
             }
             modelData = modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbManufacturedMaterial, ManufacturedMaterial>(manufacturedMaterialData), false, declaredOnly: true);
-            var materialData = referenceObjects.OfType<DbMaterial>().FirstOrDefault();
+            var materialData = referenceObjects?.OfType<DbMaterial>().FirstOrDefault();
             if (materialData == null)
             {
                 this.m_tracer.TraceWarning("Using slow join to DbMaterial from DbEntityVersion");

@@ -77,7 +77,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// </summary>
         protected override Observation DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
-            var obsData = referenceObjects.OfType<DbObservation>().FirstOrDefault();
+            var obsData = referenceObjects?.OfType<DbObservation>().FirstOrDefault();
             if (obsData == null)
             {
                 obsData = context.FirstOrDefault<DbObservation>(o => o.ParentKey == dbModel.VersionKey);

@@ -98,7 +98,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override Person DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var personData = referenceObjects.OfType<DbPerson>().FirstOrDefault();
+            var personData = referenceObjects?.OfType<DbPerson>().FirstOrDefault();
             if (personData == null)
             {
                 this.m_tracer.TraceWarning("Using slow join to DbPerson from DbEntityVersion");

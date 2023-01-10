@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override NonPersonLivingSubject DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var nplsData = referenceObjects.OfType<DbNonPersonLivingSubject>().FirstOrDefault();
+            var nplsData = referenceObjects?.OfType<DbNonPersonLivingSubject>().FirstOrDefault();
             if (nplsData == null)
             {
                 this.m_tracer.TraceWarning("Using slow load of NonPersonLivingSubjectData to DbEntityVersion");

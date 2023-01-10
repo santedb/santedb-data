@@ -52,7 +52,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
 
             var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var dbApplication = referenceObjects.OfType<DbApplicationEntity>().FirstOrDefault();
+            var dbApplication = referenceObjects?.OfType<DbApplicationEntity>().FirstOrDefault();
             if (dbApplication == null)
             {
                 this.m_tracer.TraceWarning("Using slow cross reference of application");
