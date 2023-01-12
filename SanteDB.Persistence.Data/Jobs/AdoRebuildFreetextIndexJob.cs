@@ -101,7 +101,7 @@ namespace SanteDB.Persistence.Data.Jobs
                 using (var ctx = this.m_configuration.Provider.GetWriteConnection())
                 {
                     ctx.Open();
-
+                    ctx.CommandTimeout = 360000;
                     ctx.ExecuteProcedure<object>("rfrsh_fti");
 
                 }
