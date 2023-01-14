@@ -218,6 +218,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 // Get ID
                 DbIdentityDomain dbAuth = null;
+                var domainKey = id.IdentityDomain?.Key ?? id.IdentityDomainKey;
 
                 if (id.IdentityDomainKey.HasValue)
                 {
@@ -231,12 +232,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     throw new InvalidOperationException(String.Format(ErrorMessages.DEPENDENT_PROPERTY_NULL, "Authority"));
                 }
-                else if (id.IdentityDomain.Key.HasValue) // Attempt lookup in adhoc cache then by db
+                else if (domainKey.HasValue) // Attempt lookup in adhoc cache then by db
                 {
-                    dbAuth = this.m_adhocCache?.Get<DbIdentityDomain>($"{DataConstants.AdhocAuthorityKey}{id.IdentityDomain.Key}");
+                    dbAuth = this.m_adhocCache?.Get<DbIdentityDomain>($"{DataConstants.AdhocAuthorityKey}{domainKey}");
                     if (dbAuth == null)
                     {
-                        dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.Key == id.IdentityDomain.Key);
+                        dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.Key == domainKey);
                     }
                 }
                 else
@@ -262,25 +263,25 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
                 else
                 {
-                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityKey}{id.IdentityDomain.Key}", dbAuth, new TimeSpan(0, 5, 0));
+                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityKey}{domainKey}", dbAuth, new TimeSpan(0, 5, 0));
                     this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityKey}{dbAuth.DomainName}", dbAuth, new TimeSpan(0, 5, 0));
                 }
 
                 // Get this identifier records which is not owned by my record
                 bool ownedByOthers, ownedByMe;
 
-                if (objectToVerify is Entity)
+                if (objectToVerify is Entity ent)
                 {
                     ownedByOthers = context.Query<DbEntityIdentifier>(
                         context.CreateSqlStatement()
                         .SelectFrom(typeof(DbEntityIdentifier))
-                        .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.IdentityDomain.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
+                        .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == domainKey && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
                         .And("NOT EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ? AND trg_ent_id = ent_id_tbl.ent_id OR trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL)", objectToVerify.Key, objectToVerify.Key) // Handles the case where the identifier is on a shared MASTER record for MDM
                     ).Any();
                     ownedByMe = context.Query<DbEntityIdentifier>(
                         context.CreateSqlStatement()
                         .SelectFrom(typeof(DbEntityIdentifier))
-                        .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.IdentityDomain.Key && o.ObsoleteVersionSequenceId == null)
+                        .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == domainKey && o.ObsoleteVersionSequenceId == null)
                         .And("(ent_id = ? OR EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ?  AND trg_ent_id = ent_id_tbl.ent_id) OR (trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL))", objectToVerify.Key, objectToVerify.Key, objectToVerify.Key)
                     ).Any();
                 }
@@ -289,13 +290,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     ownedByOthers = context.Query<DbActIdentifier>(
                         context.CreateSqlStatement()
                         .SelectFrom(typeof(DbActIdentifier))
-                        .Where<DbActIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.IdentityDomain.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
+                        .Where<DbActIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == domainKey && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
                         .And("NOT EXISTS (SELECT 1 FROM act_rel_tbl WHERE (src_act_id = ? AND trg_act_id = act_id_tbl.act_id OR trg_act_id = ? AND src_act_id = act_id_tbl.act_id) AND obslt_vrsn_seq_id IS NULL)", objectToVerify.Key, objectToVerify.Key)
                     ).Any();
                     ownedByMe = context.Query<DbActIdentifier>(
                         context.CreateSqlStatement()
                         .SelectFrom(typeof(DbActIdentifier))
-                        .Where<DbActIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.IdentityDomain.Key && o.ObsoleteVersionSequenceId == null)
+                        .Where<DbActIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == domainKey && o.ObsoleteVersionSequenceId == null)
                         .And("(act_id = ? OR EXISTS (SELECT 1 FROM act_rel_tbl WHERE (src_act_id = ?  AND trg_act_id = act_id_tbl.act_id) OR (trg_act_id = ? AND src_act_id = act_id_tbl.act_id) AND obslt_vrsn_seq_id IS NULL))", objectToVerify.Key, objectToVerify.Key, objectToVerify.Key)
                     ).Any();
 
