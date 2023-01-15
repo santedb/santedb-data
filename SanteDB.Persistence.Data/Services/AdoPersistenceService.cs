@@ -22,12 +22,14 @@ using SanteDB.BI.Model;
 using SanteDB.BI.Services;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Jobs;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.Migration;
 using SanteDB.Persistence.Data.Configuration;
+using SanteDB.Persistence.Data.Jobs;
 using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
@@ -74,7 +76,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// ADO Persistence service
         /// </summary>
-        public AdoPersistenceService(IConfigurationManager configManager, IServiceManager serviceManager, IBiMetadataRepository biMetadataRepository = null)
+        public AdoPersistenceService(IConfigurationManager configManager, IServiceManager serviceManager, IJobManagerService jobManager, IBiMetadataRepository biMetadataRepository = null)
         {
             this.m_configuration = configManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
@@ -99,6 +101,12 @@ namespace SanteDB.Persistence.Data.Services
             serviceManager.AddServiceProvider(typeof(AdoRelationshipValidationProvider));
             serviceManager.AddServiceProvider(typeof(AdoDatasetInstallerService));
 
+            if(jobManager.GetJobInstance(OptimizeDatabaseJob.ID) == null)
+            {
+                var job = serviceManager.CreateInjected<OptimizeDatabaseJob>();
+                jobManager.AddJob(job, JobStartType.DelayStart);
+                jobManager.SetJobSchedule(job, new DayOfWeek[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday }, DateTime.Now.Date.AddHours(3));
+            }
             // Add this to the BI layer
             using (AuthenticationContext.EnterSystemContext())
             {
