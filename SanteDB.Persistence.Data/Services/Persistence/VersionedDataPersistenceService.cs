@@ -68,7 +68,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected abstract void DoCopyVersionSubTableInternal(DataContext context, TDbModel newVersion);
 
         /// <inheritdoc/>
-        protected override bool ValidateCacheItem(TModel cacheEntry, TDbModel dataModel) => cacheEntry.VersionSequence >= dataModel.VersionSequenceId;
+        protected override bool ValidateCacheItem(TModel cacheEntry, TDbModel dataModel) => cacheEntry.VersionSequence >= dataModel.VersionSequenceId && dataModel.IsHeadVersion;
 
         /// <summary>
         /// This method creates a new version from the old
@@ -273,31 +273,35 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 if (objectToVerify is Entity ent)
                 {
                     ownedByOthers = context.Query<DbEntityIdentifier>(
-                        context.CreateSqlStatement()
+                        context.CreateSqlStatementBuilder()
                         .SelectFrom(typeof(DbEntityIdentifier))
                         .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == domainKey && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
                         .And("NOT EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ? AND trg_ent_id = ent_id_tbl.ent_id OR trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL)", objectToVerify.Key, objectToVerify.Key) // Handles the case where the identifier is on a shared MASTER record for MDM
+                        .Statement
                     ).Any();
                     ownedByMe = context.Query<DbEntityIdentifier>(
-                        context.CreateSqlStatement()
+                        context.CreateSqlStatementBuilder()
                         .SelectFrom(typeof(DbEntityIdentifier))
                         .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == domainKey && o.ObsoleteVersionSequenceId == null)
                         .And("(ent_id = ? OR EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ?  AND trg_ent_id = ent_id_tbl.ent_id) OR (trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL))", objectToVerify.Key, objectToVerify.Key, objectToVerify.Key)
+                        .Statement
                     ).Any();
                 }
                 else
                 {
                     ownedByOthers = context.Query<DbActIdentifier>(
-                        context.CreateSqlStatement()
+                        context.CreateSqlStatementBuilder()
                         .SelectFrom(typeof(DbActIdentifier))
                         .Where<DbActIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == domainKey && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
                         .And("NOT EXISTS (SELECT 1 FROM act_rel_tbl WHERE (src_act_id = ? AND trg_act_id = act_id_tbl.act_id OR trg_act_id = ? AND src_act_id = act_id_tbl.act_id) AND obslt_vrsn_seq_id IS NULL)", objectToVerify.Key, objectToVerify.Key)
+                        .Statement
                     ).Any();
                     ownedByMe = context.Query<DbActIdentifier>(
-                        context.CreateSqlStatement()
+                        context.CreateSqlStatementBuilder()
                         .SelectFrom(typeof(DbActIdentifier))
                         .Where<DbActIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == domainKey && o.ObsoleteVersionSequenceId == null)
                         .And("(act_id = ? OR EXISTS (SELECT 1 FROM act_rel_tbl WHERE (src_act_id = ?  AND trg_act_id = act_id_tbl.act_id) OR (trg_act_id = ? AND src_act_id = act_id_tbl.act_id) AND obslt_vrsn_seq_id IS NULL))", objectToVerify.Key, objectToVerify.Key, objectToVerify.Key)
+                        .Statement
                     ).Any();
 
                 }
@@ -591,7 +595,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     {
                         this.m_tracer.TraceWarning("WARNING: Using very slow DeleteAll() method - consider using only primary properties for delete all");
                         var columnKey = TableMapping.Get(typeof(TDbModel)).GetColumn(nameof(DbVersionedData.Key));
-                        var keyQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(expression, columnKey);
+                        var keyQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(expression, columnKey).Statement;
                         var keys = context.Query<TDbModel>(keyQuery).Select(o => o.Key);
                         domainExpression = o => keys.Contains(o.Key);
                     }
@@ -740,7 +744,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             var tableMap = TableMapping.Get(typeof(TDbModel));
             var headColumn = tableMap.GetColumn(nameof(DbVersionedData.IsHeadVersion));
-            return base.GetCurrentVersionFilter(tableAlias).And($"{tableAlias ?? tableMap.TableName}.{headColumn.Name} = {this.Provider.StatementFactory.CreateSqlKeyword(SqlKeyword.True)}");
+            return new SqlStatementBuilder(this.Provider.StatementFactory, base.GetCurrentVersionFilter(tableAlias))
+                .And($"{tableAlias ?? tableMap.TableName}.{headColumn.Name} = {this.Provider.StatementFactory.CreateSqlKeyword(SqlKeyword.True)}")
+                .Statement;
         }
 
         /// <inheritdoc/>
@@ -803,7 +809,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var headProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedData.IsHeadVersion)));
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, headProperty, Expression.Constant(true))), query.Parameters[0]);
             }
-            return base.ApplyDefaultQueryFilters(query);
+
+            if (!queryString.Contains(nameof(BaseEntityData.ObsoletionTime)) && !queryString.Contains(nameof(IVersionedData.VersionKey)))
+            {
+                var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
+                query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
+            }
+            return query;
 
         }
 

@@ -637,12 +637,13 @@ namespace SanteDB.Persistence.Data.Services
                     try
                     {
                         context.Open();
-                        var sql = context.CreateSqlStatement<DbSession>()
+                        var sql = context.CreateSqlStatementBuilder()
                             .SelectFrom(typeof(DbSession), typeof(DbSecurityApplication), typeof(DbSecurityUser), typeof(DbSecurityDevice))
-                            .InnerJoin<DbSecurityApplication>(o => o.ApplicationKey, o => o.Key)
+                            .InnerJoin<DbSession, DbSecurityApplication>(o => o.ApplicationKey, o => o.Key)
                             .Join<DbSession, DbSecurityUser>("LEFT", o => o.UserKey, o => o.Key)
                             .Join<DbSession, DbSecurityDevice>("LEFT", o => o.DeviceKey, o => o.Key)
-                            .Where<DbSession>(o => o.Key == sessionId);
+                            .Where<DbSession>(o => o.Key == sessionId)
+                            .Statement;
                         var dbSession = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser, DbSecurityDevice>>(sql);
 
                         if (dbSession == null)

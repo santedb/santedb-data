@@ -179,7 +179,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     using (var tx = context.BeginTransaction())
                     {
-                        context.ExecuteNonQuery(context.CreateSqlStatement(sql));
+                        context.ExecuteNonQuery(sql);
                         tx.Commit();
                     }
                 }

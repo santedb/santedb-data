@@ -22,13 +22,15 @@ using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
+using System;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
     /// <summary>
     /// A <see cref="IDataPersistenceService{TModel}"/> which is responsible for the storage and maintenance of <see cref="Protocol"/> definitions
     /// </summary>
-    public class ProtocolPersistenceService : BaseEntityDataPersistenceService<Protocol, DbProtocol>
+    public class ProtocolPersistenceService : BaseEntityDataPersistenceService<Protocol, DbProtocol>, IAdoKeyResolver<Protocol>, IAdoKeyResolver<DbProtocol>
     {
         /// <inheritdoc/>
         public ProtocolPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
@@ -65,5 +67,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             retVal.Oid = dbModel.Oid;
             return retVal;
         }
+
+        /// <inheritdoc/>
+        Expression<Func<Protocol, bool>> IAdoKeyResolver<Protocol>.GetKeyExpression(Protocol model) => o => o.Oid == model.Oid && o.ObsoletionTime == null;
+
+        /// <inheritdoc/>
+        Expression<Func<DbProtocol, bool>> IAdoKeyResolver<DbProtocol>.GetKeyExpression(DbProtocol model) => o => o.Oid == model.Oid && o.ObsoletionTime == null;
     }
 }

@@ -368,7 +368,7 @@ namespace SanteDB.Persistence.Data.Services
         public IForeignDataSubmission Get(DataContext context, Guid key) => new AdoForeignDataSubmission(context.FirstOrDefault<DbForeignDataStage>(o => o.Key == key && o.ObsoletionTime == null), context.Query<DbForeignDataIssue>(o => o.SourceKey == key).ToArray(), this.m_streamManager);
 
         /// <inheritdoc/>
-        public Expression MapExpression<TReturn>(Expression<Func<IForeignDataSubmission, TReturn>> sortExpression)
+        public LambdaExpression MapExpression<TReturn>(Expression<Func<IForeignDataSubmission, TReturn>> sortExpression)
         {
             return this.m_modelMapper.MapModelExpression<IForeignDataSubmission, DbForeignDataStage, TReturn>(sortExpression, false);
 
@@ -616,7 +616,7 @@ namespace SanteDB.Persistence.Data.Services
         {
             var tableMap = TableMapping.Get(typeof(DbForeignDataStage));
             var obsltCol = tableMap.GetColumn(nameof(DbForeignDataStage.ObsoletionTime));
-            return new SqlStatement(this.Provider.StatementFactory, $"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
+            return new SqlStatement($"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
         }
     }
 }

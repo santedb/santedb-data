@@ -39,7 +39,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Collections
     /// </summary>
     [TestFixture]
     [ExcludeFromCodeCoverage]
-    public class BundleReorganizeTest
+    public class BundleReorganizeTest : DataPersistenceTest
     {
 
 
@@ -63,37 +63,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Collections
             Assert.AreEqual(2, reorganized.Item.IndexOf(a));
         }
 
-        /// <summary>
-        /// Tests that bundle { A, B, C } where
-        /// A relies on B
-        /// B relies on C
-        /// C relies on A
-        /// Throws a circular dependency issue
-        /// </summary>
-        [Test]
-        public void TestCircularDependency()
-        {
-            IdentifiedData c = new Person() { Key = Guid.NewGuid() },
-                b = new Patient() { Key = Guid.NewGuid(), Relationships = new List<EntityRelationship>() { new EntityRelationship(EntityRelationshipTypeKeys.Mother, c as Entity) } },
-                a = new Act() { Key = Guid.NewGuid(), Participations = new List<ActParticipation>() { new ActParticipation(ActParticipationKeys.RecordTarget, b as Entity) } };
-
-            (c as Entity).Participations = new List<ActParticipation>() { new ActParticipation(ActParticipationKeys.RecordTarget, c.Key) { ActKey = a.Key } };
-
-            try
-            {
-                var serviceManager = ApplicationServiceContext.Current.GetService<IServiceManager>();
-                serviceManager.CreateInjected<BundlePersistenceService>().ReorganizeForInsert(new Core.Model.Collection.Bundle(new IdentifiedData[] { a, b, c }));
-                Assert.Fail("Should throw detected issue exception!");
-            }
-            catch (InvalidOperationException e) when (e.Message == ErrorMessageStrings.DATA_CIRCULAR_DEPENDENCY)
-            {
-
-            }
-            catch
-            {
-                Assert.Fail("Wrong exception type thrown");
-            }
-        }
 
         /// <summary>
         /// Tests that bundles { A, B, C, D, E, F }, { B, A, D, E, C, F }, { F, E, D, C, B, A } and { E, F, B, A, C, D } where

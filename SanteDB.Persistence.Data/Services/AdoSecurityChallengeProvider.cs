@@ -203,10 +203,11 @@ namespace SanteDB.Persistence.Data.Services
                             this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.Login, new AdoClaimsPrincipal(identity)); // must still be allowed to login
 
                             // Establish role
-                            var roleSql = context.CreateSqlStatement<DbSecurityRole>()
-                                .SelectFrom()
-                                .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
-                                .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key);
+                            var roleSql = context.CreateSqlStatementBuilder()
+                                .SelectFrom(typeof(DbSecurityRole))
+                                .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
+                                .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key)
+                                .Statement;
                             identity.AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
 
                             // Establish additional claims
@@ -281,10 +282,11 @@ namespace SanteDB.Persistence.Data.Services
                 {
 
                     context.Open();
-                    var sqlQuery = context.CreateSqlStatement<DbSecurityChallenge>().SelectFrom(typeof(DbSecurityChallenge), typeof(DbSecurityUserChallengeAssoc))
-                            .InnerJoin<DbSecurityUserChallengeAssoc>(o => o.Key, o => o.ChallengeKey)
+                    var sqlQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbSecurityChallenge), typeof(DbSecurityUserChallengeAssoc))
+                            .InnerJoin<DbSecurityChallenge, DbSecurityUserChallengeAssoc>(o => o.Key, o => o.ChallengeKey)
                             .InnerJoin<DbSecurityUserChallengeAssoc, DbSecurityUser>(o => o.UserKey, o => o.Key)
-                            .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant());
+                            .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant())
+                            .Statement;
 
                     var retVal = context.Query<CompositeResult<DbSecurityChallenge, DbSecurityUserChallengeAssoc>>(sqlQuery).ToArray().Select(o => new SecurityChallenge()
                     {
@@ -334,9 +336,10 @@ namespace SanteDB.Persistence.Data.Services
                 {
 
                     context.Open();
-                    var sqlQuery = context.CreateSqlStatement<DbSecurityChallenge>().SelectFrom(typeof(DbSecurityChallenge), typeof(DbSecurityUserChallengeAssoc))
-                            .InnerJoin<DbSecurityUserChallengeAssoc>(o => o.Key, o => o.ChallengeKey)
-                            .Where<DbSecurityUserChallengeAssoc>(o => o.UserKey == userKey);
+                    var sqlQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbSecurityChallenge), typeof(DbSecurityUserChallengeAssoc))
+                            .InnerJoin<DbSecurityChallenge, DbSecurityUserChallengeAssoc>(o => o.Key, o => o.ChallengeKey)
+                            .Where<DbSecurityUserChallengeAssoc>(o => o.UserKey == userKey)
+                            .Statement;
 
                     var retVal = context.Query<CompositeResult<DbSecurityChallenge, DbSecurityUserChallengeAssoc>>(sqlQuery).ToArray().Select(o => new SecurityChallenge()
                     {

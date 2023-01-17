@@ -399,9 +399,12 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 base.TestQuery<IdentityDomain>(o => o.Oid.Contains("1.2.3.8.%") && o.ObsoletionTime != null, 9);
 
                 // Now permadelete
-                pservice.DeleteAll(o => o.Oid.Contains("1.2.3.8.%") && o.ObsoletionTime != null, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
-                base.TestQuery<IdentityDomain>(o => o.Oid.Contains("1.2.3.8.%"), 0); // No results 
-                base.TestQuery<IdentityDomain>(o => o.Oid.Contains("1.2.3.8.%") && o.ObsoletionTime != null, 0);
+                using (DataPersistenceControlContext.Create(DeleteMode.PermanentDelete))
+                {
+                    pservice.DeleteAll(o => o.Oid.Contains("1.2.3.8.%") && o.ObsoletionTime != null, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+                    base.TestQuery<IdentityDomain>(o => o.Oid.Contains("1.2.3.8.%"), 0); // No results 
+                    base.TestQuery<IdentityDomain>(o => o.Oid.Contains("1.2.3.8.%") && o.ObsoletionTime != null, 0);
+                }
 
                 // This should succeed since we've purged
                 Enumerable.Range(1, 9).ToList().ForEach(i =>

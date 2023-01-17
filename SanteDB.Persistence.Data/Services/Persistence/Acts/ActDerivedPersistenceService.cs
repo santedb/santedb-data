@@ -111,7 +111,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 var columns = TableMapping.Get(typeof(TDbActSubTable)).Columns.Union(
                         TableMapping.Get(typeof(DbActVersion)).Columns, new ColumnMapping.ColumnComparer()
                         ).Union(TableMapping.Get(typeof(TDbTopLevelTable)).Columns, new ColumnMapping.ColumnComparer());
-                var retVal = context.CreateSqlStatement().SelectFrom(typeof(DbActVersion), columns.ToArray())
+                var retVal = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbActVersion), columns.ToArray())
                     .InnerJoin<DbActVersion, TDbActSubTable>(q => q.VersionKey, q => q.ParentKey)
                     .InnerJoin<TDbActSubTable, TDbTopLevelTable>(q => q.ParentKey, q => q.ParentKey);
                 return retVal;
@@ -195,7 +195,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             {
                 var columns = TableMapping.Get(typeof(TDbActSubTable)).Columns.Union(
                         TableMapping.Get(typeof(DbActVersion)).Columns, new ColumnMapping.ColumnComparer());
-                var retVal = context.CreateSqlStatement().SelectFrom(typeof(DbActVersion), columns.ToArray())
+                var retVal = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbActVersion), columns.ToArray())
                     .InnerJoin<DbActVersion, TDbActSubTable>(q => q.VersionKey, q => q.ParentKey);
                 return retVal;
             });
@@ -428,9 +428,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
                     goto case LoadMode.QuickLoad;
                 case LoadMode.QuickLoad:
-                    var query = context.CreateSqlStatement<DbActSecurityPolicy>().SelectFrom(typeof(DbActSecurityPolicy), typeof(DbSecurityPolicy))
-                       .InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
-                       .Where(o => o.SourceKey == dbModel.Key);
+                    var query = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbActSecurityPolicy), typeof(DbSecurityPolicy))
+                       .InnerJoin<DbActSecurityPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
+                       .Where<DbActSecurityPolicy>(o => o.SourceKey == dbModel.Key)
+                       .Statement;
                     retVal.Policies = context.Query<CompositeResult<DbActSecurityPolicy, DbSecurityPolicy>>(query)
                         .ToList()
                         .Select(o => new SecurityPolicyInstance(new SecurityPolicy(o.Object2.Name, o.Object2.Oid, o.Object2.IsPublic, o.Object2.CanOverride), PolicyGrantType.Grant))
@@ -450,7 +451,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
                 if (referenceObjects.Length == 0)
                 {
-                    referenceObjects = edps.GetReferencedObjects(context, dbModel);
+                    referenceObjects = edps.GetReferencedObjects(context, dbModel) ?? new object[0];
                 }
                 var retVal = edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
                 if (retVal is TAct ta)

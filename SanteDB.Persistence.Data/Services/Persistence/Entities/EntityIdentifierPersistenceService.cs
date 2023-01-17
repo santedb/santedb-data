@@ -60,7 +60,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 {
                     var columns = TableMapping.Get(typeof(DbEntityIdentifier)).Columns.Union(
                         TableMapping.Get(typeof(DbIdentityDomain)).Columns, new ColumnMapping.ColumnComparer());
-                    var retVal = context.CreateSqlStatement().SelectFrom(typeof(DbEntityIdentifier), columns.ToArray())
+                    var retVal = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityIdentifier), columns.ToArray())
                         .InnerJoin<DbEntityIdentifier, DbIdentityDomain>(q => q.IdentityDomainKey, q => q.Key);
                     return retVal;
                 });

@@ -777,7 +777,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// <summary>
         /// Map property expression
         /// </summary>
-        public Expression MapExpression<TReturn>(Expression<Func<PubSubSubscriptionDefinition, TReturn>> sortExpression)
+        public LambdaExpression MapExpression<TReturn>(Expression<Func<PubSubSubscriptionDefinition, TReturn>> sortExpression)
         {
             return this.m_mapper.MapModelExpression<PubSubSubscriptionDefinition, DbSubscription, TReturn>(sortExpression, true);
         }
@@ -814,7 +814,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// <summary>
         /// Map property expression
         /// </summary>
-        public Expression MapExpression<TReturn>(Expression<Func<PubSubChannelDefinition, TReturn>> sortExpression)
+        public LambdaExpression MapExpression<TReturn>(Expression<Func<PubSubChannelDefinition, TReturn>> sortExpression)
         {
             return this.m_mapper.MapModelExpression<PubSubChannelDefinition, DbChannel, TReturn>(sortExpression, true);
         }
@@ -848,7 +848,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         {
             var tableMap = TableMapping.Get(typeof(DbSubscription));
             var obsltCol = tableMap.GetColumn(nameof(DbSubscription.ObsoletionTime));
-            return new SqlStatement(this.Provider.StatementFactory, $"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
+            return new SqlStatement($"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
         }
 
         /// <summary>
@@ -858,7 +858,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         {
             var tableMap = TableMapping.Get(typeof(DbChannel));
             var obsltCol = tableMap.GetColumn(nameof(DbChannel.ObsoletionTime));
-            return new SqlStatement(this.Provider.StatementFactory, $"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
+            return new SqlStatement($"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
         }
 
     }

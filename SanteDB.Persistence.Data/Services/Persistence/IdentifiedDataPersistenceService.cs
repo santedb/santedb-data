@@ -398,7 +398,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Perform the query however return a custom <typeparamref name="TReturn"/>. This function allows you
         /// to modify the query instructions before sending query to the database
         /// </summary>
-        protected virtual OrmResultSet<TReturn> DoQueryInternalAs<TReturn>(DataContext context, Expression<Func<TModel, bool>> query, Func<SqlStatement, SqlStatement> queryModifier = null)
+        protected virtual OrmResultSet<TReturn> DoQueryInternalAs<TReturn>(DataContext context, Expression<Func<TModel, bool>> query, Func<SqlStatementBuilder, SqlStatementBuilder> queryModifier = null)
         {
             if (context == null)
             {
@@ -412,7 +412,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Convert the query to a domain query so that the object persistence layer can turn the
             // structured LINQ query into a SQL statement
             query = this.ApplyDefaultQueryFilters(query);
-            var domainQuery = context.CreateSqlStatement().SelectFrom(typeof(TDbModel), TableMapping.Get(typeof(TDbModel)).Columns.ToArray());
+            var domainQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(TDbModel), TableMapping.Get(typeof(TDbModel)).Columns.ToArray());
             if (queryModifier != null)
             {
                 domainQuery = queryModifier(domainQuery);
@@ -429,7 +429,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(query);
             }
 
-            return context.Query<TReturn>(domainQuery.Build());
+            return context.Query<TReturn>(domainQuery.Statement);
         }
 
         /// <summary>

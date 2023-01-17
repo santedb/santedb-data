@@ -331,10 +331,11 @@ namespace SanteDB.Persistence.Data.Services
                             var identity = new AdoUserIdentity(dbUser, "LOCAL");
 
                             // Establish role
-                            var roleSql = context.CreateSqlStatement<DbSecurityRole>()
-                                .SelectFrom()
-                                .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
-                                .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key);
+                            var roleSql = context.CreateSqlStatementBuilder()
+                                .SelectFrom(typeof(DbSecurityRole))
+                                .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
+                                .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key)
+                                .Statement;
                             identity.AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
 
                             // Establish additional claims
@@ -343,12 +344,13 @@ namespace SanteDB.Persistence.Data.Services
 
 
                             // Add the default language 
-                            var prefLangSql = context.CreateSqlStatement<DbPersonLanguageCommunication>().SelectFrom()
-                                .InnerJoin<DbEntityVersion>(o => o.SourceKey, o => o.Key)
+                            var prefLangSql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbPersonLanguageCommunication))
+                                .InnerJoin<DbPersonLanguageCommunication, DbEntityVersion>(o => o.SourceKey, o => o.Key)
                                 .InnerJoin<DbEntityVersion, DbUserEntity>(o => o.VersionKey, o => o.ParentKey)
                                 .Where<DbUserEntity>(o => o.SecurityUserKey == dbUser.Key)
                                 .And<DbPersonLanguageCommunication>(o => o.IsPreferred == true && o.ObsoleteVersionSequenceId == null)
-                                .And<DbEntityVersion>(o => o.IsHeadVersion);
+                                .And<DbEntityVersion>(o => o.IsHeadVersion)
+                                .Statement;
                             var preferredLanguage = context.Query<DbPersonLanguageCommunication>(prefLangSql).Select(o => o.LanguageCode).FirstOrDefault();
                             if (!String.IsNullOrEmpty(preferredLanguage))
                             {
@@ -554,9 +556,10 @@ namespace SanteDB.Persistence.Data.Services
                         newIdentity = context.Insert(newIdentity);
 
                         // Register the group
-                        context.InsertAll(context.Query<DbSecurityRole>(context.CreateSqlStatement<DbSecurityRole>()
-                            .SelectFrom()
-                            .Where<DbSecurityRole>(o => o.Name == "USERS"))
+                        context.InsertAll(context.Query<DbSecurityRole>(context.CreateSqlStatementBuilder()
+                            .SelectFrom(typeof(DbSecurityRole))
+                            .Where<DbSecurityRole>(o => o.Name == "USERS")
+                            .Statement)
                             .ToArray()
                             .Select(o => new DbSecurityUserRole()
                             {
@@ -654,10 +657,11 @@ namespace SanteDB.Persistence.Data.Services
                     retVal.AddClaims(dbClaims.ToArray().Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
 
                     // Establish role
-                    var roleSql = context.CreateSqlStatement<DbSecurityRole>()
-                                .SelectFrom()
-                                .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
-                                .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key);
+                    var roleSql = context.CreateSqlStatementBuilder()
+                                .SelectFrom(typeof(DbSecurityRole))
+                                .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
+                                .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key)
+                                .Statement;
                     retVal.AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
 
                     return retVal;
@@ -910,10 +914,11 @@ namespace SanteDB.Persistence.Data.Services
                     var identity = new AdoUserIdentity(dbUser, "LOCAL");
 
                     // Get roles
-                    var roleSql = context.CreateSqlStatement<DbSecurityRole>()
-                        .SelectFrom()
-                        .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
-                        .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key);
+                    var roleSql = context.CreateSqlStatementBuilder()
+                        .SelectFrom(typeof(DbSecurityRole))
+                        .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
+                        .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key)
+                        .ToString();
                     identity.AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
 
                     // Establish additional claims

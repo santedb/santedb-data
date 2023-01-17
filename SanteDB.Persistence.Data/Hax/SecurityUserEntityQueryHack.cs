@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Data.Hax
         /// <summary>
         /// Hack the query
         /// </summary>
-        public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<string, string[]> queryFilter)
+        public bool HackQuery(QueryBuilder builder, SqlStatementBuilder sqlStatement, SqlStatementBuilder whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<string, string[]> queryFilter)
         {
             if (typeof(SecurityUser) == tmodel && property.Name == nameof(SecurityUser.UserEntity))
             {

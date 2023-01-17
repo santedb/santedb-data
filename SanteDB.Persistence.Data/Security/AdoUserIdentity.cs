@@ -109,10 +109,11 @@ namespace SanteDB.Persistence.Data.Security
         /// </summary>
         internal void AddXspaClaims(DataContext contextForReadingAdditionalData)
         {
-            var cdrEntitySql = contextForReadingAdditionalData.CreateSqlStatement<DbEntityVersion>().SelectFrom()
+            var cdrEntitySql = contextForReadingAdditionalData.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityVersion))
                     .InnerJoin<DbEntityVersion, DbUserEntity>(o => o.VersionKey, o => o.ParentKey)
                     .Where<DbUserEntity>(o => o.SecurityUserKey == this.Sid)
-                    .And<DbEntityVersion>(o => o.IsHeadVersion);
+                    .And<DbEntityVersion>(o => o.IsHeadVersion)
+                    .Statement;
 
             var cdrEntityId = contextForReadingAdditionalData.Query<DbEntityVersion>(cdrEntitySql).Select(o => o.Key).First();
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.CdrEntityId, cdrEntityId.ToString()));
@@ -129,10 +130,11 @@ namespace SanteDB.Persistence.Data.Security
                 this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaFacilityClaim, facilityId.ToString()));
             }
 
-            var subjectNameSql = contextForReadingAdditionalData.CreateSqlStatement<DbEntityNameComponent>().SelectFrom()
-                .InnerJoin<DbEntityName>(o => o.SourceKey, o => o.Key)
+            var subjectNameSql = contextForReadingAdditionalData.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityNameComponent))
+                .InnerJoin<DbEntityNameComponent, DbEntityName>(o => o.SourceKey, o => o.Key)
                 .Where<DbEntityName>(o => o.SourceKey == cdrEntityId && o.ObsoleteVersionSequenceId == null && (o.UseConceptKey == NameUseKeys.OfficialRecord))
-                .OrderBy<DbEntityNameComponent>(o => o.OrderSequence);
+                .OrderBy<DbEntityNameComponent>(o => o.OrderSequence)
+                .Statement;
 
             var nameValue = String.Join(" ", contextForReadingAdditionalData.Query<DbEntityNameComponent>(subjectNameSql).Select(o => o.Value));
             if (!String.IsNullOrEmpty(nameValue))
@@ -140,8 +142,8 @@ namespace SanteDB.Persistence.Data.Security
                 this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaSubjectNameClaim, nameValue));
             }
 
-            var subjectRoleSql = contextForReadingAdditionalData.CreateSqlStatement<DbEntityRelationship>().SelectFrom(typeof(DbReferenceTerm), typeof(DbCodeSystem))
-                .InnerJoin<DbEntityVersion>(o => o.TargetKey, o => o.Key)
+            var subjectRoleSql = contextForReadingAdditionalData.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityRelationship), typeof(DbReferenceTerm), typeof(DbCodeSystem))
+                .InnerJoin<DbEntityRelationship, DbEntityVersion>(o => o.TargetKey, o => o.Key)
                 .InnerJoin<DbEntityVersion, DbProvider>(o => o.VersionKey, o => o.ParentKey)
                 .InnerJoin<DbProvider, DbConceptVersion>(o => o.SpecialtyKey, o => o.Key)
                 .Join<DbConceptVersion, DbConceptReferenceTerm>("LEFT", o => o.Key, o => o.SourceKey)
@@ -149,7 +151,8 @@ namespace SanteDB.Persistence.Data.Security
                 .InnerJoin<DbReferenceTerm, DbCodeSystem>(o => o.CodeSystemKey, o => o.Key)
                 .Where<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.EquivalentEntity && o.ClassificationKey == RelationshipClassKeys.PlayedRoleLink && o.ObsoleteVersionSequenceId == null)
                 .And<DbEntityVersion>(o => o.ObsoletionTime == null)
-                .And<DbConceptReferenceTerm>(o => o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs && o.ObsoleteVersionSequenceId == null);
+                .And<DbConceptReferenceTerm>(o => o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs && o.ObsoleteVersionSequenceId == null)
+                .Statement;
 
             foreach (var cd in contextForReadingAdditionalData.Query<CompositeResult<DbReferenceTerm, DbCodeSystem>>(subjectRoleSql))
             {

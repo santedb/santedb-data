@@ -398,7 +398,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
                 var dbInstance = this.DoDeleteInternal(context, key, deleteMode);
 
-                if (!this.m_configuration.FastDelete)
+                if (!this.m_configuration.FastDelete && deleteMode != DeleteMode.PermanentDelete)
                 {
                     return this.DoConvertToInformationModel(context, dbInstance);
                 }
@@ -1017,7 +1017,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Map the sorting expression
         /// </summary>
-        public virtual Expression MapExpression<TResult>(Expression<Func<TModel, TResult>> sortExpression)
+        public virtual LambdaExpression MapExpression<TResult>(Expression<Func<TModel, TResult>> sortExpression)
         {
             if (sortExpression == null)
             {
@@ -1245,6 +1245,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         public object Delete(Guid id) => this.Delete(id, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
         /// <inheritdoc/>
-        public virtual SqlStatement GetCurrentVersionFilter(string tableAlias) => new SqlStatement(this.Provider.StatementFactory, this.Provider.StatementFactory.CreateSqlKeyword(SqlKeyword.True));
+        public virtual SqlStatement GetCurrentVersionFilter(string tableAlias) => new SqlStatement(this.Provider.StatementFactory.CreateSqlKeyword(SqlKeyword.True));
     }
 }

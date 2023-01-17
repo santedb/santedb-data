@@ -616,9 +616,10 @@ namespace SanteDB.Persistence.Data.Services
                         dbsa = context.Insert(dbsa);
 
                         // Assign default group policies
-                        var skelSql = context.CreateSqlStatement<DbSecurityRolePolicy>().SelectFrom()
-                            .InnerJoin<DbSecurityRole>(o => o.SourceKey, o => o.Key)
-                            .Where<DbSecurityRole>(o => o.Name == "APPLICATIONS");
+                        var skelSql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbSecurityRolePolicy))
+                            .InnerJoin<DbSecurityRolePolicy, DbSecurityRole>(o => o.SourceKey, o => o.Key)
+                            .Where<DbSecurityRole>(o => o.Name == "APPLICATIONS")
+                            .Statement;
 
                         context.Query<DbSecurityRolePolicy>(skelSql)
                             .ToList()

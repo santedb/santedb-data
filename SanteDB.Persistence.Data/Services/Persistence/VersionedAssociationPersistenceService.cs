@@ -53,7 +53,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected abstract long GetCurrentVersionSequenceForSource(DataContext context, Guid sourceKey);
 
         /// <inheritdoc/>
-        protected override bool ValidateCacheItem(TModel cacheEntry, TDbModel dataModel) => cacheEntry.EffectiveVersionSequenceId >= dataModel.EffectiveVersionSequenceId;
+        protected override bool ValidateCacheItem(TModel cacheEntry, TDbModel dataModel) => cacheEntry.EffectiveVersionSequenceId >= dataModel.EffectiveVersionSequenceId ;
 
         /// <summary>
         /// Obsolete all objects
@@ -89,7 +89,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     this.m_tracer.TraceWarning("WARNING: Using very slow DeleteAll() method - consider using only primary properties for delete all");
                     var columnKey = TableMapping.Get(typeof(TDbModel)).GetColumn(nameof(DbVersionedData.Key));
-                    var keyQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(expression, columnKey);
+                    var keyQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(expression, columnKey).Statement;
                     var keys = context.Query<TDbModel>(keyQuery).Select(o => o.Key);
                     domainExpression = o => keys.Contains(o.Key);
                 }

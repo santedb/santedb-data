@@ -179,11 +179,12 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
-                    return context.Query<DbSecurityUser>(context.CreateSqlStatement<DbSecurityUser>()
-                        .SelectFrom()
-                        .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.UserKey)
+                    return context.Query<DbSecurityUser>(context.CreateSqlStatementBuilder()
+                        .SelectFrom(typeof(DbSecurityUser))
+                        .InnerJoin<DbSecurityUser, DbSecurityUserRole>(o => o.Key, o => o.UserKey)
                         .InnerJoin<DbSecurityUserRole, DbSecurityRole>(o => o.RoleKey, o => o.Key)
                         .Where<DbSecurityRole>(o => o.Name.ToLowerInvariant() == role.ToLowerInvariant())
+                        .Statement
                         ).Select(o => o.UserName).ToArray();
                 }
                 catch (Exception e)
@@ -231,11 +232,12 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
-                    return context.Query<DbSecurityRole>(context.CreateSqlStatement<DbSecurityRole>()
-                        .SelectFrom()
-                        .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
+                    return context.Query<DbSecurityRole>(context.CreateSqlStatementBuilder()
+                        .SelectFrom(typeof(DbSecurityRole))
+                        .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                         .InnerJoin<DbSecurityUserRole, DbSecurityUser>(o => o.UserKey, o => o.Key)
                         .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null)
+                        .Statement
                         ).Select(o => o.Name).ToArray();
                 }
                 catch (Exception e)
@@ -266,12 +268,13 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
-                    return context.Any(context.CreateSqlStatement<DbSecurityUserRole>()
-                        .SelectFrom()
+                    return context.Any(context.CreateSqlStatementBuilder()
+                        .SelectFrom(typeof(DbSecurityUserRole))
                         .InnerJoin<DbSecurityUserRole, DbSecurityUser>(o => o.UserKey, o => o.Key)
                         .InnerJoin<DbSecurityUserRole, DbSecurityRole>(o => o.RoleKey, o => o.Key)
                         .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant())
                         .And<DbSecurityRole>(o => o.Name.ToLowerInvariant() == roleName.ToLowerInvariant())
+                        .Statement
                         );
                 }
                 catch (Exception e)

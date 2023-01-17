@@ -172,7 +172,7 @@ namespace SanteDB.Persistence.Data.Services
                             this.m_tracer.TraceInfo("Executing post-install triggers for {0}...", dataset.Id);
                             foreach (var itm in dataset.SqlExec.Where(o => o.InvariantName == this.m_configuration.Provider.Invariant))
                             {
-                                context.ExecuteNonQuery(context.CreateSqlStatement(itm.QueryText));
+                                context.ExecuteNonQuery(itm.QueryText);
                             }
                         }
 

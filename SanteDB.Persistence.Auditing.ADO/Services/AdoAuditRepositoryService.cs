@@ -277,11 +277,11 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 if (!summary)
                 {
                     // Actors
-                    var sql = context.CreateSqlStatement<DbAuditActorAssociation>().SelectFrom(typeof(DbAuditActorAssociation), typeof(DbAuditActor), typeof(DbAuditCode))
+                    var sql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbAuditActorAssociation), typeof(DbAuditActor), typeof(DbAuditCode))
                             .InnerJoin<DbAuditActorAssociation, DbAuditActor>(o => o.TargetKey, o => o.Key)
                             .Join<DbAuditActor, DbAuditCode>("LEFT", o => o.ActorRoleCode, o => o.Key)
                             .Where<DbAuditActorAssociation>(o => o.SourceKey == res.Object1.Key)
-                            .Build();
+                            .Statement;
 
                     foreach (var itm in context.Query<CompositeResult<DbAuditActorAssociation, DbAuditActor, DbAuditCode>>(sql))
                     {
@@ -296,9 +296,9 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     }
 
                     // Objects
-                    sql = context.CreateSqlStatement<DbAuditObject>().SelectFrom(typeof(DbAuditObject), typeof(DbAuditCode))
+                    sql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbAuditObject), typeof(DbAuditCode))
                         .Join<DbAuditObject, DbAuditCode>("LEFT", o => o.CustomIdType, o => o.Key)
-                        .Where<DbAuditObject>(o => o.AuditId == res.Object1.Key);
+                        .Where<DbAuditObject>(o => o.AuditId == res.Object1.Key).Statement;
                     foreach (var itm in context.Query<CompositeResult<DbAuditObject, DbAuditCode>>(sql).ToArray())
                     {
                         var ao = new AuditableObject()
@@ -327,9 +327,10 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
                     // Metadata
 
-                    var stmt = context.CreateSqlStatement().SelectFrom(typeof(DbAuditMetadata))
+                    var stmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbAuditMetadata), typeof(DbAuditMetadataValue))
                         .InnerJoin<DbAuditMetadata, DbAuditMetadataValue>(o => o.ValueId, o => o.Key)
-                        .Where<DbAuditMetadata>(o => o.AuditId == res.Object1.Key);
+                        .Where<DbAuditMetadata>(o => o.AuditId == res.Object1.Key)
+                        .Statement;
                     foreach (var itm in context.Query<CompositeResult<DbAuditMetadata, DbAuditMetadataValue>>(stmt))
                     {
                         retVal.AddMetadata((AuditMetadataKey)itm.Object1.MetadataKey, itm.Object2.Value);
@@ -339,11 +340,11 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 {
                     // Actors
                     // Actors
-                    var sql = context.CreateSqlStatement<DbAuditActorAssociation>().SelectFrom(typeof(DbAuditActorAssociation), typeof(DbAuditActor), typeof(DbAuditCode))
+                    var sql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbAuditActorAssociation), typeof(DbAuditActor), typeof(DbAuditCode))
                             .InnerJoin<DbAuditActorAssociation, DbAuditActor>(o => o.TargetKey, o => o.Key)
                             .Join<DbAuditActor, DbAuditCode>("LEFT", o => o.ActorRoleCode, o => o.Key)
                             .Where<DbAuditActorAssociation>(o => o.SourceKey == res.Object1.Key)
-                            .Build();
+                            .Statement;
 
                     foreach (var itm in context.Query<CompositeResult<DbAuditActorAssociation, DbAuditActor, DbAuditCode>>(sql))
                     {
@@ -585,7 +586,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 {
                     context.Open();
 
-                    var sql = this.m_builder.CreateQuery<AuditEventData>(o => o.Key == pk).Build();
+                    var sql = this.m_builder.CreateQuery<AuditEventData>(o => o.Key == pk).Statement;
                     var res = context.FirstOrDefault<CompositeResult<DbAuditEventData, DbAuditCode>>(sql);
                     var result = this.ToModelInstance(context, res as CompositeResult<DbAuditEventData, DbAuditCode>, false);
 
@@ -662,7 +663,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <inheritdoc/>
         public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<AuditEventData, bool>> query)
         {
-            var sql = this.m_builder.CreateQuery(query).Build();
+            var sql = this.m_builder.CreateQuery(query).Statement;
             return context.Query<CompositeResult<DbAuditCode, DbAuditEventData>>(sql);
         }
 
@@ -698,7 +699,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Map to a database sort expression
         /// </summary>
-        public Expression MapExpression<TReturn>(Expression<Func<AuditEventData, TReturn>> sortExpression)
+        public LambdaExpression MapExpression<TReturn>(Expression<Func<AuditEventData, TReturn>> sortExpression)
         {
             return this.m_mapper.MapModelExpression<AuditEventData, DbAuditEventData, TReturn>(sortExpression);
         }
@@ -708,7 +709,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// </summary>
         public SqlStatement GetCurrentVersionFilter(string tableAlias)
         {
-            return new SqlStatement(this.Provider.StatementFactory, this.Provider.StatementFactory.CreateSqlKeyword(SqlKeyword.True));
+            return new SqlStatement(this.Provider.StatementFactory.CreateSqlKeyword(SqlKeyword.True));
         }
 #pragma warning restore CS0067
     }

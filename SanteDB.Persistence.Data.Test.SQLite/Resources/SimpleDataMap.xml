@@ -3,101 +3,101 @@
   <description>A simple map</description>
   <!-- CSV file = MRN,Dob,Gender,surname,given,Middle,Insurance,street,City,State,Country,ZIP,Birthplace,Alias,Mother Family,Mother Given,Birth Order -->
   <maps>
-    <add abortOnError="false" required="true">
+    <map abortOnError="false" required="true">
       <resource type="Patient" />
       <maps>
-        <add required="true">
+        <map required="true">
           <source>MRN</source>
           <target>identifier[MRN_I].value</target>
-        </add>
-        <add required="true">
+        </map>
+          <map required="true">
           <source>Dob</source>
           <target>dateOfBirth</target>
-        </add>
-        <add required="true">
+        </map>
+        <map required="true">
           <source>Gender</source>
           <target>genderConcept</target>
           <transforms>
-            <add transformer="ReferenceTermLookup">
+            <transform transformer="ReferenceTermLookup">
               <args>
                 <string>http://terminology.hl7.org/CodeSystem/v2-0001</string>
               </args>
-            </add>
+            </transform>
           </transforms>
-        </add>
-        <add required="true">
+        </map>
+        <map required="true">
           <source>surname</source>
           <target>name[OfficialRecord].component[Family].value</target>
-        </add>
-        <add required="true">
+        </map>
+        <map required="true">
           <source>given</source>
           <target>name[OfficialRecord].component[Given].value</target>
-        </add>
-        <add required="true">
+        </map>
+        <map required="true">
           <source>Middle</source>
           <target>name[OfficialRecord].component[Given].value</target>
           <transforms>
-            <add transformer="NoCase"/>
-            <add transformer="Expression">
+            <transform transformer="NoCase"/>
+            <transform transformer="Expression">
               <args>
                 <string>Middle.Substring(0,1)</string>
               </args>
-            </add>
+            </transform>
           </transforms>
-        </add>
-        <add required="true">
+        </map>
+        <map required="true">
           <source>Insurance</source>
           <target>identifier[INSURANCE_I].value</target>
-        </add>
-        <add required="false">
+        </map>
+        <map required="false">
           <source>street</source>
           <target>address[HomeAddress].component[StreetAddressLine].value</target>
-        </add>
-        <add required="false">
+        </map>
+        <map required="false">
           <source>City</source>
           <target>address[HomeAddress].component[City].value</target>
-        </add>
-        <add required="false">
+        </map>
+        <map required="false">
           <source>State</source>
           <target>address[HomeAddress].component[State].value</target>
-        </add>
-        <add required="false">
+        </map>
+        <map required="false">
           <source>Country</source>
           <target>address[HomeAddress].component[Country].value</target>
-        </add>
-        <add required="false">
+        </map>
+        <map required="false">
           <source>ZIP</source>
           <target>address[HomeAddress].component[PostalCode].value</target>
-        </add>
-        <add required="false" whenTargetMissing="Warning">
+        </map>
+        <map required="false" whenTargetMissing="Warning">
           <source>Birthplace</source>
           <target>relationship[Birthplace].target</target>
           <transforms>
-            <add transformer="EntityLookup">
+            <transform transformer="EntityLookup">
               <args>
                 <string>Place</string>
                 <string>name.component.value=:(nocase)$input</string>
               </args>
-            </add>
+            </transform>
           </transforms>
-        </add>
-        <add required="false">
+        </map>
+        <map required="false">
           <source>Alias</source>
           <target>name[Anonymous].component.value</target>
-        </add>
-        <add required="false">
+        </map>
+        <map required="false">
           <source>Mother Family</source>
           <target>relationship[Mother].target@Person.name[MaidenName].component[Family].value</target>
-        </add>
-        <add required="false">
+        </map>
+          <map required="false">
           <source>Mother Given</source>
           <target>relationship[Mother].target@Person.name[MaidenName].component[Given].value</target>
-        </add>
-        <add required="false">
+        </map>
+        <map required="false">
           <source>Birth Order</source>
           <target>multipleBirthOrder</target>
-        </add>
+        </map>
       </maps>
-    </add>
+    </map>
   </maps>
 </ForeignDataMap>

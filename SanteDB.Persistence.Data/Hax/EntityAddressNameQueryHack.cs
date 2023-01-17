@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Data.Hax
         /// <summary>
         /// Hack the query
         /// </summary>
-        public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<String, String[]> queryFilter)
+        public bool HackQuery(QueryBuilder builder, SqlStatementBuilder sqlStatement, SqlStatementBuilder whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<String, String[]> queryFilter)
         {
             String cmpTblType = String.Empty, keyName = String.Empty;
             Type guardType = null, componentType = null;
@@ -80,7 +80,7 @@ namespace SanteDB.Persistence.Data.Hax
             if (guardType == null ||
                 predicate.Path != "component" ||
                 predicate.SubPath != "value" ||
-                !String.IsNullOrEmpty(whereClause.SQL))
+                !String.IsNullOrEmpty(whereClause.Statement.Sql))
             {
                 return false;
             }

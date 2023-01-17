@@ -114,7 +114,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 TableMapping.Get(typeof(TDbTopLevelTable)).Columns.Union(
                         TableMapping.Get(typeof(TDbEntitySubTable)).Columns, new ColumnMapping.ColumnComparer()
                         ).Union(TableMapping.Get(typeof(DbEntityVersion)).Columns, new ColumnMapping.ColumnComparer());
-                var retVal = context.CreateSqlStatement().SelectFrom(typeof(DbEntityVersion), columns.ToArray())
+                var retVal = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityVersion), columns.ToArray())
                     .InnerJoin<DbEntityVersion, TDbEntitySubTable>(q => q.VersionKey, q => q.ParentKey)
                     .InnerJoin<TDbEntitySubTable, TDbTopLevelTable>(q => q.ParentKey, q => q.ParentKey);
                 return retVal;
@@ -199,7 +199,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 var columns = TableMapping.Get(typeof(TDbEntitySubTable)).Columns.Union(
                         TableMapping.Get(typeof(DbEntityVersion)).Columns, new ColumnMapping.ColumnComparer());
-                var retVal = context.CreateSqlStatement().SelectFrom(typeof(DbEntityVersion), columns.ToArray())
+                var retVal = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityVersion), columns.ToArray())
                     .InnerJoin<DbEntityVersion, TDbEntitySubTable>(q => q.VersionKey, q => q.ParentKey);
                 return retVal;
             });
@@ -445,9 +445,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
                     goto case LoadMode.QuickLoad;
                 case LoadMode.QuickLoad:
-                    var query = context.CreateSqlStatement<DbEntitySecurityPolicy>().SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
-                        .InnerJoin<DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
-                        .Where(o => o.SourceKey == dbModel.Key);
+                    var query = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
+                        .InnerJoin<DbEntitySecurityPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
+                        .Where<DbEntitySecurityPolicy>(o => o.SourceKey == dbModel.Key)
+                        .Statement;
                     retVal.Policies = context.Query<CompositeResult<DbEntitySecurityPolicy, DbSecurityPolicy>>(query)
                         .ToList()
                         .Select(o => new SecurityPolicyInstance(new SecurityPolicy(o.Object2.Name, o.Object2.Oid, o.Object2.IsPublic, o.Object2.CanOverride), PolicyGrantType.Grant))
@@ -469,7 +470,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 if(referenceObjects.Length == 0)
                 {
                     this.m_tracer.TraceWarning($"Fetching referenced objects - consider calling IDataPersistences<{typeof(TEntity).Name}> in the future");
-                    referenceObjects = edps.GetReferencedObjects(context, dbModel);
+                    referenceObjects = edps.GetReferencedObjects(context, dbModel) ?? new object[0];
                 }
                 return (TEntity)edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
             }

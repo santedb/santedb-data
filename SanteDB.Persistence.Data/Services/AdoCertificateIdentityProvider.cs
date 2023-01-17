@@ -206,14 +206,15 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
-                    var authSql = context.CreateSqlStatement<DbCertificateMapping>().SelectFrom(typeof(DbCertificateMapping), typeof(DbSecurityUser), typeof(DbSecurityApplication), typeof(DbSecurityDevice))
+                    var authSql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping), typeof(DbSecurityUser), typeof(DbSecurityApplication), typeof(DbSecurityDevice))
                         .Join<DbCertificateMapping, DbSecurityUser>("LEFT", o => o.SecurityUserKey, o => o.Key)
                         .Join<DbCertificateMapping, DbSecurityApplication>("LEFT", o => o.SecurityApplicationKey, o => o.Key)
                         .Join<DbCertificateMapping, DbSecurityDevice>("LEFT", o => o.SecurityDeviceKey, o => o.Key)
                         .Where<DbCertificateMapping>(o => o.X509Thumbprint == authenticationCertificate.Thumbprint && o.ObsoletionTime == null && o.Expiration > DateTimeOffset.Now)
                         .And<DbSecurityDevice>(o => o.ObsoletionTime == null)
                         .And<DbSecurityApplication>(o => o.ObsoletionTime == null)
-                        .And<DbSecurityUser>(o => o.ObsoletionTime == null);
+                        .And<DbSecurityUser>(o => o.ObsoletionTime == null)
+                        .Statement;
 
                     var authData = context.Query<CompositeResult<DbCertificateMapping, DbSecurityUser, DbSecurityApplication, DbSecurityDevice>>(authSql).SingleOrDefault();
                     // Was authentication successful?
@@ -247,10 +248,11 @@ namespace SanteDB.Persistence.Data.Services
                         claims.RemoveAll(o => o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode);
 
                         // Establish role
-                        var roleSql = context.CreateSqlStatement<DbSecurityRole>()
-                            .SelectFrom()
-                            .InnerJoin<DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
-                            .Where<DbSecurityUserRole>(o => o.UserKey == authData.Object1.SecurityUserKey);
+                        var roleSql = context.CreateSqlStatementBuilder()
+                            .SelectFrom(typeof(DbSecurityRole))
+                            .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
+                            .Where<DbSecurityUserRole>(o => o.UserKey == authData.Object1.SecurityUserKey)
+                            .Statement;
                         (authenticatedIdentity as AdoUserIdentity).AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
 
                     }
@@ -321,14 +323,15 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
-                    var authSql = context.CreateSqlStatement<DbCertificateMapping>().SelectFrom(typeof(DbCertificateMapping), typeof(DbSecurityUser), typeof(DbSecurityApplication), typeof(DbSecurityDevice))
+                    var authSql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping), typeof(DbSecurityUser), typeof(DbSecurityApplication), typeof(DbSecurityDevice))
                         .Join<DbCertificateMapping, DbSecurityUser>("LEFT", o => o.SecurityUserKey, o => o.Key)
                         .Join<DbCertificateMapping, DbSecurityApplication>("LEFT", o => o.SecurityApplicationKey, o => o.Key)
                         .Join<DbCertificateMapping, DbSecurityDevice>("LEFT", o => o.SecurityDeviceKey, o => o.Key)
                         .Where<DbCertificateMapping>(o => o.X509Thumbprint == authenticationCertificate.Thumbprint && o.ObsoletionTime == null && o.Expiration > DateTime.Now)
                         .And<DbSecurityDevice>(o => o.ObsoletionTime == null)
                         .And<DbSecurityApplication>(o => o.ObsoletionTime == null)
-                        .And<DbSecurityUser>(o => o.ObsoletionTime == null);
+                        .And<DbSecurityUser>(o => o.ObsoletionTime == null)
+                        .Statement;
 
                     // Return the appropriate type of data 
                     var authData = context.Query<CompositeResult<DbCertificateMapping, DbSecurityUser, DbSecurityApplication, DbSecurityDevice>>(authSql).FirstOrDefault();
@@ -374,24 +377,27 @@ namespace SanteDB.Persistence.Data.Services
                     DbCertificateMapping retVal = null;
                     if (identityOfCertificte is IDeviceIdentity did)
                     {
-                        retVal = context.Query<DbCertificateMapping>(context.CreateSqlStatement<DbCertificateMapping>().SelectFrom()
+                        retVal = context.Query<DbCertificateMapping>(context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping))
                             .InnerJoin<DbCertificateMapping, DbSecurityDevice>(o => o.SecurityDeviceKey, o => o.Key)
                             .Where<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == did.Name.ToLowerInvariant() && o.ObsoletionTime == null)
-                            .And<DbCertificateMapping>(o => o.ObsoletionTime == null)).FirstOrDefault();
+                            .And<DbCertificateMapping>(o => o.ObsoletionTime == null)
+                            .Statement).FirstOrDefault();
                     }
                     else if (identityOfCertificte is IApplicationIdentity aid)
                     {
-                        retVal = context.Query<DbCertificateMapping>(context.CreateSqlStatement<DbCertificateMapping>().SelectFrom()
+                        retVal = context.Query<DbCertificateMapping>(context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping))
                            .InnerJoin<DbCertificateMapping, DbSecurityApplication>(o => o.SecurityApplicationKey, o => o.Key)
                            .Where<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == aid.Name.ToLowerInvariant() && o.ObsoletionTime == null)
-                           .And<DbCertificateMapping>(o => o.ObsoletionTime == null)).FirstOrDefault();
+                           .And<DbCertificateMapping>(o => o.ObsoletionTime == null)
+                           .Statement).FirstOrDefault();
                     }
                     else
                     {
-                        retVal = context.Query<DbCertificateMapping>(context.CreateSqlStatement<DbCertificateMapping>().SelectFrom()
+                        retVal = context.Query<DbCertificateMapping>(context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping))
                            .InnerJoin<DbCertificateMapping, DbSecurityUser>(o => o.SecurityUserKey, o => o.Key)
                            .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == identityOfCertificte.Name.ToLowerInvariant() && o.ObsoletionTime == null)
-                           .And<DbCertificateMapping>(o => o.ObsoletionTime == null)).FirstOrDefault();
+                           .And<DbCertificateMapping>(o => o.ObsoletionTime == null)
+                           .Statement).FirstOrDefault();
                     }
 
                     if (retVal != null)
@@ -445,26 +451,29 @@ namespace SanteDB.Persistence.Data.Services
                     DbCertificateMapping dbCertMapping = null;
                     if (identityToBeUnMapped is IDeviceIdentity did)
                     {
-                        dbCertMapping = context.Query<DbCertificateMapping>(context.CreateSqlStatement<DbCertificateMapping>().SelectFrom()
-                            .InnerJoin<DbSecurityDevice>(o => o.SecurityDeviceKey, o => o.Key)
+                        dbCertMapping = context.Query<DbCertificateMapping>(context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping))
+                            .InnerJoin<DbCertificateMapping, DbSecurityDevice>(o => o.SecurityDeviceKey, o => o.Key)
                             .Where<DbSecurityDevice>(o => o.ObsoletionTime == null && o.PublicId.ToLowerInvariant() == did.Name.ToLowerInvariant())
-                            .And<DbCertificateMapping>(o => o.ObsoletionTime == null && o.X509Thumbprint == authenticationCertificate.Thumbprint))
+                            .And<DbCertificateMapping>(o => o.ObsoletionTime == null && o.X509Thumbprint == authenticationCertificate.Thumbprint)
+                            .Statement)
                             .FirstOrDefault();
                     }
                     else if (identityToBeUnMapped is IApplicationIdentity aid)
                     {
-                        dbCertMapping = context.Query<DbCertificateMapping>(context.CreateSqlStatement<DbCertificateMapping>().SelectFrom()
-                            .InnerJoin<DbSecurityApplication>(o => o.SecurityApplicationKey, o => o.Key)
+                        dbCertMapping = context.Query<DbCertificateMapping>(context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping))
+                            .InnerJoin<DbCertificateMapping,DbSecurityApplication>(o => o.SecurityApplicationKey, o => o.Key)
                             .Where<DbSecurityApplication>(o => o.ObsoletionTime == null && o.PublicId.ToLowerInvariant() == aid.Name.ToLowerInvariant())
-                            .And<DbCertificateMapping>(o => o.ObsoletionTime == null && o.X509Thumbprint == authenticationCertificate.Thumbprint))
+                            .And<DbCertificateMapping>(o => o.ObsoletionTime == null && o.X509Thumbprint == authenticationCertificate.Thumbprint)
+                            .Statement)
                             .FirstOrDefault();
                     }
                     else
                     {
-                        dbCertMapping = context.Query<DbCertificateMapping>(context.CreateSqlStatement<DbCertificateMapping>().SelectFrom()
-                            .InnerJoin<DbSecurityUser>(o => o.SecurityUserKey, o => o.Key)
+                        dbCertMapping = context.Query<DbCertificateMapping>(context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping))
+                            .InnerJoin<DbCertificateMapping, DbSecurityUser>(o => o.SecurityUserKey, o => o.Key)
                             .Where<DbSecurityUser>(o => o.ObsoletionTime == null && o.UserName.ToLowerInvariant() == identityToBeUnMapped.Name.ToLowerInvariant())
-                            .And<DbCertificateMapping>(o => o.ObsoletionTime == null && o.X509Thumbprint == authenticationCertificate.Thumbprint))
+                            .And<DbCertificateMapping>(o => o.ObsoletionTime == null && o.X509Thumbprint == authenticationCertificate.Thumbprint)
+                            .Statement)
                             .FirstOrDefault();
                     }
 

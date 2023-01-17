@@ -54,7 +54,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             var tableMap = TableMapping.Get(typeof(TDbModel));
             var obsltCol = tableMap.GetColumn(nameof(DbBaseData.ObsoletionTime));
-            return new SqlStatement(this.Provider.StatementFactory, $"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
+            return new SqlStatement($"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
         }
 
         /// <inheritdoc/>
@@ -159,7 +159,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 else
                 {
                     this.m_tracer.TraceVerbose("Will use slow query construction due to complex mapped fields");
-                    var domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(expression);
+                    var domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(expression).Statement;
 
                     var returnKeys = context.Query<TDbModel>(domainQuery).Select(o => o.Key).ToList();
                     switch (deletionMode)
@@ -189,7 +189,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected override Expression<Func<TModel, bool>> ApplyDefaultQueryFilters(Expression<Func<TModel, bool>> query)
         {
             // If the user has not explicitly set the obsoletion time parameter then we will add it
-            if (!query.ToString().Contains(nameof(BaseEntityData.ObsoletionTime)))
+            var queryStr = query.ToString();
+            if (!queryStr.Contains(nameof(BaseEntityData.ObsoletionTime)))
             {
                 var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);

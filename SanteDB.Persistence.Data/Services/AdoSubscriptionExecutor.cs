@@ -157,10 +157,10 @@ namespace SanteDB.Persistence.Data.Services
 
                 // We want to build a query that is appropriate for the resource type so the definition will become
                 // SELECT [columns for type] FROM (definition from subscription logic here) AS [tablename] WHERE [filter provided by caller];
-                var query = new QueryBuilder(this.m_modelMapper, persistenceInstance.Provider.StatementFactory).CreateQuery(subscription.ResourceType, queryExpression).Build();
+                var query = new QueryBuilder(this.m_modelMapper, persistenceInstance.Provider.StatementFactory).CreateQuery(subscription.ResourceType, queryExpression).Statement;
 
                 // Now we want to remove the portions of the built query statement after FROM and before WHERE as the definition in the subscription will be the source of our selection
-                SqlStatement domainQuery = new SqlStatement(m_configuration.Provider.StatementFactory, query.SQL.Substring(0, query.SQL.IndexOf(" FROM ")));
+                SqlStatementBuilder domainQuery = new SqlStatementBuilder(m_configuration.Provider.StatementFactory, query.ToString().Substring(0, query.ToString().IndexOf(" FROM ")));
 
                 // Append our query
                 var definitionQuery = definition.Definition;
@@ -189,9 +189,9 @@ namespace SanteDB.Persistence.Data.Services
 
                 // Now we want to append the new definitional query (with parameter substitutions) to our main select statement
                 domainQuery.Append(" FROM (").Append(definitionQuery, arguments.ToArray()).Append($") AS {tableMapping.TableName} ");
-                domainQuery.Append(query.SQL.Substring(query.SQL.IndexOf("WHERE ")), query.Arguments.ToArray()); // Then we add the filters supplied by the caller 
+                domainQuery.Append(query.ToString().Substring(query.ToString().IndexOf("WHERE ")), query.Arguments.ToArray()); // Then we add the filters supplied by the caller 
 
-                var retVal = persistenceInstance.Query(domainQuery);
+                var retVal = persistenceInstance.Query(domainQuery.Statement);
                 var postEvt = new SubscriptionExecutedEventArgs(subscription, parameters, retVal, AuthenticationContext.Current.Principal);
                 this.Executed?.Invoke(this, postEvt);
 

@@ -5,6 +5,9 @@
  * </feature>
  */
 
+ DROP INDEX IF EXISTS ent_addr_cmp_val_idx;
+ DROP INDEX IF EXISTS ent_name_cmp_val_idx;
+ DROP INDEX IF EXISTS ENT_NAME_CMP_SDX_IDX;
 DROP FUNCTION IF EXISTS rfrsh_fti;
 DROP FUNCTION IF EXISTS reindex_fti_ent;
 
@@ -78,5 +81,8 @@ create index sec_dev_pub_id_idx on sec_dev_tbl(lower(dev_pub_id));
 drop index sec_usr_name_pwd_idx;
 create index sec_usr_name_pwd_idx on sec_usr_tbl (lower(usr_name), passwd);
 
+-- INDEX FOR PROTOCOL BY OID
+DROP INDEX IF EXISTS PROTO_NAME_UQ_IDX ;
+CREATE UNIQUE INDEX PROTO_OID_UQ_IDX ON PROTO_TBL(OID) WHERE (OBSLT_UTC IS NULL);
 ALTER TABLE FD_STG_SYSTBL ADD DESCR TEXT;
 SELECT REG_PATCH('20221214-02'); 

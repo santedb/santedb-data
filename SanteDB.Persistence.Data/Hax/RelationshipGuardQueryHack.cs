@@ -51,7 +51,7 @@ namespace SanteDB.Persistence.Data.Hax
         /// <summary>
         /// Hack query builder based on clause
         /// </summary>
-        public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<String, string[]> queryFilter)
+        public bool HackQuery(QueryBuilder builder, SqlStatementBuilder sqlStatement, SqlStatementBuilder whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<String, string[]> queryFilter)
         {
             string columnName = String.Empty;
             Type scanType = null;
@@ -115,20 +115,19 @@ namespace SanteDB.Persistence.Data.Hax
 
                 // Remove the inner join 
                 var remStack = new Stack<SqlStatement>();
-                SqlStatement last;
-                while (sqlStatement.RemoveLast(out last) != null && last != null)
+                while (sqlStatement.RemoveLast(out var last) != null && !last.IsEmpty())
                 {
-                    var m = removeRegex.Match(last.SQL);
+                    var m = removeRegex.Match(last.Sql);
                     if (m.Success)
                     {
                         // The last thing we added was the 
-                        if (m.Index == 0 && m.Length == last.SQL.Length)
+                        if (m.Index == 0 && m.Length == last.Sql.Length)
                         {
                             remStack.Pop();
                         }
                         else
                         {
-                            sqlStatement.Append(last.SQL.Remove(m.Index, m.Length), last.Arguments.ToArray());
+                            sqlStatement.Append(last.Sql.Remove(m.Index, m.Length), last.Arguments.ToArray());
                         }
 
                         break;
