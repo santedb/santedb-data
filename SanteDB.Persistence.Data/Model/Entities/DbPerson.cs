@@ -76,6 +76,18 @@ namespace SanteDB.Persistence.Data.Model.Entities
         public Guid? OccupationKey { get; set; }
 
         /// <summary>
+        /// Gets or sets the ethnic group code id
+        /// </summary>
+        [Column("vip_sts_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid? VipStatusKey { get; set; }
+
+        /// <summary>
+        /// Nationality key
+        /// </summary>
+        [Column("nat_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid? NationalityKey { get; set; }
+
+        /// <summary>
         /// Gets or sets the gender concept
         /// </summary>
         /// <value>The gender concept.</value>

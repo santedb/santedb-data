@@ -43,6 +43,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             data.OccupationKey = this.EnsureExists(context, data.Occupation)?.Key ?? data.OccupationKey;
             data.GenderConceptKey = this.EnsureExists(context, data.GenderConcept)?.Key ?? data.GenderConceptKey;
+            data.NationalityKey = this.EnsureExists(context, data.Nationality)?.Key ?? data.NationalityKey;
+            data.VipStatusKey = this.EnsureExists(context, data.VipStatus)?.Key ?? data.VipStatusKey;
             return base.BeforePersisting(context, data);
         }
 
@@ -109,10 +111,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    modelData.GenderConcept = modelData.GenderConcept.GetRelatedPersistenceService().Get(context, personData.GenderConceptKey.GetValueOrDefault());
+                    var conceptLoader = modelData.GenderConcept.GetRelatedPersistenceService();
+                    modelData.GenderConcept = conceptLoader.Get(context, personData.GenderConceptKey.GetValueOrDefault());
                     modelData.SetLoaded(o => o.GenderConcept);
-                    modelData.Occupation = modelData.Occupation.GetRelatedPersistenceService().Get(context, personData.OccupationKey.GetValueOrDefault());
+                    modelData.Occupation = conceptLoader.Get(context, personData.OccupationKey.GetValueOrDefault());
                     modelData.SetLoaded(o => o.Occupation);
+                    modelData.Nationality = conceptLoader.Get(context, personData.NationalityKey.GetValueOrDefault());
+                    modelData.SetLoaded(o => o.Nationality);
+                    modelData.VipStatus = conceptLoader.Get(context, personData.VipStatusKey.GetValueOrDefault());
+                    modelData.SetLoaded(o => o.VipStatus);
                     goto case LoadMode.SyncLoad;
                 case LoadMode.SyncLoad:
                     modelData.LanguageCommunication = modelData.LanguageCommunication.GetRelatedPersistenceService().Query(context, r => r.SourceEntityKey == dbModel.Key)?.ToList();

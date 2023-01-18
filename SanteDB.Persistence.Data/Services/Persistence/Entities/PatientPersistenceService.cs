@@ -45,11 +45,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             data.EducationLevelKey = this.EnsureExists(context, data.EducationLevel)?.Key ?? data.EducationLevelKey;
             data.EthnicGroupKey = this.EnsureExists(context, data.EthnicGroup)?.Key ?? data.EthnicGroupKey;
-            data.LivingArrangementKey = this.EnsureExists(context, data.LivingArrangement)?.Key ?? data.LivingArrangementKey;
             data.MaritalStatusKey = this.EnsureExists(context, data.MaritalStatus)?.Key ?? data.MaritalStatusKey;
-            data.NationalityKey = this.EnsureExists(context, data.Nationality)?.Key ?? data.NationalityKey;
+            data.LivingArrangementKey = this.EnsureExists(context, data.LivingArrangement)?.Key ?? data.LivingArrangementKey;
             data.ReligiousAffiliationKey = this.EnsureExists(context, data.ReligiousAffiliation)?.Key ?? data.ReligiousAffiliationKey;
-            data.VipStatusKey = this.EnsureExists(context, data.VipStatus)?.Key ?? data.VipStatusKey;
             return base.BeforePersisting(context, data);
         }
 
@@ -77,12 +75,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     modelData.SetLoaded(o => o.LivingArrangement);
                     modelData.MaritalStatus = conceptPersister.Get(context, dbPatient.MaritalStatusKey.GetValueOrDefault());
                     modelData.SetLoaded(o => o.MaritalStatus);
-                    modelData.Nationality = conceptPersister.Get(context, dbPatient.NationalityKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.Nationality);
                     modelData.ReligiousAffiliation = conceptPersister.Get(context, dbPatient.ReligiousAffiliationKey.GetValueOrDefault());
                     modelData.SetLoaded(o => o.ReligiousAffiliation);
-                    modelData.VipStatus = conceptPersister.Get(context, dbPatient.VipStatusKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.VipStatus);
+
                     break;
             }
 

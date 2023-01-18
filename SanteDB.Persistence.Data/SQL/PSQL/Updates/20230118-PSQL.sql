@@ -1,0 +1,16 @@
+﻿/** 
+ * <feature scope="SanteDB.Persistence.Data" id="20230118-01" name="Update:20230118-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ *	<summary>Update: Migrate Nationality and VIP to person</summary>
+ *	<isInstalled>select ck_patch('20230118-01')</isInstalled>
+ * </feature>
+ */
+ALTER TABLE PSN_TBL ADD VIP_STS_CD_ID UUID;
+ALTER TABLE PSN_TBL ADD CONSTRAINT CK_VIP_STS_CD CHECK (((VIP_STS_CD_ID IS NULL) OR IS_CD_SET_MEM(VIP_STS_CD_ID, 'VeryImportantPersonStatus') OR IS_CD_SET_MEM(VIP_STS_CD_ID, 'NullReason')));
+ALTER TABLE PSN_TBL ADD NAT_CD_ID UUID;
+
+UPDATE PSN_TBL SET VIP_STS_CD_ID = PAT_TBL.VIP_STS_CD_ID , NAT_CD_ID = PAT_TBL.NAT_CD_ID FROM PAT_TBL WHERE PSN_TBL.ENT_VRSN_ID = PAT_TBL.ENT_VRSN_ID ; 
+
+ALTER TABLE PAT_TBL DROP VIP_STS_CD_ID;
+ALTER TABLE PSN_TBL DROP NAT_CD_ID;
+
+SELECT REG_PATCH('20230118-01'); 

@@ -1,0 +1,14 @@
+﻿/** 
+ * <feature scope="SanteDB.Persistence.Data" id="20230105" name="Update:Cumulative Update for SQLite" applyRange="0.2.0.0-0.9.0.0" invariantName="sqlite">
+ *	<summary>Update:Cumulative update for SQLite</summary>
+ *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE tbl_name = 'PSN_TBL' AND sql LIKE '%VIP%')</isInstalled>
+ * </feature>
+ */
+ALTER TABLE PSN_TBL ADD VIP_STS_CD_ID BLOB(16);
+ALTER TABLE PSN_TBL ADD NAT_CD_ID BLOB(16);
+
+UPDATE PSN_TBL SET VIP_STS_CD_ID = PAT_TBL.VIP_STS_CD_ID , NAT_CD_ID = PAT_TBL.NAT_CD_ID FROM PAT_TBL WHERE PSN_TBL.ENT_VRSN_ID = PAT_TBL.ENT_VRSN_ID ; 
+
+ALTER TABLE PAT_TBL DROP VIP_STS_CD_ID;
+ALTER TABLE PSN_TBL DROP NAT_CD_ID;
+
