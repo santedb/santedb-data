@@ -58,9 +58,10 @@ namespace SanteDB.Persistence.Data.Test.SQLite
             };
 
             var dbPatient = mapper.MapModelInstance<Patient, DbPatient>(patient);
-            Assert.AreEqual(patient.DeceasedDate, dbPatient.DeceasedDate);
+            Assert.AreEqual(patient.EducationLevelKey, dbPatient.EducationLevelKey);
 
             var dbPerson = mapper.MapModelInstance<Person, DbPerson>(patient);
+            Assert.AreEqual(patient.DeceasedDate, dbPerson.DeceasedDate);
             Assert.AreEqual(patient.GenderConceptKey, dbPerson.GenderConceptKey);
             Assert.AreEqual(patient.DateOfBirth, dbPerson.DateOfBirth);
 
@@ -70,9 +71,10 @@ namespace SanteDB.Persistence.Data.Test.SQLite
 
             // Reverse map
             var revPatient = mapper.MapDomainInstance<DbPatient, Patient>(dbPatient);
-            Assert.AreEqual(dbPatient.DeceasedDate, revPatient.DeceasedDate);
+            Assert.AreEqual(dbPatient.EducationLevelKey, revPatient.EducationLevelKey);
 
             var revPerson = mapper.MapDomainInstance<DbPerson, Person>(dbPerson);
+            Assert.AreEqual(dbPerson.DeceasedDate, revPerson.DeceasedDate);
             Assert.AreEqual(dbPerson.DateOfBirth, revPerson.DateOfBirth);
             Assert.AreEqual(patient.DateOfBirthPrecision, revPerson.DateOfBirthPrecision);
 
@@ -102,9 +104,10 @@ namespace SanteDB.Persistence.Data.Test.SQLite
             };
 
             var dbPatient = mapper.MapModelInstance<Patient, DbPatient>(patient);
-            Assert.AreEqual(patient.DeceasedDate, dbPatient.DeceasedDate);
+            Assert.AreEqual(patient.EducationLevelKey, dbPatient.EducationLevelKey);
 
             var dbPerson = mapper.MapModelInstance<Person, DbPerson>(patient);
+            Assert.AreEqual(patient.DeceasedDate, dbPerson.DeceasedDate);
             Assert.AreEqual(patient.GenderConceptKey, dbPerson.GenderConceptKey);
             Assert.AreEqual(patient.DateOfBirth, dbPerson.DateOfBirth);
 
@@ -114,9 +117,10 @@ namespace SanteDB.Persistence.Data.Test.SQLite
 
             // Reverse map
             var revPatient = mapper.MapDomainInstance<DbPatient, Patient>(dbPatient);
-            Assert.AreEqual(dbPatient.DeceasedDate, revPatient.DeceasedDate);
+            Assert.AreEqual(dbPatient.EducationLevelKey, revPatient.EducationLevelKey);
 
             var revPerson = mapper.MapDomainInstance<DbPerson, Person>(dbPerson);
+            Assert.AreEqual(dbPerson.DeceasedDate, revPerson.DeceasedDate);
             Assert.AreEqual(dbPerson.DateOfBirth, revPerson.DateOfBirth);
             Assert.AreEqual(patient.DateOfBirthPrecision, revPerson.DateOfBirthPrecision);
 

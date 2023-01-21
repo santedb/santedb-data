@@ -50,29 +50,6 @@ namespace SanteDB.Persistence.Data.Model.Roles
                 base.ParentKey = value;
             }
         }
-
-        /// <summary>
-        /// Gets or sets the deceased date.
-        /// </summary>
-        /// <value>The deceased date.</value>
-        [Column("dcsd_utc")]
-        public DateTime? DeceasedDate
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the deceased date precision.
-        /// </summary>
-        /// <value>The deceased date precision.</value>
-        [Column("dcsd_prec")]
-        public string DeceasedDatePrecision
-        {
-            get;
-            set;
-        }
-
         /// <summary>
         /// Gets or sets the multiple birth order.
         /// </summary>

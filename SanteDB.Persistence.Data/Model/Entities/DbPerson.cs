@@ -70,6 +70,29 @@ namespace SanteDB.Persistence.Data.Model.Entities
         }
 
         /// <summary>
+        /// Gets or sets the deceased date.
+        /// </summary>
+        /// <value>The deceased date.</value>
+        [Column("dcsd_utc")]
+        public DateTime? DeceasedDate
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the deceased date precision.
+        /// </summary>
+        /// <value>The deceased date precision.</value>
+        [Column("dcsd_prec")]
+        public string DeceasedDatePrecision
+        {
+            get;
+            set;
+        }
+
+
+        /// <summary>
         /// Gets or sets the ethnic group code id
         /// </summary>
         [Column("occ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
