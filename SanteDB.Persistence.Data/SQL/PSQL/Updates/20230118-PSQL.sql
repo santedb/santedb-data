@@ -86,5 +86,21 @@ BEGIN
 	END IF;
 	RETURN NEW;
 END;
+
+
+-- Create a function that always returns the first non-NULL item
+CREATE OR REPLACE FUNCTION public.first_nvl_agg ( anyelement, anyelement )
+RETURNS anyelement AS $$
+        SELECT COALESCE($1, $2);
+$$ LANGUAGE SQL IMMUTABLE STRICT ;
+
+-- And then wrap an aggregate around it
+CREATE AGGREGATE public.FIRST_NVL (
+        sfunc    = public.first_nvl_agg,
+        basetype = anyelement,
+        stype    = anyelement
+);
+ 
+
 $$ LANGUAGE plpgsql;
 SELECT REG_PATCH('20230118-01'); 
