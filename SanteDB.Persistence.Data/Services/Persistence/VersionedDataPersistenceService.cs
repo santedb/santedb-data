@@ -609,7 +609,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     {
                         case DeleteMode.LogicalDelete:
                             context.UpdateAll(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId);
-                            foreach (var newVersion in context.Query<TDbModel>(o => o.ObsoletionTime != null && o.ObsoletedByKey == context.ContextId).Select(o=>o.Key))
+                            foreach (var newVersion in context.Query<TDbModel>(o => o.ObsoletionTime != null && o.ObsoletedByKey == context.ContextId).Select(o => o.Key))
                             {
                                 yield return newVersion;
                             }
@@ -863,12 +863,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             // Next we want to perform a relationship query to establish what is being loaded and what is being persisted
             // TODO: Determine if this line performs better than selecting the entire object (I suspect it would - but need to check)
+            var contextKeys = context.Data.Where(o => o.Value is BatchOperationType bt && bt != BatchOperationType.Delete).Select(o => (Guid?)Guid.Parse(o.Key)).ToArray();
             var assocKeys = associations.Select(k => k.Key).ToArray();
             var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && o.ObsoleteVersionSequenceId == null || assocKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
             var associationKeys = associations.Select(o => o.Key).ToArray();
             var toDelete = associations.Where(a => a.BatchOperation == BatchOperationType.Delete).Select(o => o.Key)
-                .Union(existing.Where(e => !associationKeys.Contains(e))).ToArray();
+                .Union(existing.Where(e => !associationKeys.Contains(e)));
 
+            toDelete = toDelete.Except(contextKeys).ToArray();
             // Anything to remove?
             if (toDelete.Any())
             {
@@ -935,11 +937,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             var existing = context.Query<TAssociativeTable>(o => o.SourceKey == sourceKey && !o.ObsoleteVersionSequenceId.HasValue).ToArray();
 
             // Which ones are new?
+            var contextKeys = context.Data.Where(o => o.Value is BatchOperationType bt && bt != BatchOperationType.Delete).Select(o => (TAssociativeTable)existing.OfType<IDbIdentified>().FirstOrDefault(i=>i.Key == Guid.Parse(o.Key))).ToArray();
             var removeRelationships = existing.Where(e => !associations.Any(a => a.Equals(e)));
+            removeRelationships = removeRelationships.Except(contextKeys);
             var addRelationships = associations.Where(a => !existing.Any(e => e.Equals(a)));
 
             // First, remove the old
-            foreach (var itm in removeRelationships)
+            foreach (var itm in removeRelationships.Except(contextKeys))
             {
                 this.m_tracer.TraceVerbose("Will remove {0} of {1}", typeof(TAssociativeTable).Name, itm);
 
@@ -961,8 +965,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 itm.EffectiveVersionSequenceId = versionSequence;
                 context.Insert(itm);
             }
-           
-                return existing.Except(removeRelationships).Union(addRelationships).ToArray();
+
+            return existing.Except(removeRelationships).Union(addRelationships).ToArray();
         }
     }
 }

@@ -295,6 +295,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             {
                 this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)i / (float)data.Item.Count, UserMessages.PROCESSING));
                 var persistenceService = data.Item[i].GetType().GetRelatedPersistenceService();
+
                 try
                 {
                     switch (data.Item[i].BatchOperation)
@@ -327,6 +328,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                             }
                             break;
                     }
+
+                    context.Data.Add(data.Item[i].Key.ToString(), data.Item[i].BatchOperation);
+
                 }
                 catch (DbException e)
                 {
