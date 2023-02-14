@@ -329,7 +329,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                             break;
                     }
 
-                    context.Data.Add(data.Item[i].Key.ToString(), data.Item[i].BatchOperation);
+                    // Add to the context dictionary so others know that this was added
+                    if (!context.Data.ContainsKey(data.Item[i].Key.ToString()))
+                    {
+                        context.Data.Add(data.Item[i].Key.ToString(), data.Item[i].BatchOperation);
+                    }
 
                 }
                 catch (DbException e)

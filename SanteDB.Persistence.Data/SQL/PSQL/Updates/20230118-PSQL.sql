@@ -24,6 +24,7 @@ ALTER TABLE PAT_TBL DROP NAT_CD_ID;
 ALTER TABLE PAT_TBL DROP DCSD_PREC CASCADE;
 ALTER TABLE PAT_TBL DROP DCSD_UTC CASCADE;
 
+UPDATE CD_VRSN_TBL SET MNEMONIC = 'DataEnterer' WHERE CD_ID = 'C50D66D2-E5DA-4A34-B2B7-4CD4FE4EF2C4';--#!
 
 CREATE OR REPLACE FUNCTION trg_vrfy_ent_rel_tbl()
  RETURNS trigger
@@ -86,7 +87,7 @@ BEGIN
 	END IF;
 	RETURN NEW;
 END;
-
+$$ LANGUAGE plpgsql;
 
 -- Create a function that always returns the first non-NULL item
 CREATE OR REPLACE FUNCTION public.first_nvl_agg ( anyelement, anyelement )
@@ -101,6 +102,4 @@ CREATE AGGREGATE public.FIRST_NVL (
         stype    = anyelement
 );
  
-
-$$ LANGUAGE plpgsql;
 SELECT REG_PATCH('20230118-01'); 
