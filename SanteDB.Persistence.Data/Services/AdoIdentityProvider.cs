@@ -471,7 +471,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         // Abandon all sessions for this user
-                        foreach (var ses in context.Query<DbSession>(o => o.UserKey == dbUser.Key && o.NotAfter >= DateTimeOffset.Now))
+                        foreach (var ses in context.Query<DbSession>(o => o.UserKey == dbUser.Key && o.NotAfter >= DateTimeOffset.Now).ToArray())
                         {
                             ses.NotAfter = DateTimeOffset.Now;
                             context.Update(ses);
