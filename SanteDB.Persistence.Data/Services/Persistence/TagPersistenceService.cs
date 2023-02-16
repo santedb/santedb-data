@@ -25,6 +25,8 @@ using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
+using SanteDB.Persistence.Data.Model.Acts;
+using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Extensibility;
 using System;
 
@@ -37,19 +39,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     {
         // Configuration
         private readonly AdoPersistenceConfigurationSection m_configuration;
-
-        /// <summary>
-        /// Localization service
-        /// </summary>
-        private readonly ILocalizationService m_localizationService;
+        private readonly IDataCachingService m_dataCache;
 
         /// <summary>
         /// Creates a new tag persistence service
         /// </summary>
-        public TagPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService)
+        public TagPersistenceService(IConfigurationManager configurationManager, IDataCachingService dataCachingService)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
-            this.m_localizationService = localizationService;
+            this.m_dataCache = dataCachingService;
         }
 
         /// <summary>
@@ -57,16 +55,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public string ServiceName => "ADO.NET Data Tagging Service";
 
-        /// <summary>
-        /// Save the specified tag against the specified source key
-        /// </summary>
-        public void Save(Guid sourceKey, ITag tag)
+        /// <inheritdoc/>
+        public void Save(Guid sourceKey, String tagName, String tagValue)
         {
-            if (tag == null)
+            if (String.IsNullOrEmpty(tagName))
             {
-                throw new ArgumentNullException(nameof(tag), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+                throw new ArgumentNullException(nameof(tagName), ErrorMessages.ARGUMENT_NULL);
             }
-            else if (tag.TagKey.StartsWith("$")) // transient tag don't save
+            else if (tagName.StartsWith("$")) // transient tag don't save
             {
                 return;
             }
@@ -78,50 +74,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     context.Open();
 
                     var provenanceId = context.EstablishProvenance(AuthenticationContext.Current.Principal, null);
-                    // Persist act tags
-                    if (tag is ActTag actTag)
+                    if (context.Any<DbEntity>(o => o.Key == sourceKey))
                     {
-                        var existingTag = context.FirstOrDefault<DbActTag>(o => o.SourceKey == sourceKey && o.TagKey == tag.TagKey && o.ObsoletionTime == null);
+                        var existingTag = context.FirstOrDefault<DbEntityTag>(o => o.SourceKey == sourceKey && o.TagKey == tagName && o.ObsoletionTime == null);
                         if (existingTag != null)
                         {
                             // Update?
-                            if (String.IsNullOrEmpty(tag.Value))
+                            if (String.IsNullOrEmpty(tagValue))
                             {
                                 existingTag.ObsoletedByKey = provenanceId;
                                 existingTag.ObsoletionTime = DateTimeOffset.Now;
                             }
                             else
                             {
-                                existingTag.Value = tag.Value;
-                            }
-                            context.Update(existingTag);
-                        }
-                        else
-                        {
-                            context.Insert(new DbActTag()
-                            {
-                                CreatedByKey = provenanceId,
-                                CreationTime = DateTimeOffset.Now,
-                                SourceKey = sourceKey,
-                                TagKey = tag.TagKey,
-                                Value = tag.Value
-                            });
-                        }
-                    }
-                    else if (tag is EntityTag entityTag)
-                    {
-                        var existingTag = context.FirstOrDefault<DbEntityTag>(o => o.SourceKey == sourceKey && o.TagKey == tag.TagKey && o.ObsoletionTime == null);
-                        if (existingTag != null)
-                        {
-                            // Update?
-                            if (String.IsNullOrEmpty(tag.Value))
-                            {
-                                existingTag.ObsoletedByKey = provenanceId;
-                                existingTag.ObsoletionTime = DateTimeOffset.Now;
-                            }
-                            else
-                            {
-                                existingTag.Value = tag.Value;
+                                existingTag.Value = tagValue;
                             }
                             context.Update(existingTag);
                         }
@@ -132,17 +98,59 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                                 CreatedByKey = provenanceId,
                                 CreationTime = DateTimeOffset.Now,
                                 SourceKey = sourceKey,
-                                TagKey = tag.TagKey,
-                                Value = tag.Value
+                                TagKey = tagName,
+                                Value = tagValue
                             });
                         }
                     }
+                    else if (context.Any<DbAct>(o => o.Key == sourceKey))
+                    {
+                        var existingTag = context.FirstOrDefault<DbActTag>(o => o.SourceKey == sourceKey && o.TagKey == tagName && o.ObsoletionTime == null);
+                        if (existingTag != null)
+                        {
+                            // Update?
+                            if (String.IsNullOrEmpty(tagValue))
+                            {
+                                existingTag.ObsoletedByKey = provenanceId;
+                                existingTag.ObsoletionTime = DateTimeOffset.Now;
+                            }
+                            else
+                            {
+                                existingTag.Value = tagValue;
+                            }
+                            context.Update(existingTag);
+                        }
+                        else
+                        {
+                            context.Insert(new DbActTag()
+                            {
+                                CreatedByKey = provenanceId,
+                                CreationTime = DateTimeOffset.Now,
+                                SourceKey = sourceKey,
+                                TagKey = tagName,
+                                Value = tagValue
+                            });
+                        }
+                    }
+                    else
+                    {
+                        throw new NotSupportedException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(ITaggable), null));
+                    }
+                    this.m_dataCache.Remove(sourceKey);
                 }
                 catch (Exception e)
                 {
                     throw new DataPersistenceException($"Error adding tag to {sourceKey}", e);
                 }
             }
+        }
+
+        /// <summary>
+        /// Save the specified tag against the specified source key
+        /// </summary>
+        public void Save(Guid sourceKey, ITag tag)
+        {
+            this.Save(sourceKey, tag.TagKey, tag.Value);
         }
     }
 }
