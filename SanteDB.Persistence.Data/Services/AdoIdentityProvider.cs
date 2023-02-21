@@ -310,8 +310,8 @@ namespace SanteDB.Persistence.Data.Services
                             if (dbUser.TwoFactorEnabled && String.IsNullOrEmpty(tfaSecret) &&
                                 dbUser.TwoFactorMechnaismKey.HasValue)
                             {
-                                this.m_tfaRelay.SendSecret(dbUser.TwoFactorMechnaismKey.Value, new AdoUserIdentity(dbUser));
-                                throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ));
+                                var secretString = this.m_tfaRelay.SendSecret(dbUser.TwoFactorMechnaismKey.Value, new AdoUserIdentity(dbUser));
+                                throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ, new { message = secretString }));
                             }
 
                             // TFA supplied?
