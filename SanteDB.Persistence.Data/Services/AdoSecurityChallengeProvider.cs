@@ -164,21 +164,26 @@ namespace SanteDB.Persistence.Data.Services
                             throw new LockedIdentityAuthenticationException(dbUser.Lockout.Value);
                         }
 
-                        // TFA required? Or not supplied?
+                        var identity = new AdoUserIdentity(dbUser);
+                        // Is the challenge a TFA code?
+                        if(challengeKey == dbUser.TwoFactorMechnaismKey.GetValueOrDefault())
+                        {
+                            tfaSecret = response;
+                        }
+
                         if (dbUser.TwoFactorEnabled && String.IsNullOrEmpty(tfaSecret) &&
                             dbUser.TwoFactorMechnaismKey.HasValue)
                         {
                             this.m_tfaRelay.SendSecret(dbUser.TwoFactorMechnaismKey.Value, new AdoUserIdentity(dbUser));
                             throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ));
                         }
-
-                        // TFA supplied?
-                        if (dbUser.TwoFactorEnabled && !this.m_tfaRelay.ValidateSecret(dbUser.TwoFactorMechnaismKey.Value, new AdoUserIdentity(dbUser), tfaSecret))
+                        else if (dbUser.TwoFactorEnabled && !this.m_tfaRelay.ValidateSecret(dbUser.TwoFactorMechnaismKey.Value, identity , tfaSecret))
                         {
                             throw new InvalidIdentityAuthenticationException();
                         }
 
-                        if (!context.Any<DbSecurityUserChallengeAssoc>(c => pepperResponses.Contains(c.ChallengeResponse) && c.ChallengeKey == challengeKey && c.ExpiryTime > DateTimeOffset.Now)) // Increment invalid
+                        if (challengeKey != dbUser.TwoFactorMechnaismKey.GetValueOrDefault() &&
+                            !context.Any<DbSecurityUserChallengeAssoc>(c => pepperResponses.Contains(c.ChallengeResponse) && c.ChallengeKey == challengeKey && c.ExpiryTime > DateTimeOffset.Now)) // Increment invalid
                         {
                             dbUser.InvalidLoginAttempts++;
                             if (dbUser.InvalidLoginAttempts > this.m_securityConfiguration.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxInvalidLogins, 5))
@@ -199,7 +204,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
                         else
                         {
-                            var identity = new AdoUserIdentity(dbUser, "LOCAL_CHALLENGE");
+                            identity = new AdoUserIdentity(dbUser, "LOCAL_CHALLENGE");
                             this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.Login, new AdoClaimsPrincipal(identity)); // must still be allowed to login
 
                             // Establish role

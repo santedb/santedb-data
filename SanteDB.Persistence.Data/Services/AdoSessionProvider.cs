@@ -341,18 +341,24 @@ namespace SanteDB.Persistence.Data.Services
 
 
                         // Create refresh data
-                        var refreshToken = new byte[32];
-                        System.Security.Cryptography.RandomNumberGenerator.Create().GetBytes(refreshToken);
+                        byte[] refreshToken = null;
                         var dbSession = new DbSession()
                         {
                             ApplicationKey = applicationKey.GetValueOrDefault(),
                             DeviceKey = deviceKey,
                             UserKey = userKey,
                             NotBefore = DateTimeOffset.Now,
-                            RemoteEndpoint = remoteEp,
-                            RefreshExpiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.RefreshLength, new TimeSpan(1, 0, 0))),
-                            RefreshToken = this.m_passwordHashingService.ComputeHash(refreshToken).HexEncode().ToLower()
+                            RemoteEndpoint = remoteEp
                         };
+
+                        // Sessions with 
+                        if(String.IsNullOrEmpty(purpose) && !isOverride)
+                        {
+                            refreshToken = new byte[32];
+                            System.Security.Cryptography.RandomNumberGenerator.Create().GetBytes(refreshToken);
+                            dbSession.RefreshExpiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.RefreshLength, new TimeSpan(1, 0, 0)));
+                            dbSession.RefreshToken = this.m_passwordHashingService.ComputeHash(refreshToken).HexEncode().ToLower();
+                        }
 
                         // Is the original principal already a session principal from another service? If so we should use its expiration
                         if (principal is ITokenPrincipal itp)
@@ -402,7 +408,7 @@ namespace SanteDB.Persistence.Data.Services
                             // Convert POU from Guid (which it should be) to a MNEMONIC
                             if (Guid.TryParse(purpose, out var purposeId))
                             {
-                                purpose = context.Query<DbConceptVersion>(o => o.StatusConceptKey == purposeId && o.ObsoletionTime == null).Select(o => o.Mnemonic).First();
+                                purpose = context.Query<DbConceptVersion>(o => o.Key == purposeId && o.ObsoletionTime == null).Select(o => o.Mnemonic).First();
                             }
                             claims.Add(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, purpose));
                         }

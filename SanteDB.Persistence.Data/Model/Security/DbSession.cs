@@ -63,13 +63,13 @@ namespace SanteDB.Persistence.Data.Model.Security
         /// <summary>
         /// Identifies the refresh token which can be used to refresh the session
         /// </summary>
-        [Column("rfrsh_tkn"), NotNull]
+        [Column("rfrsh_tkn")]
         public String RefreshToken { get; set; }
 
         /// <summary>
         /// Identifies the expiration of the refresh token
         /// </summary>
-        [Column("rfrsh_exp_utc"), NotNull]
+        [Column("rfrsh_exp_utc")]
         public DateTimeOffset RefreshExpiration { get; set; }
 
         /// <summary>

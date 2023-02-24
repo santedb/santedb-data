@@ -55,13 +55,13 @@ namespace SanteDB.Persistence.Data.Model.Security
         /// <summary>
         /// Gets the user that is associated with this challenge
         /// </summary>
-        [Column("usr_id"), ForeignKey(typeof(DbSecurityUser), nameof(DbSecurityUser.Key))]
+        [PrimaryKey, Column("usr_id"), ForeignKey(typeof(DbSecurityUser), nameof(DbSecurityUser.Key))]
         public Guid UserKey { get; set; }
 
         /// <summary>
         /// Gets or sets the associated challenge text
         /// </summary>
-        [Column("chl_id")]
+        [PrimaryKey, Column("chl_id")]
         public Guid ChallengeKey { get; set; }
 
         /// <summary>

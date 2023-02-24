@@ -85,4 +85,10 @@ create index sec_usr_name_pwd_idx on sec_usr_tbl (lower(usr_name), passwd);
 DROP INDEX IF EXISTS PROTO_NAME_UQ_IDX ;
 CREATE UNIQUE INDEX PROTO_OID_UQ_IDX ON PROTO_TBL(OID) WHERE (OBSLT_UTC IS NULL);
 ALTER TABLE FD_STG_SYSTBL ADD DESCR TEXT;
+ALTER TABLE sec_ses_tbl ALTER COLUMN rfrsh_exp_utc DROP NOT NULL;
+ALTER TABLE sec_ses_tbl ALTER COLUMN rfrsh_tkn DROP NOT NULL;
+ALTER TABLE sec_ses_tbl DROP CONSTRAINT ck_sec_ses_rfrsh_exp ;
+ALTER TABLE sec_ses_tbl ADD CONSTRAINT ck_sec_ses_rfrsh_exp CHECK (rfrsh_exp_utc IS NULL OR (rfrsh_exp_utc >= exp_utc));
+
+
 SELECT REG_PATCH('20221214-02'); 
