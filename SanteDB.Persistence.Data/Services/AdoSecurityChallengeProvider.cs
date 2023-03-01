@@ -165,8 +165,9 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         var identity = new AdoUserIdentity(dbUser);
+                        var challengeIsMfa = this.m_tfaRelay.Mechanisms.Any(m => m.Id == challengeKey);
                         // Is the challenge a TFA code?
-                        if(challengeKey == dbUser.TwoFactorMechnaismKey.GetValueOrDefault())
+                        if (challengeIsMfa)
                         {
                             tfaSecret = response;
                         }
@@ -182,8 +183,8 @@ namespace SanteDB.Persistence.Data.Services
                             throw new InvalidIdentityAuthenticationException();
                         }
 
-                        if (challengeKey != dbUser.TwoFactorMechnaismKey.GetValueOrDefault() &&
-                            !context.Any<DbSecurityUserChallengeAssoc>(c => pepperResponses.Contains(c.ChallengeResponse) && c.ChallengeKey == challengeKey && c.ExpiryTime > DateTimeOffset.Now)) // Increment invalid
+                        if (challengeIsMfa && !this.m_tfaRelay.ValidateSecret(challengeKey, identity, response) ||
+                            !challengeIsMfa && !context.Any<DbSecurityUserChallengeAssoc>(c => pepperResponses.Contains(c.ChallengeResponse) && c.ChallengeKey == challengeKey && c.ExpiryTime > DateTimeOffset.Now)) // Increment invalid
                         {
                             dbUser.InvalidLoginAttempts++;
                             if (dbUser.InvalidLoginAttempts > this.m_securityConfiguration.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxInvalidLogins, 5))
