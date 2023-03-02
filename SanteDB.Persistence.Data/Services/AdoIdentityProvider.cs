@@ -471,10 +471,13 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         // Abandon all sessions for this user
-                        foreach (var ses in context.Query<DbSession>(o => o.UserKey == dbUser.Key && o.NotAfter >= DateTimeOffset.Now).ToArray())
+                        if (this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AbandonSessionAfterPasswordReset, false))
                         {
-                            ses.NotAfter = DateTimeOffset.Now;
-                            context.Update(ses);
+                            foreach (var ses in context.Query<DbSession>(o => o.UserKey == dbUser.Key && o.NotAfter >= DateTimeOffset.Now).ToArray())
+                            {
+                                ses.NotAfter = DateTimeOffset.Now;
+                                context.Update(ses);
+                            }
                         }
 
                         // Save user
