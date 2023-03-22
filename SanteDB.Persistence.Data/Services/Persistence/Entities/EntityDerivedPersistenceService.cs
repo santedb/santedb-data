@@ -37,6 +37,7 @@ using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Extensibility;
 using SanteDB.Persistence.Data.Model.Roles;
 using SanteDB.Persistence.Data.Model.Security;
+using SanteDB.Persistence.Data.Model.Sys;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -325,6 +326,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             context.DeleteAll<DbPlace>(o => o.ParentKey == key);
 
             base.DoDeleteReferencesInternal(context, key);
+        }
+
+        /// <inheritdoc />
+        protected override void DoDeleteFreeTextIndexInternal(DataContext context, Guid key)
+        {
+            context.DeleteAll<DbEntityFreetextEntry>(o => o.Key == key);
+
+            base.DoDeleteFreeTextIndexInternal(context, key);
         }
 
         /// <summary>
