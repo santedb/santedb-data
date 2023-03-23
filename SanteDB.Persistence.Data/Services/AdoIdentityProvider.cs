@@ -106,7 +106,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// Gets the service name of the identity provider
         /// </summary>
-        public string ServiceName => "Data-Based Identity Provider";
+        public string ServiceName => "ADO.NET Identity Provider";
 
         /// <summary>
         /// Fired when the identity provider is authenticating a principal
