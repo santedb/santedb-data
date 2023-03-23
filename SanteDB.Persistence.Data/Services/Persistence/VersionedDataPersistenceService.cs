@@ -699,7 +699,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             this.DoDeleteReferencesInternal(context, existing.VersionKey);
                             context.DeleteAll<TDbModel>(o => o.VersionKey == existing.VersionKey);
                             // Reverse the history
-                            foreach (var ver in context.Query<TDbModel>(o => o.Key == existing.Key).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionKey))
+                            foreach (var ver in context.Query<TDbModel>(o => o.Key == existing.Key).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionKey).ToList())
                             {
                                 this.DoDeleteReferencesInternal(context, ver);
                                 context.DeleteAll<TDbModel>(o => o.VersionKey == ver);

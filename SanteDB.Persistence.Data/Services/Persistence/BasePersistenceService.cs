@@ -23,6 +23,7 @@ using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
@@ -32,6 +33,7 @@ using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model;
+using SanteDB.Persistence.Data.Model.Sys;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -395,6 +397,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 if (deleteMode == DeleteMode.PermanentDelete)
                 {
                     this.DoDeleteReferencesInternal(context, key);
+
+                    if (this.m_configuration.Provider.StatementFactory.GetFilterFunction("freetext") != null)
+                    {
+                        this.DoDeleteFreeTextIndexInternal(context, key);
+                    }
                 }
                 var dbInstance = this.DoDeleteInternal(context, key, deleteMode);
 
@@ -421,6 +428,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// The object <paramref name="key"/> is being purged - delete all references for the object
         /// </summary>
         protected abstract void DoDeleteReferencesInternal(DataContext context, Guid key);
+
+        /// <summary>
+        /// The object <paramref name="key"/> is being purged - delete freetext entries for the object.
+        /// </summary>
+        /// <param name="context">The data context where the purge transaction is taking place.</param>
+        /// <param name="key">The key of the object.</param>
+        protected virtual void DoDeleteFreeTextIndexInternal(DataContext context, Guid key)
+        {
+        }
 
         /// <summary>
         /// Perform a get operation returning a model

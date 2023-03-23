@@ -54,16 +54,20 @@ CREATE TABLE rel_vrfy_systbl (
 	CONSTRAINT fk_rel_vrfy_trg_cls_cd FOREIGN KEY (trg_cls_cd_id) REFERENCES cd_tbl(cd_id)
 );
 
+CREATE UNIQUE INDEX rel_vrfy_src_trg_unq ON rel_vrfy_systbl(rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id);
+
 INSERT INTO rel_vrfy_systbl 
 SELECT 
 	ent_rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, 1 AS rel_cs
 FROM 
-	ent_rel_vrfy_cdtbl;
+	ent_rel_vrfy_cdtbl
+ON CONFLICT DO NOTHING;
 
 DROP INDEX ent_rel_vrfy_src_trg_unq;
 DROP FUNCTION vrfy_ent_rel;
 DROP FUNCTION trg_vrfy_ent_rel_tbl CASCADE;
 DROP TABLE ENT_REL_VRFY_CDTBL;
+
 
 CREATE OR REPLACE FUNCTION trg_vrfy_ent_rel_tbl()
  RETURNS trigger
