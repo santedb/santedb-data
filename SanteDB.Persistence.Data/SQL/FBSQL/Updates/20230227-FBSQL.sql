@@ -33,6 +33,10 @@ AND NOT EXISTS (SELECT 1 FROM REL_VRFY_SYSTBL D WHERE
 	;--#!
 DELETE FROM REL_VRFY_SYSTBL WHERE SRC_CLS_CD_ID = char_to_uuid('d9489d56-ddac-4596-b5c6-8f41d73d8dc5') OR TRG_CLS_CD_ID = char_to_uuid('d9489d56-ddac-4596-b5c6-8f41d73d8dc5') --#!
 
+
+delete from cd_set_mem_assoc_tbl where set_id = char_to_uuid('3d02fb53-1133-406d-a06f-7d47a556f3bc') and cd_id = char_to_uuid('8cf4b0b0-84e5-4122-85fe-6afa8240c218');--#!
+delete from cd_set_mem_assoc_tbl where set_id = char_to_uuid('3d02fb53-1133-406d-a06f-7d47a556f3bc') and cd_id = char_to_uuid('d9489d56-ddac-4596-b5c6-8f41d73d8dc5');--#!
+delete from cd_set_mem_assoc_tbl where set_id = char_to_uuid('91dec343-1324-4fa4-8cea-4a1d0439908a') and cd_id = char_to_uuid('d9489d56-ddac-4596-b5c6-8f41d73d8dc5');--#!
  
 SELECT REG_PATCH('20230227-01') FROM RDB$DATABASE; --#!
 
