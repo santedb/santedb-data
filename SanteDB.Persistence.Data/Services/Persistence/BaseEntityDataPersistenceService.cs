@@ -52,9 +52,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public override SqlStatement GetCurrentVersionFilter(string tableAlias)
         {
-            var tableMap = TableMapping.Get(typeof(TDbModel));
-            var obsltCol = tableMap.GetColumn(nameof(DbBaseData.ObsoletionTime));
-            return new SqlStatement($"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
+            /*
+             var tableMap = TableMapping.Get(typeof(TDbModel));
+             var obsltCol = tableMap.GetColumn(nameof(DbBaseData.ObsoletionTime));
+             return new SqlStatement($"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
+            */
+            return null;
         }
 
         /// <inheritdoc/>

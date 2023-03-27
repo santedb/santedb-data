@@ -75,7 +75,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
                 }
-                else if (data == default(TData))
+                else if (data == default(TData) || data.IsEmpty())
                 {
                     return default(TData);
                 }

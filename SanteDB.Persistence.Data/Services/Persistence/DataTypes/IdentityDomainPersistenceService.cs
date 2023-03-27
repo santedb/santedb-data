@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-3-10
  */
+using DocumentFormat.OpenXml.Office2010.Excel;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -76,6 +77,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <returns>The inserted assigning authority</returns>
         protected override IdentityDomain DoInsertModel(DataContext context, IdentityDomain data)
         {
+
             var retVal = base.DoInsertModel(context, data);
             if (data.AuthorityScopeXml?.Any() == true)
             {
@@ -88,6 +90,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             {
                 retVal.AssigningAuthority = base.UpdateModelAssociations(context, retVal, data.AssigningAuthority).ToList();
             }
+
+            this.m_adhocCache?.Remove($"{DataConstants.AdhocAuthorityKey}{retVal.Key}");
+
             return retVal;
         }
 
