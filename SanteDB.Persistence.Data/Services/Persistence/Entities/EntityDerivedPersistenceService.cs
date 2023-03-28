@@ -476,7 +476,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             if (this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var subClassProvider) && subClassProvider is IAdoClassMapper edps)
             {
-                if(referenceObjects.Length == 0)
+                if (referenceObjects.Length == 0)
                 {
                     this.m_tracer.TraceWarning($"Fetching referenced objects - consider calling IDataPersistences<{typeof(TEntity).Name}> in the future");
                     referenceObjects = edps.GetReferencedObjects(context, dbModel) ?? new object[0];
@@ -557,6 +557,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 retVal.Telecoms = this.UpdateModelVersionedAssociations(context, retVal, data.Telecoms).ToList();
                 retVal.SetLoaded(o => o.Telecoms);
             }
+            if (data.GeoTag != null && data.GeoTag.Key.HasValue)
+            {
+                data.GeoTag.GetRelatedPersistenceService().Update(context, data.GeoTag);
+            }
 
             return retVal;
         }
@@ -625,6 +629,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 retVal.SetLoaded(o => o.Telecoms);
             }
 
+            if (data.GeoTag != null && data.GeoTag.Key.HasValue)
+            {
+                data.GeoTag.GetRelatedPersistenceService().Update(context, data.GeoTag);
+            }
+
             return retVal;
         }
 
@@ -639,7 +648,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc/>
         public object[] GetReferencedObjects(DataContext context, object dbModel)
         {
-            if(dbModel is DbEntityVersion ent)
+            if (dbModel is DbEntityVersion ent)
             {
                 return (this.ExecuteQueryOrm(context, o => o.Key == ent.Key && o.VersionKey == ent.VersionKey).FirstOrDefault() as CompositeResult)?.Values;
             }
