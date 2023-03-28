@@ -352,7 +352,7 @@ namespace SanteDB.Persistence.Data.Services
                         };
 
                         // Sessions with 
-                        if(String.IsNullOrEmpty(purpose) && !isOverride)
+                        if(String.IsNullOrEmpty(purpose) && !isOverride && userKey != null)
                         {
                             refreshToken = new byte[32];
                             System.Security.Cryptography.RandomNumberGenerator.Create().GetBytes(refreshToken);
