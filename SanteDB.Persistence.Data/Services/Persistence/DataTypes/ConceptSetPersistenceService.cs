@@ -60,6 +60,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                     SourceKey = retVal.Key.Value
                 })).Select(o => o.ConceptKey).ToList();
             }
+
+            if (data.Composition?.Any() == true)
+            {
+                retVal.Composition = base.UpdateModelAssociations(context, retVal, data.Composition).ToList();
+            }
             return retVal;
         }
 
@@ -75,6 +80,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                     SourceKey = retVal.Key.Value
                 }), o => o.SourceKey == data.Key).Select(o => o.ConceptKey).ToList();
             }
+            if (data.Composition?.Any() == true)
+            {
+                retVal.Composition = base.UpdateModelAssociations(context, retVal, data.Composition).ToList();
+            }
             return retVal;
         }
 
@@ -85,6 +94,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
             retVal.ConceptsXml = context.Query<DbConceptSetConceptAssociation>(o => o.SourceKey == dbModel.Key).Select(o => o.ConceptKey).ToList();
+
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            {
+                case LoadMode.FullLoad:
+                case LoadMode.SyncLoad:
+                    retVal.Composition = retVal.Composition.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    break;
+            }
             return retVal;
         }
 

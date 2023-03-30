@@ -123,6 +123,11 @@
     <property modelName="ModifiedOn" domainName="UpdatedTime" />
      <property modelName="Tag" queryOnly="true" domainName="Key" /> 
   </class>
+  <class modelClass="SanteDB.Core.Model.DataTypes.ConceptSetComposition, SanteDB.Core.Model"
+		domainClass="SanteDB.Persistence.Data.Model.Concepts.DbConceptSetComposition, SanteDB.Persistence.Data">
+    <property modelName="SourceEntityKey" domainName="SourceKey" />
+  </class>
+  
   <class modelClass="SanteDB.Core.Model.DataTypes.Concept, SanteDB.Core.Model"
          domainClass="SanteDB.Persistence.Data.Model.Concepts.DbConceptVersion, SanteDB.Persistence.Data">
     <property modelName="PreviousVersionKey" domainName="ReplacesVersionKey" />
