@@ -513,7 +513,7 @@ namespace SanteDB.Persistence.Data.Services
             }
         }
 
-        /// <inher
+        /// <inheritdoc/>
         public IForeignDataSubmission ToModelInstance(DataContext context, object result)
         {
             if (result is DbForeignDataStage dbfds)

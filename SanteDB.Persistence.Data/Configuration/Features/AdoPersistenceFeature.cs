@@ -111,10 +111,12 @@ namespace SanteDB.Persistence.Data.Configuration.Features
             /// </summary>
             public string Name => "Register ADO Providers";
 
+#pragma warning disable CS0067
             /// <summary>
             /// Progress has changed
             /// </summary>
             public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
+#pragma warning restore
 
             /// <summary>
             /// Execute the configuration

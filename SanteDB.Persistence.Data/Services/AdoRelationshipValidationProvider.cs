@@ -217,6 +217,7 @@ namespace SanteDB.Persistence.Data.Services
             }
         }
 
+        /// <inheritdoc/>
         public void RemoveRuleByKey<TRelationship>(Guid key) where TRelationship: ITargetedAssociation
         {
             if (key == Guid.Empty)

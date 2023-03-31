@@ -202,12 +202,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
 
-        /// <summary>
-        /// Perform an obsolete either logically (if configured) or a hard delete
-        /// </summary>
-        /// <param name="context">The context on which the delete should be performed</param>
-        /// <param name="key">The key of the object to be deleted</param>
-        /// <returns>The deleted/obsoleted object</returns>
+        /// <inheritdoc/>
         protected override TDbModel DoDeleteInternal(DataContext context, Guid key, DeleteMode deletionMode)
         {
 

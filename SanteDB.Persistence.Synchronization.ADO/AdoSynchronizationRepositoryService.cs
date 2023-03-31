@@ -50,6 +50,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
     {
         private Tracer _Tracer;
 
+        /// <inheritdoc/>
         public string ServiceName => "ADO.NET Synchronization Repository";
 
         readonly AdoSynchronizationConfigurationSection _Configuration;

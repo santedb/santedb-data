@@ -753,8 +753,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected override Expression<Func<TModel, bool>> ApplyDefaultQueryFilters(Expression<Func<TModel, bool>> query)
         {
 
-            //// First - we determine if the query has an explicit status concept set
-            /// We don't need this anymore since we are using HEAD versions
+            // First - we determine if the query has an explicit status concept set
+            // We don't need this anymore since we are using HEAD versions
             //if (typeof(IHasState).IsAssignableFrom(typeof(TModel)) && !query.ToString().Contains(nameof(IHasState.StatusConceptKey)))
             //{
             //    var statusKeyProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IHasState.StatusConceptKey)));

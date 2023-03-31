@@ -91,6 +91,14 @@ namespace SanteDB.Persistence.Data.Model.Concepts
         public Guid ConceptKey { get; set; }
 
         /// <summary>
+        /// Get the hash code
+        /// </summary>
+        public override int GetHashCode()
+        {
+            return this.SourceKey.GetHashCode() + this.ConceptKey.GetHashCode();
+        }
+
+        /// <summary>
         /// Determine equality of this relationship and another
         /// </summary>
         public override bool Equals(object obj)

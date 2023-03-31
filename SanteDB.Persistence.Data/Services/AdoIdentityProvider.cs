@@ -935,7 +935,7 @@ namespace SanteDB.Persistence.Data.Services
                     this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(retVal.Identity.Name, retVal, true));
                     return retVal;
                 }
-                catch(AuthenticationException e)
+                catch(AuthenticationException)
                 {
                     throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_INVALID));
                 }
