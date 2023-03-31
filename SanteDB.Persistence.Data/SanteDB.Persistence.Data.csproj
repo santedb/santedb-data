@@ -197,9 +197,6 @@
     <EmbeddedResource Include="SQL\PSQL\Updates\20230330-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQL\PSQL\Updates\20230328-PSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
     <EmbeddedResource Include="SQL\SQLITE\20221003.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20221027.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20221130.sql" />
