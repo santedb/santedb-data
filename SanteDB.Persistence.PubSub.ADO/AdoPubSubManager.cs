@@ -105,6 +105,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         // Ado Pub Sub Manager Tracer source
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoPubSubManager));
 
+#pragma warning disable CS0067
         /// <summary>
         /// Fired when subscribing is about to occur
         /// </summary>
@@ -144,7 +145,10 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// Fired after deactivation
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<PubSubSubscriptionDefinition>> DeActivated;
+
+        /// <inheritdoc/>
         public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
+#pragma warning restore
 
         /// <summary>
         /// Retrieve the specified channel by ID
