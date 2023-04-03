@@ -127,28 +127,21 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             remove { this.Deleted -= value; }
         }
 
-        /// <summary>
-        /// Fired when data is being retrieved
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DataRetrievingEventArgs<AuditEventData>> Retrieving;
 
-        /// <summary>
-        /// Fired when data is has been retrieved
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DataRetrievedEventArgs<AuditEventData>> Retrieved;
 
-        /// <summary>
-        /// Fired when data is being queryed
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<QueryRequestEventArgs<AuditEventData>> Querying;
 
-        /// <summary>
-        /// Fired when data is has been queried
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<QueryResultEventArgs<AuditEventData>> Queried;
-
+        /// <inheritdoc/>
         public event EventHandler<DataPersistedEventArgs<AuditEventData>> Deleted;
 
+        /// <inheritdoc/>
         public event EventHandler<DataPersistingEventArgs<AuditEventData>> Deleting;
 
 
@@ -613,6 +606,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             return tr;
         }
 
+#pragma warning disable CS0612
         /// <summary>
         /// Execute a query
         /// </summary>
@@ -649,6 +643,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 throw;
             }
         }
+#pragma warning restore
 
         /// <summary>
         /// Executes a query for the specified objects

@@ -332,11 +332,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 #endif
         }
 
-        /// <summary>
-        /// Obsolete the specified object which for the generic identified data persistene service means deletion
-        /// </summary>
-        /// <param name="context">The context on which the obsoletion should occur</param>
-        /// <param name="key">The key of the object to delete</param>
+        /// <inheritdoc/>
         protected override TDbModel DoDeleteInternal(DataContext context, Guid key, DeleteMode deletionMode)
         {
             if (context == null)

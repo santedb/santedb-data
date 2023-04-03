@@ -44,6 +44,9 @@ namespace SanteDB.Persistence.Data.Docker
         /// </summary>
         public const string ReadonlyConnectionSetting = "RO_CONNECTION";
 
+        /// <summary>
+        /// The versioning policy to set on the instance
+        /// </summary>
         public const string VersioningPolicySetting = "VERSIONING";
 
         /// <summary>

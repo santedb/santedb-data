@@ -50,6 +50,11 @@ namespace SanteDB.Persistence.Data.Model
         public abstract Guid Key { get; set; }
 
         /// <summary>
+        /// Get hash code
+        /// </summary>
+        public override int GetHashCode() => this.Key.GetHashCode();
+
+        /// <summary>
         /// Return whether the object has value equality
         /// </summary>
         public override bool Equals(object obj)

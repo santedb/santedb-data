@@ -29,6 +29,9 @@ namespace SanteDB.Persistence.Data.Model.Error
     /// </summary>
     public class FunctionErrorCode
     {
+        /// <summary>
+        /// Gets the error code
+        /// </summary>
 
         [Column("err_code")]
         public String ErrorCode { get; set; }
