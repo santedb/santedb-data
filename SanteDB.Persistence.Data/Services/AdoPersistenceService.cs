@@ -92,7 +92,7 @@ namespace SanteDB.Persistence.Data.Services
                 pservice.Provider = this.m_configuration.Provider;
                 serviceManager.AddServiceProvider(pservice);
                 this.m_services.Add(pservice);
-                if(pservice is IReportProgressChanged irpc) // Cascade these status updates
+                if (pservice is IReportProgressChanged irpc) // Cascade these status updates
                 {
                     irpc.ProgressChanged += (o, e) => this.ProgressChanged?.Invoke(o, e);
                 }
@@ -101,7 +101,7 @@ namespace SanteDB.Persistence.Data.Services
             serviceManager.AddServiceProvider(typeof(AdoRelationshipValidationProvider));
             serviceManager.AddServiceProvider(typeof(AdoDatasetInstallerService));
 
-            if(jobManager.GetJobInstance(OptimizeDatabaseJob.ID) == null)
+            if (jobManager.GetJobInstance(OptimizeDatabaseJob.ID) == null)
             {
                 var job = serviceManager.CreateInjected<OptimizeDatabaseJob>();
                 jobManager.AddJob(job, JobStartType.DelayStart);
@@ -211,18 +211,10 @@ namespace SanteDB.Persistence.Data.Services
         public bool TryCreateService(Type serviceType, out object serviceInstance)
         {
             var knownServiceType = this.m_serviceFactoryTypes.FirstOrDefault(o => serviceType.IsAssignableFrom(o));
-            if(knownServiceType != null)
+            if (knownServiceType != null)
             {
-                try
-                {
-                    serviceInstance = this.m_serviceManager.CreateInjected(knownServiceType);
-                    return true;
-                }
-                catch (InvalidOperationException)
-                {
-                    serviceInstance = null;
-                    return false;
-                }
+                serviceInstance = this.m_serviceManager.CreateInjected(knownServiceType);
+                return true;
             }
             serviceInstance = this.m_services.FirstOrDefault(o => serviceType.IsAssignableFrom(o.GetType()));
             return serviceInstance != null;
