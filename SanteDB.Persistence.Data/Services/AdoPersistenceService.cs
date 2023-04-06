@@ -213,8 +213,16 @@ namespace SanteDB.Persistence.Data.Services
             var knownServiceType = this.m_serviceFactoryTypes.FirstOrDefault(o => serviceType.IsAssignableFrom(o));
             if(knownServiceType != null)
             {
-                serviceInstance = this.m_serviceManager.CreateInjected(knownServiceType);
-                return true;
+                try
+                {
+                    serviceInstance = this.m_serviceManager.CreateInjected(knownServiceType);
+                    return true;
+                }
+                catch (InvalidOperationException)
+                {
+                    serviceInstance = null;
+                    return false;
+                }
             }
             serviceInstance = this.m_services.FirstOrDefault(o => serviceType.IsAssignableFrom(o.GetType()));
             return serviceInstance != null;
