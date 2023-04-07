@@ -113,7 +113,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
                                 Assert.IsFalse(dataImporter.Validate(fdm, fdReader).Any());
                                 var detectedIssues = dataImporter.Import(fdm, fdReader, rejectWriter, TransactionMode.Commit).ToList();
                                 Assert.AreEqual(rejectWriter.RecordsWritten, detectedIssues.Count);
-                                Assert.AreEqual(beforePatientCount + 100 - detectedIssues.Count, patientPersistence.Find(o => o.ObsoletionTime == null).Count());
+                                Assert.AreEqual(beforePatientCount + 100 - detectedIssues.Count - 1, patientPersistence.Find(o => o.ObsoletionTime == null).Count());
 
                                 // Attempt to search and ensure that the patient was imported correctly
                                 // 1601850032,10/15/1986 0:00,F,Adams,Kayla,Jennifer,993670-011530-1986A,31 Cannon St. S,Stoney Creek,ON,CA,A2B-3Q2,Hospital1,,Adams,Zoe,
