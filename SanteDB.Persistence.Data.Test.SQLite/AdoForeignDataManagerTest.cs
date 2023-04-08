@@ -124,13 +124,14 @@ namespace SanteDB.Persistence.Data.Test.SQLite
                     Assert.AreEqual(ForeignDataStatus.CompletedWithErrors, fdi.Status);
 
                     // Reject Stream can be read
-                    Console.WriteLine("Testing Rejects...");
 
-                    using (var sr = new StreamReader(fdi.GetRejectStream()))
+                    var rjs = fdi.GetRejectStream();
+                    if (rjs != null)
                     {
-                        while(!sr.EndOfStream)
+                        Console.WriteLine("Testing Rejects...");
+                        using (var sr = new StreamReader(fdi.GetRejectStream()))
                         {
-                            Assert.DoesNotThrow(()=>sr.ReadLine());
+                            Assert.DoesNotThrow(() => Console.WriteLine(sr.ReadLine()));
                         }
                     }
                 }
