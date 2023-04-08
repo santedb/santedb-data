@@ -52,6 +52,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
             using (AuthenticationContext.EnterSystemContext())
             {
 
+                Trace.TraceInformation("Setting up data...");
                 if (!placePersistenceService.Find(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Clinic1"))).Any())
                 {
                     placePersistenceService.Insert(new Place()
@@ -87,6 +88,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
 
                 var foreignDataManager = ApplicationServiceContext.Current.GetService<IForeignDataManagerService>();
                 Assert.IsNotNull(foreignDataManager);
+                Trace.TraceInformation("Testing Issue Generation...");
 
                 // Test - cannot find map
                 using (var fds = typeof(AdoForeignDataManagerTest).Assembly.GetManifestResourceStream("SanteDB.Persistence.Data.Test.SQLite.Resources.BadPatients.csv"))
@@ -101,6 +103,9 @@ namespace SanteDB.Persistence.Data.Test.SQLite
 
 
                 }
+
+                Trace.TraceInformation("Testing Stage...");
+
                 using (var fds = typeof(AdoForeignDataManagerTest).Assembly.GetManifestResourceStream("SanteDB.Persistence.Data.Test.SQLite.Resources.Patients.csv"))
                 {
                     var fdi = foreignDataManager.Stage(fds, "patients.csv", "test", Guid.Parse("4ABA7190-B975-4623-92A2-7EF105E0C428"));
@@ -110,15 +115,22 @@ namespace SanteDB.Persistence.Data.Test.SQLite
                     Assert.AreEqual(ForeignDataStatus.Scheduled, fdi.Status);
                     var results = foreignDataManager.Find(o => o.Status == ForeignDataStatus.Scheduled);
                     Assert.AreEqual(1, results.Count());
+                    Console.WriteLine("Testing Execute...");
+
+                    if (foreignDataManager is IReportProgressChanged irpt)
+                        irpt.ProgressChanged += (o, e) => Trace.TraceInformation(e.State);
+
                     fdi = foreignDataManager.Execute(results.First().Key.Value);
                     Assert.AreEqual(ForeignDataStatus.CompletedWithErrors, fdi.Status);
 
                     // Reject Stream can be read
-                    using(var sr = new StreamReader(fdi.GetRejectStream()))
+                    Trace.TraceInformation("Testing Rejects...");
+
+                    using (var sr = new StreamReader(fdi.GetRejectStream()))
                     {
                         while(!sr.EndOfStream)
                         {
-                            Debug.WriteLine(sr.ReadLine());
+                            Assert.DoesNotThrow(()=>sr.ReadLine());
                         }
                     }
                 }
