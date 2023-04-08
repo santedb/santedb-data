@@ -52,7 +52,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
             using (AuthenticationContext.EnterSystemContext())
             {
 
-                Trace.TraceInformation("Setting up data...");
+                Console.WriteLine("Setting up data...");
                 if (!placePersistenceService.Find(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Clinic1"))).Any())
                 {
                     placePersistenceService.Insert(new Place()
@@ -88,7 +88,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
 
                 var foreignDataManager = ApplicationServiceContext.Current.GetService<IForeignDataManagerService>();
                 Assert.IsNotNull(foreignDataManager);
-                Trace.TraceInformation("Testing Issue Generation...");
+                Console.WriteLine("Testing Issue Generation...");
 
                 // Test - cannot find map
                 using (var fds = typeof(AdoForeignDataManagerTest).Assembly.GetManifestResourceStream("SanteDB.Persistence.Data.Test.SQLite.Resources.BadPatients.csv"))
@@ -104,7 +104,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
 
                 }
 
-                Trace.TraceInformation("Testing Stage...");
+                Console.WriteLine("Testing Stage...");
 
                 using (var fds = typeof(AdoForeignDataManagerTest).Assembly.GetManifestResourceStream("SanteDB.Persistence.Data.Test.SQLite.Resources.Patients.csv"))
                 {
@@ -118,13 +118,13 @@ namespace SanteDB.Persistence.Data.Test.SQLite
                     Console.WriteLine("Testing Execute...");
 
                     if (foreignDataManager is IReportProgressChanged irpt)
-                        irpt.ProgressChanged += (o, e) => Trace.TraceInformation(e.State);
+                        irpt.ProgressChanged += (o, e) => Console.WriteLine(e.State);
 
                     fdi = foreignDataManager.Execute(results.First().Key.Value);
                     Assert.AreEqual(ForeignDataStatus.CompletedWithErrors, fdi.Status);
 
                     // Reject Stream can be read
-                    Trace.TraceInformation("Testing Rejects...");
+                    Console.WriteLine("Testing Rejects...");
 
                     using (var sr = new StreamReader(fdi.GetRejectStream()))
                     {
