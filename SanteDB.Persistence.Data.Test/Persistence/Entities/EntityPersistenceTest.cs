@@ -328,6 +328,9 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     Identifiers = new List<Core.Model.DataTypes.EntityIdentifier>()
                     {
                         new Core.Model.DataTypes.EntityIdentifier(new IdentityDomain("TEST_3", "TESTING", "1.2.3.4.5.5"), "TEST3")
+                        {
+                            IdentifierTypeKey = IdentifierTypeKeys.Employer
+                        }
                     }
                 };
 
@@ -339,6 +342,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 var afterFetch = fetch.First();
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Identifiers).Count);
                 Assert.AreEqual("TEST_3", afterFetch.Identifiers[0].LoadProperty(o => o.IdentityDomain).DomainName);
+                Assert.AreEqual(IdentifierTypeKeys.Employer, afterFetch.Identifiers[0].IdentifierTypeKey);
             }
         }
 

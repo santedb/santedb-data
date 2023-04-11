@@ -238,12 +238,6 @@
      <property modelName="Tag" queryOnly="true" domainName="Key" /> 
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.IdentifierType, SanteDB.Core.Model"
-         domainClass="SanteDB.Persistence.Data.Model.DataType.DbIdentifierType, SanteDB.Persistence.Data">
-    <property modelName="ModifiedOn" domainName="CreationTime" />
-     <property modelName="Tag" queryOnly="true" domainName="Key" /> 
-  </class>
-
   <class modelClass="SanteDB.Core.Model.DataTypes.GeoTag, SanteDB.Core.Model"
        domainClass="SanteDB.Persistence.Data.Model.DataType.DbGeoTag, SanteDB.Persistence.Data">
      <property modelName="Tag" queryOnly="true" domainName="Key" /> 

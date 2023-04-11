@@ -21,6 +21,7 @@
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Acts;
+using SanteDB.Persistence.Data.Model.Concepts;
 using SanteDB.Persistence.Data.Model.Entities;
 using System;
 
@@ -49,7 +50,7 @@ namespace SanteDB.Persistence.Data.Model.DataType
         /// Gets or sets the type identifier.
         /// </summary>
         /// <value>The type identifier.</value>
-        [Column("id_typ_id"), ForeignKey(typeof(DbIdentifierType), nameof(DbIdentifierType.Key))]
+        [Column("typ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid? TypeKey
         {
             get;
