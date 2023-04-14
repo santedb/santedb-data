@@ -520,6 +520,10 @@ namespace SanteDB.Persistence.Data.Services
             {
                 return new AdoForeignDataSubmission(dbfds, context.Query<DbForeignDataIssue>(o => o.SourceKey == dbfds.Key).ToArray(), this.m_streamManager);
             }
+            else if(result == null)
+            {
+                return null;
+            }
             else
             {
                 throw new ArgumentOutOfRangeException(nameof(result));
