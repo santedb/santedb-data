@@ -30,6 +30,7 @@ using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Test.SQLite
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class TestForeignDataMapRepository : IRepositoryService<ForeignDataMap>
     {
 

@@ -44,7 +44,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Creates a new tag persistence service
         /// </summary>
-        public TagPersistenceService(IConfigurationManager configurationManager, IDataCachingService dataCachingService)
+        public TagPersistenceService(IConfigurationManager configurationManager, IDataCachingService dataCachingService = null)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_dataCache = dataCachingService;
@@ -136,7 +136,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     {
                         throw new NotSupportedException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(ITaggable), null));
                     }
-                    this.m_dataCache.Remove(sourceKey);
+                    this.m_dataCache?.Remove(sourceKey);
                 }
                 catch (Exception e)
                 {

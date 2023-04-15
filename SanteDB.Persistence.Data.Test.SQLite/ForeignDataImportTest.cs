@@ -41,6 +41,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
     /// <summary>
     /// Foreign data importer test needs the database to insert into database
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class ForeignDataImportTest : DataPersistenceTest
     {
 

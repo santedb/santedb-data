@@ -42,6 +42,14 @@ namespace SanteDB.Persistence.Data.Model.Acts
         [Column("proto_name")]
         public String Name { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets the name
+        /// </summary>
+        [Column("group_id")]
+        public String GroupId { get; set; }
+
+
         /// <summary>
         /// Gets or sets the handler identifier
         /// </summary>

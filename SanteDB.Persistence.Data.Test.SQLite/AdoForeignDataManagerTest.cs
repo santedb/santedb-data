@@ -38,6 +38,7 @@ using System.Threading.Tasks;
 namespace SanteDB.Persistence.Data.Test.SQLite
 {
     [TestFixture]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class AdoForeignDataManagerTest : DataPersistenceTest
     {
 
