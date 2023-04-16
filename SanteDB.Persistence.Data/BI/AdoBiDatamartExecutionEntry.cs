@@ -1,4 +1,4 @@
-﻿using SanteDB.BI.Datamart;
+﻿using SanteDB.BI.Datamart.DataFlow;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Model.Sys;
@@ -12,7 +12,7 @@ namespace SanteDB.Persistence.Data.BI
     /// <summary>
     /// Represetns a BI datamart log entry stored in the database
     /// </summary>
-    internal class AdoBiDatamartExecutionEntry : IBiDatamartExecutionEntry
+    internal class AdoBiDatamartExecutionEntry : IDataFlowExecutionEntry
     {
 
         private readonly IDbProvider m_dbProvider;
@@ -35,10 +35,10 @@ namespace SanteDB.Persistence.Data.BI
         public Guid? Key { get; }
 
         /// <inheritdoc/>
-        public BiExecutionPurposeType Purpose { get; }
+        public DataFlowExecutionPurposeType Purpose { get; }
 
         /// <inheritdoc/>
-        public BiExecutionOutcomeType Outcome { get; }
+        public DataFlowExecutionOutcomeType Outcome { get; }
 
         /// <inheritdoc/>
         public DateTimeOffset Started { get; }
@@ -58,7 +58,7 @@ namespace SanteDB.Persistence.Data.BI
         /// <summary>
         /// Log entries
         /// </summary>
-        public IEnumerable<IBiDatamartLogEntry> LogEntries
+        public IEnumerable<IDataFlowLogEntry> LogEntries
         {
             get
             {

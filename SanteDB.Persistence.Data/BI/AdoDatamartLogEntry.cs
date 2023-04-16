@@ -1,4 +1,4 @@
-﻿using SanteDB.BI.Datamart;
+﻿using SanteDB.BI.Datamart.DataFlow;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
@@ -7,9 +7,9 @@ using System.Diagnostics.Tracing;
 namespace SanteDB.Persistence.Data.BI
 {
     /// <summary>
-    /// Represents a <see cref="IBiDatamartLogEntry"/> which is generated from ADO data
+    /// Represents a <see cref="IDataFlowLogEntry"/> which is generated from ADO data
     /// </summary>
-    internal class AdoDatamartLogEntry : IBiDatamartLogEntry
+    internal class AdoDatamartLogEntry : IDataFlowLogEntry
     {
 
         /// <summary>

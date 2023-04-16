@@ -56,6 +56,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
             public string Name => this.m_protocol.Name;
 
             public string Version => "1.0";
+            public string GroupId => "SAMPLE_TESTS";
 
             public IEnumerable<Act> Calculate(Patient p, IDictionary<string, object> parameters)
             {

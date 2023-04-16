@@ -1,4 +1,5 @@
 ﻿using SanteDB.BI.Datamart;
+using SanteDB.BI.Datamart.DataFlow;
 using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.OrmLite.Providers;
@@ -11,9 +12,9 @@ using System.Text;
 namespace SanteDB.Persistence.Data.BI
 {
     /// <summary>
-    /// A <see cref="IBiDatamart"/> which is derived from ADO.NET storage tables
+    /// A <see cref="IDatamart"/> which is derived from ADO.NET storage tables
     /// </summary>
-    internal class AdoBiDatamart : IBiDatamart
+    internal class AdoBiDatamart : IDatamart
     {
         private readonly IDbProvider m_provider;
 
@@ -47,7 +48,7 @@ namespace SanteDB.Persistence.Data.BI
         public string Version { get; }
 
         /// <inheritdoc/>
-        public IEnumerable<IBiDatamartExecutionEntry> Executions
+        public IEnumerable<IDataFlowExecutionEntry> FlowExecutions
         {
             get
             {

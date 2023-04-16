@@ -1,5 +1,6 @@
 ﻿using SanteDB.BI.Datamart;
 using SanteDB.BI.Datamart.DataFlow;
+using SanteDB.BI.Diagnostics;
 using SanteDB.BI.Model;
 using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Exceptions;
@@ -25,34 +26,41 @@ namespace SanteDB.Persistence.Data.BI
     /// <summary>
     /// An ADO.NET data flow execution context
     /// </summary>
-    internal class AdoDataFlowExecutionContext : IBiDataFlowExecutionContext
+    internal class AdoDataFlowExecutionContext : IDataFlowExecutionContext
     {
         private readonly IConfigurationManager m_configurationManager;
         private readonly AdoPersistenceConfigurationSection m_configuration;
 
         /// <inheritdoc/>
-        public BiExecutionPurposeType Purpose { get; }
+        public DataFlowExecutionPurposeType Purpose { get; }
 
         /// <inheritdoc/>
         public Guid Key { get; }
 
         /// <inheritdoc/>
-        public IBiDatamart Datamart { get; }
+        public IDatamart Datamart { get; }
+
+        /// <inheritdoc/>
+        public IDataFlowDiagnosticSession DiagnosticSession { get; }
 
         /// <summary>
         /// Creates a new data flow execution context
         /// </summary>
-        public AdoDataFlowExecutionContext(IConfigurationManager configurationManager, IBiDatamart datamartForExecution, BiExecutionPurposeType biExecutionPurpose)
+        public AdoDataFlowExecutionContext(IConfigurationManager configurationManager, IDatamart datamartForExecution, DataFlowExecutionPurposeType biExecutionPurpose)
         {
             this.m_configurationManager = configurationManager;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.Purpose = biExecutionPurpose;
             this.Datamart = datamartForExecution;
             this.Key = Guid.NewGuid();
+            if(biExecutionPurpose.HasFlag(DataFlowExecutionPurposeType.Diagnostics))
+            {
+                this.DiagnosticSession = new DataFlowDiagnosticSession(this);
+            }
         }
 
         /// <inheritdoc/>
-        internal IBiDataFlowExecutionContext LogStart()
+        internal IDataFlowExecutionContext LogStart()
         {
             try
             {
@@ -69,7 +77,7 @@ namespace SanteDB.Persistence.Data.BI
                         CreatedByKey = context.EstablishProvenance(AuthenticationContext.Current.Principal),
                         DatamartKey = this.Datamart.Key.Value,
                         Key = this.Key,
-                        Outcome = BiExecutionOutcomeType.Unknown,
+                        Outcome = DataFlowExecutionOutcomeType.Unknown,
                         StartTime = DateTimeOffset.Now,
                         Purpose = this.Purpose
                     });
@@ -117,7 +125,7 @@ namespace SanteDB.Persistence.Data.BI
 
 
         /// <inheritdoc/>
-        public void SetOutcome(BiExecutionOutcomeType outcome)
+        public void SetOutcome(DataFlowExecutionOutcomeType outcome)
         {
             try
             {
@@ -146,7 +154,7 @@ namespace SanteDB.Persistence.Data.BI
         }
 
         /// <inheritdoc/>
-        public IBiDataIntegrator GetIntegrator(BiDataSourceDefinition dataSource)
+        public IDataIntegrator GetIntegrator(BiDataSourceDefinition dataSource)
         {
             var databaseProvider = this.m_configuration.Provider; // database provider - assume same as our ADO context
 
@@ -181,7 +189,7 @@ namespace SanteDB.Persistence.Data.BI
         }
 
         /// <inheritdoc/>
-        public IBiDatamartLogEntry Log(EventLevel priority, string logText)
+        public IDataFlowLogEntry Log(EventLevel priority, string logText)
         {
             try
             {
@@ -206,5 +214,6 @@ namespace SanteDB.Persistence.Data.BI
                 throw new DataPersistenceException(ErrorMessages.GENERAL_QUERY_ERROR, e);
             }
         }
+
     }
 }

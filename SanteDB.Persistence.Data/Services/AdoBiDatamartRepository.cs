@@ -55,7 +55,7 @@ namespace SanteDB.Persistence.Data.Services
     /// Represents an implementation of the BI datamart manager which uses the primary ADO storage to store 
     /// metadata about the other datamarts which are available on the SanteDB server
     /// </summary>
-    public class AdoBiDatamartRepository : IBiDatamartRepository, IMappedQueryProvider<IBiDatamart>
+    public class AdoBiDatamartRepository : IBiDatamartRepository, IMappedQueryProvider<IDatamart>
     {
         private readonly IConfigurationManager m_configurationManager;
 
@@ -87,9 +87,9 @@ namespace SanteDB.Persistence.Data.Services
         public IQueryPersistenceService QueryPersistence => throw new NotSupportedException();
 
         /// <inheritdoc/>
-        public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<IBiDatamart, bool>> query)
+        public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<IDatamart, bool>> query)
         {
-            var expression = this.m_modelMapper.MapModelExpression<IBiDatamart, DbDatamartRegistration, bool>(query, false);
+            var expression = this.m_modelMapper.MapModelExpression<IDatamart, DbDatamartRegistration, bool>(query, false);
             if (!query.ToString().Contains(nameof(BaseEntityData.ObsoletionTime)))
             {
                 var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(expression.Parameters[0], typeof(DbBaseData).GetProperty(nameof(DbBaseData.ObsoletionTime))), Expression.Constant(null));
@@ -100,17 +100,17 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public IQueryResultSet<IBiDatamart> Find(Expression<Func<IBiDatamart, bool>> query)
+        public IQueryResultSet<IDatamart> Find(Expression<Func<IDatamart, bool>> query)
         {
             if (query == null)
             {
                 throw new ArgumentNullException(nameof(query));
             }
-            return new MappedQueryResultSet<IBiDatamart>(this).Where(query);
+            return new MappedQueryResultSet<IDatamart>(this).Where(query);
         }
 
         /// <inheritdoc/>
-        public IBiDatamart Get(DataContext context, Guid key) => new AdoBiDatamart(context.FirstOrDefault<DbDatamartRegistration>(o => o.Key == key), this.m_configuration.Provider);
+        public IDatamart Get(DataContext context, Guid key) => new AdoBiDatamart(context.FirstOrDefault<DbDatamartRegistration>(o => o.Key == key), this.m_configuration.Provider);
 
         /// <inheritdoc/>
         public SqlStatement GetCurrentVersionFilter(string tableAlias)
@@ -121,26 +121,26 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public IBiDataFlowExecutionContext GetExecutionContext(IBiDatamart datamart, BiExecutionPurposeType purpose)
+        public IDataFlowExecutionContext GetExecutionContext(IDatamart datamart, DataFlowExecutionPurposeType purpose)
         {
             if(datamart == null)
             {
                 throw new ArgumentNullException(nameof(datamart));
             }
 
-            if (purpose.HasFlag(BiExecutionPurposeType.Discovery))
+            if (purpose.HasFlag(DataFlowExecutionPurposeType.Discovery))
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.ReadWarehouseData);
             }
-            else if(purpose.HasFlag(BiExecutionPurposeType.DatabaseManagement))
+            else if(purpose.HasFlag(DataFlowExecutionPurposeType.DatabaseManagement))
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration);
             }
-            else if(purpose.HasFlag(BiExecutionPurposeType.SchemaManagement))
+            else if(purpose.HasFlag(DataFlowExecutionPurposeType.SchemaManagement))
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.AdministerWarehouse);
             }
-            else if(purpose.HasFlag(BiExecutionPurposeType.Refresh))
+            else if(purpose.HasFlag(DataFlowExecutionPurposeType.Refresh))
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.WriteWarehouseData);
             }
@@ -149,10 +149,10 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public LambdaExpression MapExpression<TReturn>(Expression<Func<IBiDatamart, TReturn>> sortExpression) => this.m_modelMapper.MapModelExpression<IBiDatamart, DbDatamartRegistration, TReturn>(sortExpression, false);
+        public LambdaExpression MapExpression<TReturn>(Expression<Func<IDatamart, TReturn>> sortExpression) => this.m_modelMapper.MapModelExpression<IDatamart, DbDatamartRegistration, TReturn>(sortExpression, false);
 
         /// <inheritdoc/>
-        public IBiDatamart Register(BiDatamartDefinition dataMartDefinition)
+        public IDatamart Register(BiDatamartDefinition dataMartDefinition)
         {
             if (dataMartDefinition == null)
             {
@@ -218,7 +218,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public IBiDatamart ToModelInstance(DataContext context, object result)
+        public IDatamart ToModelInstance(DataContext context, object result)
         {
             if (result is DbDatamartRegistration dbfds)
             {
@@ -235,7 +235,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public void Unregister(IBiDatamart datamart)
+        public void Unregister(IDatamart datamart)
         {
             if (datamart == null)
             {

@@ -1,4 +1,5 @@
 ﻿using SanteDB.BI.Datamart;
+using SanteDB.BI.Datamart.DataFlow;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
@@ -29,13 +30,13 @@ namespace SanteDB.Persistence.Data.Model.Sys
         /// Gets or sets the type of the log entry
         /// </summary>
         [Column("TYP_CS"), NotNull]
-        public BiExecutionPurposeType Purpose { get; set; }
+        public DataFlowExecutionPurposeType Purpose { get; set; }
 
         /// <summary>
         /// Gets or sets the outcome of the log entry (if known)
         /// </summary>
         [Column("OUTC_CS"), NotNull]
-        public BiExecutionOutcomeType Outcome { get; set; }
+        public DataFlowExecutionOutcomeType Outcome { get; set; }
 
         /// <summary>
         /// Gets or sets the start time
