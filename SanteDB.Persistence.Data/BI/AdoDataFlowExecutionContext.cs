@@ -165,7 +165,8 @@ namespace SanteDB.Persistence.Data.BI
             }
             else if (String.IsNullOrEmpty(dataSource.ConnectionString))
             {
-                connectionString = this.m_configurationManager.GetConnectionString($"bi.marts") ??
+                // TODO: Move this to a configuration variable in the Ado
+                connectionString = this.m_configurationManager.GetConnectionString(this.m_configuration.WarehouseConnectionStringSkel ?? "bi.marts") ??
                      new ConnectionString(this.m_configuration.Provider.Invariant, this.m_configuration.Provider.ConnectionString); // Allow the administrator to change or manually set this data to another server in config
 
                 // We have to create a connection string?
@@ -197,12 +198,13 @@ namespace SanteDB.Persistence.Data.BI
                 {
                     context.Open();
 
-                    return new AdoDatamartLogEntry(context.Insert(new DbDatamartLogEntry()
+                    var logEntry = new AdoDatamartLogEntry(context.Insert(new DbDatamartLogEntry()
                     {
                         ExecutionContextId = this.Key,
                         Priority = priority,
                         Text = logText
                     }));
+                    return logEntry;
                 }
             }
             catch (DbException e)

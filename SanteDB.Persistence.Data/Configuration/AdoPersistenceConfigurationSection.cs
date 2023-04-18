@@ -231,6 +231,13 @@ namespace SanteDB.Persistence.Data.Configuration
         public bool FastDelete { get; set; }
 
         /// <summary>
+        /// Gets or sets the name of the skeleton connection string for the warehouse
+        /// </summary>
+        [XmlAttribute("biSkel"), Category("Business Intelligence"), DisplayName("Warehouse"), Description("The connection string to the data warehouse server")]
+        [Editor("SanteDB.Configuration.Editors.ConnectionStringEditor, SanteDB.Configuration", "System.Drawing.Design.UITypeEditor, System.Drawing, Version=4.0.0.0")]
+        public string WarehouseConnectionStringSkel { get; set; }
+
+        /// <summary>
         /// Get all peppered combinations of the specified secret
         /// </summary>
         public IEnumerable<String> GetPepperCombos(String secret)
