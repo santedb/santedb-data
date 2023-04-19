@@ -688,7 +688,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         // Is this an update or insert?
                         if ((DataPersistenceControlContext.Current?.AutoUpdate ?? this.m_configuration.AutoUpdateExisting) && data.Key.HasValue && this.Exists(context, data.Key.Value))
                         {
-                            this.m_tracer.TraceVerbose("Object {0} already exists - updating instead", data);
+                            this.m_tracer.TraceWarning("Object {0} already exists - updating instead", data);
                             data = this.DoUpdateModel(context, data);
                             data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
                         }

@@ -51,7 +51,8 @@ namespace SanteDB.Persistence.Data.Services
             typeof(AdoRelationshipValidationProvider),
             typeof(AdoFreetextSearchService),
             typeof(AdoDatasetInstallerService),
-            typeof(AdoBiDatamartRepository)
+            typeof(AdoBiDatamartRepository),
+            typeof(AdoJobManager)
         };
 
         // Gets the configuration
