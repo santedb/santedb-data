@@ -100,7 +100,8 @@ namespace SanteDB.Persistence.Data.Services
             public TBisDefinition Get(DataContext context, Guid key)
             {
 
-                if(this.m_adhocCacheService?.TryGet(this.GetCacheKey(key), out TBisDefinition retVal) == true)
+                TBisDefinition retVal = null;
+                if(this.m_adhocCacheService?.TryGet(this.GetCacheKey(key), out retVal) == true)
                 {
                     return retVal;
                 }
@@ -231,7 +232,8 @@ namespace SanteDB.Persistence.Data.Services
             {
                 var cacheKey = this.GetCacheKey<TBisDefinition>(id);
 
-                if (this.m_adhocCacheService?.TryGet(cacheKey, out TBisDefinition retVal) != true)
+                TBisDefinition retVal = null;
+                if (this.m_adhocCacheService?.TryGet(cacheKey, out retVal) != true)
                 {
                     using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                     {
