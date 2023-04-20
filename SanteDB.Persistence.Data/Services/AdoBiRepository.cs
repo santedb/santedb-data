@@ -32,6 +32,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
@@ -48,6 +49,7 @@ namespace SanteDB.Persistence.Data.Services
         private readonly IAdhocCacheService m_adhocCacheService;
         private readonly ILocalizationService m_localizationService;
         private readonly ModelMapper m_modelMapper;
+        private readonly SHA1 m_sha = SHA1.Create();
 
         /// <summary>
         /// Query provider
@@ -65,6 +67,7 @@ namespace SanteDB.Persistence.Data.Services
                 this.m_modelMapper = mapper;
                 this.m_adhocCacheService = cacheService;
             }
+
             /// <inheritdoc/>
             public IDbProvider Provider { get; }
 
@@ -85,11 +88,14 @@ namespace SanteDB.Persistence.Data.Services
                     domainQuery = Expression.Lambda<Func<DbBiQueryResult, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, domainQuery.Body), domainQuery.Parameters);
                 }
 
+                var typeName = typeof(TBisDefinition).GetSerializationName();
+
                 // Statement for query
-                var stmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbBiDefinition), typeof(DbBiDefinitionVersion))
-                    .InnerJoin<DbBiDefinition, DbBiDefinitionVersion>(o => o.Key, o => o.Key)
+                var stmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbBiDefinitionVersion), typeof(DbBiDefinition))
+                    .InnerJoin<DbBiDefinitionVersion, DbBiDefinition>(o => o.Key, o => o.Key)
                     .Where(domainQuery)
                     .And<DbBiDefinitionVersion>(o => o.IsHeadVersion)
+                    .And<DbBiDefinition>(o=>o.Type == typeName)
                     .Statement
                     .Prepare();
 
@@ -196,6 +202,7 @@ namespace SanteDB.Persistence.Data.Services
                     using (var ms = new MemoryStream(content))
                     {
                         var ast = BiDefinition.Load(ms);
+                        
                         this.Insert(ast);
                     }
                 }
@@ -291,19 +298,36 @@ namespace SanteDB.Persistence.Data.Services
                     using (var tx = context.BeginTransaction())
                     {
 
-                        var typeName = typeof(TBisDefinition).GetSerializationName();
+                        var typeName = metadata.GetType().GetSerializationName();
 
-                        var stmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbBiDefinition), typeof(DbBiDefinitionVersion))
-                            .InnerJoin<DbBiDefinition, DbBiDefinitionVersion>(o => o.Key, o => o.Key)
+                        var stmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbBiDefinitionVersion), typeof(DbBiDefinition))
+                            .InnerJoin<DbBiDefinitionVersion, DbBiDefinition>(o => o.Key, o => o.Key)
                             .Where<DbBiDefinitionVersion>(o => o.IsHeadVersion && o.ObsoletionTime == null)
                             .And<DbBiDefinition>(o => o.Id == metadata.Id && o.Type == typeName)
                             .Statement
                             .Prepare();
 
-                        if (context.Any(stmt) && this.m_configuration.AutoUpdateExisting)
+                        var existing = context.FirstOrDefault<DbBiQueryResult>(stmt);
+                        if (existing != null)
                         {
-                            this.m_tracer.TraceWarning("Object {0} already exists - updating instead", metadata);
-                            metadata = this.DoUpdateModel(context, metadata);
+                            // Is there a need to update this?
+                            var existingHash = this.m_sha.ComputeHash(existing.DefinitionContents);
+                            using(var ms = new MemoryStream())
+                            {
+                                metadata.Uuid = existing.Key;// ensure key agreement
+                                metadata.Save(ms);
+                                var newHash = this.m_sha.ComputeHash(ms.ToArray());
+                                if(!existingHash.SequenceEqual(newHash))
+                                {
+                                    this.m_tracer.TraceWarning("Object {0} already exists - updating instead", metadata);
+                                    metadata = this.DoUpdateModel(context, metadata);
+                                }
+                                else
+                                {
+                                    return metadata;
+                                }
+                            }
+
                         }
                         else
                         {
@@ -369,9 +393,9 @@ namespace SanteDB.Persistence.Data.Services
                     CreationTime = DateTimeOffset.Now,
                     DefinitionContents = ms.ToArray(),
                     IsHeadVersion = true,
-                    Name = metadata.Name,
+                    Name = metadata.Name ?? $"Unnamed {metadata.GetType()}",
                     Key = biEntry.Key,
-                    Status = metadata.MetaData?.Status ?? BiDefinitionStatus.New
+                    Status = metadata.Status
                 });
             }
 
@@ -404,6 +428,8 @@ namespace SanteDB.Persistence.Data.Services
             newVersion.ObsoletionTime = null;
             newVersion.ObsoletedByKey = null;
             newVersion.ObsoletedByKeySpecified = newVersion.ObsoletionTimeSpecified = true;
+            newVersion.VersionKey = Guid.Empty;
+            newVersion.VersionSequenceId = null;
 
             // Obsolete and set new version
             cVersion.ObsoletionTime = newVersion.CreationTime = DateTimeOffset.Now;
@@ -415,22 +441,48 @@ namespace SanteDB.Persistence.Data.Services
             }
             cVersion.IsHeadVersion = false;
             newVersion.IsHeadVersion = true;
-            newVersion.Name = metadata.Name;
-            newVersion.ReplacesVersionKey = cVersion.VersionKey;
-            newVersion.Status = metadata.MetaData?.Status ?? BiDefinitionStatus.Active;
+            newVersion.Name = metadata.Name ?? $"Unnamed {metadata.GetType()}";
+            newVersion.Status = metadata.Status;
 
-            context.Update(cVersion);
+            if (this.m_configuration.VersioningPolicy.HasFlag(AdoVersioningPolicyFlags.VersionNonCdrAssets))
+            {
+                context.Update(cVersion);
+                newVersion.ReplacesVersionKey = cVersion.VersionKey;
+            }
+            else
+            {
+                context.DeleteAll<DbBiDefinitionVersion>(o => o.Key == metadata.Uuid);
+            }
             newVersion = context.Insert(newVersion);
 
             if (metadata.MetaData == null)
             {
                 metadata.MetaData = new BiMetadata()
                 {
-                    Version = newVersion.VersionSequenceId.ToString(),
-                    Status = newVersion.Status
+                    Version = newVersion.VersionSequenceId.ToString()
                 };
             }
+
             return metadata;
+        }
+
+        /// <summary>
+        /// Returns true if the object is installed
+        /// </summary>
+        private bool IsInstalled(Type biType, String publicId)
+        {
+            using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                context.Open();
+                var typeName = biType.GetSerializationName();
+                var stmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbBiDefinitionVersion), typeof(DbBiDefinition))
+                    .InnerJoin<DbBiDefinitionVersion, DbBiDefinition>(o => o.Key, o => o.Key)
+                    .Where<DbBiDefinitionVersion>(o => o.IsHeadVersion && o.ObsoletionTime == null)
+                    .And<DbBiDefinition>(o => o.Id == publicId && o.Type == typeName)
+                    .Statement
+                    .Prepare();
+                return context.Any(stmt);
+            }
         }
 
         /// <inheritdoc/>
@@ -446,7 +498,44 @@ namespace SanteDB.Persistence.Data.Services
 
             try
             {
-                return new MappedQueryResultSet<TBisDefinition>(new MappedQueryProvider<TBisDefinition>(this.m_configuration.Provider, this.m_modelMapper, this.m_adhocCacheService)).Where(filter);
+                try
+                {
+                    return new MappedQueryResultSet<TBisDefinition>(new MappedQueryProvider<TBisDefinition>(this.m_configuration.Provider, this.m_modelMapper, this.m_adhocCacheService)).Where(filter);
+                }
+                catch // Fallback to a fat query
+                {
+                    using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+                    {
+                        context.Open();
+
+                        var typeName = typeof(TBisDefinition).GetSerializationName();
+
+                        var stmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbBiDefinitionVersion), typeof(DbBiDefinition))
+                            .InnerJoin<DbBiDefinitionVersion, DbBiDefinition>(o => o.Key, o => o.Key)
+                            .Where<DbBiDefinitionVersion>(o => o.IsHeadVersion && o.ObsoletionTime == null)
+                            .And<DbBiDefinition>(o => o.Type == typeName)
+                            .Statement
+                            .Prepare();
+
+                        // TODO: Make this more efficient - the issue is that some queries 
+                        return context.Query<CompositeResult<DbBiDefinitionVersion, DbBiDefinition>>(stmt).ToList()
+                            .Select(o =>
+                            {
+                                var cacheKey = this.GetCacheKey<TBisDefinition>(o.Object2.Id);
+                                TBisDefinition retVal = null;
+                                if (this.m_adhocCacheService?.TryGet(cacheKey, out retVal) != true)
+                                {
+                                    using (var ms = new MemoryStream(o.Object1.DefinitionContents))
+                                    {
+                                        retVal = (TBisDefinition)BiDefinition.Load(ms);
+                                        this.m_adhocCacheService?.Add(cacheKey, retVal);
+                                    }
+                                }
+                                return retVal;
+                            }).Where(filter.Compile()).AsResultSet();
+
+                    }
+                }
             }
             catch (DbException e)
             {

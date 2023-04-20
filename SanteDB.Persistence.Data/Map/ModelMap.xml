@@ -21,6 +21,11 @@
  -->
 <modelMap xmlns="http://santedb.org/model/map">
 
+  <class modelClass="SanteDB.BI.Model.BiDefinition, SanteDB.BI"
+         domainClass="SanteDB.Persistence.Data.Model.Sys.DbBiQueryResult, SanteDB.Persistence.Data" >
+    
+  </class>
+  
   <!-- Foreign Data Import -->
   <!--<class modelClass="SanteDB.Core.Data.Import.IForeignDataSubmission, SanteDB.Core.Api"
          domainClass="SanteDB.Persistence.Data.Model.Sys.DbForeignDataStage, SanteDB.Persistence.Data">

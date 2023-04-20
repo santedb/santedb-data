@@ -52,7 +52,11 @@ namespace SanteDB.Persistence.Data.Services
             typeof(AdoFreetextSearchService),
             typeof(AdoDatasetInstallerService),
             typeof(AdoBiDatamartRepository),
-            typeof(AdoJobManager)
+            typeof(AdoJobManager),
+            typeof(AdoBiRepository),
+            typeof(OrmBiDataProvider),
+            typeof(OrmBiDataIntegrator),
+            typeof(AdoRecordMatchingConfigurationService)
         };
 
         // Gets the configuration
@@ -118,10 +122,10 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         IsSystemObject = true,
                         ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                        Status = BiDefinitionStatus.Active,
                         MetaData = new BiMetadata()
                         {
                             Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
-                            Status = BiDefinitionStatus.Active,
                             Demands = new List<string>()
                             {
                                 PermissionPolicyIdentifiers.ReadClinicalData
@@ -137,10 +141,10 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         IsSystemObject = true,
                         ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                        Status = BiDefinitionStatus.Active,
                         MetaData = new BiMetadata()
                         {
                             Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
-                            Status = BiDefinitionStatus.Active,
                             Demands = new List<string>()
                             {
                                 PermissionPolicyIdentifiers.UnrestrictedAdministration

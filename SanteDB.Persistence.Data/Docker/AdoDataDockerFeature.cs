@@ -144,7 +144,7 @@ namespace SanteDB.Persistence.Data.Docker
                 typeof(SanteDB.Persistence.Data.Services.AdoPolicyInformationService),
                 typeof(SanteDB.Persistence.Data.Services.AdoRoleProvider),
                 typeof(SanteDB.Persistence.Data.Services.AdoPersistenceService),
-                //typeof(SanteDB.Persistence.Data.Services.AdoSubscriptionExecutor)
+                typeof(SanteDB.Persistence.Data.Services.AdoSubscriptionExecutor)
               };
             // Add services
             var serviceConfiguration = configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders;

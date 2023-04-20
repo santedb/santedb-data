@@ -60,7 +60,7 @@ namespace SanteDB.Persistence.Data.Model.Sys
         /// <summary>
         /// Gets or sets the name of the definition
         /// </summary>
-        [Column("name"), NotNull]
+        [Column("name")]
         public String Name { get; set; }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace SanteDB.Persistence.Data.Model.Sys
     /// <summary>
     /// A simple query result
     /// </summary>
-    internal class DbBiQueryResult : DbBiDefinitionVersion
+    public class DbBiQueryResult : DbBiDefinitionVersion
     {
 
         /// <summary>

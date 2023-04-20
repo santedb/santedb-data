@@ -67,7 +67,7 @@ namespace SanteDB.Persistence.Data.Services
                                 this.m_adhocCacheService?.Add($"matcher.config.{itm.Object1.Id}", matchConfig);
                             }
                             return matchConfig;
-                        });
+                        }).ToList();
                     }
                 }
                 catch (DbException e)
@@ -148,7 +148,7 @@ namespace SanteDB.Persistence.Data.Services
                         var queryResult = context.FirstOrDefault<CompositeResult<DbMatchConfiguration, DbMatchConfigurationVersion>>(stmt);
                         if (queryResult == null)
                         {
-                            throw new KeyNotFoundException(configurationId);
+                            return null;
                         }
                         using (var ms = new MemoryStream(queryResult.Object2.Definition))
                         {
@@ -194,6 +194,8 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             mcc = this.SaveInternal(context, mcc);
                             tx.Commit();
+                            this.m_adhocCacheService?.Add($"matcher.config.{configuration.Id}", mcc);
+
                             return mcc;
                         }
                         else
@@ -234,10 +236,17 @@ namespace SanteDB.Persistence.Data.Services
             var newVersion = new DbMatchConfigurationVersion();
             if(currentVersion != null)
             {
-                newVersion = currentVersion.CopyObjectData(currentVersion);
+                newVersion = new DbMatchConfigurationVersion().CopyObjectData(currentVersion);
+                newVersion.ReplacesVersionKey = currentVersion.VersionKey;
+                newVersion.VersionKey = Guid.Empty;
+                newVersion.VersionSequenceId = null;
                 currentVersion.ObsoletionTime = DateTimeOffset.Now;
                 currentVersion.ObsoletedByKey = context.ContextId;
+                newVersion.ObsoletionTime = null;
+                newVersion.ObsoletedByKey = null;
                 currentVersion.IsHeadVersion = false;
+                
+                newVersion.ObsoletedByKeySpecified = newVersion.ObsoletionTimeSpecified = true;
                 context.Update(currentVersion);
             }
             else
@@ -249,10 +258,11 @@ namespace SanteDB.Persistence.Data.Services
 
             newVersion.CreatedByKey = context.ContextId;
             newVersion.CreationTime = DateTimeOffset.Now;
-            newVersion.ReplacesVersionKey = currentVersion?.VersionKey;
+            //newVersion.ReplacesVersionKey = currentVersion?.VersionKey;
             newVersion.Key = existingRoot.Key;
             newVersion.AppliesToType = new TypeReferenceConfiguration(configuration.AppliesTo.First()).TypeXml;
             newVersion.Status = configuration.Metadata?.Status ?? MatchConfigurationStatus.Inactive;
+            configuration.Metadata.Version += 1;
             using (var ms = new MemoryStream()) {
                 configuration.Save(ms);
                 newVersion.Definition = ms.ToArray();

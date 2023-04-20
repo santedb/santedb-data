@@ -179,10 +179,10 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             {
                                 IsSystemObject = true,
                                 ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                                Status = BiDefinitionStatus.Active,
                                 MetaData = new BiMetadata()
                                 {
                                     Version = typeof(AdoAuditRepositoryService).Assembly.GetName().Version.ToString(),
-                                    Status = BiDefinitionStatus.Active,
                                     Demands = new List<string>()
                                     {
                                     PermissionPolicyIdentifiers.AccessAuditLog

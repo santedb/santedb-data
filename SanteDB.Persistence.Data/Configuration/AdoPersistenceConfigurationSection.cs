@@ -65,6 +65,12 @@ namespace SanteDB.Persistence.Data.Configuration
         VersionOnTouch = 4,
 
         /// <summary>
+        /// Version non CDR assets
+        /// </summary>
+        [XmlEnum("non-cdr")]
+        VersionNonCdrAssets = 8,
+
+        /// <summary>
         /// Default flags
         /// </summary>
         [XmlEnum("default")]
