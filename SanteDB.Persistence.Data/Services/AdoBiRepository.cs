@@ -53,7 +53,7 @@ namespace SanteDB.Persistence.Data.Services
         /// Query provider
         /// </summary>
         private class MappedQueryProvider<TBisDefinition> : IMappedQueryProvider<TBisDefinition>
-            where TBisDefinition: BiDefinition
+            where TBisDefinition : BiDefinition
         {
 
             private readonly IAdhocCacheService m_adhocCacheService;
@@ -101,20 +101,20 @@ namespace SanteDB.Persistence.Data.Services
             {
 
                 TBisDefinition retVal = null;
-                if(this.m_adhocCacheService?.TryGet(this.GetCacheKey(key), out retVal) == true)
+                if (this.m_adhocCacheService?.TryGet(this.GetCacheKey(key), out retVal) == true)
                 {
                     return retVal;
                 }
 
                 var bidef = context.FirstOrDefault<DbBiDefinition>(o => o.Key == key);
-                if(bidef == null)
+                if (bidef == null)
                 {
                     return default(TBisDefinition);
                 }
-                else if(this.m_adhocCacheService?.TryGet(this.GetCacheKey(bidef.Id), out retVal) != true)
+                else if (this.m_adhocCacheService?.TryGet(this.GetCacheKey(bidef.Id), out retVal) != true)
                 {
                     var def = context.FirstOrDefault<DbBiDefinitionVersion>(o => o.Key == key && o.IsHeadVersion);
-                    using(var ms = new MemoryStream(def.DefinitionContents))
+                    using (var ms = new MemoryStream(def.DefinitionContents))
                     {
                         retVal = (TBisDefinition)BiDefinition.Load(ms);
                         this.m_adhocCacheService?.Add(this.GetCacheKey(bidef.Id), retVal);
@@ -140,9 +140,9 @@ namespace SanteDB.Persistence.Data.Services
             /// <inheritdoc/>
             public TBisDefinition ToModelInstance(DataContext context, object result)
             {
-                if(result is DbBiQueryResult bir)
+                if (result is DbBiQueryResult bir)
                 {
-                    using(var ms = new MemoryStream(bir.DefinitionContents))
+                    using (var ms = new MemoryStream(bir.DefinitionContents))
                     {
                         return (TBisDefinition)BiDefinition.Load(ms);
                     }
@@ -303,11 +303,11 @@ namespace SanteDB.Persistence.Data.Services
                         if (context.Any(stmt) && this.m_configuration.AutoUpdateExisting)
                         {
                             this.m_tracer.TraceWarning("Object {0} already exists - updating instead", metadata);
-                            this.DoUpdateModel(context, metadata);
+                            metadata = this.DoUpdateModel(context, metadata);
                         }
                         else
                         {
-                            this.InsertModel(context, metadata);
+                            metadata = this.InsertModel(context, metadata);
                         }
 
                         tx.Commit();
@@ -334,8 +334,13 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// Insert a model of the BI definition
         /// </summary>
-        private void InsertModel<TBisDefinition>(DataContext context, TBisDefinition metadata) where TBisDefinition : BiDefinition
+        private TBisDefinition InsertModel<TBisDefinition>(DataContext context, TBisDefinition metadata) where TBisDefinition : BiDefinition
         {
+
+            if (metadata.Uuid == Guid.Empty)
+            {
+                metadata.Uuid = Guid.NewGuid();
+            }
 
             if (context == null)
             {
@@ -349,6 +354,7 @@ namespace SanteDB.Persistence.Data.Services
             // define the metadata root
             var biEntry = context.Insert(new DbBiDefinition()
             {
+                Key = metadata.Uuid,
                 Id = metadata.Id,
                 Type = metadata.GetType().GetSerializationName()
             });
@@ -368,12 +374,14 @@ namespace SanteDB.Persistence.Data.Services
                     Status = metadata.MetaData?.Status ?? BiDefinitionStatus.New
                 });
             }
+
+            return metadata;
         }
 
         /// <summary>
         /// Perform an update
         /// </summary>
-        private void DoUpdateModel<TBisDefinition>(DataContext context, TBisDefinition metadata) where TBisDefinition : BiDefinition
+        private TBisDefinition DoUpdateModel<TBisDefinition>(DataContext context, TBisDefinition metadata) where TBisDefinition : BiDefinition
         {
             if (context == null)
             {
@@ -384,10 +392,12 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(metadata));
             }
 
-            var verRoot = context.Query<DbBiDefinition>(o => o.Id == metadata.Id).Select(o => o.Key).First();
+            var verRoot = metadata.Uuid == Guid.Empty ? context.Query<DbBiDefinition>(o => o.Id == metadata.Id).Select(o => o.Key).First() :
+                metadata.Uuid;
 
+            metadata.Uuid = verRoot;
             // Obsolete the current version
-            var cVersion = context.Query<DbBiDefinitionVersion>(o => o.IsHeadVersion && o.Key == verRoot).FirstOrDefault();
+            var cVersion = context.Query<DbBiDefinitionVersion>(o => o.IsHeadVersion && o.Key == verRoot).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault();
             var newVersion = new DbBiDefinitionVersion().CopyObjectData<DbBiDefinitionVersion>(cVersion);
 
             // Is the current version obsolete - if so un-delete
@@ -410,7 +420,17 @@ namespace SanteDB.Persistence.Data.Services
             newVersion.Status = metadata.MetaData?.Status ?? BiDefinitionStatus.Active;
 
             context.Update(cVersion);
-            context.Insert(newVersion);
+            newVersion = context.Insert(newVersion);
+
+            if (metadata.MetaData == null)
+            {
+                metadata.MetaData = new BiMetadata()
+                {
+                    Version = newVersion.VersionSequenceId.ToString(),
+                    Status = newVersion.Status
+                };
+            }
+            return metadata;
         }
 
         /// <inheritdoc/>

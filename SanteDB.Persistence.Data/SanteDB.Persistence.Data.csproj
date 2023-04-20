@@ -481,6 +481,10 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\..\santedb-match\SanteDB.Matcher\SanteDB.Matcher.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <None Update="SQL\PSQL\santedb-drop.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
