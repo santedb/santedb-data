@@ -62,7 +62,7 @@ namespace SanteDB.Persistence.Data.Docker
         /// <summary>
         /// ID of the docker feature
         /// </summary>
-        public string Id => "NUADO";
+        public string Id => "ADO";
 
 
         /// <summary>
