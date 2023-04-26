@@ -202,7 +202,6 @@ namespace SanteDB.Persistence.Data.Services
                     using (var ms = new MemoryStream(content))
                     {
                         var ast = BiDefinition.Load(ms);
-                        
                         this.Insert(ast);
                     }
                 }
