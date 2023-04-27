@@ -3,6 +3,7 @@ using SanteDB.BI.Datamart.DataFlow;
 using SanteDB.BI.Diagnostics;
 using SanteDB.BI.Model;
 using SanteDB.Core.Configuration.Data;
+using SanteDB.Core.Data;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Security;
@@ -40,18 +41,21 @@ namespace SanteDB.Persistence.Data.BI
         /// <inheritdoc/>
         public IDatamart Datamart { get; }
 
+        private readonly IDataStreamManager m_datastreamManager;
+
         /// <inheritdoc/>
         public IDataFlowDiagnosticSession DiagnosticSession { get; }
 
         /// <summary>
         /// Creates a new data flow execution context
         /// </summary>
-        public AdoDataFlowExecutionContext(IConfigurationManager configurationManager, IDatamart datamartForExecution, DataFlowExecutionPurposeType biExecutionPurpose)
+        public AdoDataFlowExecutionContext(IConfigurationManager configurationManager, IDataStreamManager dataStreamManager, IDatamart datamartForExecution, DataFlowExecutionPurposeType biExecutionPurpose)
         {
             this.m_configurationManager = configurationManager;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.Purpose = biExecutionPurpose;
             this.Datamart = datamartForExecution;
+            this.m_datastreamManager = dataStreamManager;
             this.Key = Guid.NewGuid();
             if(biExecutionPurpose.HasFlag(DataFlowExecutionPurposeType.Diagnostics))
             {
@@ -110,6 +114,14 @@ namespace SanteDB.Persistence.Data.BI
                     }
 
                     existing.EndTime = DateTimeOffset.Now;
+                    if(this.DiagnosticSession != null)
+                    {
+                        using (var tfs = new TemporaryFileStream()) {
+                            this.DiagnosticSession.GetSessionData().Save(tfs);
+                            tfs.Seek(0, System.IO.SeekOrigin.Begin);
+                            existing.DiagnosticStreamKey = this.m_datastreamManager.Add(tfs);
+                        }
+                    }
                     new AdoBiDatamartExecutionEntry(context.Update(existing), this.m_configuration.Provider);
                 }
             }

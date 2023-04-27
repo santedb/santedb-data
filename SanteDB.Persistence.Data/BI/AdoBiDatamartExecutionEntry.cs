@@ -28,6 +28,7 @@ namespace SanteDB.Persistence.Data.BI
             this.Started  = this.ModifiedOn = executionEntry.StartTime;
             this.Purpose = executionEntry.Purpose;
             this.Outcome = executionEntry.Outcome;
+            this.DiagnosticSessionKey = executionEntry.DiagnosticStreamKey;
             this.m_dbProvider = dbProvider;
         }
 
@@ -39,6 +40,9 @@ namespace SanteDB.Persistence.Data.BI
 
         /// <inheritdoc/>
         public DataFlowExecutionOutcomeType Outcome { get; }
+
+        /// <inheritdoc/>
+        public Guid? DiagnosticSessionKey { get; }
 
         /// <inheritdoc/>
         public DateTimeOffset Started { get; }

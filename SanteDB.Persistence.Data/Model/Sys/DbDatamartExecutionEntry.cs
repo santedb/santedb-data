@@ -56,5 +56,11 @@ namespace SanteDB.Persistence.Data.Model.Sys
         [Column("CRT_PROV_ID"), ForeignKey(typeof(DbSecurityProvenance), nameof(DbSecurityProvenance.Key))]
         public Guid? CreatedByKey { get; set; }
 
+        /// <summary>
+        /// Gets or sets the file stream identifier of the diagnostic stream
+        /// </summary>
+        [Column("DIAG_STR_ID")]
+        public Guid? DiagnosticStreamKey { get; set; }
+
     }
 }

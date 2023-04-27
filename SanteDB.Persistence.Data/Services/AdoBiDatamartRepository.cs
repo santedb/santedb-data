@@ -62,17 +62,19 @@ namespace SanteDB.Persistence.Data.Services
         // Configuration
         private readonly AdoPersistenceConfigurationSection m_configuration;
         private readonly IPolicyEnforcementService m_pepService;
+        private readonly IDataStreamManager m_dataStreamManager;
         private readonly ILocalizationService m_localization;
         private readonly ModelMapper m_modelMapper;
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public AdoBiDatamartRepository(IConfigurationManager configurationManager, ILocalizationService localizationService, IPolicyEnforcementService pepService)
+        public AdoBiDatamartRepository(IConfigurationManager configurationManager, IDataStreamManager dataStreamManager, ILocalizationService localizationService, IPolicyEnforcementService pepService)
         {
             this.m_configurationManager = configurationManager;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_pepService = pepService;
+            this.m_dataStreamManager = dataStreamManager;
             this.m_localization = localizationService;
             this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
         }
@@ -145,7 +147,7 @@ namespace SanteDB.Persistence.Data.Services
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.WriteWarehouseData);
             }
 
-            return new AdoDataFlowExecutionContext(this.m_configurationManager, datamart, purpose).LogStart();
+            return new AdoDataFlowExecutionContext(this.m_configurationManager, this.m_dataStreamManager, datamart, purpose).LogStart();
         }
 
         /// <inheritdoc/>
@@ -249,16 +251,28 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
-                    var existing = context.Query<DbDatamartRegistration>(o => o.Key == datamart.Key).FirstOrDefault();
-                    if(existing == null)
+                    using (var tx = context.BeginTransaction())
                     {
-                        throw new KeyNotFoundException(datamart.Key.ToString());
+                        var existing = context.Query<DbDatamartRegistration>(o => o.Key == datamart.Key).FirstOrDefault();
+                        if (existing == null)
+                        {
+                            throw new KeyNotFoundException(datamart.Key.ToString());
+                        }
+
+                        existing.ObsoletedByKey = context.EstablishProvenance(AuthenticationContext.Current.Principal);
+                        existing.ObsoletionTime = DateTimeOffset.Now;
+                        context.Update(existing);
+
+                        // Delete executions 
+                        foreach(var itm in context.Query<DbDatamartExecutionEntry>(o => o.DatamartKey == existing.Key))
+                        {
+                            if(itm.DiagnosticStreamKey.HasValue)
+                            {
+                                this.m_dataStreamManager.Remove(itm.DiagnosticStreamKey.Value);
+                            }
+                            context.Delete(itm);
+                        }
                     }
-
-                    existing.ObsoletedByKey = context.EstablishProvenance(AuthenticationContext.Current.Principal);
-                    existing.ObsoletionTime = DateTimeOffset.Now;
-                    context.Update(existing);
-
                 }
             }
             catch (DbException e)
