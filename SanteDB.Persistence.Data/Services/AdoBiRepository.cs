@@ -236,7 +236,7 @@ namespace SanteDB.Persistence.Data.Services
 
             try
             {
-                var cacheKey = this.GetCacheKey<TBisDefinition>(id);
+                var cacheKey = this.GetCacheKey(typeof(TBisDefinition).Name, id);
 
                 TBisDefinition retVal = null;
                 if (this.m_adhocCacheService?.TryGet(cacheKey, out retVal) != true)
@@ -309,6 +309,7 @@ namespace SanteDB.Persistence.Data.Services
                         var existing = context.FirstOrDefault<DbBiQueryResult>(stmt);
                         if (existing != null)
                         {
+                            context.EstablishProvenance(AuthenticationContext.Current.Principal);
                             // Is there a need to update this?
                             var existingHash = this.m_sha.ComputeHash(existing.DefinitionContents);
                             using(var ms = new MemoryStream())
@@ -334,7 +335,8 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         tx.Commit();
-                        this.m_adhocCacheService?.Add(this.GetCacheKey<TBisDefinition>(metadata.Id), metadata);
+                        this.m_adhocCacheService?.Remove(this.GetCacheKey(metadata.GetType().Name, metadata.Id));
+                        this.m_adhocCacheService?.Add(this.GetCacheKey(metadata.GetType().Name, metadata.Id), metadata);
                         return metadata;
                     }
                 }
@@ -349,10 +351,11 @@ namespace SanteDB.Persistence.Data.Services
             }
         }
 
+        
         /// <summary>
         /// Get the cache key
         /// </summary>
-        private string GetCacheKey<TBisDefinition>(string id) where TBisDefinition : BiDefinition => $"bi.ado.{typeof(TBisDefinition).Name}.{id}";
+        private string GetCacheKey(String tbisDefinition, string id) => $"bi.ado.{tbisDefinition}.{id}";
 
         /// <summary>
         /// Insert a model of the BI definition
@@ -388,7 +391,7 @@ namespace SanteDB.Persistence.Data.Services
                 metadata.Save(ms);
                 var biVersion = context.Insert(new DbBiDefinitionVersion()
                 {
-                    CreatedByKey = context.EstablishProvenance(AuthenticationContext.Current.Principal),
+                    CreatedByKey = context.ContextId,
                     CreationTime = DateTimeOffset.Now,
                     DefinitionContents = ms.ToArray(),
                     IsHeadVersion = true,
@@ -432,7 +435,7 @@ namespace SanteDB.Persistence.Data.Services
 
             // Obsolete and set new version
             cVersion.ObsoletionTime = newVersion.CreationTime = DateTimeOffset.Now;
-            cVersion.ObsoletedByKey = newVersion.CreatedByKey = context.EstablishProvenance(AuthenticationContext.Current.Principal);
+            cVersion.ObsoletedByKey = newVersion.CreatedByKey = context.ContextId;
             using (var ms = new MemoryStream())
             {
                 metadata.Save(ms);
@@ -520,7 +523,7 @@ namespace SanteDB.Persistence.Data.Services
                         return context.Query<CompositeResult<DbBiDefinitionVersion, DbBiDefinition>>(stmt).ToList()
                             .Select(o =>
                             {
-                                var cacheKey = this.GetCacheKey<TBisDefinition>(o.Object2.Id);
+                                var cacheKey = this.GetCacheKey(o.Object2.Type, o.Object2.Id);
                                 TBisDefinition retVal = null;
                                 if (this.m_adhocCacheService?.TryGet(cacheKey, out retVal) != true)
                                 {
@@ -579,7 +582,7 @@ namespace SanteDB.Persistence.Data.Services
                     existing.Object2.ObsoletionTime = DateTimeOffset.Now;
                     existing.Object2.ObsoletedByKey = context.EstablishProvenance(AuthenticationContext.Current.Principal);
                     context.Update(existing);
-                    this.m_adhocCacheService?.Remove(this.GetCacheKey<TBisDefinition>(id));
+                    this.m_adhocCacheService?.Remove(this.GetCacheKey(existing.Object1.Type, id));
                 }
             }
             catch (DbException e)

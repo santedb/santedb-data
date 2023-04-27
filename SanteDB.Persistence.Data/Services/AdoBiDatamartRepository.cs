@@ -108,6 +108,10 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new ArgumentNullException(nameof(query));
             }
+            if(!this.m_pepService.SoftDemand(PermissionPolicyIdentifiers.QueryWarehouseData, AuthenticationContext.Current.Principal))
+            {
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AdministerWarehouse);
+            }
             return new MappedQueryResultSet<IDatamart>(this).Where(query);
         }
 
@@ -264,12 +268,15 @@ namespace SanteDB.Persistence.Data.Services
                         context.Update(existing);
 
                         // Delete executions 
-                        foreach(var itm in context.Query<DbDatamartExecutionEntry>(o => o.DatamartKey == existing.Key))
+                        foreach(var itm in context.Query<DbDatamartExecutionEntry>(o => o.DatamartKey == existing.Key).ToArray())
                         {
                             if(itm.DiagnosticStreamKey.HasValue)
                             {
                                 this.m_dataStreamManager.Remove(itm.DiagnosticStreamKey.Value);
                             }
+
+                            // Delete all logs
+                            context.DeleteAll<DbDatamartLogEntry>(o => o.ExecutionContextId == itm.Key);
                             context.Delete(itm);
                         }
 
