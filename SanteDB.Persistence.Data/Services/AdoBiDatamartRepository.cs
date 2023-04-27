@@ -272,6 +272,8 @@ namespace SanteDB.Persistence.Data.Services
                             }
                             context.Delete(itm);
                         }
+
+                        tx.Commit();
                     }
                 }
             }
