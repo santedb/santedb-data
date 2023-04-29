@@ -244,6 +244,13 @@ namespace SanteDB.Persistence.Data.Configuration
         public string WarehouseConnectionStringSkel { get; set; }
 
         /// <summary>
+        /// Trim settings
+        /// </summary>
+        [XmlElement("trim"), Category("Maintenance"), DisplayName("Database Trimming"), Description("Configures how the database is maintained including retention time for old versions, sessions, etc.")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public AdoTrimSettings TrimSettings { get; set; }
+
+        /// <summary>
         /// Get all peppered combinations of the specified secret
         /// </summary>
         public IEnumerable<String> GetPepperCombos(String secret)

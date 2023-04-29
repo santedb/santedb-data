@@ -54,7 +54,7 @@ namespace SanteDB.Persistence.Data.Jobs
         public string Name => "Optimize Databases";
 
         /// <inheritdoc/>
-        public string Description => "Optimizes primary database";
+        public string Description => "Vaccuum, Re-index, and Analyze Database";
 
         /// <inheritdoc/>
         public bool CanCancel => false;
