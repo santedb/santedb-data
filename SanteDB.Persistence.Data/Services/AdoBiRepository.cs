@@ -95,7 +95,7 @@ namespace SanteDB.Persistence.Data.Services
                     .InnerJoin<DbBiDefinitionVersion, DbBiDefinition>(o => o.Key, o => o.Key)
                     .Where(domainQuery)
                     .And<DbBiDefinitionVersion>(o => o.IsHeadVersion)
-                    .And<DbBiDefinition>(o=>o.Type == typeName)
+                    .And<DbBiDefinition>(o => o.Type == typeName)
                     .Statement
                     .Prepare();
 
@@ -307,17 +307,17 @@ namespace SanteDB.Persistence.Data.Services
                             .Prepare();
 
                         var existing = context.FirstOrDefault<DbBiQueryResult>(stmt);
+                        context.EstablishProvenance(AuthenticationContext.Current.Principal);
                         if (existing != null)
                         {
-                            context.EstablishProvenance(AuthenticationContext.Current.Principal);
                             // Is there a need to update this?
                             var existingHash = this.m_sha.ComputeHash(existing.DefinitionContents);
-                            using(var ms = new MemoryStream())
+                            using (var ms = new MemoryStream())
                             {
                                 metadata.Uuid = existing.Key;// ensure key agreement
                                 metadata.Save(ms);
                                 var newHash = this.m_sha.ComputeHash(ms.ToArray());
-                                if(!existingHash.SequenceEqual(newHash))
+                                if (!existingHash.SequenceEqual(newHash))
                                 {
                                     this.m_tracer.TraceWarning("Object {0} already exists - updating instead", metadata);
                                     metadata = this.DoUpdateModel(context, metadata);
@@ -351,7 +351,7 @@ namespace SanteDB.Persistence.Data.Services
             }
         }
 
-        
+
         /// <summary>
         /// Get the cache key
         /// </summary>
@@ -363,11 +363,6 @@ namespace SanteDB.Persistence.Data.Services
         private TBisDefinition InsertModel<TBisDefinition>(DataContext context, TBisDefinition metadata) where TBisDefinition : BiDefinition
         {
 
-            if (metadata.Uuid == Guid.Empty)
-            {
-                metadata.Uuid = Guid.NewGuid();
-            }
-
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
@@ -375,6 +370,11 @@ namespace SanteDB.Persistence.Data.Services
             else if (metadata == null)
             {
                 throw new ArgumentNullException(nameof(metadata));
+            }
+
+            if (metadata.Uuid == Guid.Empty)
+            {
+                metadata.Uuid = Guid.NewGuid();
             }
 
             // define the metadata root
@@ -473,7 +473,7 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         private bool IsInstalled(Type biType, String publicId)
         {
-            using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
                 context.Open();
                 var typeName = biType.GetSerializationName();
