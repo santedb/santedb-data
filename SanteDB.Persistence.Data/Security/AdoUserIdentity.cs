@@ -124,6 +124,7 @@ namespace SanteDB.Persistence.Data.Security
                 this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaOrganizationIdClaim, organizationId.ToString()));
             }
 
+            // HACK: Copy the XSPA facility claim from the user assignment of the dedicated service delivery location on their profile
             var facilityId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation && o.ObsoleteVersionSequenceId == null).Select(o => o.SourceKey).FirstOrDefault();
             if (facilityId != Guid.Empty && this.FindFirst(SanteDBClaimTypes.XspaFacilityClaim) == null)
             {

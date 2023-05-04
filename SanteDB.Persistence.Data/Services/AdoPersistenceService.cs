@@ -53,7 +53,6 @@ namespace SanteDB.Persistence.Data.Services
             typeof(AdoDatasetInstallerService),
             typeof(AdoBiDatamartRepository),
             typeof(AdoJobManager),
-            typeof(AdoBiRepository),
             typeof(OrmBiDataProvider),
             typeof(OrmBiDataIntegrator),
             typeof(AdoRecordMatchingConfigurationService)

@@ -44,6 +44,6 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
         };
 
         /// <inheritdoc />
-        public override FeatureFlags Flags => FeatureFlags.AutoSetup;
+        public override FeatureFlags Flags => FeatureFlags.None;
     }
 }
