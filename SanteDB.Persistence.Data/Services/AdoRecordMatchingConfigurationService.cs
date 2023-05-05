@@ -31,7 +31,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// DI constructor
         /// </summary>
-        public AdoRecordMatchingConfigurationService(IConfigurationManager configurationManager, IPolicyEnforcementService pepService, ILocalizationService localizationService, IAdhocCacheService cacheService)
+        public AdoRecordMatchingConfigurationService(IConfigurationManager configurationManager, IPolicyEnforcementService pepService, ILocalizationService localizationService, IAdhocCacheService cacheService = null)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_localizationService = localizationService;

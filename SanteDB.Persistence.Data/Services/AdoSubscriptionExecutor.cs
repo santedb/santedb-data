@@ -72,7 +72,7 @@ namespace SanteDB.Persistence.Data.Services
         private readonly AdoPersistenceConfigurationSection m_configuration;
 
         // Subscription definition
-        private readonly IRepositoryService<SubscriptionDefinition> m_subscriptionRepository;
+        private readonly ISubscriptionRepository m_subscriptionRepository;
         private readonly ILocalizationService m_localizationService;
         private readonly IServiceManager m_serviceManager;
 
@@ -82,7 +82,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// Create the default subscription executor
         /// </summary>
-        public AdoSubscriptionExecutor(IConfigurationManager configurationManager, ILocalizationService localizationService, IRepositoryService<SubscriptionDefinition> subscriptionDefinition, IServiceManager serviceManager)
+        public AdoSubscriptionExecutor(IConfigurationManager configurationManager, ILocalizationService localizationService, ISubscriptionRepository subscriptionDefinition, IServiceManager serviceManager)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_subscriptionRepository = subscriptionDefinition;

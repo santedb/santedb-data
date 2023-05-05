@@ -69,7 +69,8 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                         typeof(DefaultDatamartManager),
                         typeof(LocalBiRenderService),
                         typeof(InMemoryPivotProvider),
-                        typeof(AppletBiRepository)
+                        typeof(AppletBiRepository),
+                        typeof(AdoSubscriptionExecutor)
                     };
     }
 }

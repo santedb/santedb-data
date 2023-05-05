@@ -47,7 +47,6 @@ namespace SanteDB.Persistence.Data.Services
         private readonly Type[] m_serviceFactoryTypes = new Type[]
         {
             typeof(AdoForeignDataManager),
-            typeof(AdoSubscriptionExecutor),
             typeof(AdoRelationshipValidationProvider),
             typeof(AdoFreetextSearchService),
             typeof(AdoDatasetInstallerService),
