@@ -58,7 +58,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                         typeof(AdoRelationshipValidationProvider),
                         typeof(UpstreamIdentityProvider),
                         typeof(UpstreamApplicationIdentityProvider),
-                        typeof(UpstreamPolicyInformationService),
+                        typeof(UpstreamPolicyInformationProvider),
                         typeof(UpstreamRoleProviderService),
                         typeof(LocalSecurityRepositoryService),
                         typeof(UpstreamSecurityChallengeProvider),
