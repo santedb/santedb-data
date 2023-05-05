@@ -18,6 +18,8 @@
  * User: fyfej
  * Date: 2023-3-10
  */
+using SanteDB.BI.Rendering;
+using SanteDB.BI.Services.Impl;
 using SanteDB.Client.Configuration;
 using SanteDB.Client.Disconnected.Data.Synchronization;
 using SanteDB.Client.Repositories;
@@ -63,7 +65,11 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                         typeof(PersistenceEntitySource),
                         typeof(AdoSynchronizationRepositoryService),
                         typeof(DefaultSynchronizationQueueManager),
-                        typeof(LocalRepositoryFactory)
+                        typeof(LocalRepositoryFactory),
+                        typeof(DefaultDatamartManager),
+                        typeof(LocalBiRenderService),
+                        typeof(InMemoryPivotProvider),
+                        typeof(AppletBiRepository)
                     };
     }
 }

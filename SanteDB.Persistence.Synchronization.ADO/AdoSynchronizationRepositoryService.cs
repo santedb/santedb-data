@@ -121,6 +121,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
 
             using (var connection = _Provider.GetReadonlyConnection())
             {
+                connection.Open();
                 var result = connection.Query<Model.DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == null).FirstOrDefault();
 
                 return result?.LastSync?.ToLocalTime();
@@ -134,6 +135,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
 
             using (var connection = _Provider.GetReadonlyConnection())
             {
+                connection.Open();
                 var result = connection.Query<Model.DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == null).FirstOrDefault();
 
                 return result?.LastETag;
@@ -147,6 +149,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
 
             using (var conn = _Provider.GetWriteConnection())
             {
+                conn.Open();
                 var record = conn.Query<Model.DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == null).FirstOrDefault();
 
                 if (null == record)
@@ -180,6 +183,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
         {
             using (var conn = _Provider.GetReadonlyConnection())
             {
+                conn.Open();
                 return conn.Query<Model.DbSynchronizationLogEntry>(e => e.QueryId == null);
             }
         }
@@ -193,17 +197,18 @@ namespace SanteDB.Persistence.Synchronization.ADO
 
             using (var conn = _Provider.GetWriteConnection())
             {
+                conn.Open();
                 var record = conn.Query<Model.DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == queryId).FirstOrDefault();
 
                 if (null == record)
                 {
-                    record = new Model.DbSynchronizationLogEntry()
+                    record = conn.Insert(new Model.DbSynchronizationLogEntry()
                     {
                         Filter = filter,
                         QueryId = queryId,
                         ResourceType = modeltypename,
                         QueryOffset = offset
-                    };
+                    });
                 }
                 else
                 {
@@ -225,6 +230,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
 
             using(var conn = _Provider.GetWriteConnection())
             {
+                conn.Open();
                 conn.DeleteAll<Model.DbSynchronizationLogEntry>(e=>e.ResourceType == modelType && e.Filter == filter && e.QueryId == queryId);
             }
         }
@@ -236,6 +242,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
 
             using (var conn = _Provider.GetReadonlyConnection())
             {
+                conn.Open();
                 return conn.Query<Model.DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId != null).FirstOrDefault();
             }
         }
@@ -245,6 +252,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
         {
             using (var conn = _Provider.GetWriteConnection())
             {
+                conn.Open();
                 if (itm is Model.DbSynchronizationLogEntry dbsyncentry)
                 {
                     conn.Delete(dbsyncentry);
