@@ -82,77 +82,90 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public AdoPersistenceService(IConfigurationManager configManager, IServiceManager serviceManager, IJobManagerService jobManager, IBiMetadataRepository biMetadataRepository = null)
         {
-            this.m_configuration = configManager.GetSection<AdoPersistenceConfigurationSection>();
-            this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
-            this.m_serviceManager = serviceManager;
-            QueryBuilder.AddQueryHacks(serviceManager.CreateAll<IQueryBuilderHack>(this.m_mapper));
-
-            // Upgrade the schema
-            this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Data", serviceManager.NotifyStartupProgress);
-
-            // Iterate and register ADO data persistence services
-            foreach (var pservice in serviceManager.CreateInjectedOfAll<IAdoPersistenceProvider>())
+            try
             {
-                pservice.Provider = this.m_configuration.Provider;
-                serviceManager.AddServiceProvider(pservice);
-                this.m_services.Add(pservice);
-                if (pservice is IReportProgressChanged irpc) // Cascade these status updates
+                this.m_configuration = configManager.GetSection<AdoPersistenceConfigurationSection>();
+                this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
+                this.m_serviceManager = serviceManager;
+                QueryBuilder.AddQueryHacks(serviceManager.CreateAll<IQueryBuilderHack>(this.m_mapper));
+
+                // Upgrade the schema
+                this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Data", serviceManager.NotifyStartupProgress);
+
+                // Iterate and register ADO data persistence services
+                foreach (var pservice in serviceManager.CreateInjectedOfAll<IAdoPersistenceProvider>())
                 {
-                    irpc.ProgressChanged += (o, e) => this.ProgressChanged?.Invoke(o, e);
+                    pservice.Provider = this.m_configuration.Provider;
+                    serviceManager.AddServiceProvider(pservice);
+                    this.m_services.Add(pservice);
+                    if (pservice is IReportProgressChanged irpc) // Cascade these status updates
+                    {
+                        irpc.ProgressChanged += (o, e) => this.ProgressChanged?.Invoke(o, e);
+                    }
                 }
-            }
-            serviceManager.AddServiceProvider(typeof(TagPersistenceService));
-            serviceManager.AddServiceProvider(typeof(AdoRelationshipValidationProvider));
-            serviceManager.AddServiceProvider(typeof(AdoDatasetInstallerService));
+                serviceManager.AddServiceProvider(typeof(TagPersistenceService));
+                serviceManager.AddServiceProvider(typeof(AdoRelationshipValidationProvider));
+                serviceManager.AddServiceProvider(typeof(AdoDatasetInstallerService));
 
-            if (jobManager.GetJobInstance(OptimizeDatabaseJob.ID) == null)
-            {
-                var job = serviceManager.CreateInjected<OptimizeDatabaseJob>();
-                jobManager.AddJob(job, JobStartType.DelayStart);
-                jobManager.SetJobSchedule(job, new DayOfWeek[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday }, DateTime.Now.Date.AddHours(3));
-            }
-            // Add this to the BI layer
-            using (AuthenticationContext.EnterSystemContext())
-            {
-                // Add audits as a BI data source
-                biMetadataRepository?
-                    .Insert(new BiDataSourceDefinition()
-                    {
-                        IsSystemObject = true,
-                        ConnectionString = this.m_configuration.ReadonlyConnectionString,
-                        Status = BiDefinitionStatus.Active,
-                        MetaData = new BiMetadata()
+                if (jobManager.GetJobInstance(OptimizeDatabaseJob.ID) == null)
+                {
+                    var job = serviceManager.CreateInjected<OptimizeDatabaseJob>();
+                    jobManager.AddJob(job, JobStartType.DelayStart);
+                    jobManager.SetJobSchedule(job, new DayOfWeek[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday }, DateTime.Now.Date.AddHours(3));
+                }
+                // Add this to the BI layer
+                using (AuthenticationContext.EnterSystemContext())
+                {
+                    // Add audits as a BI data source
+                    biMetadataRepository?
+                        .Insert(new BiDataSourceDefinition()
                         {
-                            Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
-                            Demands = new List<string>()
+                            IsSystemObject = true,
+                            ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                            Status = BiDefinitionStatus.Active,
+                            MetaData = new BiMetadata()
                             {
+                                Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
+                                Demands = new List<string>()
+                                {
                                 PermissionPolicyIdentifiers.ReadClinicalData
-                            }
-                        },
-                        Id = "org.santedb.bi.dataSource.main",
-                        Name = "main",
-                        ProviderType = typeof(OrmBiDataProvider)
-                    });
+                                }
+                            },
+                            Id = "org.santedb.bi.dataSource.main",
+                            Name = "main",
+                            ProviderType = typeof(OrmBiDataProvider)
+                        });
 
-                biMetadataRepository?
-                    .Insert(new BiDataSourceDefinition()
-                    {
-                        IsSystemObject = true,
-                        ConnectionString = this.m_configuration.ReadonlyConnectionString,
-                        Status = BiDefinitionStatus.Active,
-                        MetaData = new BiMetadata()
+                    biMetadataRepository?
+                        .Insert(new BiDataSourceDefinition()
                         {
-                            Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
-                            Demands = new List<string>()
+                            IsSystemObject = true,
+                            ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                            Status = BiDefinitionStatus.Active,
+                            MetaData = new BiMetadata()
                             {
+                                Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
+                                Demands = new List<string>()
+                                {
                                 PermissionPolicyIdentifiers.UnrestrictedAdministration
-                            }
-                        },
-                        Id = "org.santedb.bi.dataSource.admin",
-                        Name = "admin",
-                        ProviderType = typeof(OrmBiDataProvider)
-                    });
-            };
+                                }
+                            },
+                            Id = "org.santedb.bi.dataSource.admin",
+                            Name = "admin",
+                            ProviderType = typeof(OrmBiDataProvider)
+                        });
+                };
+            }
+            catch (ModelMapValidationException e)
+            {
+                this.m_tracer.TraceError("Error validing map: {0}", e.Message);
+                foreach (var i in e.ValidationDetails)
+                {
+                    this.m_tracer.TraceError("{0}:{1} @ {2}", i.Level, i.Message, i.Location);
+                }
+
+                throw;
+            }
         }
 
         /// <summary>

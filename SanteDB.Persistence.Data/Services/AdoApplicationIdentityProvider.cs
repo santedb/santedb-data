@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-3-10
  */
+using DocumentFormat.OpenXml.Wordprocessing;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
@@ -425,6 +426,35 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     this.m_tracer.TraceError("Error updating secret for {0} - {1}", name, e);
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.UPDATE_SECRET), e);
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public IApplicationIdentity GetIdentity(Guid sid)
+        {
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                try
+                {
+                    context.Open();
+                    var app = context.FirstOrDefault<DbSecurityApplication>(o => o.Key == sid && o.ObsoletionTime == null);
+                    if (app == null)
+                    {
+                        return null;
+                    }
+                    var identity = new AdoApplicationIdentity(app);
+                    var dbClaims = context.Query<DbApplicationClaim>(o => o.SourceKey == app.Key &&
+                        (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now));
+
+                    identity.AddClaims(dbClaims.ToArray().Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
+
+                    return identity;
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceError("Error fetching identity for {0}", sid);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_APPLICATION), e);
                 }
             }
         }

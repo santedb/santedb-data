@@ -725,5 +725,33 @@ namespace SanteDB.Persistence.Data.Services
                 }
             }
         }
+
+        /// <summary>
+        /// Get all active sessions 
+        /// </summary>
+        public ISession[] GetActiveSessions()
+        {
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration); // Must be administrator to have this event return
+
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    var sessions = context.Query<DbSession>(
+                        s => s.NotAfter >= DateTimeOffset.Now
+                        )?.ToList();
+
+                    return sessions
+                        .Select(s => new AdoSecuritySession(s.Key.ToByteArray(), null, s, context.Query<DbSessionClaim>(sc => sc.SessionKey == s.Key))).ToArray();
+                }
+                catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
+                {
+                    this.m_tracer.TraceError("Error getting session data {0}", ex);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_GEN_ERR), ex);
+                }
+            }
+        }
     }
 }

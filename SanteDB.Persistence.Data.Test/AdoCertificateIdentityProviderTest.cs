@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 
@@ -65,7 +66,7 @@ namespace SanteDB.Persistence.Data.Test
             certService.AddIdentityMap(userIdentity, this.GetCertificate(), AuthenticationContext.SystemPrincipal);
 
             // Lookup 
-            var cert = certService.GetIdentityCertificate(userIdentity);
+            var cert = certService.GetIdentityCertificates(userIdentity).FirstOrDefault();
             Assert.IsNotNull(cert);
             Assert.AreEqual(this.GetCertificate().Thumbprint, cert.Thumbprint);
             certService.RemoveIdentityMap(userIdentity, cert, AuthenticationContext.SystemPrincipal);
@@ -91,14 +92,14 @@ namespace SanteDB.Persistence.Data.Test
             certService.AddIdentityMap(userIdentity, this.GetCertificate(), AuthenticationContext.SystemPrincipal);
 
             // Lookup 
-            var cert = certService.GetIdentityCertificate(userIdentity);
+            var cert = certService.GetIdentityCertificates(userIdentity).FirstOrDefault();
             Assert.IsNotNull(cert);
             Assert.AreEqual(this.GetCertificate().Thumbprint, cert.Thumbprint);
 
             certService.RemoveIdentityMap(userIdentity, cert, AuthenticationContext.SystemPrincipal);
             try
             {
-                cert = certService.GetIdentityCertificate(userIdentity);
+                cert = certService.GetIdentityCertificates(userIdentity).FirstOrDefault();
                 Assert.Fail("Should have thrown exception");
             }
             catch (Exception e) when (e.InnerException is KeyNotFoundException)

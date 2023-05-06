@@ -24,6 +24,7 @@ using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Jobs;
 using SanteDB.Core.Model.Audit;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Map;
@@ -37,6 +38,7 @@ using SanteDB.OrmLite.Migration;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Auditing.ADO.Configuration;
 using SanteDB.Persistence.Auditing.ADO.Data.Model;
+using SanteDB.Persistence.Auditing.ADO.Jobs;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -157,6 +159,8 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             IConceptRepositoryService conceptRepository,
             IQueryPersistenceService queryPersistence,
             IServiceManager serviceManager,
+            IJobManagerService jobManager = null,
+            IJobScheduleManager jobScheduleManager = null,
             IAdhocCacheService adhocCacheService = null)
         {
             this.m_configuration = configurationManager.GetSection<AdoAuditConfigurationSection>();
@@ -170,32 +174,39 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 this.QueryPersistence = queryPersistence;
                 this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Audit.ADO", serviceManager.NotifyStartupProgress);
 
-
-                    using (AuthenticationContext.EnterSystemContext())
-                    {
-                        // Add audits as a BI data source
-                        biMetadataRepository
-                            .Insert(new BiDataSourceDefinition()
+                using (AuthenticationContext.EnterSystemContext())
+                {
+                    // Add audits as a BI data source
+                    biMetadataRepository
+                        .Insert(new BiDataSourceDefinition()
+                        {
+                            IsSystemObject = true,
+                            ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                            Status = BiDefinitionStatus.Active,
+                            MetaData = new BiMetadata()
                             {
-                                IsSystemObject = true,
-                                ConnectionString = this.m_configuration.ReadonlyConnectionString,
-                                Status = BiDefinitionStatus.Active,
-                                MetaData = new BiMetadata()
+                                Version = typeof(AdoAuditRepositoryService).Assembly.GetName().Version.ToString(),
+                                Demands = new List<string>()
                                 {
-                                    Version = typeof(AdoAuditRepositoryService).Assembly.GetName().Version.ToString(),
-                                    Demands = new List<string>()
-                                    {
                                     PermissionPolicyIdentifiers.AccessAuditLog
-                                    }
-                                },
-                                Id = "org.santedb.bi.dataSource.audit",
-                                Name = "audit",
-                                ProviderType = typeof(OrmBiDataProvider)
-                            });
-                    };
+                                }
+                            },
+                            Id = "org.santedb.bi.dataSource.audit",
+                            Name = "audit",
+                            ProviderType = typeof(OrmBiDataProvider)
+                        });
+                };
 
                 this.m_mapper = new ModelMapper(typeof(AdoAuditRepositoryService).Assembly.GetManifestResourceStream("SanteDB.Persistence.Auditing.ADO.Data.Map.ModelMap.xml"), AuditConstants.ModelMapName, true);
                 this.m_builder = new QueryBuilder(this.m_mapper, this.m_configuration.Provider.StatementFactory);
+
+                // Register the audit jobs
+                if(jobManager?.IsJobRegistered(typeof(AuditRetentionJob)) == false)
+                {
+                    var job = serviceManager.CreateInjected<AuditRetentionJob>();
+                    jobManager.AddJob(job, JobStartType.DelayStart);
+                    jobScheduleManager.Add(job, new TimeSpan(1, 0, 0, 0));
+                }
             }
             catch (ModelMapValidationException e)
             {
@@ -428,7 +439,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             long? dbAct = null;
                             if (roleCode != null)
                             {
-                                dbAct = context.Query<DbAuditActor>(o => o.UserName == act.UserName && o.ActorRoleCode == roleCode.Key).Select(o=>o.Key).FirstOrDefault();
+                                dbAct = context.Query<DbAuditActor>(o => o.UserName == act.UserName && o.ActorRoleCode == roleCode.Key).Select(o => o.Key).FirstOrDefault();
                             }
                             else
                             {
@@ -439,7 +450,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                             {
                                 var actor = this.m_mapper.MapModelInstance<AuditActorData, DbAuditActor>(act);
                                 actor.ActorRoleCode = roleCode?.Key ?? Guid.Empty;
-                                dbAct= context.Insert(actor).Key;
+                                dbAct = context.Insert(actor).Key;
                             }
                             context.Insert(new DbAuditActorAssociation()
                             {
@@ -491,7 +502,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     {
                         foreach (var meta in storageData.Metadata.Where(o => !String.IsNullOrEmpty(o.Value) && o.Key != AuditMetadataKey.CorrelationToken))
                         {
-                            var kv = context.Query<DbAuditMetadataValue>(o => o.Value == meta.Value).Select(o => o.Key).FirstOrDefault() ;
+                            var kv = context.Query<DbAuditMetadataValue>(o => o.Value == meta.Value).Select(o => o.Key).FirstOrDefault();
                             if (kv == default(long))
                             {
                                 kv = context.Insert(new DbAuditMetadataValue()

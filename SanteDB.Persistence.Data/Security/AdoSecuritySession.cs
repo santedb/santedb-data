@@ -24,6 +24,7 @@ using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 
 namespace SanteDB.Persistence.Data.Security
 {
@@ -74,6 +75,11 @@ namespace SanteDB.Persistence.Data.Security
                 new SanteDBClaim(SanteDBClaimTypes.Expiration, sessionInfo.NotAfter.ToUniversalTime().ToString("o")),
                 new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, sessionInfo.Key.ToString())
             };
+
+            if(!String.IsNullOrEmpty(sessionInfo.RemoteEndpoint))
+            {
+                addlClaims.Add(new SanteDBClaim(SanteDBClaimTypes.RemoteEndpointClaim, sessionInfo.RemoteEndpoint));
+            }
 
             this.Claims = addlClaims.Union(claims.Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue))).ToArray();
             this.Key = sessionInfo.Key;

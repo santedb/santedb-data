@@ -362,7 +362,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public X509Certificate2 GetIdentityCertificate(IIdentity identityOfCertificte)
+        public IEnumerable<X509Certificate2> GetIdentityCertificates(IIdentity identityOfCertificte)
         {
             if (identityOfCertificte == null)
             {
@@ -374,14 +374,14 @@ namespace SanteDB.Persistence.Data.Services
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     context.Open();
-                    DbCertificateMapping retVal = null;
+                    OrmResultSet<DbCertificateMapping> retVal = null;
                     if (identityOfCertificte is IDeviceIdentity did)
                     {
                         retVal = context.Query<DbCertificateMapping>(context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping))
                             .InnerJoin<DbCertificateMapping, DbSecurityDevice>(o => o.SecurityDeviceKey, o => o.Key)
                             .Where<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == did.Name.ToLowerInvariant() && o.ObsoletionTime == null)
                             .And<DbCertificateMapping>(o => o.ObsoletionTime == null)
-                            .Statement).FirstOrDefault();
+                            .Statement);
                     }
                     else if (identityOfCertificte is IApplicationIdentity aid)
                     {
@@ -389,7 +389,7 @@ namespace SanteDB.Persistence.Data.Services
                            .InnerJoin<DbCertificateMapping, DbSecurityApplication>(o => o.SecurityApplicationKey, o => o.Key)
                            .Where<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == aid.Name.ToLowerInvariant() && o.ObsoletionTime == null)
                            .And<DbCertificateMapping>(o => o.ObsoletionTime == null)
-                           .Statement).FirstOrDefault();
+                           .Statement);
                     }
                     else
                     {
@@ -397,12 +397,12 @@ namespace SanteDB.Persistence.Data.Services
                            .InnerJoin<DbCertificateMapping, DbSecurityUser>(o => o.SecurityUserKey, o => o.Key)
                            .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == identityOfCertificte.Name.ToLowerInvariant() && o.ObsoletionTime == null)
                            .And<DbCertificateMapping>(o => o.ObsoletionTime == null)
-                           .Statement).FirstOrDefault();
+                           .Statement);
                     }
 
                     if (retVal != null)
                     {
-                        return new X509Certificate2(retVal.X509PublicKeyData);
+                        return retVal.Select(o => new X509Certificate2(o.X509PublicKeyData)).ToArray();
                     }
                     else
                     {

@@ -48,9 +48,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Jobs\" />
-  </ItemGroup>
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">
       <ItemGroup>

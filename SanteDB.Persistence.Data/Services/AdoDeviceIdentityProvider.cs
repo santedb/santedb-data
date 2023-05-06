@@ -266,6 +266,33 @@ namespace SanteDB.Persistence.Data.Services
             }
         }
 
+        /// <inheritdoc/>
+        public IDeviceIdentity GetIdentity(Guid sid)
+        {
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                try
+                {
+                    context.Open();
+                    var dev = context.FirstOrDefault<DbSecurityDevice>(d => d.Key == sid && d.ObsoletionTime == null);
+                    if (dev == null)
+                    {
+                        return null;
+                    }
+                    var dbClaims = context.Query<DbDeviceClaim>(o => o.SourceKey == dev.Key &&
+                       (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now));
+                    var retVal = new AdoDeviceIdentity(dev);
+                    retVal.AddClaims(dbClaims.ToArray().Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
+                    return retVal;
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceError("Error fetching identity for {0}", sid);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_DEVICE_KEY), e);
+                }
+            }
+        }
+
         /// <summary>
         /// Gets an unauthenticated device identity for the specified name
         /// </summary>
@@ -295,7 +322,7 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     this.m_tracer.TraceError("Error fetching identity for {0}", name);
-                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_APPLICATION), e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_DEVICE_KEY), e);
                 }
             }
         }

@@ -18,8 +18,11 @@
  * User: fyfej
  * Date: 2023-3-10
  */
+using Newtonsoft.Json;
 using SanteDB.Core.Configuration;
 using SanteDB.OrmLite.Configuration;
+using System;
+using System.ComponentModel;
 using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Auditing.ADO.Configuration
@@ -30,6 +33,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Configuration
     [XmlType(nameof(AdoAuditConfigurationSection), Namespace = "http://santedb.org/configuration")]
     public class AdoAuditConfigurationSection : OrmConfigurationBase, IConfigurationSection
     {
+
 
     }
 }
