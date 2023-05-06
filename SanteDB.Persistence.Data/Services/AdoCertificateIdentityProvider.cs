@@ -402,7 +402,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     if (retVal != null)
                     {
-                        return retVal.Select(o => new X509Certificate2(o.X509PublicKeyData)).ToArray();
+                        return retVal.ToList().Select(o => new X509Certificate2(o.X509PublicKeyData)).ToArray();
                     }
                     else
                     {
