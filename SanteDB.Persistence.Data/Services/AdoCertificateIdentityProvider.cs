@@ -400,7 +400,7 @@ namespace SanteDB.Persistence.Data.Services
                            .Statement);
                     }
 
-                    if (retVal != null)
+                    if (retVal.Any())
                     {
                         return retVal.ToList().Select(o => new X509Certificate2(o.X509PublicKeyData)).ToArray();
                     }
