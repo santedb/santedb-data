@@ -87,7 +87,6 @@ namespace SanteDB.Persistence.Data.Configuration.Features
                 typeof(AdoPolicyInformationService),
                 typeof(AdoForeignDataManager),
                 typeof(AdoBiDatamartRepository),
-                typeof(AdoBiRepository),
                 typeof(AdoJobManager)
             };
 
