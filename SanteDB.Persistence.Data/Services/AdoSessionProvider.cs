@@ -295,17 +295,21 @@ namespace SanteDB.Persistence.Data.Services
                         // Fetch the keys for the identities
                         Guid? applicationKey = null, deviceKey = null, userKey = null;
 
+                        var audience = String.Empty;
                         // Application
                         switch (applicationId)
                         {
                             case AdoIdentity adoApplication:
                                 applicationKey = adoApplication.Sid;
+                                audience = context.FirstOrDefault<DbApplicationClaim>(o => o.SourceKey == adoApplication.Sid && o.ClaimType == SanteDBClaimTypes.AudienceClaim && (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now))?.ClaimValue ?? adoApplication.Name;
                                 break;
                             case IClaimsIdentity claimApplication:
                                 applicationKey = Guid.Parse(claimApplication.FindFirst(SanteDBClaimTypes.SecurityId)?.Value ?? claimApplication.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim)?.Value);
+                                audience = claimApplication.FindFirst(SanteDBClaimTypes.AudienceClaim)?.Value ?? context.FirstOrDefault<DbApplicationClaim>(o => o.SourceKey == applicationKey && o.ClaimType == SanteDBClaimTypes.AudienceClaim && (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now))?.ClaimValue ?? claimApplication.Name;
                                 break;
                             case IIdentity idApplication:
                                 applicationKey = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationId.Name.ToLowerInvariant())?.Key;
+                                audience = context.FirstOrDefault<DbApplicationClaim>(o => o.SourceKey == applicationKey && o.ClaimType == SanteDBClaimTypes.AudienceClaim && (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now))?.ClaimValue ?? idApplication.Name;
                                 break;
                             default:
                                 throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_NO_APPLICATION_ID));
@@ -348,7 +352,8 @@ namespace SanteDB.Persistence.Data.Services
                             DeviceKey = deviceKey,
                             UserKey = userKey,
                             NotBefore = DateTimeOffset.Now,
-                            RemoteEndpoint = remoteEp
+                            RemoteEndpoint = remoteEp,
+                            Audience = audience
                         };
 
                         // Sessions with 
@@ -364,7 +369,6 @@ namespace SanteDB.Persistence.Data.Services
                         if (principal is ITokenPrincipal itp)
                         {
                             dbSession.NotAfter = itp.ExpiresAt;
-
                         }
                         else
                         {
@@ -378,9 +382,7 @@ namespace SanteDB.Persistence.Data.Services
                             {
                                 dbSession.NotAfter = DateTimeOffset.Now.AddSeconds(120); //TODO: Need to set this somewhere as a configuration setting. This means they have ~2 minutes to click on a password reset.
                             }
-                            
                         }
-                       
 
                         dbSession = context.Insert(dbSession);
 
@@ -464,7 +466,6 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(refreshToken), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
@@ -483,6 +484,32 @@ namespace SanteDB.Persistence.Data.Services
                         else if (dbSession.NotAfter < DateTimeOffset.Now)
                         {
                             throw new SecuritySessionException(SessionExceptionType.Expired, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_REFRESH_EXPIRE), null);
+                        }
+
+
+                        // Provided Application
+                        var providedAudience = String.Empty;
+                        switch ((AuthenticationContext.Current.Principal as IClaimsPrincipal)?.Identities.OfType<IApplicationIdentity>().FirstOrDefault())
+                        {
+                            case AdoIdentity adoApplication:
+                                providedAudience = context.FirstOrDefault<DbApplicationClaim>(o => o.SourceKey == adoApplication.Sid && o.ClaimType == SanteDBClaimTypes.AudienceClaim && (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now))?.ClaimValue ?? adoApplication.Name;
+                                break;
+                            case IClaimsIdentity claimApplication:
+                                var applicationKey = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == claimApplication.Name.ToLowerInvariant())?.Key;
+                                providedAudience = claimApplication.FindFirst(SanteDBClaimTypes.AudienceClaim)?.Value ?? context.FirstOrDefault<DbApplicationClaim>(o => o.SourceKey == applicationKey && o.ClaimType == SanteDBClaimTypes.AudienceClaim && (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now))?.ClaimValue ?? claimApplication.Name;
+                                break;
+                            case IIdentity idApplication:
+                                applicationKey = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == idApplication.Name.ToLowerInvariant())?.Key;
+                                providedAudience = context.FirstOrDefault<DbApplicationClaim>(o => o.SourceKey == applicationKey && o.ClaimType == SanteDBClaimTypes.AudienceClaim && (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now))?.ClaimValue ?? idApplication.Name;
+                                break;
+                            default:
+                                throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_NO_APPLICATION_ID));
+                        }
+
+                        // Validate that the audience has not changed!
+                        if(providedAudience != dbSession.Audience)
+                        {
+                            throw new SecuritySessionException(SessionExceptionType.Other, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_AUDIENCE_CHANGED), null);
                         }
 
                         var dbClaims = context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key).ToList();

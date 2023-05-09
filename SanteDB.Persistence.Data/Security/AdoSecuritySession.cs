@@ -73,14 +73,18 @@ namespace SanteDB.Persistence.Data.Security
             {
                 new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, sessionInfo.NotBefore.ToUniversalTime().ToString("o")),
                 new SanteDBClaim(SanteDBClaimTypes.Expiration, sessionInfo.NotAfter.ToUniversalTime().ToString("o")),
-                new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, sessionInfo.Key.ToString())
+                new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, sessionInfo.Key.ToString()),
+                new SanteDBClaim(ClaimTypes.IsPersistent, "true")
             };
 
             if(!String.IsNullOrEmpty(sessionInfo.RemoteEndpoint))
             {
                 addlClaims.Add(new SanteDBClaim(SanteDBClaimTypes.RemoteEndpointClaim, sessionInfo.RemoteEndpoint));
             }
-
+            if(!String.IsNullOrEmpty(sessionInfo.Audience))
+            {
+                addlClaims.Add(new SanteDBClaim(SanteDBClaimTypes.AudienceClaim, sessionInfo.Audience));
+            }
             this.Claims = addlClaims.Union(claims.Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue))).ToArray();
             this.Key = sessionInfo.Key;
             this.Id = token;

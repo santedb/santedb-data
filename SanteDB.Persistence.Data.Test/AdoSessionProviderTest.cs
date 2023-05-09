@@ -149,11 +149,14 @@ namespace SanteDB.Persistence.Data.Test
 
             // Extend
             Thread.Sleep(200); // Wait 1 seconds
-            var extendedSession = sesService.Extend(session.RefreshToken);
-            Assert.Greater(extendedSession.NotBefore, session.NotBefore);
-            Assert.Greater(extendedSession.NotAfter, session.NotAfter);
-            Assert.AreNotEqual(extendedSession.RefreshToken, session.RefreshToken);
-            Assert.AreEqual(extendedSession.Id, session.Id);
+            using (AuthenticationContext.EnterContext(sesPrincipal))
+            {
+                var extendedSession = sesService.Extend(session.RefreshToken);
+                Assert.Greater(extendedSession.NotBefore, session.NotBefore);
+                Assert.Greater(extendedSession.NotAfter, session.NotAfter);
+                Assert.AreNotEqual(extendedSession.RefreshToken, session.RefreshToken);
+                Assert.AreEqual(extendedSession.Id, session.Id);
+            }
         }
 
         /// <summary>
