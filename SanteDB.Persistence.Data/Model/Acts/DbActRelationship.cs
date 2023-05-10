@@ -62,5 +62,12 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// </summary>
         [Column("cls_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid? ClassificationKey { get; set; }
+
+        /// <summary>
+        /// External reference key
+        /// </summary>
+        [Column("ext_id")]
+        public String ExternalKey { get; set; }
+
     }
 }
