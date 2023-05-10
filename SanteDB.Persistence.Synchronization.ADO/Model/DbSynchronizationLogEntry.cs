@@ -51,11 +51,45 @@ namespace SanteDB.Persistence.Synchronization.ADO.Model
         public int? QueryOffset { get; set; }
         [Column("qry_strt_utc")]
         public DateTime? QueryStartTime { get; set; }
+        [Column("last_err")]
+        public String LastError { get; set; }
 
-        Guid ISynchronizationLogQuery.QueryId { get => this.QueryId ?? default; set => this.QueryId = value; }
-        int ISynchronizationLogQuery.QueryOffset { get => this.QueryOffset ?? default; set => this.QueryOffset = value; }
-        DateTime ISynchronizationLogQuery.QueryStartTime { get => this.QueryStartTime ?? default; set => this.QueryStartTime = value; }
+        /// <summary>
+        /// Instructs the ORM to persist NULL values when true
+        /// </summary>
+        public bool QueryIdSpecified { get; set; }
+        /// <summary>
+        /// Instructs the ORM to persist NULL values when true
+        /// </summary>
+        public bool QueryOffsetSpecified { get; set; }
+        /// <summary>
+        /// Instructs the ORM to persist NULL values when true
+        /// </summary>
+        public bool QueryStartTimeSpecified { get; set; }
+        public bool LastErrorSpecified { get; set; }
 
-        DateTime ISynchronizationLogEntry.LastSync => LastSync ?? default;
+        /// <inheritdoc/>
+        string ISynchronizationLogEntry.ResourceType => this.ResourceType;
+
+        /// <inheritdoc/>
+        string ISynchronizationLogEntry.Filter => this.Filter;
+
+        /// <inheritdoc/>
+        DateTime ISynchronizationLogEntry.LastSync => this.LastSync.GetValueOrDefault();
+
+        /// <inheritdoc/>
+        string ISynchronizationLogEntry.LastETag => this.LastETag;
+
+        /// <inheritdoc/>
+        string ISynchronizationLogEntry.LastError => this.LastETag;
+
+        /// <inheritdoc/>
+        Guid ISynchronizationLogQuery.QueryId => this.QueryId.GetValueOrDefault();
+
+        /// <inheritdoc/>
+        int ISynchronizationLogQuery.QueryOffset => this.QueryOffset.GetValueOrDefault();
+
+        /// <inheritdoc/>
+        DateTime ISynchronizationLogQuery.QueryStartTime => this.QueryStartTime.GetValueOrDefault();
     }
 }

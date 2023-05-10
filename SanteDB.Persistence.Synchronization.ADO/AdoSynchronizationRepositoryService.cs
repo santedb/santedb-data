@@ -30,6 +30,7 @@ using SanteDB.OrmLite;
 using SanteDB.OrmLite.Migration;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Synchronization.ADO.Configuration;
+using SanteDB.Persistence.Synchronization.ADO.Model;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -167,7 +168,8 @@ namespace SanteDB.Persistence.Synchronization.ADO
                 else
                 {
                     record.LastSync = since;
-
+                    record.LastError = null;
+                    record.LastErrorSpecified = true;
                     if (!string.IsNullOrEmpty(eTag))
                     {
                         record.LastETag = eTag;
@@ -231,7 +233,15 @@ namespace SanteDB.Persistence.Synchronization.ADO
             using(var conn = _Provider.GetWriteConnection())
             {
                 conn.Open();
-                conn.DeleteAll<Model.DbSynchronizationLogEntry>(e=>e.ResourceType == modelType && e.Filter == filter && e.QueryId == queryId);
+                var existing = conn.FirstOrDefault<DbSynchronizationLogEntry>(o => o.ResourceType == modelType && o.Filter == filter);
+                if(existing != null)
+                {
+                    existing.QueryId = null;
+                    existing.QueryOffset = null;
+                    existing.QueryStartTime = null;
+                    existing.QueryIdSpecified = existing.QueryOffsetSpecified = existing.QueryStartTimeSpecified = true;
+                    conn.Update(existing);
+                }
             }
         }
 
@@ -268,5 +278,20 @@ namespace SanteDB.Persistence.Synchronization.ADO
                 }
             }
         }
+
+        /// <inheritdoc />
+        public void SaveError(Type modelType, string filter, Exception exception)
+        {
+            using(var conn = _Provider.GetWriteConnection())
+            {
+                conn.Open();
+                var existing = conn.FirstOrDefault<DbSynchronizationLogEntry>(o => o.ResourceType == modelType.Name && o.Filter == filter);
+                if(existing != null)
+                {
+                    existing.LastError = exception.ToHumanReadableString();
+                    conn.Update(existing);
+                }
+            }
+        } 
     }
 }

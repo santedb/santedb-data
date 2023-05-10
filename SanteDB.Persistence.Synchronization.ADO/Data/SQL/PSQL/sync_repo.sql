@@ -18,6 +18,7 @@
 	qry_id uuid,
 	qry_offst integer,
 	qry_strt_utc timestamp with time zone,
+	last_err text,
 	CONSTRAINT pk_sync_log_tbl PRIMARY KEY (id)
  ); --#!
 

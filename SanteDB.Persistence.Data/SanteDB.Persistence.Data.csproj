@@ -70,10 +70,6 @@
   </Choose>
   
   <ItemGroup>
-    <Compile Remove="Services\AdoBiRepository.cs" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <None Remove="Map\ModelMap.xml" />
     <None Remove="SQL\20210414-FBSQL.sql" />
     <None Remove="SQL\20210414-PSQL.sql" />
@@ -191,10 +187,6 @@
     <None Remove="SQL\FBSQL\Updates\20220912-FBSQL.sql" />
     <None Remove="SQL\FBSQL\Updates\20220927-FBSQL.sql" />
     <None Remove="SQL\FBSQL\Updates\20220927-PSQL.sql" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Content Include="Services\AdoBiRepository.cs" />
   </ItemGroup>
   
   <ItemGroup>
