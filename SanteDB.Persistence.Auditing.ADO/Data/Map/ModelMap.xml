@@ -19,24 +19,25 @@
  - Date: 2023-3-10
  -->
 <modelMap xmlns="http://santedb.org/model/map">
-  <class modelClass="SanteDB.Core.Model.Audit.AuditEventData, SanteDB.Core.Model, Version=1.1.0.0"
-		domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditEventData, SanteDB.Persistence.Auditing.ADO, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Audit.AuditEventData, SanteDB.Core.Model"
+		domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditEventData, SanteDB.Persistence.Auditing.ADO">
+    <property modelName="ModifiedOn" domainName="CreationTime" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Audit.AuditActorData, SanteDB.Core.Model, Version=1.1.0.0"
-  domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditActor, SanteDB.Persistence.Auditing.ADO, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Audit.AuditActorData, SanteDB.Core.Model"
+  domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditActor, SanteDB.Persistence.Auditing.ADO">
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Audit.AuditableObject, SanteDB.Core.Model, Version=1.1.0.0"
-domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditObject, SanteDB.Persistence.Auditing.ADO, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Audit.AuditableObject, SanteDB.Core.Model"
+domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditObject, SanteDB.Persistence.Auditing.ADO">
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Audit.AuditCode, SanteDB.Core.Model, Version=1.1.0.0"
-domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditCode, SanteDB.Persistence.Auditing.ADO, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Audit.AuditCode, SanteDB.Core.Model"
+domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditCode, SanteDB.Persistence.Auditing.ADO">
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Audit.AuditMetadata, SanteDB.Core.Model, Version=1.1.0.0"
-domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditMetadata, SanteDB.Persistence.Auditing.ADO, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Audit.AuditMetadata, SanteDB.Core.Model"
+domainClass="SanteDB.Persistence.Auditing.ADO.Data.Model.DbAuditMetadata, SanteDB.Persistence.Auditing.ADO">
     <property modelName="Key" domainName="MetadataKey"/>
   </class>
 </modelMap>
