@@ -160,7 +160,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             IQueryPersistenceService queryPersistence,
             IServiceManager serviceManager,
             IJobManagerService jobManager = null,
-            IJobScheduleManager jobScheduleManager = null,
             IAdhocCacheService adhocCacheService = null)
         {
             this.m_configuration = configurationManager.GetSection<AdoAuditConfigurationSection>();
@@ -205,7 +204,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 {
                     var job = serviceManager.CreateInjected<AuditRetentionJob>();
                     jobManager.AddJob(job, JobStartType.DelayStart);
-                    jobScheduleManager.Add(job, new TimeSpan(1, 0, 0, 0));
+                    jobManager.SetJobSchedule(job, new TimeSpan(1, 0, 0, 0));
                 }
             }
             catch (ModelMapValidationException e)

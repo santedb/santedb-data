@@ -80,7 +80,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// ADO Persistence service
         /// </summary>
-        public AdoPersistenceService(IConfigurationManager configManager, IServiceManager serviceManager, IJobManagerService jobManager, IBiMetadataRepository biMetadataRepository = null)
+        public AdoPersistenceService(IConfigurationManager configManager, IServiceManager serviceManager, IJobManagerService jobManager, IBiMetadataRepository biMetadataRepository)
         {
             try
             {
@@ -117,8 +117,7 @@ namespace SanteDB.Persistence.Data.Services
                 using (AuthenticationContext.EnterSystemContext())
                 {
                     // Add audits as a BI data source
-                    biMetadataRepository?
-                        .Insert(new BiDataSourceDefinition()
+                    biMetadataRepository.Insert(new BiDataSourceDefinition()
                         {
                             IsSystemObject = true,
                             ConnectionString = this.m_configuration.ReadonlyConnectionString,
@@ -136,8 +135,7 @@ namespace SanteDB.Persistence.Data.Services
                             ProviderType = typeof(OrmBiDataProvider)
                         });
 
-                    biMetadataRepository?
-                        .Insert(new BiDataSourceDefinition()
+                    biMetadataRepository.Insert(new BiDataSourceDefinition()
                         {
                             IsSystemObject = true,
                             ConnectionString = this.m_configuration.ReadonlyConnectionString,

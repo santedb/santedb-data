@@ -165,11 +165,14 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(dataMartDefinition));
             }
 
-            // Ensure the definition is valid and checks out!
-            var validationResult = dataMartDefinition.Validate();
-            if (validationResult.Any(d => d.Priority == Core.BusinessRules.DetectedIssuePriorityType.Error))
+            // Ensure the definition is valid and checks out! (use SYSTEM since we're not accessing anything and we dont' care about permissions at this point
+            using (AuthenticationContext.EnterSystemContext())
             {
-                throw new DetectedIssueException(validationResult);
+                var validationResult = dataMartDefinition.Validate();
+                if (validationResult.Any(d => d.Priority == Core.BusinessRules.DetectedIssuePriorityType.Error))
+                {
+                    throw new DetectedIssueException(validationResult);
+                }
             }
 
             this.m_pepService.Demand(PermissionPolicyIdentifiers.AdministerWarehouse);
