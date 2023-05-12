@@ -117,7 +117,7 @@ namespace SanteDB.Persistence.Data.Services
                 using (AuthenticationContext.EnterSystemContext())
                 {
                     // Add audits as a BI data source
-                    biMetadataRepository.Insert(new BiDataSourceDefinition()
+                    biMetadataRepository?.Insert(new BiDataSourceDefinition()
                         {
                             IsSystemObject = true,
                             ConnectionString = this.m_configuration.ReadonlyConnectionString,
@@ -135,7 +135,7 @@ namespace SanteDB.Persistence.Data.Services
                             ProviderType = typeof(OrmBiDataProvider)
                         });
 
-                    biMetadataRepository.Insert(new BiDataSourceDefinition()
+                    biMetadataRepository?.Insert(new BiDataSourceDefinition()
                         {
                             IsSystemObject = true,
                             ConnectionString = this.m_configuration.ReadonlyConnectionString,
