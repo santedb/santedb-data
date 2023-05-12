@@ -54,7 +54,8 @@ namespace SanteDB.Persistence.Data.Services
             typeof(AdoJobManager),
             typeof(OrmBiDataProvider),
             typeof(OrmBiDataIntegrator),
-            typeof(AdoRecordMatchingConfigurationService)
+            typeof(AdoRecordMatchingConfigurationService),
+            typeof(AdoRelationshipValidationProvider)
         };
 
         // Gets the configuration

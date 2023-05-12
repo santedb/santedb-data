@@ -24,6 +24,7 @@ using SanteDB.Core.i18n;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
@@ -111,6 +112,7 @@ namespace SanteDB.Persistence.Data.Services
         private readonly AdoPersistenceConfigurationSection m_configuration;
         private readonly IPolicyEnforcementService m_pepService;
         private readonly IQueryPersistenceService m_queryPersistence;
+        private readonly ModelMapper m_mapper;
 
         /// <summary>
         /// DI constructor
@@ -120,6 +122,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_pepService = pepService;
             this.m_queryPersistence = queryPersistenceService;
+            this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
         }
 
         private RelationshipTargetType GetRelationshipTargetType<TRelationship>() where TRelationship : ITargetedAssociation
@@ -301,7 +304,8 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<IRelationshipValidationRule, bool>> query)
         {
-            throw new NotImplementedException(); // TODO: Implement this
+            var dbQuery = this.m_mapper.MapModelExpression<IRelationshipValidationRule, DbRelationshipValidationRule, bool>(query);
+            return context.Query<DbRelationshipValidationRule>(dbQuery);
         }
 
         /// <inheritdoc/>
@@ -334,7 +338,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public LambdaExpression MapExpression<TReturn>(Expression<Func<IRelationshipValidationRule, TReturn>> sortExpression)
         {
-            throw new NotImplementedException();
+            return this.m_mapper.MapModelExpression<IRelationshipValidationRule, DbRelationshipValidationRule, TReturn>(sortExpression);
         }
 
         /// <inheritdoc/>
