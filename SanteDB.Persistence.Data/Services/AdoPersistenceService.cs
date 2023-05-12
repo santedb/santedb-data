@@ -80,7 +80,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// ADO Persistence service
         /// </summary>
-        public AdoPersistenceService(IConfigurationManager configManager, IServiceManager serviceManager, IJobManagerService jobManager, IBiMetadataRepository biMetadataRepository)
+        public AdoPersistenceService(IConfigurationManager configManager, IServiceManager serviceManager, IJobManagerService jobManager, IBiMetadataRepository biMetadataRepository = null)
         {
             try
             {
