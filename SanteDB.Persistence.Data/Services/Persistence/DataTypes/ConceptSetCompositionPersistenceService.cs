@@ -2,9 +2,6 @@
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Concepts;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
@@ -24,7 +21,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <inheritdoc/>
         protected override ConceptSetComposition BeforePersisting(DataContext context, ConceptSetComposition data)
         {
-            if(data.Operation == 0) { data.Operation =  ConceptSetCompositionOperation.Include; }
+            if (data.Operation == 0) { data.Operation = ConceptSetCompositionOperation.Include; }
             data.TargetKey = this.EnsureExists(context, data.Target)?.Key ?? data.TargetKey;
             return base.BeforePersisting(context, data);
         }

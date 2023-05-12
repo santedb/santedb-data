@@ -90,7 +90,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         {
                             return existing;
                         }
-                        else if(DataPersistenceControlContext.Current?.AutoInsertChildren ?? this.m_configuration.AutoInsertChildren)
+                        else if (DataPersistenceControlContext.Current?.AutoInsertChildren ?? this.m_configuration.AutoInsertChildren)
                         {
                             return persistenceService.Insert(context, data);
                         }
@@ -113,7 +113,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     return data;
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_DEPENDENT_ENSURE_ERROR, new { dataObject = data.ToString() }), e);
             }
@@ -520,11 +520,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
                 return a;
             }).ToArray();
-            var existingKeys = associations.Select(k => k.Key).Where(o=>o.HasValue).ToArray();
+            var existingKeys = associations.Select(k => k.Key).Where(o => o.HasValue).ToArray();
             // Next we want to perform a relationship query to establish what is being loaded and what is being persisted
             var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key || existingKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
             // Which are new and which are not?
-            var removedRelationships = existing.Where(o =>  associations.Any(a => a.Key == o && a.BatchOperation == Core.Model.DataTypes.BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a =>
+            var removedRelationships = existing.Where(o => associations.Any(a => a.Key == o && a.BatchOperation == Core.Model.DataTypes.BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a =>
             {
                 return persistenceService.Delete(context, a.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
             });

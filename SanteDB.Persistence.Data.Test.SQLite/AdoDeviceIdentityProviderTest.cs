@@ -18,7 +18,6 @@
  * User: fyfej
  * Date: 2023-3-10
  */
-using Microsoft.Data.Sqlite;
 using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Exceptions;

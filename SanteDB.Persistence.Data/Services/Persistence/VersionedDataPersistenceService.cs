@@ -937,7 +937,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             var existing = context.Query<TAssociativeTable>(o => o.SourceKey == sourceKey && !o.ObsoleteVersionSequenceId.HasValue).ToArray();
 
             // Which ones are new?
-            var contextKeys = context.Data.Where(o => o.Value is BatchOperationType bt && bt != BatchOperationType.Delete).Select(o => (TAssociativeTable)existing.OfType<IDbIdentified>().FirstOrDefault(i=>i.Key == Guid.Parse(o.Key))).ToArray();
+            var contextKeys = context.Data.Where(o => o.Value is BatchOperationType bt && bt != BatchOperationType.Delete).Select(o => (TAssociativeTable)existing.OfType<IDbIdentified>().FirstOrDefault(i => i.Key == Guid.Parse(o.Key))).ToArray();
             var removeRelationships = existing.Where(e => !associations.Any(a => a.Equals(e)));
             removeRelationships = removeRelationships.Except(contextKeys);
             var addRelationships = associations.Where(a => !existing.Any(e => e.Equals(a)));

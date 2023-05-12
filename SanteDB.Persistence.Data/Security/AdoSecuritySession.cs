@@ -77,11 +77,11 @@ namespace SanteDB.Persistence.Data.Security
                 new SanteDBClaim(ClaimTypes.IsPersistent, "true")
             };
 
-            if(!String.IsNullOrEmpty(sessionInfo.RemoteEndpoint))
+            if (!String.IsNullOrEmpty(sessionInfo.RemoteEndpoint))
             {
                 addlClaims.Add(new SanteDBClaim(SanteDBClaimTypes.RemoteEndpointClaim, sessionInfo.RemoteEndpoint));
             }
-            if(!String.IsNullOrEmpty(sessionInfo.Audience))
+            if (!String.IsNullOrEmpty(sessionInfo.Audience))
             {
                 addlClaims.Add(new SanteDBClaim(SanteDBClaimTypes.AudienceClaim, sessionInfo.Audience));
             }

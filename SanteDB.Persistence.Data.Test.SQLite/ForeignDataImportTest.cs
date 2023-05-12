@@ -33,8 +33,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Test.SQLite
 {
@@ -98,7 +96,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
                 // Load the foreign data map
                 using (var definitionStream = typeof(ForeignDataImportTest).Assembly.GetManifestResourceStream("SanteDB.Persistence.Data.Test.SQLite.Resources.SimpleDataMap.xml"))
                 {
-                    var fdm = ForeignDataMap.Load(definitionStream).Maps.First() ;
+                    var fdm = ForeignDataMap.Load(definitionStream).Maps.First();
                     Assert.IsNotNull(fdm);
                     Assert.IsTrue(ForeignDataImportUtil.Current.TryGetDataFormat("csv", out var foreignDataFormat));
                     using (var rejectStream = new MemoryStream())

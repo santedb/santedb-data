@@ -200,7 +200,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 this.m_builder = new QueryBuilder(this.m_mapper, this.m_configuration.Provider.StatementFactory);
 
                 // Register the audit jobs
-                if(jobManager?.IsJobRegistered(typeof(AuditRetentionJob)) == false)
+                if (jobManager?.IsJobRegistered(typeof(AuditRetentionJob)) == false)
                 {
                     var job = serviceManager.CreateInjected<AuditRetentionJob>();
                     jobManager.AddJob(job, JobStartType.DelayStart);

@@ -18,14 +18,10 @@
  * User: fyfej
  * Date: 2023-3-10
  */
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Wordprocessing;
 using SanteDB.BI.Datamart;
 using SanteDB.BI.Datamart.DataFlow;
 using SanteDB.BI.Model;
 using SanteDB.BI.Services;
-using SanteDB.Core.Configuration.Data;
-using SanteDB.Core.Data.Import;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
@@ -36,11 +32,9 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.MappedResultSets;
-using SanteDB.OrmLite.Migration;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.BI;
 using SanteDB.Persistence.Data.Configuration;
-using SanteDB.Persistence.Data.ForeignData;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
@@ -108,7 +102,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new ArgumentNullException(nameof(query));
             }
-            if(!this.m_pepService.SoftDemand(PermissionPolicyIdentifiers.QueryWarehouseData, AuthenticationContext.Current.Principal))
+            if (!this.m_pepService.SoftDemand(PermissionPolicyIdentifiers.QueryWarehouseData, AuthenticationContext.Current.Principal))
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.AdministerWarehouse);
             }
@@ -129,7 +123,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public IDataFlowExecutionContext GetExecutionContext(IDatamart datamart, DataFlowExecutionPurposeType purpose)
         {
-            if(datamart == null)
+            if (datamart == null)
             {
                 throw new ArgumentNullException(nameof(datamart));
             }
@@ -138,15 +132,15 @@ namespace SanteDB.Persistence.Data.Services
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.ReadWarehouseData);
             }
-            else if(purpose.HasFlag(DataFlowExecutionPurposeType.DatabaseManagement))
+            else if (purpose.HasFlag(DataFlowExecutionPurposeType.DatabaseManagement))
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration);
             }
-            else if(purpose.HasFlag(DataFlowExecutionPurposeType.SchemaManagement))
+            else if (purpose.HasFlag(DataFlowExecutionPurposeType.SchemaManagement))
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.AdministerWarehouse);
             }
-            else if(purpose.HasFlag(DataFlowExecutionPurposeType.Refresh))
+            else if (purpose.HasFlag(DataFlowExecutionPurposeType.Refresh))
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.WriteWarehouseData);
             }
@@ -185,7 +179,7 @@ namespace SanteDB.Persistence.Data.Services
                     using (var tx = context.BeginTransaction())
                     {
                         var existing = context.Query<DbDatamartRegistration>(o => o.Id == dataMartDefinition.Id && o.ObsoletionTime == null).FirstOrDefault();
-                        
+
                         // Register the datamart
                         if (existing == null)
                         {
@@ -233,7 +227,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 return new AdoBiDatamart(dbfds, this.m_configuration.Provider);
             }
-            else if(result == null)
+            else if (result == null)
             {
                 return null;
             }
@@ -271,9 +265,9 @@ namespace SanteDB.Persistence.Data.Services
                         context.Update(existing);
 
                         // Delete executions 
-                        foreach(var itm in context.Query<DbDatamartExecutionEntry>(o => o.DatamartKey == existing.Key).ToArray())
+                        foreach (var itm in context.Query<DbDatamartExecutionEntry>(o => o.DatamartKey == existing.Key).ToArray())
                         {
-                            if(itm.DiagnosticStreamKey.HasValue)
+                            if (itm.DiagnosticStreamKey.HasValue)
                             {
                                 this.m_dataStreamManager.Remove(itm.DiagnosticStreamKey.Value);
                             }

@@ -65,7 +65,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Security
             // The user may be trying to purge old provenance objects
             if (deleteMode == DeleteMode.PermanentDelete) // this statement will fail due to RI in the database anyways - so just send it
             {
-                foreach(var itm in base.DoDeleteAllInternal(context, expression, deleteMode))
+                foreach (var itm in base.DoDeleteAllInternal(context, expression, deleteMode))
                 {
                     yield return itm;
                 }

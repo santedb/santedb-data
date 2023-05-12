@@ -18,7 +18,6 @@
  * User: fyfej
  * Date: 2023-3-10
  */
-using DocumentFormat.OpenXml.Wordprocessing;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;

@@ -20,7 +20,6 @@
  */
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
-using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;

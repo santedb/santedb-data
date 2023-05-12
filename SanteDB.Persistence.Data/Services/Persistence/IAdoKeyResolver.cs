@@ -18,13 +18,10 @@
  * User: fyfej
  * Date: 2023-3-10
  */
-using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Persistence.Data.Model;
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {

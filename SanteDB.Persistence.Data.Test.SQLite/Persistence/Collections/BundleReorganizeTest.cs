@@ -20,7 +20,6 @@
  */
 using NUnit.Framework;
 using SanteDB.Core;
-using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;

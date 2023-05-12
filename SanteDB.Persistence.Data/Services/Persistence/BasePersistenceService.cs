@@ -23,7 +23,6 @@ using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
-using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
@@ -33,7 +32,6 @@ using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model;
-using SanteDB.Persistence.Data.Model.Sys;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -270,7 +268,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 throw new ArgumentNullException(nameof(data), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            else if(data.IsEmpty()) // No sense in persisting an empty data object
+            else if (data.IsEmpty()) // No sense in persisting an empty data object
             {
                 return data;
             }

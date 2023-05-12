@@ -179,7 +179,7 @@ namespace SanteDB.Persistence.Data.Services
                             this.m_tfaRelay.SendSecret(dbUser.TwoFactorMechnaismKey.Value, new AdoUserIdentity(dbUser));
                             throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ));
                         }
-                        else if (dbUser.TwoFactorEnabled && !this.m_tfaRelay.ValidateSecret(dbUser.TwoFactorMechnaismKey.Value, identity , tfaSecret))
+                        else if (dbUser.TwoFactorEnabled && !this.m_tfaRelay.ValidateSecret(dbUser.TwoFactorMechnaismKey.Value, identity, tfaSecret))
                         {
                             throw new InvalidIdentityAuthenticationException();
                         }

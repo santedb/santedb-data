@@ -25,7 +25,6 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Core.TestFramework;
 using SanteDB.Persistence.Data.Services;
-using SQLitePCL;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -76,11 +75,11 @@ namespace SanteDB.Persistence.Data.Test.SQLite
         [OneTimeSetUp]
         public virtual void Setup()
         {
-            
+
             this.m_localizationService = new TestLocalizationService();
             TestApplicationContext.TestAssembly = typeof(DataPersistenceTest).Assembly;
             TestApplicationContext.Initialize(TestContext.CurrentContext.TestDirectory);
-            
+
             this.m_serviceManager = ApplicationServiceContext.Current.GetService<IServiceManager>();
             this.m_serviceManager.AddServiceProvider(typeof(TestQueryPersistenceService));
             this.m_serviceManager.AddServiceProvider(typeof(AdoApplicationIdentityProvider));

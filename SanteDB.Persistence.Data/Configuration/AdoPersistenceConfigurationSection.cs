@@ -21,8 +21,6 @@
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite.Configuration;
-using SanteDB.OrmLite.Providers;
-using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -146,7 +144,8 @@ namespace SanteDB.Persistence.Data.Configuration
         public bool LegacyPepper
         {
             get => this.m_legacyPepper;
-            set {
+            set
+            {
                 this.m_legacyPepper = value;
                 this.LegacyPepperSpecified = true;
             }

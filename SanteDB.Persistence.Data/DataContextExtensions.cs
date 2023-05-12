@@ -402,10 +402,10 @@ namespace SanteDB.Persistence.Data
             }
             else // Establish the slow way - using identity name
             {
-                switch(principal.Identity)
+                switch (principal.Identity)
                 {
                     case IDeviceIdentity di:
-                        retVal.DeviceKey = me.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == di.Name.ToLowerInvariant()).Select(o=>o.Key).First();
+                        retVal.DeviceKey = me.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == di.Name.ToLowerInvariant()).Select(o => o.Key).First();
                         retVal.ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid);
                         break;
                     case IApplicationIdentity ai:

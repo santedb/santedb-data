@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -173,7 +172,7 @@ namespace SanteDB.Persistence.Data.Services
         public IRecordMatchingConfiguration SaveConfiguration(IRecordMatchingConfiguration configuration)
         {
 
-            if(configuration == null)
+            if (configuration == null)
             {
                 throw new ArgumentNullException(nameof(configuration));
             }
@@ -182,15 +181,15 @@ namespace SanteDB.Persistence.Data.Services
 
             try
             {
-                using(var context = this.m_configuration.Provider.GetWriteConnection())
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open();
 
-                    using(var tx = context.BeginTransaction())
+                    using (var tx = context.BeginTransaction())
                     {
                         context.EstablishProvenance(AuthenticationContext.Current.Principal);
                         // First - check if we already have a root
-                        if(configuration is MatchConfiguration mcc)
+                        if (configuration is MatchConfiguration mcc)
                         {
                             mcc = this.SaveInternal(context, mcc);
                             tx.Commit();
@@ -221,7 +220,7 @@ namespace SanteDB.Persistence.Data.Services
         private MatchConfiguration SaveInternal(DataContext context, MatchConfiguration configuration)
         {
             var existingRoot = context.FirstOrDefault<DbMatchConfiguration>(o => o.Id == configuration.Id);
-            if(existingRoot == null)
+            if (existingRoot == null)
             {
                 existingRoot = context.Insert(new DbMatchConfiguration()
                 {
@@ -234,7 +233,7 @@ namespace SanteDB.Persistence.Data.Services
             // Existing version?
             var currentVersion = context.Query<DbMatchConfigurationVersion>(o => o.IsHeadVersion).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault();
             var newVersion = new DbMatchConfigurationVersion();
-            if(currentVersion != null)
+            if (currentVersion != null)
             {
                 newVersion = new DbMatchConfigurationVersion().CopyObjectData(currentVersion);
                 newVersion.ReplacesVersionKey = currentVersion.VersionKey;
@@ -245,7 +244,7 @@ namespace SanteDB.Persistence.Data.Services
                 newVersion.ObsoletionTime = null;
                 newVersion.ObsoletedByKey = null;
                 currentVersion.IsHeadVersion = false;
-                
+
                 newVersion.ObsoletedByKeySpecified = newVersion.ObsoletionTimeSpecified = true;
                 context.Update(currentVersion);
             }
@@ -263,7 +262,8 @@ namespace SanteDB.Persistence.Data.Services
             newVersion.AppliesToType = new TypeReferenceConfiguration(configuration.AppliesTo.First()).TypeXml;
             newVersion.Status = configuration.Metadata?.Status ?? MatchConfigurationStatus.Inactive;
             configuration.Metadata.Version += 1;
-            using (var ms = new MemoryStream()) {
+            using (var ms = new MemoryStream())
+            {
                 configuration.Save(ms);
                 newVersion.Definition = ms.ToArray();
             }

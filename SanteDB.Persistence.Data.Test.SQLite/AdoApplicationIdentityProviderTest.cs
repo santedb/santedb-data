@@ -50,7 +50,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
             var serviceProvider = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
             // Pre-Condition
             Assert.IsNull(serviceProvider.GetIdentity("TEST_APP_001"));
-            
+
             // Create the device identity
             var appIdentity = serviceProvider.CreateIdentity("TEST_APP_001", "THIS_IS_A_SECRET", AuthenticationContext.SystemPrincipal);
             Assert.IsNotNull(appIdentity);

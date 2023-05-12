@@ -6,13 +6,11 @@ using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
-using SanteDB.Persistence.Data.Model.Concepts;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Jobs
 {
@@ -105,7 +103,7 @@ namespace SanteDB.Persistence.Data.Jobs
                         var delSessions = context.Query<DbSession>(o => o.NotAfter < cutoff).Select(o => o.Key).ToArray();
                         // HACK: The IN() statement can only have a certain number of elements so we want to chunk our delete 
                         var c = 0;
-                        while(c < delSessions.Length)
+                        while (c < delSessions.Length)
                         {
                             var batch = delSessions.Skip(c).Take(50).ToArray();
                             context.DeleteAll<DbSessionClaim>(o => batch.Contains(o.SessionKey));
@@ -129,12 +127,12 @@ namespace SanteDB.Persistence.Data.Jobs
                     }
 
                     // Prune deleted objects
-                    using(var tx = context.BeginTransaction())
+                    using (var tx = context.BeginTransaction())
                     {
                         var trimHelpers = this.m_serviceManager.GetServices().OfType<IAdoTrimProvider>().ToArray();
-                        
+
                         var c = 0;
-                        foreach(var th in trimHelpers)
+                        foreach (var th in trimHelpers)
                         {
                             if (this.m_cancelRequest)
                             {
@@ -152,7 +150,7 @@ namespace SanteDB.Persistence.Data.Jobs
                 this.m_jobStateManager.SetState(this, JobStateType.Completed);
                 audit.WithOutcome(OutcomeIndicator.Success);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.m_tracer.TraceError("Error running trim job: {0}", ex.ToHumanReadableString());
                 this.m_jobStateManager.SetState(this, JobStateType.Aborted);

@@ -118,40 +118,40 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     // Add audits as a BI data source
                     biMetadataRepository?.Insert(new BiDataSourceDefinition()
+                    {
+                        IsSystemObject = true,
+                        ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                        Status = BiDefinitionStatus.Active,
+                        MetaData = new BiMetadata()
                         {
-                            IsSystemObject = true,
-                            ConnectionString = this.m_configuration.ReadonlyConnectionString,
-                            Status = BiDefinitionStatus.Active,
-                            MetaData = new BiMetadata()
-                            {
-                                Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
-                                Demands = new List<string>()
+                            Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
+                            Demands = new List<string>()
                                 {
                                 PermissionPolicyIdentifiers.ReadClinicalData
                                 }
-                            },
-                            Id = "org.santedb.bi.dataSource.main",
-                            Name = "main",
-                            ProviderType = typeof(OrmBiDataProvider)
-                        });
+                        },
+                        Id = "org.santedb.bi.dataSource.main",
+                        Name = "main",
+                        ProviderType = typeof(OrmBiDataProvider)
+                    });
 
                     biMetadataRepository?.Insert(new BiDataSourceDefinition()
+                    {
+                        IsSystemObject = true,
+                        ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                        Status = BiDefinitionStatus.Active,
+                        MetaData = new BiMetadata()
                         {
-                            IsSystemObject = true,
-                            ConnectionString = this.m_configuration.ReadonlyConnectionString,
-                            Status = BiDefinitionStatus.Active,
-                            MetaData = new BiMetadata()
-                            {
-                                Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
-                                Demands = new List<string>()
+                            Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
+                            Demands = new List<string>()
                                 {
                                 PermissionPolicyIdentifiers.UnrestrictedAdministration
                                 }
-                            },
-                            Id = "org.santedb.bi.dataSource.admin",
-                            Name = "admin",
-                            ProviderType = typeof(OrmBiDataProvider)
-                        });
+                        },
+                        Id = "org.santedb.bi.dataSource.admin",
+                        Name = "admin",
+                        ProviderType = typeof(OrmBiDataProvider)
+                    });
                 };
             }
             catch (ModelMapValidationException e)

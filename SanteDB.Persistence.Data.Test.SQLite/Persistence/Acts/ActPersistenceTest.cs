@@ -365,9 +365,9 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                 Assert.AreEqual("HasSubject", afterQuery.Relationships[0].LoadProperty(o => o.RelationshipType).Mnemonic);
                 Assert.AreEqual(IntoleranceObservationTypeKeys.DrugIntolerance, afterQuery.Relationships[0].LoadProperty(o => o.TargetAct).TypeConceptKey);
                 Assert.AreEqual(3, afterQuery.LoadProperty(o => o.Participations).Count);
-                Assert.IsTrue(afterQuery.Participations.Any(p=>p.ParticipationRoleKey == ActParticipationKeys.Location), "Missing Location");
-                Assert.IsTrue(afterQuery.Participations.Any(p=>p.ParticipationRoleKey == ActParticipationKeys.Authororiginator), "Missing Authororiginator");
-                Assert.IsTrue(afterQuery.Participations.Any(p=>p.ParticipationRoleKey == ActParticipationKeys.Performer), "Missing Performer");
+                Assert.IsTrue(afterQuery.Participations.Any(p => p.ParticipationRoleKey == ActParticipationKeys.Location), "Missing Location");
+                Assert.IsTrue(afterQuery.Participations.Any(p => p.ParticipationRoleKey == ActParticipationKeys.Authororiginator), "Missing Authororiginator");
+                Assert.IsTrue(afterQuery.Participations.Any(p => p.ParticipationRoleKey == ActParticipationKeys.Performer), "Missing Performer");
                 Assert.AreEqual("Good Health Hospital Testing Facility", afterQuery.Participations[0].LoadProperty(o => o.PlayerEntity).LoadProperty(o => o.Names).First().LoadProperty(o => o.Component).First().Value);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Identifiers).Count);
                 Assert.AreEqual("123-303-TEST30", afterQuery.Identifiers.First().Value);

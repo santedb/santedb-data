@@ -37,14 +37,12 @@ using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.ForeignData;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Sys;
-using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -81,24 +79,24 @@ namespace SanteDB.Persistence.Data.Services
             this.m_queryPersistenceService = queryPersistence;
             this.m_streamManager = foreignDataStreamManager;
             this.m_importService = importService;
-            
+
             this.m_foreignDataMapRepository = foreignDataMapRepository;
             this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
-            
+
             // Reset the state of running jobs
             try
             {
-                using(var context = this.m_configuration.Provider.GetWriteConnection())
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open();
-                    foreach(var rj in context.Query<DbForeignDataStage>(o=>o.Status == ForeignDataStatus.Running).ToArray())
+                    foreach (var rj in context.Query<DbForeignDataStage>(o => o.Status == ForeignDataStatus.Running).ToArray())
                     {
                         rj.Status = ForeignDataStatus.Staged;
                         context.Update(rj);
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceError("Error resetting job status: {0}", e);
             }
@@ -276,15 +274,15 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                             }
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             var exceptionString = String.Empty;
                             var ce = e;
-                            while(ce != null)
+                            while (ce != null)
                             {
                                 exceptionString += ce.Message;
                                 ce = ce.InnerException;
-                                if(ce != null)
+                                if (ce != null)
                                 {
                                     exceptionString += ". CAUSE: ";
                                 }
@@ -432,7 +430,7 @@ namespace SanteDB.Persistence.Data.Services
                                 context.EstablishProvenance(AuthenticationContext.Current.Principal);
                                 context.DeleteAll<DbForeignDataIssue>(o => o.SourceKey == foreignDataId);
                                 var issues = this.ValidateInternal(context, existing).ToArray();
-                                
+
                                 tx.Commit();
                                 return new AdoForeignDataSubmission(existing, issues.ToArray(), this.m_streamManager);
                             }
@@ -520,7 +518,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 return new AdoForeignDataSubmission(dbfds, context.Query<DbForeignDataIssue>(o => o.SourceKey == dbfds.Key).ToArray(), this.m_streamManager);
             }
-            else if(result == null)
+            else if (result == null)
             {
                 return null;
             }

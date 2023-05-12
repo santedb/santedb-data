@@ -250,7 +250,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 purpose = claimsPrincipal.FindFirst(SanteDBClaimTypes.PurposeOfUse).Value;
             }
-           
+
             // Validate override permission for the user
             if (isOverride)
             {
@@ -357,7 +357,7 @@ namespace SanteDB.Persistence.Data.Services
                         };
 
                         // Sessions with 
-                        if(String.IsNullOrEmpty(purpose) && !isOverride && userKey != null)
+                        if (String.IsNullOrEmpty(purpose) && !isOverride && userKey != null)
                         {
                             refreshToken = new byte[32];
                             System.Security.Cryptography.RandomNumberGenerator.Create().GetBytes(refreshToken);
@@ -390,7 +390,7 @@ namespace SanteDB.Persistence.Data.Services
                         var sessionScopes = new List<string>();
                         if (scope == null || scope.Contains("*"))
                         {
-                            sessionScopes.AddRange(this.m_pdpService.GetEffectivePolicySet(principal).Where(o=>o.Rule == Core.Model.Security.PolicyGrantType.Grant).Select(c => c.Policy.Oid));
+                            sessionScopes.AddRange(this.m_pdpService.GetEffectivePolicySet(principal).Where(o => o.Rule == Core.Model.Security.PolicyGrantType.Grant).Select(c => c.Policy.Oid));
                         }
 
                         // Explicitly set scopes
@@ -507,7 +507,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         // Validate that the audience has not changed!
-                        if(providedAudience != dbSession.Audience)
+                        if (providedAudience != dbSession.Audience)
                         {
                             throw new SecuritySessionException(SessionExceptionType.Other, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_AUDIENCE_CHANGED), null);
                         }
@@ -577,9 +577,9 @@ namespace SanteDB.Persistence.Data.Services
                         )?.ToList();
 
                     return sessions
-                        .Select(s=>new AdoSecuritySession(s.Key.ToByteArray(), null, s, context.Query<DbSessionClaim>(sc=>sc.SessionKey == s.Key))).ToArray();
+                        .Select(s => new AdoSecuritySession(s.Key.ToByteArray(), null, s, context.Query<DbSessionClaim>(sc => sc.SessionKey == s.Key))).ToArray();
                 }
-                catch(Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
+                catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
                 {
                     this.m_tracer.TraceError("Error getting session data {0}", ex);
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_GEN_ERR), ex);

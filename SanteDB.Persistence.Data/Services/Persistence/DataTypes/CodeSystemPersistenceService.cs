@@ -23,7 +23,6 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
-using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {

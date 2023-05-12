@@ -21,7 +21,6 @@
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
-using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Exceptions;
 using SanteDB.Persistence.Data.Model.Security;
 using System;

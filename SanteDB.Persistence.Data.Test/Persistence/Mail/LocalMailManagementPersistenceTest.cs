@@ -93,9 +93,9 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
 
                 // Now we want to test the sorting and search of the mailbox
                 // NOTE: FIREBIRD DOES NOT SUPPORT INTERSECT SO WE COLLAPSE THE ENUMARBLE TO AN ARRAY FIRST 
-                Assert.AreEqual(1, messages.ToArray().Where(s => s.LoadProperty(o=>o.Target.Subject) == "This is a test").Count());
+                Assert.AreEqual(1, messages.ToArray().Where(s => s.LoadProperty(o => o.Target.Subject) == "This is a test").Count());
                 Assert.AreEqual(0, messages.ToArray().Where(s => s.Target.Body == "This is a test").Count());
-                Assert.AreEqual("This is another test", messages.ToArray().Where(s => s.Target.Flags == MailMessageFlags.LowPriority).First().LoadProperty(o=>o.Target).Subject);
+                Assert.AreEqual("This is another test", messages.ToArray().Where(s => s.Target.Flags == MailMessageFlags.LowPriority).First().LoadProperty(o => o.Target).Subject);
 
             }
 
@@ -163,7 +163,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
                 var mailboxes = mailService.GetMailboxes().Where(o => o.Name == Mailbox.INBOX_NAME).FirstOrDefault();
                 var messages = mailService.GetMessages(Mailbox.INBOX_NAME);
                 Assert.GreaterOrEqual(messages.Count(), 1);
-                Assert.AreEqual("Test from FOO", messages.First().LoadProperty(o=>o.Target).Subject);
+                Assert.AreEqual("Test from FOO", messages.First().LoadProperty(o => o.Target).Subject);
                 Assert.AreEqual("TEST_MAIL_TO2", messages.First().LoadProperty(o => o.Target).From);
                 Assert.AreEqual("SYSTEM;TEST_MAIL_TO2", messages.First().LoadProperty(o => o.Target).To);
 

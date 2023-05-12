@@ -174,7 +174,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc />
-        public IRelationshipValidationRule GetRuleByKey(Guid key) 
+        public IRelationshipValidationRule GetRuleByKey(Guid key)
         {
             if (key == Guid.Empty)
             {
@@ -244,18 +244,18 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
                     var existing = context.FirstOrDefault<DbRelationshipValidationRule>(r => r.Key == key);
-                    if(existing == null)
+                    if (existing == null)
                     {
                         throw new KeyNotFoundException(key.ToString());
                     }
                     context.Delete(existing);
                     return new AdoRelationshipValidationRule(existing);
                 }
-                catch(DbException dbex)
+                catch (DbException dbex)
                 {
                     throw dbex.TranslateDbException();
                 }
-                catch(Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
+                catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
                 {
                     throw new DataPersistenceException($"Error removing validation rule with id {key}", ex);
                 }
@@ -291,7 +291,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public IQueryResultSet<IRelationshipValidationRule> QueryRelationships(Expression<Func<IRelationshipValidationRule, bool>> query)
         {
-            if(query == null)
+            if (query == null)
             {
                 throw new ArgumentNullException(nameof(query));
             }
@@ -308,7 +308,7 @@ namespace SanteDB.Persistence.Data.Services
         public IRelationshipValidationRule Get(DataContext context, Guid key)
         {
             var existing = context.FirstOrDefault<DbRelationshipValidationRule>(o => o.Key == key);
-            if(existing != null)
+            if (existing != null)
             {
                 return new AdoRelationshipValidationRule(existing);
             }
@@ -321,10 +321,10 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public IRelationshipValidationRule ToModelInstance(DataContext context, object result)
         {
-            if(result is DbRelationshipValidationRule rule)
+            if (result is DbRelationshipValidationRule rule)
             {
                 return new AdoRelationshipValidationRule(rule);
-            }   
+            }
             else
             {
                 throw new ArgumentOutOfRangeException(nameof(result), String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(DbRelationshipValidationRule), result.GetType()));

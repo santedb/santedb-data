@@ -131,7 +131,7 @@ namespace SanteDB.Persistence.Data.Services
                                             throw new ArgumentException("Role does not exist.", nameof(securable));
                                         }
                                     }
-                                    
+
                                     context.DeleteAll<DbSecurityRolePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sr.Key);
                                     context.InsertAll(policies.Select(o => new DbSecurityRolePolicy()
                                     {

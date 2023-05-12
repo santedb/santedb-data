@@ -18,7 +18,6 @@
  * User: fyfej
  * Date: 2023-3-10
  */
-using SanteDB.BI.Rendering;
 using SanteDB.BI.Services.Impl;
 using SanteDB.Client.Configuration;
 using SanteDB.Client.Disconnected.Data.Synchronization;
@@ -30,7 +29,6 @@ using SanteDB.Core.Services.Impl.Repository;
 using SanteDB.Persistence.Data.Services;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Synchronization.ADO.Configuration
 {

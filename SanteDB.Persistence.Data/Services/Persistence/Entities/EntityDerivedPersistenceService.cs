@@ -30,7 +30,6 @@ using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
-using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Entities;

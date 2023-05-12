@@ -1,18 +1,10 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.EMMA;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Office2010.Ink;
-using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.Wordprocessing;
-using SanteDB.BI.Model;
+﻿using SanteDB.BI.Model;
 using SanteDB.BI.Services;
 using SanteDB.Core.Applets;
-using SanteDB.Core.Applets.Model;
 using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
@@ -25,15 +17,12 @@ using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Sys;
 using SharpCompress;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net.Http.Headers;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {

@@ -2,9 +2,7 @@
 using SanteDB.Core.Jobs;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Xml;
 
 namespace SanteDB.Persistence.Data.Jobs

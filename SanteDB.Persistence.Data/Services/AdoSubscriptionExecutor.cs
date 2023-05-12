@@ -193,7 +193,7 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             arguments.AddRange(qValue.Select(v => Guid.Parse(v)).OfType<Object>());
                         }
-                        else if(DateTime.TryParse(qValue.First(), out var dt))
+                        else if (DateTime.TryParse(qValue.First(), out var dt))
                         {
                             arguments.AddRange(qValue.Select(v => DateTime.Parse(v)).OfType<Object>());
                         }

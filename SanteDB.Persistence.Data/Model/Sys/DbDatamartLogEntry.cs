@@ -1,10 +1,6 @@
-﻿using SanteDB.BI.Datamart;
-using SanteDB.OrmLite.Attributes;
-using SanteDB.Persistence.Data.Model.Security;
+﻿using SanteDB.OrmLite.Attributes;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.Tracing;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Model.Sys
 {

@@ -9,7 +9,6 @@ using SanteDB.Persistence.Auditing.ADO.Data.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Auditing.ADO.Jobs
 {

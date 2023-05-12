@@ -1,8 +1,6 @@
 ﻿using SanteDB.Core.Jobs;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Jobs
 {

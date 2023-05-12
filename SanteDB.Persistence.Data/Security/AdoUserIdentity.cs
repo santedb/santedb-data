@@ -23,7 +23,6 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Exceptions;
 using SanteDB.Persistence.Data.Model.Concepts;
-using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Roles;
 using SanteDB.Persistence.Data.Model.Security;

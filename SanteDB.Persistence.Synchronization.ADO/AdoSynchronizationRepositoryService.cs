@@ -20,26 +20,15 @@
  */
 using SanteDB.Client.Disconnected.Data.Synchronization;
 using SanteDB.Core.Diagnostics;
-using SanteDB.Core.Event;
-using SanteDB.Core.Exceptions;
-using SanteDB.Core.Model.Map;
-using SanteDB.Core.Model.Query;
-using SanteDB.Core.Security;
 using SanteDB.Core.Services;
-using SanteDB.OrmLite;
 using SanteDB.OrmLite.Migration;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Synchronization.ADO.Configuration;
 using SanteDB.Persistence.Synchronization.ADO.Model;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
-using System.Security.Principal;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Synchronization.ADO
@@ -230,11 +219,11 @@ namespace SanteDB.Persistence.Synchronization.ADO
         {
             ValidateQueryId(queryId);
 
-            using(var conn = _Provider.GetWriteConnection())
+            using (var conn = _Provider.GetWriteConnection())
             {
                 conn.Open();
                 var existing = conn.FirstOrDefault<DbSynchronizationLogEntry>(o => o.ResourceType == modelType && o.Filter == filter);
-                if(existing != null)
+                if (existing != null)
                 {
                     existing.QueryId = null;
                     existing.QueryOffset = null;
@@ -282,16 +271,16 @@ namespace SanteDB.Persistence.Synchronization.ADO
         /// <inheritdoc />
         public void SaveError(Type modelType, string filter, Exception exception)
         {
-            using(var conn = _Provider.GetWriteConnection())
+            using (var conn = _Provider.GetWriteConnection())
             {
                 conn.Open();
                 var existing = conn.FirstOrDefault<DbSynchronizationLogEntry>(o => o.ResourceType == modelType.Name && o.Filter == filter);
-                if(existing != null)
+                if (existing != null)
                 {
                     existing.LastError = exception.ToHumanReadableString();
                     conn.Update(existing);
                 }
             }
-        } 
+        }
     }
 }

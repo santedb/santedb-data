@@ -97,7 +97,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     break;
             }
 
-            if(referenceObjects.Length == 0)
+            if (referenceObjects.Length == 0)
             {
                 referenceObjects = mapper.GetReferencedObjects(context, dbModel);
             }

@@ -20,16 +20,13 @@
  */
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Data.Import;
-using SanteDB.Core.Data.Import.Definition;
 using SanteDB.Core.Model.Interfaces;
-using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.ForeignData
 {
@@ -46,8 +43,8 @@ namespace SanteDB.Persistence.Data.ForeignData
         /// <summary>
         /// Foreign data information 
         /// </summary>
-        public AdoForeignDataSubmission(DbForeignDataStage foreignDataStage, 
-            IEnumerable<DbForeignDataIssue> issues, 
+        public AdoForeignDataSubmission(DbForeignDataStage foreignDataStage,
+            IEnumerable<DbForeignDataIssue> issues,
             IDataStreamManager dataStreamManager)
         {
             this.Name = foreignDataStage.Name;
@@ -92,13 +89,13 @@ namespace SanteDB.Persistence.Data.ForeignData
 
         /// <inheritdoc/>
         public Guid? CreatedByKey { get; }
-        
+
         /// <inheritdoc/>
-        public Guid? ObsoletedByKey { get;  }
+        public Guid? ObsoletedByKey { get; }
 
         /// <inheritdoc/>
         public DateTimeOffset CreationTime { get; }
-        
+
         /// <inheritdoc/>
         public DateTimeOffset? ObsoletionTime { get; }
 

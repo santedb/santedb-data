@@ -39,7 +39,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <inheritdoc/>
-        public Expression<Func<EntityTag, bool>> GetKeyExpression(EntityTag model) => o => o.SourceEntityKey == model.SourceEntityKey && o.TagKey  == model.TagKey && o.ObsoletionTime == null;
+        public Expression<Func<EntityTag, bool>> GetKeyExpression(EntityTag model) => o => o.SourceEntityKey == model.SourceEntityKey && o.TagKey == model.TagKey && o.ObsoletionTime == null;
 
         /// <inheritdoc/>
         public Expression<Func<DbEntityTag, bool>> GetKeyExpression(DbEntityTag model) => o => o.SourceKey == model.SourceKey && o.TagKey == model.TagKey && o.ObsoletionTime == null;
@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             if (dbModel.TagKey.StartsWith("$"))
                 return dbModel;
-            else 
+            else
                 return base.DoInsertInternal(context, dbModel);
         }
     }

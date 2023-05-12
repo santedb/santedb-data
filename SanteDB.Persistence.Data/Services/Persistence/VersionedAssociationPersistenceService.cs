@@ -53,7 +53,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected abstract long GetCurrentVersionSequenceForSource(DataContext context, Guid sourceKey);
 
         /// <inheritdoc/>
-        protected override bool ValidateCacheItem(TModel cacheEntry, TDbModel dataModel) => cacheEntry.EffectiveVersionSequenceId >= dataModel.EffectiveVersionSequenceId ;
+        protected override bool ValidateCacheItem(TModel cacheEntry, TDbModel dataModel) => cacheEntry.EffectiveVersionSequenceId >= dataModel.EffectiveVersionSequenceId;
 
         /// <summary>
         /// Obsolete all objects
@@ -113,8 +113,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         context.DeleteAll<TDbModel>(domainExpression);
                         break;
                 }
-                
-                foreach(var itm in keyReturn)
+
+                foreach (var itm in keyReturn)
                 {
                     yield return itm;
                 }

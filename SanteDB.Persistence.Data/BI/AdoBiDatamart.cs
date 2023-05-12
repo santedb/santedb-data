@@ -1,13 +1,11 @@
 ﻿using SanteDB.BI.Datamart;
 using SanteDB.BI.Datamart.DataFlow;
-using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.BI
 {
@@ -18,7 +16,7 @@ namespace SanteDB.Persistence.Data.BI
     {
         private readonly IDbProvider m_provider;
 
-        public AdoBiDatamart(DbDatamartRegistration datamart, 
+        public AdoBiDatamart(DbDatamartRegistration datamart,
             IDbProvider dbProvider)
         {
             this.Key = datamart.Key;
@@ -52,7 +50,7 @@ namespace SanteDB.Persistence.Data.BI
         {
             get
             {
-                using(var context = this.m_provider.GetReadonlyConnection())
+                using (var context = this.m_provider.GetReadonlyConnection())
                 {
                     context.Open();
                     return context.Query<DbDatamartExecutionEntry>(o => o.DatamartKey == this.Key).OrderByDescending(o => o.StartTime).Take(25).ToList().Select(o => new AdoBiDatamartExecutionEntry(o, this.m_provider));
@@ -74,7 +72,7 @@ namespace SanteDB.Persistence.Data.BI
 
         /// <inheritdoc/>
         public Guid? UpdatedByKey { get; }
-    
+
 
         /// <inheritdoc/>
         public DateTimeOffset? UpdatedTime { get; }

@@ -18,13 +18,8 @@
  * User: fyfej
  * Date: 2023-3-10
  */
-using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.Security
 {

@@ -21,11 +21,9 @@
 using SanteDB.Core.Jobs;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite.Configuration;
-using SanteDB.Persistence.Data.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Jobs
 {
@@ -77,10 +75,10 @@ namespace SanteDB.Persistence.Data.Jobs
 
                 var dataConnections = this.m_configurationManager.Configuration.Sections.OfType<OrmConfigurationBase>().ToArray();
                 var optimizedConnections = new HashSet<String>();
-                for(int i = 0; i < dataConnections.Length; i++)
+                for (int i = 0; i < dataConnections.Length; i++)
                 {
                     var configuration = dataConnections[i];
-                    if(optimizedConnections.Contains(configuration.ReadWriteConnectionString))
+                    if (optimizedConnections.Contains(configuration.ReadWriteConnectionString))
                     {
                         continue;
                     }
@@ -96,11 +94,11 @@ namespace SanteDB.Persistence.Data.Jobs
                         context.ExecuteNonQuery(configuration.Provider.StatementFactory.CreateSqlKeyword(OrmLite.Providers.SqlKeyword.Analyze));
                     }
                 }
-                
+
 
                 this.m_jobState.SetState(this, JobStateType.Completed);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.m_jobState.SetState(this, JobStateType.Aborted);
                 this.m_jobState.SetProgress(this, ex.Message, 1.0f);

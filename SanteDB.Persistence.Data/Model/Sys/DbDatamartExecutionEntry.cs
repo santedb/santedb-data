@@ -1,10 +1,7 @@
-﻿using SanteDB.BI.Datamart;
-using SanteDB.BI.Datamart.DataFlow;
+﻿using SanteDB.BI.Datamart.DataFlow;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Model.Sys
 {

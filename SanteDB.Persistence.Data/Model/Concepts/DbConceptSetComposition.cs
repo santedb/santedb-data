@@ -1,8 +1,6 @@
 ﻿using SanteDB.Core.Model.DataTypes;
 using SanteDB.OrmLite.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Model.Concepts
 {
@@ -31,7 +29,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
         /// </summary>
         [Column("rol_cs")]
         public ConceptSetCompositionOperation Operation { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the compisition key
         /// </summary>

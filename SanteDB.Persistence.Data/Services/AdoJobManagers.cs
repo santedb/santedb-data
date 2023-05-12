@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Presentation;
-using DocumentFormat.OpenXml.Wordprocessing;
-using SanteDB.Core;
+﻿using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
@@ -18,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
-using System.Text;
 using System.Xml;
 
 namespace SanteDB.Persistence.Data.Services
@@ -139,7 +134,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
                     var provId = context.EstablishProvenance(AuthenticationContext.Current.Principal);
-                    context.UpdateAll<DbJobScheule>(o => o.JobId == job.Id, o=>o.ObsoletionTime == DateTimeOffset.Now, o=>o.ObsoletedByKey == provId);
+                    context.UpdateAll<DbJobScheule>(o => o.JobId == job.Id, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == provId);
                 }
             }
             catch (DbException e)
@@ -161,7 +156,7 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(job));
             }
 
-            
+
             try
             {
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
@@ -227,7 +222,7 @@ namespace SanteDB.Persistence.Data.Services
                     context.Open();
                     var cacheStatus = this.m_adhocCache.Get<XmlJobState>($"sts.job.{job.Id}");
                     var dbStatus = context.FirstOrDefault<DbJobState>(o => o.JobId == job.Id);
-                    if(cacheStatus == null)
+                    if (cacheStatus == null)
                     {
                         cacheStatus = new XmlJobState()
                         {
@@ -284,7 +279,7 @@ namespace SanteDB.Persistence.Data.Services
                             LastStartTime = state == JobStateType.Starting || state == JobStateType.Running ? DateTime.Now : dbStatus?.LastStart?.DateTime,
                         };
                     }
-                    if(dbStatus == null)
+                    if (dbStatus == null)
                     {
                         dbStatus = context.Insert(new DbJobState()
                         {
@@ -294,10 +289,10 @@ namespace SanteDB.Persistence.Data.Services
                         });
                     }
 
-                    switch(state)
+                    switch (state)
                     {
                         case JobStateType.Running:
-                            if(!cacheStatus.IsRunning())
+                            if (!cacheStatus.IsRunning())
                             {
                                 dbStatus.LastStart = cacheStatus.LastStartTime = DateTime.Now;
                                 dbStatus.LastStop = cacheStatus.LastStopTime = null;

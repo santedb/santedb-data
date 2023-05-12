@@ -196,23 +196,23 @@ namespace SanteDB.Persistence.Data.Services
                             }
                         }
 
-                        if(dataset.ServiceExec?.Any() == true)
+                        if (dataset.ServiceExec?.Any() == true)
                         {
                             this.m_tracer.TraceInfo("Executing post-install service actions for {0}...", dataset.Id);
-                            foreach(var svc in dataset.ServiceExec)
+                            foreach (var svc in dataset.ServiceExec)
                             {
                                 var serviceType = Type.GetType(svc.ServiceType);
-                                if(serviceType == null)
+                                if (serviceType == null)
                                 {
                                     throw new InvalidOperationException(String.Format(ErrorMessages.TYPE_NOT_FOUND, svc.ServiceType));
                                 }
                                 var serviceInstance = ApplicationServiceContext.Current.GetService(serviceType);
-                                if(serviceInstance == null)
+                                if (serviceInstance == null)
                                 {
                                     throw new InvalidOperationException(String.Format(ErrorMessages.SERVICE_NOT_FOUND, serviceType));
                                 }
                                 var method = serviceType.GetRuntimeMethod(svc.Method, svc.Arguments.Select(o => o.GetType()).ToArray());
-                                if(method == null)
+                                if (method == null)
                                 {
                                     throw new EntryPointNotFoundException(String.Format(ErrorMessages.METHOD_NOT_FOUND, $"{svc.Method}({String.Join(",", svc.Arguments.Select(o => o.GetType()))})"));
                                 }

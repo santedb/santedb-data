@@ -42,9 +42,10 @@ namespace SanteDB.Persistence.Data.BI
         public DateTimeOffset ModifiedOn => this.Timestamp;
 
         /// <inheritdoc/>
-        Guid? IIdentifiedResource.Key { 
-            get => this.Key; 
-            set => throw new NotSupportedException(); 
+        Guid? IIdentifiedResource.Key
+        {
+            get => this.Key;
+            set => throw new NotSupportedException();
         }
     }
 }

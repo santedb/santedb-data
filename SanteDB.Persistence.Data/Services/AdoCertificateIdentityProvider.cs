@@ -461,7 +461,7 @@ namespace SanteDB.Persistence.Data.Services
                     else if (identityToBeUnMapped is IApplicationIdentity aid)
                     {
                         dbCertMapping = context.Query<DbCertificateMapping>(context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping))
-                            .InnerJoin<DbCertificateMapping,DbSecurityApplication>(o => o.SecurityApplicationKey, o => o.Key)
+                            .InnerJoin<DbCertificateMapping, DbSecurityApplication>(o => o.SecurityApplicationKey, o => o.Key)
                             .Where<DbSecurityApplication>(o => o.ObsoletionTime == null && o.PublicId.ToLowerInvariant() == aid.Name.ToLowerInvariant())
                             .And<DbCertificateMapping>(o => o.ObsoletionTime == null && o.X509Thumbprint == authenticationCertificate.Thumbprint)
                             .Statement)

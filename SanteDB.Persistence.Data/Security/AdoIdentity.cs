@@ -19,9 +19,6 @@
  * Date: 2023-3-10
  */
 using SanteDB.Core.Security.Claims;
-using SanteDB.Core.Security.Principal;
-using SanteDB.OrmLite;
-using SanteDB.Persistence.Data.Model.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -114,6 +111,6 @@ namespace SanteDB.Persistence.Data.Security
             this.m_claims.Remove(claim);
         }
 
-        
+
     }
 }

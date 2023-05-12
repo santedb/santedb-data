@@ -3,7 +3,6 @@ using SanteDB.Core.Model.Interfaces;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -25,7 +24,7 @@ namespace SanteDB.Persistence.Data.BI
             this.Key = executionEntry.Key;
             this.CreatedByKey = executionEntry.CreatedByKey;
             this.Finished = executionEntry.EndTime;
-            this.Started  = this.ModifiedOn = executionEntry.StartTime;
+            this.Started = this.ModifiedOn = executionEntry.StartTime;
             this.Purpose = executionEntry.Purpose;
             this.Outcome = executionEntry.Outcome;
             this.DiagnosticSessionKey = executionEntry.DiagnosticStreamKey;
@@ -66,7 +65,7 @@ namespace SanteDB.Persistence.Data.BI
         {
             get
             {
-                using(var context = this.m_dbProvider.GetReadonlyConnection())
+                using (var context = this.m_dbProvider.GetReadonlyConnection())
                 {
                     context.Open();
                     return context.Query<DbDatamartLogEntry>(o => o.ExecutionContextId == this.Key).ToList().Select(o => new AdoDatamartLogEntry(o));

@@ -7,20 +7,14 @@ using SanteDB.Core.Data;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Security;
-using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
-using SanteDB.OrmLite.Configuration;
 using SanteDB.OrmLite.Migration;
-using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
-using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics.Tracing;
-using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.BI
 {
@@ -57,7 +51,7 @@ namespace SanteDB.Persistence.Data.BI
             this.Datamart = datamartForExecution;
             this.m_datastreamManager = dataStreamManager;
             this.Key = Guid.NewGuid();
-            if(biExecutionPurpose.HasFlag(DataFlowExecutionPurposeType.Diagnostics))
+            if (biExecutionPurpose.HasFlag(DataFlowExecutionPurposeType.Diagnostics))
             {
                 this.DiagnosticSession = new DataFlowDiagnosticSession(this);
             }
@@ -114,9 +108,10 @@ namespace SanteDB.Persistence.Data.BI
                     }
 
                     existing.EndTime = DateTimeOffset.Now;
-                    if(this.DiagnosticSession != null)
+                    if (this.DiagnosticSession != null)
                     {
-                        using (var tfs = new TemporaryFileStream()) {
+                        using (var tfs = new TemporaryFileStream())
+                        {
                             this.DiagnosticSession.GetSessionData().Save(tfs);
                             tfs.Seek(0, System.IO.SeekOrigin.Begin);
                             existing.DiagnosticStreamKey = this.m_datastreamManager.Add(tfs);

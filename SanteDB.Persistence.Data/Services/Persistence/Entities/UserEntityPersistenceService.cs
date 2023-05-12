@@ -48,9 +48,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             data.SecurityUserKey = this.EnsureExists(context, data.SecurityUser)?.Key ?? data.SecurityUserKey;
 
             // The data may be synchronized from an upstream - if so we want to ensure our security user actually exists
-            if(data.SecurityUserKey.HasValue 
-                && data.TryGetTag(SystemTagNames.UpstreamDataTag, out _) 
-                && !context.Any<DbSecurityUser>(o=>o.Key == data.SecurityUserKey))
+            if (data.SecurityUserKey.HasValue
+                && data.TryGetTag(SystemTagNames.UpstreamDataTag, out _)
+                && !context.Any<DbSecurityUser>(o => o.Key == data.SecurityUserKey))
             {
                 data.SecurityUserKey = null;
             }

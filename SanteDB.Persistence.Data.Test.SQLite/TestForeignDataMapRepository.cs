@@ -22,11 +22,8 @@ using SanteDB.Core.Data.Import.Definition;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.Test.SQLite
 {

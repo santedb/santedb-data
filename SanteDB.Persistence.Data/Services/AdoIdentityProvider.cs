@@ -878,7 +878,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public IPrincipal ReAuthenticate(IPrincipal principal)
         {
-            if(principal == null)
+            if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ARGUMENT_NULL);
             }
@@ -890,14 +890,14 @@ namespace SanteDB.Persistence.Data.Services
             this.m_pepService.Demand(PermissionPolicyIdentifiers.Login, principal); // Re-validate
 
             // Create an ADO principal off this principal
-            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
                 {
                     context.Open();
                     var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == principal.Identity.Name.ToLowerInvariant() && o.ObsoletionTime == null);
 
-                    if(dbUser == null)
+                    if (dbUser == null)
                     {
                         throw new InvalidIdentityAuthenticationException();
                     }
@@ -935,7 +935,7 @@ namespace SanteDB.Persistence.Data.Services
                     this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(retVal.Identity.Name, retVal, true));
                     return retVal;
                 }
-                catch(AuthenticationException)
+                catch (AuthenticationException)
                 {
                     throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_INVALID));
                 }
@@ -945,17 +945,17 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public AuthenticationMethod GetAuthenticationMethods(string userName)
         {
-            if(String.IsNullOrEmpty(userName))
+            if (String.IsNullOrEmpty(userName))
             {
                 throw new ArgumentNullException(nameof(userName));
             }
 
             try
             {
-                using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+                using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     context.Open();
-                    if(context.Any<DbSecurityUser>(o=>o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null))
+                    if (context.Any<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null))
                     {
                         return AuthenticationMethod.Local;
                     }

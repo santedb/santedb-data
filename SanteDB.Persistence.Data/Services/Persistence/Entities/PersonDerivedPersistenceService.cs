@@ -47,7 +47,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             data.OccupationKey = this.EnsureExists(context, data.Occupation)?.Key ?? data.OccupationKey;
             data.GenderConceptKey = this.EnsureExists(context, data.GenderConcept)?.Key ?? data.GenderConceptKey;
             data.NationalityKey = this.EnsureExists(context, data.Nationality)?.Key ?? data.NationalityKey;
-            data.VipStatusKey= this.EnsureExists(context, data.VipStatus)?.Key ?? data.VipStatusKey;
+            data.VipStatusKey = this.EnsureExists(context, data.VipStatus)?.Key ?? data.VipStatusKey;
             return base.BeforePersisting(context, data);
         }
 
