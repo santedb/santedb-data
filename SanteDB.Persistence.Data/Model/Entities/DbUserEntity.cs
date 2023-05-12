@@ -53,7 +53,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// Gets or sets the security user which is associated with this entity
         /// </summary>
         [Column("sec_usr_id"), ForeignKey(typeof(DbSecurityUser), nameof(DbSecurityUser.Key))]
-        public Guid SecurityUserKey { get; set; }
+        public Guid? SecurityUserKey { get; set; }
 
     }
 }

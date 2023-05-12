@@ -18,10 +18,12 @@
  * User: fyfej
  * Date: 2023-3-10
  */
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
+using SanteDB.Persistence.Data.Model.Security;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
@@ -44,6 +46,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override UserEntity BeforePersisting(DataContext context, UserEntity data)
         {
             data.SecurityUserKey = this.EnsureExists(context, data.SecurityUser)?.Key ?? data.SecurityUserKey;
+
+            // The data may be synchronized from an upstream - if so we want to ensure our security user actually exists
+            if(data.SecurityUserKey.HasValue 
+                && data.TryGetTag(SystemTagNames.UpstreamDataTag, out _) 
+                && !context.Any<DbSecurityUser>(o=>o.Key == data.SecurityUserKey))
+            {
+                data.SecurityUserKey = null;
+            }
+
             return base.BeforePersisting(context, data);
         }
 
@@ -62,7 +73,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    modelData.SecurityUser = modelData.SecurityUser.GetRelatedPersistenceService().Get(context, userData.SecurityUserKey);
+                    modelData.SecurityUser = modelData.SecurityUser.GetRelatedPersistenceService().Get(context, userData.SecurityUserKey.GetValueOrDefault());
                     modelData.SetLoaded(o => o.SecurityUser);
                     break;
             }

@@ -293,7 +293,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             data = this.ReorganizeForInsert(data);
             for (var i = 0; i < data.Item.Count; i++)
             {
-                this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)i / (float)data.Item.Count, UserMessages.PROCESSING));
+                if (i % 10 == 0)
+                {
+                    this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)i / (float)data.Item.Count, UserMessages.PROCESSING));
+                }
                 var persistenceService = data.Item[i].GetType().GetRelatedPersistenceService();
 
                 try
