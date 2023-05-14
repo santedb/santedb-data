@@ -58,18 +58,20 @@ namespace SanteDB.Persistence.Data.Services
             this.TargetClassKey = rule.TargetClassKey;
             this.RelationshipTypeKey = rule.RelationshipTypeKey;
             this.Description = rule.Description;
+            switch(rule.RelationshipClassType)
+            {
+                case RelationshipTargetType.ActParticipation:
+                    this.AppliesTo = typeof(ActParticipation);
+                    break;
+                case RelationshipTargetType.ActRelationship:
+                    this.AppliesTo = typeof(ActRelationship);
+                    break;
+                case RelationshipTargetType.EntityRelationship:
+                    this.AppliesTo = typeof(EntityRelationship);
+                    break;
+            }
         }
 
-        /// <summary>
-        /// Create a new validation rule 
-        /// </summary>
-        internal AdoRelationshipValidationRule(Guid? sourceClassKey, Guid? targetClassKey, Guid relationshipType, String description)
-        {
-            this.SourceClassKey = sourceClassKey;
-            this.TargetClassKey = targetClassKey;
-            this.RelationshipTypeKey = relationshipType;
-            this.Description = description;
-        }
 
         /// <summary>
         /// The identified key of the relationship.
@@ -96,6 +98,10 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public string Description { get; }
 
+        /// <summary>
+        /// Gets the type that this applies to
+        /// </summary>
+        public Type AppliesTo { get; }
     }
 
     /// <summary>
