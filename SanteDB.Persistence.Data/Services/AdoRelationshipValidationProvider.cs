@@ -21,7 +21,9 @@
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
@@ -42,74 +44,13 @@ using System.Linq.Expressions;
 namespace SanteDB.Persistence.Data.Services
 {
 
-    /// <summary>
-    /// ADO Relationship validation rule
-    /// </summary>
-    public class AdoRelationshipValidationRule : IRelationshipValidationRule
-    {
-
-        /// <summary>
-        /// Create a new relationship validation rule based on a database relationship rule
-        /// </summary>
-        internal AdoRelationshipValidationRule(DbRelationshipValidationRule rule)
-        {
-            this.Key = rule.Key;
-            this.SourceClassKey = rule.SourceClassKey;
-            this.TargetClassKey = rule.TargetClassKey;
-            this.RelationshipTypeKey = rule.RelationshipTypeKey;
-            this.Description = rule.Description;
-            switch(rule.RelationshipClassType)
-            {
-                case RelationshipTargetType.ActParticipation:
-                    this.AppliesTo = typeof(ActParticipation);
-                    break;
-                case RelationshipTargetType.ActRelationship:
-                    this.AppliesTo = typeof(ActRelationship);
-                    break;
-                case RelationshipTargetType.EntityRelationship:
-                    this.AppliesTo = typeof(EntityRelationship);
-                    break;
-            }
-        }
-
-
-        /// <summary>
-        /// The identified key of the relationship.
-        /// </summary>
-        public Guid? Key { get; }
-
-        /// <summary>
-        /// Gets the source classification key
-        /// </summary>
-        public Guid? SourceClassKey { get; }
-
-        /// <summary>
-        /// Gets the target classification key
-        /// </summary>
-        public Guid? TargetClassKey { get; }
-
-        /// <summary>
-        /// Gets the type of relationship
-        /// </summary>
-        public Guid RelationshipTypeKey { get; }
-
-        /// <summary>
-        /// Gets the description of the relationship
-        /// </summary>
-        public string Description { get; }
-
-        /// <summary>
-        /// Gets the type that this applies to
-        /// </summary>
-        public Type AppliesTo { get; }
-    }
-
+    
     /// <summary>
     /// ADO.NET Based Relationship Provider
     /// </summary>
     /// <remarks>This class allows for the management of validation rules between entities, 
     /// acts, or entities and acts</remarks>
-    public class AdoRelationshipValidationProvider : IRelationshipValidationProvider, IMappedQueryProvider<IRelationshipValidationRule>
+    public class AdoRelationshipValidationProvider : IRelationshipValidationProvider, IMappedQueryProvider<RelationshipValidationRule>
     {
         // Tracer
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoRelationshipValidationProvider));
@@ -147,7 +88,7 @@ namespace SanteDB.Persistence.Data.Services
         public IQueryPersistenceService QueryPersistence => this.m_queryPersistence;
 
         /// <inheritdoc/>
-        public IRelationshipValidationRule AddValidRelationship<TRelationship>(Guid? sourceClassKey, Guid? targetClassKey, Guid relationshipTypeKey, string description)
+        public RelationshipValidationRule AddValidRelationship<TRelationship>(Guid? sourceClassKey, Guid? targetClassKey, Guid relationshipTypeKey, string description)
             where TRelationship : ITargetedAssociation
         {
 
@@ -159,16 +100,24 @@ namespace SanteDB.Persistence.Data.Services
                 {
 
                     context.Open();
-                    var dbInstance = new DbRelationshipValidationRule()
+                    using (var tx = context.BeginTransaction())
                     {
-                        Description = description,
-                        RelationshipTypeKey = relationshipTypeKey,
-                        SourceClassKey = sourceClassKey,
-                        TargetClassKey = targetClassKey,
-                        RelationshipClassType = GetRelationshipTargetType<TRelationship>()
-                    };
+                        var dbInstance = new DbRelationshipValidationRule()
+                        {
+                            Description = description,
+                            RelationshipTypeKey = relationshipTypeKey,
+                            SourceClassKey = sourceClassKey,
+                            TargetClassKey = targetClassKey,
+                            RelationshipClassType = GetRelationshipTargetType<TRelationship>(),
+                            CreatedByKey = context.EstablishProvenance(AuthenticationContext.Current.Principal),
+                            CreationTime = DateTimeOffset.Now
+                        };
 
-                    return new AdoRelationshipValidationRule(context.Insert(dbInstance));
+                        var retVal = context.Insert(dbInstance);
+                        tx.Commit();
+
+                        return this.m_mapper.MapDomainInstance<DbRelationshipValidationRule, RelationshipValidationRule>(retVal);
+                    }
                 }
                 catch (DbException e)
                 {
@@ -183,7 +132,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc />
-        public IRelationshipValidationRule GetRuleByKey(Guid key)
+        public RelationshipValidationRule GetRuleByKey(Guid key)
         {
             if (key == Guid.Empty)
             {
@@ -202,13 +151,13 @@ namespace SanteDB.Persistence.Data.Services
                 }
                 else
                 {
-                    return new AdoRelationshipValidationRule(rule);
+                    return this.m_mapper.MapDomainInstance<DbRelationshipValidationRule, RelationshipValidationRule>(rule);
                 }
             }
         }
 
         /// <inheritdoc/>
-        public IEnumerable<IRelationshipValidationRule> GetValidRelationships<TRelationship>()
+        public IEnumerable<RelationshipValidationRule> GetValidRelationships<TRelationship>()
             where TRelationship : ITargetedAssociation
         {
             using (var context = this.m_configuration.Provider.GetReadonlyConnection())
@@ -218,13 +167,13 @@ namespace SanteDB.Persistence.Data.Services
 
                 foreach (var itm in context.Query<DbRelationshipValidationRule>(o => o.RelationshipClassType == tclass))
                 {
-                    yield return new AdoRelationshipValidationRule(itm);
+                    yield return this.m_mapper.MapDomainInstance<DbRelationshipValidationRule, RelationshipValidationRule>(itm);
                 }
             }
         }
 
         /// <inheritdoc/>
-        public IEnumerable<IRelationshipValidationRule> GetValidRelationships<TRelationship>(Guid sourceClassKey)
+        public IEnumerable<RelationshipValidationRule> GetValidRelationships<TRelationship>(Guid sourceClassKey)
             where TRelationship : ITargetedAssociation
         {
             using (var context = this.m_configuration.Provider.GetWriteConnection())
@@ -234,13 +183,13 @@ namespace SanteDB.Persistence.Data.Services
 
                 foreach (var itm in context.Query<DbRelationshipValidationRule>(o => (o.SourceClassKey == sourceClassKey || o.SourceClassKey == null) && o.RelationshipClassType == tclass))
                 {
-                    yield return new AdoRelationshipValidationRule(itm);
+                    yield return this.m_mapper.MapDomainInstance<DbRelationshipValidationRule, RelationshipValidationRule>(itm);
                 }
             }
         }
 
         /// <inheritdoc/>
-        public IRelationshipValidationRule RemoveRuleByKey(Guid key)
+        public RelationshipValidationRule RemoveRuleByKey(Guid key)
         {
             if (key == Guid.Empty)
             {
@@ -252,13 +201,27 @@ namespace SanteDB.Persistence.Data.Services
                 try
                 {
                     context.Open();
-                    var existing = context.FirstOrDefault<DbRelationshipValidationRule>(r => r.Key == key);
-                    if (existing == null)
+                    using (var tx = context.BeginTransaction())
                     {
-                        throw new KeyNotFoundException(key.ToString());
+                        var existing = context.FirstOrDefault<DbRelationshipValidationRule>(r => r.Key == key);
+                        if (existing == null)
+                        {
+                            throw new KeyNotFoundException(key.ToString());
+                        }
+
+                        if (existing.ObsoletionTime.HasValue)
+                        {
+                            context.Delete(existing);
+                        }
+                        else
+                        {
+                            existing.ObsoletionTime = DateTimeOffset.Now;
+                            existing.ObsoletedByKey = context.EstablishProvenance(AuthenticationContext.Current.Principal);
+                        }
+
+                        tx.Commit();
+                        return this.m_mapper.MapDomainInstance<DbRelationshipValidationRule, RelationshipValidationRule>(existing);
                     }
-                    context.Delete(existing);
-                    return new AdoRelationshipValidationRule(existing);
                 }
                 catch (DbException dbex)
                 {
@@ -298,29 +261,36 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public IQueryResultSet<IRelationshipValidationRule> QueryRelationships(Expression<Func<IRelationshipValidationRule, bool>> query)
+        public IQueryResultSet<RelationshipValidationRule> QueryRelationships(Expression<Func<RelationshipValidationRule, bool>> query)
         {
             if (query == null)
             {
                 throw new ArgumentNullException(nameof(query));
             }
-            return new MappedQueryResultSet<IRelationshipValidationRule>(this).Where(query);
+
+            if (!query.ToString().Contains(nameof(BaseEntityData.ObsoletionTime)))
+            {
+                var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(RelationshipValidationRule).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
+                query = Expression.Lambda<Func<RelationshipValidationRule, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
+            }
+            return new MappedQueryResultSet<RelationshipValidationRule>(this).Where(query);
         }
 
         /// <inheritdoc/>
-        public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<IRelationshipValidationRule, bool>> query)
+        public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<RelationshipValidationRule, bool>> query)
         {
-            var dbQuery = this.m_mapper.MapModelExpression<IRelationshipValidationRule, DbRelationshipValidationRule, bool>(query);
+            var dbQuery = this.m_mapper.MapModelExpression<RelationshipValidationRule, DbRelationshipValidationRule, bool>(query);
+            
             return context.Query<DbRelationshipValidationRule>(dbQuery);
         }
 
         /// <inheritdoc/>
-        public IRelationshipValidationRule Get(DataContext context, Guid key)
+        public RelationshipValidationRule Get(DataContext context, Guid key)
         {
-            var existing = context.FirstOrDefault<DbRelationshipValidationRule>(o => o.Key == key);
+            var existing = context.FirstOrDefault<DbRelationshipValidationRule>(o => o.Key == key && o.ObsoletionTime == null);
             if (existing != null)
             {
-                return new AdoRelationshipValidationRule(existing);
+                return this.m_mapper.MapDomainInstance<DbRelationshipValidationRule, RelationshipValidationRule>(existing);
             }
             else
             {
@@ -329,11 +299,13 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public IRelationshipValidationRule ToModelInstance(DataContext context, object result)
+        public RelationshipValidationRule ToModelInstance(DataContext context, object result)
         {
             if (result is DbRelationshipValidationRule rule)
             {
-                return new AdoRelationshipValidationRule(rule);
+                var retVal = this.m_mapper.MapDomainInstance<DbRelationshipValidationRule, RelationshipValidationRule>(rule);
+                retVal.AppliesToXml = rule.RelationshipClassType.ToString();
+                return retVal;
             }
             else
             {
@@ -342,9 +314,9 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public LambdaExpression MapExpression<TReturn>(Expression<Func<IRelationshipValidationRule, TReturn>> sortExpression)
+        public LambdaExpression MapExpression<TReturn>(Expression<Func<RelationshipValidationRule, TReturn>> sortExpression)
         {
-            return this.m_mapper.MapModelExpression<IRelationshipValidationRule, DbRelationshipValidationRule, TReturn>(sortExpression);
+            return this.m_mapper.MapModelExpression<RelationshipValidationRule, DbRelationshipValidationRule, TReturn>(sortExpression);
         }
 
         /// <inheritdoc/>
