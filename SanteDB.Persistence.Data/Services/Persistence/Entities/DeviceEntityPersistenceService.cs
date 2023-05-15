@@ -18,10 +18,12 @@
  * User: fyfej
  * Date: 2023-3-10
  */
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
+using SanteDB.Persistence.Data.Model.Security;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
@@ -43,6 +45,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             data.SecurityDeviceKey = this.EnsureExists(context, data.SecurityDevice)?.Key ?? data.SecurityDeviceKey;
             data.GeoTagKey = this.EnsureExists(context, data.GeoTag)?.Key ?? data.GeoTagKey;
+
+            // The data may be synchronized from an upstream - if so we want to ensure our security user actually exists
+            if (data.SecurityDeviceKey.HasValue
+                && data.TryGetTag(SystemTagNames.UpstreamDataTag, out _)
+                && !context.Any<DbSecurityDevice>(o => o.Key == data.SecurityDeviceKey))
+            {
+                data.SecurityDeviceKey = null;
+            }
+
             return base.BeforePersisting(context, data);
         }
 

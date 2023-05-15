@@ -18,10 +18,12 @@
  * User: fyfej
  * Date: 2023-3-10
  */
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
+using SanteDB.Persistence.Data.Model.Security;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
@@ -44,6 +46,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override ApplicationEntity BeforePersisting(DataContext context, ApplicationEntity data)
         {
             data.SecurityApplicationKey = this.EnsureExists(context, data.SecurityApplication)?.Key ?? data.SecurityApplicationKey;
+            // The data may be synchronized from an upstream - if so we want to ensure our security user actually exists
+            if (data.SecurityApplicationKey.HasValue
+                && data.TryGetTag(SystemTagNames.UpstreamDataTag, out _)
+                && !context.Any<DbSecurityApplication>(o => o.Key == data.SecurityApplicationKey))
+            {
+                data.SecurityApplicationKey = null;
+            }
             return base.BeforePersisting(context, data);
         }
 
