@@ -217,6 +217,7 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             existing.ObsoletionTime = DateTimeOffset.Now;
                             existing.ObsoletedByKey = context.EstablishProvenance(AuthenticationContext.Current.Principal);
+                            context.Update(existing);
                         }
 
                         tx.Commit();
