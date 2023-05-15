@@ -165,7 +165,7 @@ namespace SanteDB.Persistence.Data.Services
                 var tclass = GetRelationshipTargetType<TRelationship>();
                 context.Open();
 
-                foreach (var itm in context.Query<DbRelationshipValidationRule>(o => o.RelationshipClassType == tclass))
+                foreach (var itm in context.Query<DbRelationshipValidationRule>(o => o.RelationshipClassType == tclass && o.ObsoletionTime == null))
                 {
                     yield return this.m_mapper.MapDomainInstance<DbRelationshipValidationRule, RelationshipValidationRule>(itm);
                 }
@@ -181,7 +181,7 @@ namespace SanteDB.Persistence.Data.Services
                 var tclass = GetRelationshipTargetType<TRelationship>();
                 context.Open();
 
-                foreach (var itm in context.Query<DbRelationshipValidationRule>(o => (o.SourceClassKey == sourceClassKey || o.SourceClassKey == null) && o.RelationshipClassType == tclass))
+                foreach (var itm in context.Query<DbRelationshipValidationRule>(o => (o.SourceClassKey == sourceClassKey || o.SourceClassKey == null) && o.RelationshipClassType == tclass && o.ObsoletionTime == null))
                 {
                     yield return this.m_mapper.MapDomainInstance<DbRelationshipValidationRule, RelationshipValidationRule>(itm);
                 }

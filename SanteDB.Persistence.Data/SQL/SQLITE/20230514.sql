@@ -55,6 +55,7 @@ SELECT
   REL_CLS,
   x'76A0DCFA90366E4AAF9EF1CD68E8C7E8'
 FROM temp;
+CREATE UNIQUE INDEX rel_vrfy_src_trg_unq ON rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id) WHERE (obslt_utc IS NULL);
 
 DROP TABLE temp;
 INSERT INTO PATCH_DB_SYSTBL (PATCH_ID, APPLY_DATE, INFO_NAME) VALUES ('20230514-01', UNIXEPOCH(), 'Add create and obsolete times to database verify tables'); 
