@@ -251,6 +251,7 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             this.Delete(context, toDelete.Key, DeleteMode.PermanentDelete);
                         }
+                        tx.Commit();
                     }
                 }
                 catch (DbException e)

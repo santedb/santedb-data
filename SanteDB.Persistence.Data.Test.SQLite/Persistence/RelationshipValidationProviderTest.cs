@@ -169,7 +169,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence
                 }
                 catch (DataPersistenceException) { }
                 catch (DetectedIssueException) { }
-                catch
+                catch (Exception e)
                 {
                     Assert.Fail("Wrong type of exception is thrown");
                 }
