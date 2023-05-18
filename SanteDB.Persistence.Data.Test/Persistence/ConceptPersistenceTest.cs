@@ -401,6 +401,15 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                                 Mnemonic = "TEST07A",
                                 CodeSystemKey = CodeSystemKeys.AdministrativeGender
                             }
+                        },
+                        new ConceptReferenceTerm()
+                        {
+                            RelationshipTypeKey = ConceptRelationshipTypeKeys.SameAs,
+                            ReferenceTerm = new ReferenceTerm()
+                            {
+                                Mnemonic = "TEST07A.B",
+                                CodeSystemKey = CodeSystemKeys.CVX
+                            }
                         }
                     },
                     ConceptNames = new List<ConceptName>()
@@ -448,6 +457,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 // Test filte ron reference term
                 base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST07A"), 1);
+                base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST07A.B"), 1);
 
                 // Test ordering
                 var result = base.TestQuery<Concept>(o => o.Mnemonic.StartsWith("TEST-07"), 2);
@@ -483,11 +493,22 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(1, stateful.Skip(0).Take(1).Count());
                 Assert.AreEqual(1, stateful.Skip(1).Take(100).Count());
 
-
                 // Test that nested selectors work
                 var uuids = result.Select(o => o.Key);
                 Assert.AreEqual(after1.Key, uuids.First());
                 Assert.AreEqual(after2.Key, uuids.Last());
+
+
+                // Update
+
+                var after3 = base.TestUpdate(after1, o =>
+                {
+                    o.ReferenceTerms.RemoveAt(1);
+                    return o;
+                });
+                base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST07A"), 1);
+                base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST07A.B"), 0);
+
 
 
             }
