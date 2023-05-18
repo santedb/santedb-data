@@ -99,7 +99,7 @@ namespace SanteDB.Persistence.Data.Docker
                     {
                         new AdoValidationPolicy()
                         {
-                            Authority = AdoValidationEnforcement.Loose,
+                            Authority = AdoValidationEnforcement.Strict,
                             Format = AdoValidationEnforcement.Loose,
                             Scope = AdoValidationEnforcement.Strict,
                             Uniqueness = AdoValidationEnforcement.Loose,
