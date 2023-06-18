@@ -16,7 +16,7 @@
  - the License.
  - 
  - User: fyfej
- - Date: 2023-3-10
+ - Date: 2023-5-19
  -->
 <modelMap xmlns="http://santedb.org/model/map">
   <class modelClass="SanteDB.Core.Model.Audit.AuditEventData, SanteDB.Core.Model"
