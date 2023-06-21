@@ -327,7 +327,7 @@ namespace SanteDB.Persistence.Data.Services
                 }
                 catch (Exception e)
                 {
-                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.ROL_UNASSOC), e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.ROL_ASSOC), e);
                 }
             }
         }
