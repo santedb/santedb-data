@@ -187,7 +187,7 @@ namespace SanteDB.Persistence.Data.Services
                 var arguments = new List<Object>();
                 definitionQuery = m_parmRegex.Replace(definitionQuery, (o) =>
                 {
-                    if (parameters.TryGetValue(o.Groups[1].Value, out var qValue))
+                    if (parameters.TryGetValue($"_{o.Groups[1].Value}", out var qValue))
                     {
                         if (Guid.TryParse(qValue.First(), out var uuid))
                         {

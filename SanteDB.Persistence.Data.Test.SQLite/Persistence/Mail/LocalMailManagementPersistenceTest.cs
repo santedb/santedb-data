@@ -61,7 +61,8 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Mail
                 var toUser = securityService.Insert(new Core.Model.Security.SecurityUser()
                 {
                     UserName = "TEST_MAIL_TO1",
-                    Email = "test@test.com"
+                    Email = "test@test.com",
+                    Password = "@Foo123!!"
                 });
                 Assert.IsNotNull(toUser);
 
@@ -125,7 +126,8 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Mail
                 var toUser = securityService.Insert(new Core.Model.Security.SecurityUser()
                 {
                     UserName = "TEST_MAIL_TO2",
-                    Email = "test2@test.com"
+                    Email = "test2@test.com",
+                    Password = "@Foo123!!"
                 });
                 roleService.AddUsersToRoles(new string[] { "TEST_MAIL_TO2" }, new string[] { "USERS", "CLINICAL_STAFF" }, AuthenticationContext.SystemPrincipal);
                 Assert.IsNotNull(toUser);

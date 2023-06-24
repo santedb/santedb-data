@@ -517,7 +517,7 @@ namespace SanteDB.Persistence.Data.Services
             }
             else if (String.IsNullOrEmpty(password))
             {
-                throw new ArgumentNullException(nameof(userName), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+                throw new ArgumentNullException(nameof(password), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (!this.m_passwordValidator.Validate(password))
             {
