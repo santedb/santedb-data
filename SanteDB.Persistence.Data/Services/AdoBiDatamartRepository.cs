@@ -40,8 +40,10 @@ using SanteDB.Persistence.Data.Model.Sys;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Cryptography;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -180,6 +182,13 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         var existing = context.Query<DbDatamartRegistration>(o => o.Id == dataMartDefinition.Id && o.ObsoletionTime == null).FirstOrDefault();
 
+                        byte[] defHash = null;
+                        using(var ms = new MemoryStream())
+                        {
+                            dataMartDefinition.Save(ms);
+                            defHash = SHA256.Create().ComputeHash(ms.ToArray());
+                        }
+
                         // Register the datamart
                         if (existing == null)
                         {
@@ -189,6 +198,7 @@ namespace SanteDB.Persistence.Data.Services
                                 CreationTime = DateTimeOffset.Now,
                                 Description = dataMartDefinition.MetaData?.Annotation?.JsonBody,
                                 Id = dataMartDefinition.Id,
+                                DefinitionHash = defHash,
                                 Name = dataMartDefinition.Name,
                                 Version = dataMartDefinition.MetaData?.Version ?? "1.0"
                             });
@@ -200,6 +210,7 @@ namespace SanteDB.Persistence.Data.Services
                             existing.Description = dataMartDefinition.MetaData?.Annotation?.JsonBody;
                             existing.Name = dataMartDefinition.Name;
                             existing.Version = dataMartDefinition.MetaData?.Version ?? "1.0";
+                            existing.DefinitionHash = defHash;
                             existing = context.Update(existing);
                         }
 

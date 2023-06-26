@@ -59,5 +59,11 @@ namespace SanteDB.Persistence.Data.Model.Sys
         [Column("VER"), NotNull]
         public String Version { get; set; }
 
+        /// <summary>
+        /// Gets or sets the hash of the definition
+        /// </summary>
+        [Column("HASH"), NotNull]
+        public byte[] DefinitionHash { get; set; }
+
     }
 }
