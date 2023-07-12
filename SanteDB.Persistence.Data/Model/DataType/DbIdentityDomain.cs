@@ -85,7 +85,7 @@ namespace SanteDB.Persistence.Data.Model.DataType
         /// <summary>
         /// Gets or sets the check digit algorithm
         /// </summary>
-        [Column("chk_dgt")]
+        [Column("chk_dgt_alg")]
         public string CheckDigitAlgorithm { get; set; }
 
         /// <summary>

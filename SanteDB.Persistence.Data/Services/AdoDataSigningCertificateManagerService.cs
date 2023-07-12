@@ -67,7 +67,7 @@ namespace SanteDB.Persistence.Data.Services
             // Doing this to some other identity requires special permission
             if (!identity.Name.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase))
             {
-                this.m_pepService?.Demand(PermissionPolicyIdentifiers.AssignCertificateToIdentity);
+                this.m_pepService?.Demand(PermissionPolicyIdentifiers.AssignCertificateToIdentity, principal);
             }
 
             try
@@ -201,7 +201,7 @@ namespace SanteDB.Persistence.Data.Services
             // Doing this to some other identity requires special permission
             if (!identity.Name.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase))
             {
-                this.m_pepService?.Demand(PermissionPolicyIdentifiers.AssignCertificateToIdentity);
+                this.m_pepService?.Demand(PermissionPolicyIdentifiers.AssignCertificateToIdentity, principal);
             }
 
             try
@@ -262,7 +262,11 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public bool TryGetSigningCertificate(string x509Thumbprint, out X509Certificate2 certificate)
+        public bool TryGetSigningCertificateByHash(byte[] certHash, out X509Certificate2 certificate)
+            => this.TryGetSigningCertificateByThumbprint(certHash.HexEncode(), out certificate);
+
+        /// <inheritdoc/>
+        public bool TryGetSigningCertificateByThumbprint(string x509Thumbprint, out X509Certificate2 certificate)
         {
             if (String.IsNullOrEmpty(x509Thumbprint))
             {
