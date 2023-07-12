@@ -497,58 +497,6 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <summary>
-        /// Get the secure key for the application
-        /// </summary>
-        /// <param name="name">The name of the applicationto fetch</param>
-        /// <returns>The secure key</returns>
-        /// <remarks>This method fetches the security stamp from the database for things like HMAC shared secrets</remarks>
-        public byte[] GetPublicSigningKey(string name)
-        {
-            if (String.IsNullOrEmpty(name))
-            {
-                throw new ArgumentNullException(nameof(name), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
-            }
-
-            // Get key
-            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
-            {
-                try
-                {
-                    context.Open();
-                    var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant());
-                    if (app == null)
-                    {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
-                    }
-
-                    // Key is null
-                    if (app.PublicSigningKey == null)
-                    {
-                        return null;
-                    }
-
-                    // First 16 bytes are IV
-                    if (this.m_configuration.EncryptPublicKeys)
-                    {
-                        var ivLength = app.PublicSigningKey[0];
-                        var iv = app.PublicSigningKey.Skip(1).Take(ivLength).ToArray();
-                        var data = app.PublicSigningKey.Skip(1 + ivLength).ToArray();
-                        return this.m_symmetricCryptographicProvider.Decrypt(data, this.m_symmetricCryptographicProvider.GetContextKey(), iv);
-                    }
-                    else
-                    {
-                        return app.PublicSigningKey;
-                    }
-                }
-                catch (Exception e)
-                {
-                    this.m_tracer.TraceError("Error fetching security information for {0}", name);
-                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_APPLICATION_KEY), e);
-                }
-            }
-        }
-
-        /// <summary>
         /// Set the lockout period
         /// </summary>
         /// <param name="name">The name of the application to set</param>
@@ -698,65 +646,6 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     this.m_tracer.TraceError("Error fetching SID for {0}", name);
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Set the public key used for symmetric encryption, etc.
-        /// </summary>
-        public void SetPublicKey(string name, byte[] key, IPrincipal principal)
-        {
-            if (String.IsNullOrEmpty(name))
-            {
-                throw new ArgumentNullException(nameof(name), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
-            }
-            if (key == null || key.Length == 0)
-            {
-                throw new ArgumentException(nameof(key), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
-            }
-
-            // Must be self or have unrestricted
-            if (!principal.Identity.IsAuthenticated || !principal.Identity.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-            {
-                this.m_pepService.Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration, principal);
-            }
-
-            using (var context = this.m_configuration.Provider.GetWriteConnection())
-            {
-                try
-                {
-                    context.Open();
-
-                    var dbApp = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
-                    if (dbApp == null)
-                    {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_APPLICATION_KEY));
-                    }
-
-                    if (this.m_configuration.EncryptPublicKeys)
-                    {
-                        var iv = this.m_symmetricCryptographicProvider.GenerateIV();
-                        var encData = this.m_symmetricCryptographicProvider.Encrypt(key, this.m_symmetricCryptographicProvider.GetContextKey(), iv);
-                        byte[] storeData = new byte[iv.Length + encData.Length + 1];
-                        storeData[0] = (byte)iv.Length;
-                        Array.Copy(iv, 0, storeData, 1, iv.Length);
-                        Array.Copy(encData, 0, storeData, 1 + iv.Length, encData.Length);
-                        dbApp.PublicSigningKey = storeData;
-                    }
-                    else
-                    {
-                        dbApp.PublicSigningKey = key;
-                    }
-                    dbApp.UpdatedByKey = context.EstablishProvenance(principal, null);
-                    dbApp.UpdatedTime = DateTimeOffset.Now;
-
-                    context.Update(dbApp);
-                }
-                catch (Exception e)
-                {
-                    this.m_tracer.TraceError("Error updating application key: {0}", e);
-                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.APP_UPDATE_ERROR), e);
                 }
             }
         }

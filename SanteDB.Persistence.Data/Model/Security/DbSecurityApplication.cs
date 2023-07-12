@@ -85,12 +85,6 @@ namespace SanteDB.Persistence.Data.Model.Security
         [Column("last_auth_utc")]
         public DateTimeOffset? LastAuthentication { get; set; }
 
-        /// <summary>
-        /// The security stamp for the application (used when sharing data with the application)
-        /// </summary>
-        /// <remarks>This is returned by the GetSecurityKey function</remarks>
-        [Column("sgn_key")]
-        public byte[] PublicSigningKey { get; set; }
 
     }
 

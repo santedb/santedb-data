@@ -278,24 +278,7 @@ namespace SanteDB.Persistence.Data.Test
             Assert.AreEqual(AuthenticationContext.SystemApplicationSid, serviceProvider.GetSid("SYSTEM").ToString());
         }
 
-        /// <summary>
-        /// Tests that we can add and remove a signing key
-        /// </summary>
-        [Test]
-        public void TestSigningKey()
-        {
-            var serviceProvider = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
-            // Pre-Condition
-            Assert.IsNull(serviceProvider.GetIdentity("TEST_APP_010"));
-
-            // Create the device identity
-            serviceProvider.CreateIdentity("TEST_APP_010", "THIS_IS_A_SECRET", AuthenticationContext.SystemPrincipal);
-
-            // First add as system principal and retrieve
-            var key = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
-            serviceProvider.SetPublicKey("TEST_APP_010", key, AuthenticationContext.SystemPrincipal);
-            Assert.IsTrue(serviceProvider.GetPublicSigningKey("TEST_APP_010").SequenceEqual(key));
-        }
+      
 
         /// <summary>
         /// Tests that the security layer does not permit unauthenticated principals from performing operations
@@ -311,15 +294,6 @@ namespace SanteDB.Persistence.Data.Test
             serviceProvider.CreateIdentity("TEST_APP_012", "THIS_IS_A_SECRET", AuthenticationContext.SystemPrincipal);
             var identity = serviceProvider.GetIdentity("TEST_APP_012");
             var principal = new GenericPrincipal(identity, new string[] { "ADMINISTRATORS" });
-
-            try
-            {
-                serviceProvider.SetPublicKey("TEST_APP_012", new byte[] { 1, 2, 3, 4 }, principal);
-                Assert.Fail("Should have blocked unauthenticated update");
-            }
-            catch
-            {
-            }
 
             try
             {
@@ -369,44 +343,6 @@ namespace SanteDB.Persistence.Data.Test
                 Assert.Fail("Incorrect exception thrown");
             }
         }
-
-        /// <summary>
-        /// The identity provider should block updates of another systems KEY
-        /// </summary>
-        [Test]
-        public void TestShouldPreventKeyUpdate()
-        {
-            var serviceProvider = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
-            // Pre-Condition
-            Assert.IsNull(serviceProvider.GetIdentity("TEST_APP_011"));
-            Assert.IsNull(serviceProvider.GetIdentity("TEST_APP_011B"));
-
-            // Create the device identity
-            serviceProvider.CreateIdentity("TEST_APP_011", "THIS_IS_A_SECRET", AuthenticationContext.SystemPrincipal);
-            serviceProvider.CreateIdentity("TEST_APP_011B", "THIS_IS_A_SECRET", AuthenticationContext.SystemPrincipal);
-
-            // First authenticate
-            var principal = serviceProvider.Authenticate("TEST_APP_011", "THIS_IS_A_SECRET");
-            // Should be able to set a key on our own
-            var key = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
-            serviceProvider.SetPublicKey("TEST_APP_011", key, principal);
-            Assert.IsTrue(serviceProvider.GetPublicSigningKey("TEST_APP_011").SequenceEqual(key));
-
-            // Should not be able to change anothers
-            try
-            {
-                serviceProvider.SetPublicKey("TEST_APP_011B", key, principal);
-                Assert.Fail("Should not have set key");
-            }
-            catch (PolicyViolationException e) when (e.PolicyId == PermissionPolicyIdentifiers.UnrestrictedAdministration)
-            {
-            }
-            catch
-            {
-                Assert.Fail("Improper exception type was thrown");
-            }
-        }
-
 
         /// <summary>
         /// Test that the provider adds a claim

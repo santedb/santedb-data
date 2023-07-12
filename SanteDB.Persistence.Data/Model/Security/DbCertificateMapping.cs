@@ -23,6 +23,22 @@ using System;
 
 namespace SanteDB.Persistence.Data.Model.Security
 {
+
+    /// <summary>
+    /// Certificate mapping intended use
+    /// </summary>
+    public enum CertificateMappingUse
+    {
+        /// <summary>
+        /// Certificate is to be used for auth
+        /// </summary>
+        Authentication = 0x2,
+        /// <summary>
+        /// Certificate is to be used for sig
+        /// </summary>
+        Signature = 0x1
+    }
+
     /// <summary>
     /// Represents a mapping in the database between a certificate and an identity
     /// </summary>
@@ -47,6 +63,12 @@ namespace SanteDB.Persistence.Data.Model.Security
         /// </summary>
         [Column("x509_pk")]
         public Byte[] X509PublicKeyData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the intended use
+        /// </summary>
+        [Column("use")]
+        public CertificateMappingUse Use { get; set; }
 
         /// <summary>
         /// Gets or sets the expiration date of the certificate
