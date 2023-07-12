@@ -67,7 +67,7 @@ namespace SanteDB.Persistence.Data.Model.Security
         /// <summary>
         /// Gets or sets the intended use
         /// </summary>
-        [Column("use")]
+        [Column("cer_use")]
         public CertificateMappingUse Use { get; set; }
 
         /// <summary>
