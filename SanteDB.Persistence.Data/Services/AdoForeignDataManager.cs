@@ -218,7 +218,7 @@ namespace SanteDB.Persistence.Data.Services
                                     // Callback function for status of this import
                                     var progressPerSubset = 1 / (float)subsetNames.Length;
                                     var currentSubsetOffset = 0;
-                                    EventHandler<ProgressChangedEventArgs> progressRelay = (o, e) => this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(currentSubsetOffset * progressPerSubset + e.Progress * progressPerSubset, $"{String.Format(UserMessages.IMPORTING_NAME, existing.Name)} ({e.State})"));
+                                    EventHandler<ProgressChangedEventArgs> progressRelay = (o, e) => this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(AdoForeignDataManager), currentSubsetOffset * progressPerSubset + e.Progress * progressPerSubset, $"{String.Format(UserMessages.IMPORTING_NAME, existing.Name)} ({e.State})"));
                                     if (this.m_importService is IReportProgressChanged irpc)
                                     {
                                         irpc.ProgressChanged += progressRelay;

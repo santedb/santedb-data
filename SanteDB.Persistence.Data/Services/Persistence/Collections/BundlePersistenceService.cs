@@ -295,7 +295,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             {
                 if (i % 10 == 0)
                 {
-                    this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)i / (float)data.Item.Count, UserMessages.PROCESSING));
+                    this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(BundlePersistenceService), (float)i / (float)data.Item.Count, UserMessages.PROCESSING));
                 }
                 var persistenceService = data.Item[i].GetType().GetRelatedPersistenceService();
 

@@ -250,10 +250,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         /// <param name="status">The status of the progress item</param>
         /// <param name="progress">The progress to be set</param>
-        protected virtual void FireProgressChanged(String status, float progress)
-        {
-            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(progress, status));
-        }
+        //protected virtual void FireProgressChanged(String status, float progress)
+        //{
+        //    this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(progress, status));
+        //}
 
         /// <summary>
         /// Perform the actual insert of a model object
