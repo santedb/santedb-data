@@ -70,6 +70,17 @@ namespace SanteDB.Persistence.Data
         /// </summary>
         public const string IdentifierPatternFormatFail = "id.format";
 
+
+        /// <summary>
+        /// Identity domain check digit provider not found
+        /// </summary>
+        public const string IdentifierValidatorProviderNotFound = "id.validator.provider";
+
+        /// <summary>
+        /// Identity domain check digit provider returned false
+        /// </summary>
+        public const string IdentifierValidatorFailed = "id.validator.fail";
+
         /// <summary>
         /// Identity domain check digit provider not found
         /// </summary>
@@ -79,6 +90,11 @@ namespace SanteDB.Persistence.Data
         /// Identity domain check digit provider returned false
         /// </summary>
         public const string IdentifierCheckDigitFailed = "id.check.fail";
+
+        /// <summary>
+        /// Identity check digit is not provided
+        /// </summary>
+        public const string IdentifierCheckDigitMissing = "id.checkDigit.missing";
 
     }
 }

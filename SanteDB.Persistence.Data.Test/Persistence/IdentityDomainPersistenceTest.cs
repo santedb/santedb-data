@@ -504,7 +504,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(1, patient.LoadProperty(o => o.Extensions).Count);
                 Assert.AreEqual(ExtensionTypeKeys.DataQualityExtension, patient.Extensions[0].ExtensionTypeKey);
                 extension = patient.Extensions[0].GetValue<List<DetectedIssue>>();
-                Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierCheckDigitFailed), "Expected a check digit fail issue");
+                Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierValidatorFailed), "Expected a check digit fail issue");
                 Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierPatternFormatFail), "Expected a format fail issue");
 
                 // We should not be able to register an act with a patient identifier
@@ -522,7 +522,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(1, act.LoadProperty(o => o.Extensions).Count);
                 Assert.AreEqual(ExtensionTypeKeys.DataQualityExtension, act.Extensions[0].ExtensionTypeKey);
                 extension = act.Extensions[0].GetValue<List<DetectedIssue>>();
-                Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierCheckDigitFailed), "Expected a check digit fail issue");
+                Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierValidatorFailed), "Expected a check digit fail issue");
                 Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierPatternFormatFail), "Expected a format fail issue");
                 Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierInvalidTargetScope), "Expected a scope fail issue");
 
