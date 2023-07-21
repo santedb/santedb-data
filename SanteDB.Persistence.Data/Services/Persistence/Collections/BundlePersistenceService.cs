@@ -293,7 +293,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             data = this.ReorganizeForInsert(data);
             for (var i = 0; i < data.Item.Count; i++)
             {
-                if (i % 10 == 0)
+                if (i % 100 == 0)
                 {
                     this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(BundlePersistenceService), (float)i / (float)data.Item.Count, UserMessages.PROCESSING));
                 }

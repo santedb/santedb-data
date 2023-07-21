@@ -47,9 +47,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             data.GeoTagKey = this.EnsureExists(context, data.GeoTag)?.Key ?? data.GeoTagKey;
 
             // The data may be synchronized from an upstream - if so we want to ensure our security user actually exists
-            if (data.SecurityDeviceKey.HasValue
-                && data.TryGetTag(SystemTagNames.UpstreamDataTag, out _)
-                && !context.Any<DbSecurityDevice>(o => o.Key == data.SecurityDeviceKey))
+            if (data.SecurityDeviceKey.HasValue &&
+                data.GetAnnotations<string>().Contains(SystemTagNames.UpstreamDataTag) && 
+               !context.Any<DbSecurityDevice>(o => o.Key == data.SecurityDeviceKey))
             {
                 data.SecurityDeviceKey = null;
             }

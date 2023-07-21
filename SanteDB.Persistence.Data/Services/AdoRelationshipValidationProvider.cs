@@ -349,6 +349,7 @@ namespace SanteDB.Persistence.Data.Services
             // UNIQUE Constraint -> We want to remove any previous reference to the same source/target/relationship
             var dbInstance = new DbRelationshipValidationRule()
             {
+                Key = data.Key ?? Guid.NewGuid(),
                 Description = data.Description,
                 RelationshipTypeKey = data.RelationshipTypeKey,
                 SourceClassKey = data.SourceClassKey,
