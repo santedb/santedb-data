@@ -73,7 +73,9 @@ namespace SanteDB.Persistence.Data.Services
             this.m_dataStreamManager = dataStreamManager;
             this.m_localization = localizationService;
             this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
+
         }
+
 
         /// <inheritdoc/>
         public string ServiceName => "ADO.NET Datamart Manager";
