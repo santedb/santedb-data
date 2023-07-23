@@ -53,7 +53,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
             Assert.IsTrue(certSignService.TryGetSigningCertificateByThumbprint(this.GetCertificate().Thumbprint, out cert));
             Assert.IsTrue(certSignService.TryGetSigningCertificateByHash(this.GetCertificate().GetCertHash(), out cert));
             // Ensure that the identity service does not return
-            Assert.Throws<DataPersistenceException>(() => certAuthService.GetIdentityCertificates(userIdentity));
+            Assert.IsNull(certAuthService.GetIdentityCertificates(userIdentity));
             try
             {
                 certAuthService.Authenticate(this.GetCertificate());
