@@ -104,15 +104,19 @@ namespace SanteDB.Persistence.Data.Services
                     var existingMap = context.FirstOrDefault<DbCertificateMapping>(o =>
                         o.X509Thumbprint == x509Certificate.Thumbprint &&
                         o.Use == CertificateMappingUse.Signature &&
-                        o.ObsoletionTime == null &&
-                        (o.SecurityApplicationKey == certificateRegistration.SecurityApplicationKey || o.SecurityDeviceKey == certificateRegistration.SecurityDeviceKey || o.SecurityUserKey == certificateRegistration.SecurityUserKey));
+                        o.ObsoletionTime == null);
 
-                    if (existingMap != null)
+                    if (existingMap != null &&
+                        (existingMap.SecurityApplicationKey.GetValueOrDefault() == certificateRegistration.SecurityApplicationKey || existingMap.SecurityDeviceKey.GetValueOrDefault() == certificateRegistration.SecurityDeviceKey || existingMap.SecurityUserKey.GetValueOrDefault() == certificateRegistration.SecurityUserKey))
                     {
                         certificateRegistration.Key = existingMap.Key;
                         certificateRegistration.UpdatedByKey = context.ContextId;
                         certificateRegistration.UpdatedTime = DateTimeOffset.Now;
                         context.Update(certificateRegistration);
+                    }
+                    else if(existingMap != null)
+                    {
+                        throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.SIG_CERT_ALREADY_ASSIGNED));
                     }
                     else
                     {

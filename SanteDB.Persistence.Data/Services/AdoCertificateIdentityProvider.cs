@@ -402,14 +402,7 @@ namespace SanteDB.Persistence.Data.Services
                            .Statement);
                     }
 
-                    if (retVal.Any())
-                    {
-                        return retVal.ToList().Select(o => new X509Certificate2(o.X509PublicKeyData));
-                    }
-                    else
-                    {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_NO_CERT_MAP));
-                    }
+                    return retVal.ToList().Select(o => new X509Certificate2(o.X509PublicKeyData));
                 }
             }
             catch (Exception e)
