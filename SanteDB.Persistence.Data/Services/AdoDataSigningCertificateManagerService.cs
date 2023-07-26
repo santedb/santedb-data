@@ -83,7 +83,7 @@ namespace SanteDB.Persistence.Data.Services
                         CreationTime = DateTimeOffset.Now,
                         Expiration = x509Certificate.NotAfter,
                         X509Thumbprint = x509Certificate.Thumbprint,
-                        X509PublicKeyData = x509Certificate.RawData,
+                        X509PublicKeyData = x509Certificate.GetRawCertData(),
                         Use = CertificateMappingUse.Signature
                     };
 
