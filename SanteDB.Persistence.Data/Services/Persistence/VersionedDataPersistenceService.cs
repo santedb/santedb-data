@@ -274,10 +274,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     {
                         yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckDigitMissing, $"Identifier {id.Value} in domain {dbAuth.DomainName} is missing check digit", DetectedIssueKeys.InvalidDataIssue);
                     }
-                    var validatorType = Type.GetType(dbAuth.CustomValidator);
+                    var validatorType = Type.GetType(dbAuth.CheckDigitAlgorithm);
                     if(validatorType == null)
                     {
-                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckProviderNotFound, $"Check digit provider {dbAuth.CustomValidator} is not found", DetectedIssueKeys.OtherIssue);
+                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckProviderNotFound, $"Check digit provider {dbAuth.CheckDigitAlgorithm} is not found", DetectedIssueKeys.OtherIssue);
                     }
                     var validator = Activator.CreateInstance(validatorType) as ICheckDigitAlgorithm;
                     if(validator?.ValidateCheckDigit(id.Value, id.CheckDigit) != true)

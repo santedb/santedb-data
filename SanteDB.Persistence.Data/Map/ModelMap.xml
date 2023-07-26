@@ -276,7 +276,7 @@
   <class modelClass="SanteDB.Core.Model.DataTypes.EntityExtension, SanteDB.Core.Model"
    domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbEntityExtension, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
-    <property modelName="ExtensionValueXml" domainName="Value" />
+    <property modelName="ExtensionValueData" domainName="Value" />
     <property modelName="ExtensionDisplay" domainName="Display" />
      <property modelName="Tag" queryOnly="true" domainName="Key" /> 
   </class>
@@ -425,7 +425,7 @@
   <class modelClass="SanteDB.Core.Model.DataTypes.ActExtension, SanteDB.Core.Model"
  domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbActExtension, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
-    <property modelName="ExtensionValueXml" domainName="Value" />
+    <property modelName="ExtensionValueData" domainName="Value" />
     <property modelName="ExtensionDisplay" domainName="Display" />
      <property modelName="Tag" queryOnly="true" domainName="Key" /> 
   </class>
