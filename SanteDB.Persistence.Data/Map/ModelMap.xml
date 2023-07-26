@@ -155,7 +155,6 @@
 
   <class modelClass="SanteDB.Core.Model.DataTypes.CodeSystem, SanteDB.Core.Model"
          domainClass="SanteDB.Persistence.Data.Model.Concepts.DbCodeSystem, SanteDB.Persistence.Data">
-    <property modelName="Authority" domainName="Domain" />
     <property modelName="ModifiedOn" domainName="UpdatedTime" />
      <property modelName="Tag" queryOnly="true" domainName="Key" /> 
   </class>
