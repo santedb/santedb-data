@@ -45,6 +45,7 @@ namespace SanteDB.Persistence.Data.ForeignData
         /// </summary>
         public AdoForeignDataSubmission(DbForeignDataStage foreignDataStage,
             IEnumerable<DbForeignDataIssue> issues,
+            IEnumerable<DbForeignDataStageParameter> parameters,
             IDataStreamManager dataStreamManager)
         {
             this.Name = foreignDataStage.Name;
@@ -64,6 +65,7 @@ namespace SanteDB.Persistence.Data.ForeignData
             this.UpdatedByKey = foreignDataStage.UpdatedByKey;
             this.UpdatedTime = foreignDataStage.UpdatedTime;
             this.Description = foreignDataStage.Description;
+            this.ParameterValues = parameters.ToDictionary(o => o.Name, o => o.Value);
         }
 
         /// <inheritdoc/>
@@ -104,6 +106,9 @@ namespace SanteDB.Persistence.Data.ForeignData
 
         /// <inheritdoc/>
         public DateTimeOffset? UpdatedTime { get; }
+
+        /// <inheritdoc/>
+        public IDictionary<String, String> ParameterValues { get; }
 
         /// <inheritdoc/>
         public string Description { get; }

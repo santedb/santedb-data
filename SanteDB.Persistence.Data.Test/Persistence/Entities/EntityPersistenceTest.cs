@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 {
@@ -708,6 +709,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     };
 
                     base.TestInsert(entity);
+                    Thread.Sleep(300);
                 });
 
                 var afterQuery = base.TestQuery<Entity>(o => o.Identifiers.Any(i => i.Value.Contains("TEST_CASE3_%")), 3).AsResultSet() as IOrderableQueryResultSet<Entity>;
