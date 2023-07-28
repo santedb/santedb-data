@@ -29,6 +29,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// Concept set reference association
     /// </summary>
     [Table("cd_set_comp_assoc_tbl")]
+#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
     public class DbConceptSetComposition : IDbAssociation, IDbIdentified
     {
         /// <summary>
@@ -73,4 +74,5 @@ namespace SanteDB.Persistence.Data.Model.Concepts
             }
         }
     }
+#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
 }

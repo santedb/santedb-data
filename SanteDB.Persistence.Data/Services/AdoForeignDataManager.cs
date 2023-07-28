@@ -341,6 +341,14 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<IForeignDataSubmission, bool>> query)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+            else if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
 
             var expression = this.m_modelMapper.MapModelExpression<IForeignDataSubmission, DbForeignDataStage, bool>(query, false);
             if (!query.ToString().Contains(nameof(BaseEntityData.ObsoletionTime)))

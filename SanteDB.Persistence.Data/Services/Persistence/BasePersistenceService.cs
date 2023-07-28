@@ -174,7 +174,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Fired when progress changes
         /// </summary>
+#pragma warning disable CS0067 // The event 'BasePersistenceService<TModel, TDbModel>.ProgressChanged' is never used
         public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
+#pragma warning restore CS0067 // The event 'BasePersistenceService<TModel, TDbModel>.ProgressChanged' is never used
 
         /// <summary>
         /// Perform the query operation
@@ -245,15 +247,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected abstract TModel AfterPersisted(DataContext context, TModel data);
 
-        /// <summary>
-        /// Fires the <see cref="ProgressChanged"/> event
-        /// </summary>
-        /// <param name="status">The status of the progress item</param>
-        /// <param name="progress">The progress to be set</param>
-        //protected virtual void FireProgressChanged(String status, float progress)
-        //{
-        //    this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(progress, status));
-        //}
 
         /// <summary>
         /// Perform the actual insert of a model object
