@@ -138,6 +138,7 @@ namespace SanteDB.Persistence.Data.Model.DataType
     /// Identifier scope
     /// </summary>
     [Table("id_dmn_scp_tbl")]
+#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
     public class DbIdentityDomainScope : DbAssociation
     {
 
@@ -165,8 +166,8 @@ namespace SanteDB.Persistence.Data.Model.DataType
         {
             if (obj is DbIdentityDomainScope dba)
             {
-                return dba.ScopeConceptKey == this.ScopeConceptKey &&
-                    dba.SourceKey == this.SourceKey;
+                return dba.ScopeConceptKey == this?.ScopeConceptKey &&
+                    dba.SourceKey == this?.SourceKey;
             }
             else
             {
@@ -175,4 +176,5 @@ namespace SanteDB.Persistence.Data.Model.DataType
         }
 
     }
+#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
 }

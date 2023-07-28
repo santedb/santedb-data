@@ -230,7 +230,7 @@ namespace SanteDB.Persistence.Data.Services
             }
             catch (Exception e)
             {
-                throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.MATCH_CONFIG_ERR, new { id = configuration.Id }));
+                throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.MATCH_CONFIG_ERR, new { id = configuration.Id, error = e }));
             }
         }
 
