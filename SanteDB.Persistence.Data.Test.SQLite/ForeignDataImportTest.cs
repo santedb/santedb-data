@@ -109,8 +109,8 @@ namespace SanteDB.Persistence.Data.Test.SQLite
                             using (var fdReader = fdFile.CreateReader())
                             {
 
-                                Assert.IsFalse(dataImporter.Validate(fdm, fdReader).Any());
-                                var detectedIssues = dataImporter.Import(fdm, fdReader, rejectWriter, TransactionMode.Commit).ToList();
+                                Assert.IsFalse(dataImporter.Validate(fdm, new Dictionary<String, String>(), fdReader).Any());
+                                var detectedIssues = dataImporter.Import(fdm, new Dictionary<String, String>(), fdReader, rejectWriter, TransactionMode.Commit).ToList();
                                 Assert.AreEqual(rejectWriter.RecordsWritten, detectedIssues.Count);
                                 Assert.AreEqual(beforePatientCount + 100 - detectedIssues.Count - 1, patientPersistence.Find(o => o.ObsoletionTime == null).Count());
 
