@@ -36,7 +36,7 @@ namespace SanteDB.Persistence.Data.Model.Security
         /// Gets or sets the email.
         /// </summary>
         /// <value>The email.</value>
-        [Column("email"), IgnoreCase]
+        [Column("email"), IgnoreCase, ApplicationEncrypt("user.email")]
         public String Email
         {
             get;

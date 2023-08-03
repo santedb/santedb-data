@@ -64,7 +64,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         /// <summary>
         /// DI constructor
         /// </summary>
-        public BundlePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IDataCachingService dataCachingService)
+        public BundlePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IDataCachingService dataCachingService = null)
         {
             this.m_localizationService = localizationService;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();

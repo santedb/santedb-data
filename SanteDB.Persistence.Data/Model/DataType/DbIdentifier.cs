@@ -25,8 +25,6 @@ using SanteDB.Persistence.Data.Model.Concepts;
 using SanteDB.Persistence.Data.Model.Entities;
 using System;
 
-
-
 namespace SanteDB.Persistence.Data.Model.DataType
 {
     /// <summary>
@@ -40,7 +38,7 @@ namespace SanteDB.Persistence.Data.Model.DataType
         /// Gets or sets the value.
         /// </summary>
         [Column("id_val")]
-        public String Value
+        public abstract String Value
         {
             get;
             set;
@@ -111,6 +109,12 @@ namespace SanteDB.Persistence.Data.Model.DataType
         /// </summary>
         [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key))]
         public override Guid SourceKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value
+        /// </summary>
+        [ApplicationEncrypt("entity.identifier")]
+        public override string Value { get; set; }
     }
 
     /// <summary>
@@ -130,6 +134,12 @@ namespace SanteDB.Persistence.Data.Model.DataType
         /// </summary>
         [Column("act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.Key))]
         public override Guid SourceKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value
+        /// </summary>
+        [ApplicationEncrypt("act.identifier")]
+        public override string Value { get; set; }
     }
 }
 

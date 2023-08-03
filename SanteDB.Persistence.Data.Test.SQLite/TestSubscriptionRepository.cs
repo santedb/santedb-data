@@ -91,7 +91,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
                                         AND EXISTS (
                                             SELECT 1 FROM 
                                             ENT_ADDR_CMP_TBL INNER JOIN ENT_ADDR_TBL USING (ADDR_ID)
-                                            WHERE VAL IN (${city}) AND ENT_ADDR_CMP_TBL.TYP_CD_ID = '" + AddressComponentKeys.City.ToString() + @"' AND 
+                                            WHERE VAL IN (${city#address.component}) AND ENT_ADDR_CMP_TBL.TYP_CD_ID = '" + AddressComponentKeys.City.ToString() + @"' AND 
                                             ENT_ADDR_TBL.OBSLT_VRSN_SEQ_ID IS NULL AND ENT_ADDR_TBL.ENT_ID = ENT_VRSN_TBL.ENT_ID
                                         ) "
                     }

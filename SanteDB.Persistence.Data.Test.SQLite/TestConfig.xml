@@ -103,6 +103,14 @@
            autoInsertChildren="true"
            prepareStatements="true">
     <validation unique="loose" scope="loose" format="loose" checkDigit="loose" authority="loose"/>
+    <!--<aleConfiguration aleMode="deterministic">
+      <certificate findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="66731f5eb6d3004bccb70d152677e4c68b89aeb2"/>
+      <fields>
+        <enable>entity.identifier</enable>
+        <enable>address.component</enable>
+        <enable>name.component</enable>
+      </fields>
+    </aleConfiguration>-->
 
   </section>
   <section xsi:type="ApplicationServiceContextConfigurationSection" allowUnsignedAssemblies="true" threadPoolSize="4">

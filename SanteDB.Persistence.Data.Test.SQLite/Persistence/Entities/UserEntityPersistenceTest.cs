@@ -28,6 +28,7 @@ using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
 {
@@ -81,7 +82,8 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
 
                 var ue = securityService.GetUserEntity(principal.Identity);
                 Assert.AreEqual(ue.Key, afterInsert.Key);
-
+                var addr = ue.LoadProperty(o => o.Addresses);
+                var comps = addr.First().LoadProperty(o => o.Component);
                 // Attempt lookup by user name
                 var afterQuery = base.TestQuery<UserEntity>(o => o.SecurityUser.UserName == "TEST_USER_ENTITY", 1).AsResultSet().First();
                 Assert.AreEqual(afterQuery.Key, afterInsert.Key);

@@ -124,7 +124,7 @@ namespace SanteDB.Persistence.Data.Hax
                         .Append($"(SELECT {queryPrefix}{cmpTblType}.{keyName} ")
                         .Append($" FROM {cmpTblType} AS {queryPrefix}{cmpTblType} ")
                         .Append(" WHERE ")
-                        .Append(builder.CreateSqlPredicate($"{queryPrefix}{cmpTblType}", "val", componentType.GetProperty(nameof(DbGenericNameComponent.Value)), itm.Value))
+                        .Append(builder.CreateSqlPredicate($"{queryPrefix}{cmpTblType}", TableMapping.Get(componentType).GetColumn(nameof(DbGenericNameComponent.Value)), componentType.GetProperty(nameof(DbGenericNameComponent.Value)), itm.Value))
                         .Append(guardFilter)
                         .Append($") I{sq++}");
                 if (sq > 1)
