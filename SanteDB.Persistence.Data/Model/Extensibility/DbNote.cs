@@ -54,7 +54,7 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
         /// Gets or sets the text.
         /// </summary>
         /// <value>The text.</value>
-        [Column("note_txt")]
+        [Column("note_txt"), ApplicationEncrypt("note.text")]
         public String Text
         {
             get;

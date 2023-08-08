@@ -63,7 +63,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// The title of the document narrative
         /// </summary>
-        [Column("title"), NotNull]
+        [Column("title"), NotNull, ApplicationEncrypt("narrative.title")]
         public String Title { get; set; }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// The text of the narrative section
         /// </summary>
-        [Column("text"), NotNull]
+        [Column("text"), NotNull, ApplicationEncrypt("narrative.text")]
         public byte[] Text { get; set; }
     }
 }
