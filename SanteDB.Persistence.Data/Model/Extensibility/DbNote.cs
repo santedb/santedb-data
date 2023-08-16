@@ -54,8 +54,8 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
         /// Gets or sets the text.
         /// </summary>
         /// <value>The text.</value>
-        [Column("note_txt"), ApplicationEncrypt("note.text")]
-        public String Text
+        [Column("note_txt")]
+        public virtual String Text
         {
             get;
             set;
@@ -80,6 +80,12 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
             set;
         }
 
+        /// <summary>
+        /// Gets or sets the text
+        /// </summary>
+        [ApplicationEncrypt("entityNote.text")]
+        public override string Text { get; set; }
+
     }
 
     /// <summary>
@@ -98,6 +104,13 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets the text
+        /// </summary>
+        [ApplicationEncrypt("actNote.text")]
+        public override string Text { get; set; }
+
 
     }
 }

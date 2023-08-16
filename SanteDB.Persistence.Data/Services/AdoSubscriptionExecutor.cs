@@ -202,9 +202,9 @@ namespace SanteDB.Persistence.Data.Services
                         }
                         else
                         {
-                            if (!String.IsNullOrEmpty(o.Groups[2].Value) && encryptionProvider?.IsConfiguredForEncryption(o.Groups[2].Value) == true) // Encrypted field 
+                            if (!String.IsNullOrEmpty(o.Groups[2].Value) && encryptionProvider?.TryGetEncryptionMode(o.Groups[2].Value, out var ormMode) == true) // Encrypted field 
                             {
-                                arguments.AddRange(qValue.Select(q => encryptionProvider.CreateQueryValue(q)));
+                                arguments.AddRange(qValue.Select(q => encryptionProvider.CreateQueryValue(ormMode, q)));
                             }
                             else
                             {
