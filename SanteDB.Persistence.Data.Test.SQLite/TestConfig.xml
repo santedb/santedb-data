@@ -103,7 +103,7 @@
            autoInsertChildren="true"
            prepareStatements="true">
     <validation unique="loose" scope="loose" format="loose" checkDigit="loose" authority="loose"/>
-    <aleConfiguration enabled="true">
+    <aleConfiguration enabled="false">
       <certificate findType="FindByThumbprint" storeName="My" storeLocation="CurrentUser" findValue="e3829c6d1db995abcc4fc0a1a7cde9445e411e10"/>
       <field mode="deterministic">entity.identifier</field>
       <field mode="deterministic">address.component</field>
