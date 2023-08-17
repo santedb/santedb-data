@@ -203,7 +203,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
                         else
                         {
-                            OrmAleMode ormAleMode = OrmAleMode.Off;
+                            OrmAleMode ormMode = OrmAleMode.Off;
                             if (!String.IsNullOrEmpty(o.Groups[2].Value) && encryptionProvider?.TryGetEncryptionMode(o.Groups[2].Value, out ormMode) == true) // Encrypted field 
                             {
                                 arguments.AddRange(qValue.Select(q => encryptionProvider.CreateQueryValue(ormMode, q)));
