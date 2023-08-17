@@ -32,6 +32,7 @@ using SanteDB.Core.Model.Subscription;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.OrmLite.Configuration;
 using SanteDB.OrmLite.Providers.Postgres;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Services.Persistence;
@@ -202,7 +203,8 @@ namespace SanteDB.Persistence.Data.Services
                         }
                         else
                         {
-                            if (!String.IsNullOrEmpty(o.Groups[2].Value) && encryptionProvider?.TryGetEncryptionMode(o.Groups[2].Value, out var ormMode) == true) // Encrypted field 
+                            OrmAleMode ormAleMode = OrmAleMode.Off;
+                            if (!String.IsNullOrEmpty(o.Groups[2].Value) && encryptionProvider?.TryGetEncryptionMode(o.Groups[2].Value, out ormMode) == true) // Encrypted field 
                             {
                                 arguments.AddRange(qValue.Select(q => encryptionProvider.CreateQueryValue(ormMode, q)));
                             }
