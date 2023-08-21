@@ -65,5 +65,9 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// </summary>
         [Column("name_id"), ForeignKey(typeof(DbEntityName), nameof(DbEntityName.Key))]
         public override Guid SourceKey { get; set; }
+
+        /// <inheritdoc/>
+        [ApplicationEncrypt("name.component")]
+        public override String Value { get; set; }
     }
 }

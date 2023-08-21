@@ -52,6 +52,6 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// Value
         /// </summary>
         [Column("val")]
-        public string Value { get; set; }
+        public abstract string Value { get; set; }
     }
 }

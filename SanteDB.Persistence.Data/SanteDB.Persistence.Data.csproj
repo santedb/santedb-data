@@ -75,6 +75,8 @@
     <None Remove="SQL\FBSQL\Updates\20230419-FBSQL.sql" />
     <None Remove="SQL\FBSQL\Updates\20230509-fbSQL.sql" />
     <None Remove="SQL\FBSQL\Updates\20230514-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20230711-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20230727-FBSQL.sql" />
     <None Remove="SQL\PSQL\santedb-codes.sql" />
     <None Remove="SQL\PSQL\santedb-ddl.sql" />
     <None Remove="SQL\PSQL\santedb-fn.sql" />
@@ -91,6 +93,9 @@
     <None Remove="SQL\PSQL\Updates\20230419-PSQL.sql" />
     <None Remove="SQL\PSQL\Updates\20230509-PSQL.sql" />
     <None Remove="SQL\PSQL\Updates\20230513-PSQL.sql" />
+    <None Remove="SQL\PSQL\Updates\20230711-PSQL.sql" />
+    <None Remove="SQL\PSQL\Updates\20230727-PSQL.sql" />
+    <None Remove="SQL\PSQL\Updates\20230802-PSQL.sql" />
     <None Remove="SQL\SQLITE\20221003.SQL" />
     <None Remove="SQL\SQLITE\20221027.sql" />
     <None Remove="SQL\SQLITE\20221130.sql" />
@@ -103,6 +108,9 @@
     <None Remove="SQL\SQLITE\20230419.sql" />
     <None Remove="SQL\SQLITE\20230509.sql" />
     <None Remove="SQL\SQLITE\20230514.sql" />
+    <None Remove="SQL\SQLITE\20230711.sql" />
+    <None Remove="SQL\SQLITE\20230727.sql" />
+    <None Remove="SQL\SQLITE\20230802.sql" />
     <None Remove="SQL\SQLITE\santedb-codes.sql" />
     <None Remove="SQL\SQLITE\santedb-ddl.sql" />
     <None Remove="SQL\SQLITE\santedb-init.sql" />
@@ -202,6 +210,8 @@
     <EmbeddedResource Include="SQL\FBSQL\Updates\20230330-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20230727-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20230711-FBSQL.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20230514-FBSQL.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20230509-FBSQL.sql">
     </EmbeddedResource>
@@ -211,6 +221,9 @@
     <EmbeddedResource Include="SQL\PSQL\Updates\20230227-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20230118-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20221214-PSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20230802-PSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20230727-PSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20230711-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20230513-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20230509-PSQL.sql">
     </EmbeddedResource>
@@ -240,6 +253,9 @@
     <EmbeddedResource Include="SQL\SQLITE\20230330.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="SQL\SQLITE\20230802.sql" />
+    <EmbeddedResource Include="SQL\SQLITE\20230727.sql" />
+    <EmbeddedResource Include="SQL\SQLITE\20230711.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20230514.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20230509.sql">
     </EmbeddedResource>

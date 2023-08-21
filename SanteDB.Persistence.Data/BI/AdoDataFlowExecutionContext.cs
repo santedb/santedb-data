@@ -124,7 +124,7 @@ namespace SanteDB.Persistence.Data.BI
                     var existing = context.Query<DbDatamartExecutionEntry>(o => o.Key == this.Key).FirstOrDefault();
                     if (existing == null)
                     {
-                        throw new InvalidOperationException(String.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, nameof(Dispose)));
+                        return; // ignore the logging of the stop
                     }
 
                     existing.EndTime = DateTimeOffset.Now;
@@ -183,7 +183,6 @@ namespace SanteDB.Persistence.Data.BI
         /// <inheritdoc/>
         public IDataIntegrator GetIntegrator(BiDataSourceDefinition dataSource)
         {
-            var databaseProvider = this.m_configuration.Provider; // database provider - assume same as our ADO context
 
             ConnectionString connectionString = null;
             if (dataSource == null)

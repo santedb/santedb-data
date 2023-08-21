@@ -59,3 +59,4 @@ CREATE UNIQUE INDEX rel_vrfy_src_trg_unq ON rel_vrfy_systbl (rel_typ_cd_id, src_
 
 DROP TABLE temp;
 INSERT INTO PATCH_DB_SYSTBL (PATCH_ID, APPLY_DATE, INFO_NAME) VALUES ('20230514-01', UNIXEPOCH(), 'Add create and obsolete times to database verify tables'); 
+ALTER TABLE BI_DM_REG_SYSTBL ADD HASH BLOB(32);

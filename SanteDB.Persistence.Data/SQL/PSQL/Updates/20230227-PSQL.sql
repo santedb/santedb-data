@@ -10,6 +10,7 @@ INSERT INTO cd_set_mem_assoc_tbl (set_id, cd_id) VALUES ('4e6da567-0094-4f23-855
 INSERT INTO cd_set_mem_assoc_tbl (set_id, cd_id) VALUES ('4e6da567-0094-4f23-8555-11da499593af','4d1a5c28-deb7-411e-b75f-d524f90dfa63') ON CONFLICT DO NOTHING;
 insert into cd_name_tbl (cd_id, efft_vrsn_seq_id, lang_cs, val) values ('4d1a5c28-deb7-411e-b75f-d524f90dfa63', 104, 'en', 'State or Province') ON CONFLICT DO NOTHING;
 
+-- FIX STATE OR PROVINCE
 INSERT INTO REL_VRFY_SYSTBL (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
 SELECT uuid_generate_v1(), rel_typ_cd_id, CASE WHEN SRC_CLS_CD_ID = '8CF4B0B0-84E5-4122-85FE-6AFA8240C218' THEN '4d1a5c28-deb7-411e-b75f-d524f90dfa63' ELSE SRC_CLS_CD_ID END,
 CASE WHEN TRG_CLS_CD_ID = '8CF4B0B0-84E5-4122-85FE-6AFA8240C218' THEN '4d1a5c28-deb7-411e-b75f-d524f90dfa63' ELSE TRG_CLS_CD_ID END, err_desc

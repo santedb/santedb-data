@@ -21,7 +21,6 @@
 using SanteDB.BI.Services.Impl;
 using SanteDB.Client.Configuration;
 using SanteDB.Client.Disconnected.Data.Synchronization;
-using SanteDB.Client.Repositories;
 using SanteDB.Client.Upstream.Repositories;
 using SanteDB.Client.Upstream.Security;
 using SanteDB.Core.Data;
@@ -52,8 +51,13 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                         typeof(AdoSecurityChallengeProvider),
                         typeof(AdoCertificateIdentityProvider),
                         typeof(AdoFreetextSearchService),
+                        typeof(BridgedRoleProvider),
+                        typeof(BridgedApplicationIdentityProvider),
                         typeof(AdoPolicyInformationService),
                         typeof(AdoRelationshipValidationProvider),
+                        typeof(BridgedSecurityRepositoryService),
+                        typeof(UpstreamSecurityRepository),
+                        typeof(BridgedIdentityProvider),
                         typeof(UpstreamIdentityProvider),
                         typeof(UpstreamApplicationIdentityProvider),
                         typeof(BridgedPolicyInformationService),

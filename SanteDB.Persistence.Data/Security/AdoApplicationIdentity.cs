@@ -52,7 +52,6 @@ namespace SanteDB.Persistence.Data.Security
 
             this.m_application = application;
             this.m_application.Secret = null;
-            this.m_application.PublicSigningKey = null;
             this.InitializeClaims();
         }
 

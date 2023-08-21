@@ -141,7 +141,7 @@ namespace SanteDB.Persistence.Data.Services
                         for (var i = 0; i < dataset.Action.Count; i++)
                         {
                             var itm = dataset.Action[i];
-                            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)i / (float)dataset.Action.Count, String.Format(UserMessages.PROCESSING, dataset.Id)));
+                            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(AdoDatasetInstallerService), (float)i / (float)dataset.Action.Count, String.Format(UserMessages.PROCESSING, dataset.Id)));
                             var persistenceService = itm.Element.GetType().GetRelatedPersistenceService();
 
                             try

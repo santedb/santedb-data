@@ -100,7 +100,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
             try
             {
                 cert = certService.GetIdentityCertificates(userIdentity).FirstOrDefault();
-                Assert.Fail("Should have thrown exception");
+                Assert.IsNull(cert);
             }
             catch (Exception e) when (e.InnerException is KeyNotFoundException)
             {

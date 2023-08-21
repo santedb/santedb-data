@@ -32,6 +32,8 @@ using SanteDB.Core.Model.Subscription;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.OrmLite.Configuration;
+using SanteDB.OrmLite.Providers.Postgres;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Services.Persistence;
 using System;
@@ -50,7 +52,7 @@ namespace SanteDB.Persistence.Data.Services
     public class AdoSubscriptionExecutor : ISubscriptionExecutor
     {
         // Parameter regex
-        private static readonly Regex m_parmRegex = new Regex(@"\$\{([\w_][\-\d\w\._]*?)\}", RegexOptions.Multiline | RegexOptions.Compiled);
+        private static readonly Regex m_parmRegex = new Regex(@"\$\{([\w_][\-\d\w\._]*?)(?:\#([\w_\.]+?))?\}", RegexOptions.Multiline | RegexOptions.Compiled);
 
         // Allowed target types
         private readonly Type[] m_allowedTypes = new Type[]
@@ -157,6 +159,8 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     throw new InvalidOperationException(String.Format(ErrorMessages.SUBSCRIPTION_RESOURCE_NOSTORE, subscription.Resource));
                 }
+                var encryptionProvider = (persistenceInstance.Provider as IEncryptedDbProvider)?.GetEncryptionProvider();
+
                 // Get the definition
                 var definition = subscription.ServerDefinitions.FirstOrDefault(o => o.InvariantName == m_configuration.Provider.Invariant);
                 if (definition == null)
@@ -187,7 +191,7 @@ namespace SanteDB.Persistence.Data.Services
                 var arguments = new List<Object>();
                 definitionQuery = m_parmRegex.Replace(definitionQuery, (o) =>
                 {
-                    if (parameters.TryGetValue(o.Groups[1].Value, out var qValue))
+                    if (parameters.TryGetValue($"_{o.Groups[1].Value}", out var qValue))
                     {
                         if (Guid.TryParse(qValue.First(), out var uuid))
                         {
@@ -199,9 +203,16 @@ namespace SanteDB.Persistence.Data.Services
                         }
                         else
                         {
-                            arguments.AddRange(qValue);
+                            OrmAleMode ormMode = OrmAleMode.Off;
+                            if (!String.IsNullOrEmpty(o.Groups[2].Value) && encryptionProvider?.TryGetEncryptionMode(o.Groups[2].Value, out ormMode) == true) // Encrypted field 
+                            {
+                                arguments.AddRange(qValue.Select(q => encryptionProvider.CreateQueryValue(ormMode, q)));
+                            }
+                            else
+                            {
+                                arguments.AddRange(qValue);
+                            }
                         }
-
                         return String.Join(",", qValue.Select(v => "?"));
                     }
                     return "NULL";

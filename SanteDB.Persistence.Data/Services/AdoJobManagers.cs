@@ -296,6 +296,7 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             JobId = job.Id,
                             CurrentState = state,
+                            Progress = 0.0f,
                             LastStartTime = state == JobStateType.Starting || state == JobStateType.Running ? DateTime.Now : dbStatus?.LastStart?.DateTime,
                         };
                     }
@@ -305,7 +306,7 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             JobId = job.Id,
                             LastStart = DateTimeOffset.Now,
-                            LastState = JobStateType.Running
+                            LastState = JobStateType.Running,
                         });
                     }
 

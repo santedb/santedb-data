@@ -59,6 +59,10 @@ namespace SanteDB.Persistence.Data.Model.Sys
         /// </summary>
         [Column("last_stop_utc")]
         public DateTimeOffset? LastStop { get; set; }
+
+        /// <summary>
+        /// True if <see cref="LastStop"/> is provided.
+        /// </summary>
         public bool LastStopSpecified { get; internal set; }
     }
 }

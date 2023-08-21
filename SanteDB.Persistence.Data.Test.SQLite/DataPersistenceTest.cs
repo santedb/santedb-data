@@ -139,7 +139,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
         {
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TData>>();
             Assert.IsNotNull(persistenceService);
-            ApplicationServiceContext.Current.GetService<IDataCachingService>().Clear();
+            ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Clear();
 
             var queryResults = persistenceService.Query(queryFilter, AuthenticationContext.Current.Principal);
             if (expectedResults.HasValue)

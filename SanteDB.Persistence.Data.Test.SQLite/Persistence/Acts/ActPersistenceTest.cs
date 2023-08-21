@@ -27,6 +27,7 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -559,7 +560,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
 
                 var aaUuid = this.GetOrCreateAA();
 
-                Enumerable.Range(1, 99).AsParallel().ForAll(i =>
+                Enumerable.Range(1, 99).ForEach(i =>
                 {
                     using (AuthenticationContext.EnterSystemContext())
                     {

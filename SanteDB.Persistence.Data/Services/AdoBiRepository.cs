@@ -216,7 +216,7 @@ namespace SanteDB.Persistence.Data.Services
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceWarning("Error installing {0}...", itm.Name);
+                    this.m_tracer.TraceWarning("Error installing {0}...", itm.Name, e);
                 }
             }
         }

@@ -71,7 +71,7 @@ namespace SanteDB.Persistence.Data.Test
                     new SubscriptionServerDefinition()
                     {
                         InvariantName = "FirebirdSQL",
-                        Definition = @"SELECT * FROM ENT_VRSN_TBL INNER JOIN ENT_TBL USING (ENT_ID) WHERE CRT_UTC > ${_creationDate} ORDER BY VRSN_SEQ_ID DESC"
+                        Definition = @"SELECT * FROM ENT_VRSN_TBL INNER JOIN ENT_TBL USING (ENT_ID) WHERE CRT_UTC > ${creationDate} ORDER BY VRSN_SEQ_ID DESC"
                     }
                 }
             },
@@ -91,7 +91,7 @@ namespace SanteDB.Persistence.Data.Test
                                         AND EXISTS (
                                             SELECT 1 FROM 
                                             ENT_ADDR_CMP_TBL INNER JOIN ENT_ADDR_TBL USING (ADDR_ID)
-                                            WHERE VAL IN (${_city}) AND ENT_ADDR_CMP_TBL.TYP_CD_ID = '" + AddressComponentKeys.City.ToString() + @"' AND 
+                                            WHERE VAL IN (${city}) AND ENT_ADDR_CMP_TBL.TYP_CD_ID = '" + AddressComponentKeys.City.ToString() + @"' AND 
                                             ENT_ADDR_TBL.OBSLT_VRSN_SEQ_ID IS NULL AND ENT_ADDR_TBL.ENT_ID = ENT_VRSN_TBL.ENT_ID
                                         ) "
                     }

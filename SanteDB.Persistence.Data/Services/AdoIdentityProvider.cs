@@ -29,6 +29,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Security.Services;
+using SanteDB.Core.Security.Tfa;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Exceptions;
@@ -307,15 +308,16 @@ namespace SanteDB.Persistence.Data.Services
                             }
 
                             // User requires TFA but the secret is empty
-                            if (dbUser.TwoFactorEnabled && String.IsNullOrEmpty(tfaSecret) &&
-                                dbUser.TwoFactorMechnaismKey.HasValue)
+                            var useMfa = dbUser.TwoFactorEnabled || this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.ForceMfa, false);
+                            var mfaMechanism = dbUser.TwoFactorMechnaismKey ?? this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.DefaultMfaMethod, (Guid?)null) ?? TfaEmailMechanism.MechanismId;
+                            if (useMfa && String.IsNullOrEmpty(tfaSecret))
                             {
-                                var secretString = this.m_tfaRelay.SendSecret(dbUser.TwoFactorMechnaismKey.Value, new AdoUserIdentity(dbUser));
+                                var secretString = this.m_tfaRelay.SendSecret(mfaMechanism, new AdoUserIdentity(dbUser));
                                 throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ, new { message = secretString }));
                             }
 
                             // TFA supplied?
-                            if (dbUser.TwoFactorEnabled && !this.m_tfaRelay.ValidateSecret(dbUser.TwoFactorMechnaismKey.Value, new AdoUserIdentity(dbUser), tfaSecret))
+                            if (useMfa && !this.m_tfaRelay.ValidateSecret(mfaMechanism, new AdoUserIdentity(dbUser), tfaSecret))
                             {
                                 throw new InvalidIdentityAuthenticationException();
                             }
@@ -413,8 +415,8 @@ namespace SanteDB.Persistence.Data.Services
         /// <param name="userName">The user who's password is being changed</param>
         /// <param name="newPassword">The new password to set</param>
         /// <param name="principal">The principal which is setting the password</param>
-        /// <param name="force">True to bypass validation for the password change. False otherwise.</param>
-        public void ChangePassword(string userName, string newPassword, IPrincipal principal, bool force = false)
+        /// <param name="isSynchronizationOperation">True to bypass validation for the password change. False otherwise.</param>
+        public void ChangePassword(string userName, string newPassword, IPrincipal principal, bool isSynchronizationOperation = false)
         {
             if (String.IsNullOrEmpty(userName))
             {
@@ -424,7 +426,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new ArgumentNullException(nameof(userName), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            else if (!force && !this.m_passwordValidator.Validate(newPassword))
+            else if (!isSynchronizationOperation && !this.m_passwordValidator.Validate(newPassword))
             {
                 throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "password.complexity", this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_COMPLEXITY), DetectedIssueKeys.SecurityIssue, null);
             }
@@ -455,10 +457,16 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         // Password reuse policy?
-                        if (!force && this.m_securityConfiguration.GetSecurityPolicy<bool>(SecurityPolicyIdentification.PasswordHistory) && this.m_configuration.GetPepperCombos(newPassword).Any(o => this.m_passwordHashingService.ComputeHash(o) == dbUser.Password))
+                        if (!isSynchronizationOperation && this.m_securityConfiguration.GetSecurityPolicy<bool>(SecurityPolicyIdentification.PasswordHistory) && this.m_configuration.GetPepperCombos(newPassword).Any(o => this.m_passwordHashingService.ComputeHash(o) == dbUser.Password))
                         {
                             throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "password.history", this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_HISTORY), DetectedIssueKeys.SecurityIssue, null);
                         }
+                        
+                        if(isSynchronizationOperation) // the password is changing to synchronize 
+                        {
+                            dbUser.LastLoginTime = DateTimeOffset.Now;
+                        }
+
                         dbUser.Password = this.m_passwordHashingService.ComputeHash(this.m_configuration.AddPepper(newPassword));
                         dbUser.UpdatedByKey = context.EstablishProvenance(principal, null);
                         dbUser.UpdatedTime = DateTimeOffset.Now;
@@ -509,7 +517,7 @@ namespace SanteDB.Persistence.Data.Services
             }
             else if (String.IsNullOrEmpty(password))
             {
-                throw new ArgumentNullException(nameof(userName), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+                throw new ArgumentNullException(nameof(password), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             else if (!this.m_passwordValidator.Validate(password))
             {

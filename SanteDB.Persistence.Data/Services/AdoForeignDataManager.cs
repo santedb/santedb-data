@@ -144,15 +144,24 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             this.m_streamManager.Remove(existing.RejectStreamKey.Value);
                         }
-                        this.m_streamManager.Remove(existing.SourceStreamKey);
+
+                        try
+                        {
+                            this.m_streamManager.Remove(existing.SourceStreamKey);
+                        }
+                        catch(FileNotFoundException) { }
+
                         existing.RejectStreamKey = null;
                         existing.SourceStreamKey = Guid.Empty;
                         context.Update(existing);
                         var issues = context.Query<DbForeignDataIssue>(o => o.SourceKey == foreignDataId).ToArray();
                         context.DeleteAll<DbForeignDataIssue>(o => o.SourceKey == foreignDataId);
+                        var parameters = context.Query<DbForeignDataStageParameter>(o => o.SourceKey == foreignDataId).ToArray();
+                        context.DeleteAll<DbForeignDataStageParameter>(o => o.SourceKey == foreignDataId);
+
                         tx.Commit();
 
-                        return new AdoForeignDataSubmission(existing, issues, this.m_streamManager);
+                        return new AdoForeignDataSubmission(existing, issues, parameters, this.m_streamManager);
                     }
                 }
             }
@@ -196,6 +205,8 @@ namespace SanteDB.Persistence.Data.Services
                     existing.UpdatedTime = DateTimeOffset.Now;
                     context.Update(existing);
 
+                    var parameters = context.Query<DbForeignDataStageParameter>(o => o.SourceKey == existing.Key).ToDictionary(o => o.Name, o => o.Value);
+
                     var foreignDataMap = this.m_foreignDataMapRepository.Get(existing.ForeignDataMapKey);
                     if (foreignDataMap == null)
                     {
@@ -218,7 +229,7 @@ namespace SanteDB.Persistence.Data.Services
                                     // Callback function for status of this import
                                     var progressPerSubset = 1 / (float)subsetNames.Length;
                                     var currentSubsetOffset = 0;
-                                    EventHandler<ProgressChangedEventArgs> progressRelay = (o, e) => this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(currentSubsetOffset * progressPerSubset + e.Progress * progressPerSubset, $"{String.Format(UserMessages.IMPORTING_NAME, existing.Name)} ({e.State})"));
+                                    EventHandler<ProgressChangedEventArgs> progressRelay = (o, e) => this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(AdoForeignDataManager), currentSubsetOffset * progressPerSubset + e.Progress * progressPerSubset, $"{String.Format(UserMessages.IMPORTING_NAME, existing.Name)} ({e.State})"));
                                     if (this.m_importService is IReportProgressChanged irpc)
                                     {
                                         irpc.ProgressChanged += progressRelay;
@@ -233,7 +244,7 @@ namespace SanteDB.Persistence.Data.Services
                                             using (var reader = sourceFile.CreateReader(sourceName))
                                             using (var rejectWriter = rejectFile.CreateWriter(sourceName))
                                             {
-                                                var issues = this.m_importService.Import(map, reader, rejectWriter, TransactionMode.Commit).ToArray();
+                                                var issues = this.m_importService.Import(map, parameters, reader, rejectWriter, TransactionMode.Commit).ToArray();
 
                                                 foreach (var itm in issues)
                                                 {
@@ -314,7 +325,7 @@ namespace SanteDB.Persistence.Data.Services
                         context.Update(existing);
                     }
 
-                    return new AdoForeignDataSubmission(existing, context.Query<DbForeignDataIssue>(o => o.SourceKey == foreignDataId).ToArray(), this.m_streamManager);
+                    return new AdoForeignDataSubmission(existing, context.Query<DbForeignDataIssue>(o => o.SourceKey == foreignDataId).ToArray(), context.Query<DbForeignDataStageParameter>(o => o.SourceKey == foreignDataId).ToArray(), this.m_streamManager);
                 }
             }
             catch (DbException e)
@@ -330,6 +341,14 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<IForeignDataSubmission, bool>> query)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+            else if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
 
             var expression = this.m_modelMapper.MapModelExpression<IForeignDataSubmission, DbForeignDataStage, bool>(query, false);
             if (!query.ToString().Contains(nameof(BaseEntityData.ObsoletionTime)))
@@ -369,7 +388,7 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         throw new KeyNotFoundException(foreignDataId.ToString());
                     }
-                    return new AdoForeignDataSubmission(existing, context.Query<DbForeignDataIssue>(o => o.SourceKey == foreignDataId), this.m_streamManager);
+                    return new AdoForeignDataSubmission(existing, context.Query<DbForeignDataIssue>(o => o.SourceKey == foreignDataId).ToArray(), context.Query<DbForeignDataStageParameter>(o => o.SourceKey == foreignDataId), this.m_streamManager);
                 }
             }
             catch (DbException e)
@@ -383,7 +402,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public IForeignDataSubmission Get(DataContext context, Guid key) => new AdoForeignDataSubmission(context.FirstOrDefault<DbForeignDataStage>(o => o.Key == key && o.ObsoletionTime == null), context.Query<DbForeignDataIssue>(o => o.SourceKey == key).ToArray(), this.m_streamManager);
+        public IForeignDataSubmission Get(DataContext context, Guid key) => new AdoForeignDataSubmission(context.FirstOrDefault<DbForeignDataStage>(o => o.Key == key && o.ObsoletionTime == null), context.Query<DbForeignDataIssue>(o => o.SourceKey == key).ToArray(), context.Query<DbForeignDataStageParameter>(o => o.SourceKey == key).ToArray(), this.m_streamManager);
 
         /// <inheritdoc/>
         public LambdaExpression MapExpression<TReturn>(Expression<Func<IForeignDataSubmission, TReturn>> sortExpression)
@@ -430,13 +449,13 @@ namespace SanteDB.Persistence.Data.Services
                                 context.EstablishProvenance(AuthenticationContext.Current.Principal);
                                 context.DeleteAll<DbForeignDataIssue>(o => o.SourceKey == foreignDataId);
                                 var issues = this.ValidateInternal(context, existing).ToArray();
-
+                                var parameters = context.Query<DbForeignDataStageParameter>(o => o.SourceKey == foreignDataId).ToArray();
                                 tx.Commit();
-                                return new AdoForeignDataSubmission(existing, issues.ToArray(), this.m_streamManager);
+                                return new AdoForeignDataSubmission(existing, issues.ToArray(), parameters.ToArray(), this.m_streamManager);
                             }
                     }
 
-                    return new AdoForeignDataSubmission(existing, context.Query<DbForeignDataIssue>(o => o.SourceKey == foreignDataId).ToArray(), this.m_streamManager);
+                    return new AdoForeignDataSubmission(existing, context.Query<DbForeignDataIssue>(o => o.SourceKey == foreignDataId).ToArray(), context.Query<DbForeignDataStageParameter>(o => o.SourceKey == foreignDataId).ToArray(), this.m_streamManager);
                 }
             }
             catch (DbException e)
@@ -450,7 +469,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public IForeignDataSubmission Stage(Stream inputStream, string name, string description, Guid foreignDataMapKey)
+        public IForeignDataSubmission Stage(Stream inputStream, string name, string description, Guid foreignDataMapKey, IDictionary<String, String> parameterValues)
         {
             if (inputStream == null)
             {
@@ -478,7 +497,6 @@ namespace SanteDB.Persistence.Data.Services
 
                         var stageDataRecord = new DbForeignDataStage()
                         {
-                            Key = Guid.NewGuid(),
                             CreatedByKey = context.EstablishProvenance(AuthenticationContext.Current.Principal),
                             CreationTime = DateTimeOffset.Now,
                             Name = name,
@@ -491,11 +509,17 @@ namespace SanteDB.Persistence.Data.Services
 
                         // Ensure that we understand the format
                         stageDataRecord = context.Insert(stageDataRecord);
+                        var dbParmValues = parameterValues.Select(kv => context.Insert(new DbForeignDataStageParameter()
+                        {
+                            SourceKey = stageDataRecord.Key,
+                            Name = kv.Key,
+                            Value = kv.Value
+                        })).ToArray();
                         var issues = this.ValidateInternal(context, stageDataRecord).ToArray();
 
                         tx.Commit();
 
-                        return new AdoForeignDataSubmission(stageDataRecord, issues, this.m_streamManager);
+                        return new AdoForeignDataSubmission(stageDataRecord, issues, dbParmValues, this.m_streamManager);
                     }
                 }
             }
@@ -516,7 +540,7 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (result is DbForeignDataStage dbfds)
             {
-                return new AdoForeignDataSubmission(dbfds, context.Query<DbForeignDataIssue>(o => o.SourceKey == dbfds.Key).ToArray(), this.m_streamManager);
+                return new AdoForeignDataSubmission(dbfds, context.Query<DbForeignDataIssue>(o => o.SourceKey == dbfds.Key).ToArray(), context.Query<DbForeignDataStageParameter>(o => o.SourceKey == dbfds.Key).ToArray(), this.m_streamManager);
             }
             else if (result == null)
             {
@@ -547,6 +571,8 @@ namespace SanteDB.Persistence.Data.Services
 
             // Clear out existing issues
             context.DeleteAll<DbForeignDataIssue>(o => o.SourceKey == stageDataRecord.Key);
+
+            var parameters = context.Query<DbForeignDataStageParameter>(o => o.SourceKey == stageDataRecord.Key).ToDictionary(o => o.Name, o => o.Value);
 
             // Attempt to get the foreign data map 
             var foreignDataMap = this.m_foreignDataMapRepository.Get(stageDataRecord.ForeignDataMapKey);
@@ -588,7 +614,7 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             using (var reader = foreignFile.CreateReader(subsetName))
                             {
-                                foreach (var dte in this.m_importService.Validate(map, reader))
+                                foreach (var dte in this.m_importService.Validate(map, parameters, reader))
                                 {
                                     if (dte.Priority < highestPriority)
                                     {

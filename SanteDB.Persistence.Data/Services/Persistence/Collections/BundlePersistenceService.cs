@@ -64,7 +64,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         /// <summary>
         /// DI constructor
         /// </summary>
-        public BundlePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IDataCachingService dataCachingService)
+        public BundlePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IDataCachingService dataCachingService = null)
         {
             this.m_localizationService = localizationService;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
@@ -293,9 +293,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             data = this.ReorganizeForInsert(data);
             for (var i = 0; i < data.Item.Count; i++)
             {
-                if (i % 10 == 0)
+                if (i % 100 == 0)
                 {
-                    this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)i / (float)data.Item.Count, UserMessages.PROCESSING));
+                    this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(BundlePersistenceService), (float)i / (float)data.Item.Count, UserMessages.PROCESSING));
                 }
                 var persistenceService = data.Item[i].GetType().GetRelatedPersistenceService();
 

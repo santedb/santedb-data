@@ -83,5 +83,11 @@ namespace SanteDB.Persistence.Data.Model.Entities
             set;
         }
 
+        /// <summary>
+        /// Gets or sets the value
+        /// </summary>
+        [ApplicationEncrypt("address.component")]
+        public override string Value { get; set; }
+
     }
 }

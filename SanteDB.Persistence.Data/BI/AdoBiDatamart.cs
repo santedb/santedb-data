@@ -50,6 +50,7 @@ namespace SanteDB.Persistence.Data.BI
             this.UpdatedTime = datamart.UpdatedTime;
             this.UpdatedByKey = datamart.UpdatedByKey;
             this.Version = datamart.Version;
+            this.DefinitionHash = datamart.DefinitionHash;
             this.m_provider = dbProvider;
         }
 
@@ -93,6 +94,8 @@ namespace SanteDB.Persistence.Data.BI
         /// <inheritdoc/>
         public Guid? UpdatedByKey { get; }
 
+        /// <inheritdoc/>
+        public byte[] DefinitionHash { get; }
 
         /// <inheritdoc/>
         public DateTimeOffset? UpdatedTime { get; }

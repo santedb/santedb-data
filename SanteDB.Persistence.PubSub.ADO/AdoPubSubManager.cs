@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
+using SanteDB.Core.i18n;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.PubSub;
@@ -82,6 +83,9 @@ namespace SanteDB.Persistence.PubSub.ADO
         // Query persistence service
         private IQueryPersistenceService m_queryPersistence;
 
+        // Localization for error messages
+        readonly ILocalizationService m_localizationService;
+
         /// <summary>
         /// Creates a new instance of this pub-sub manager
         /// </summary>
@@ -90,7 +94,8 @@ namespace SanteDB.Persistence.PubSub.ADO
             IConfigurationManager configurationManager,
             ISecurityRepositoryService securityRepository,
             IDataCachingService cachingService,
-            IQueryPersistenceService queryPersistence)
+            IQueryPersistenceService queryPersistence,
+            ILocalizationService localizationService)
         {
             this.m_cache = cachingService;
             this.m_serviceManager = serviceManager;
@@ -100,6 +105,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             this.m_serviceManager = serviceManager;
             this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.PubSub.ADO", serviceManager.NotifyStartupProgress);
             this.m_queryPersistence = queryPersistence;
+            this.m_localizationService = localizationService;
         }
 
         // Ado Pub Sub Manager Tracer source
@@ -791,6 +797,15 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// </summary>
         public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<PubSubChannelDefinition, bool>> query)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+            else if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
             var domainQuery = this.m_mapper.MapModelExpression<PubSubChannelDefinition, DbChannel, bool>(query, true);
             return context.Query<DbChannel>(domainQuery);
         }
