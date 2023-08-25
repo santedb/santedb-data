@@ -102,8 +102,14 @@ namespace SanteDB.Persistence.Data.Jobs
                 {
                     ctx.Open();
                     ctx.CommandTimeout = 360000;
-                    ctx.ExecuteProcedure<object>("rfrsh_fti");
-
+                    try
+                    {
+                        ctx.ExecuteProcedure<object>("rfrsh_fti");
+                    }
+                    catch(Exception ex) when (ex.Message.Contains("CALL")) // HACK: PostgreSQL < 11 does not support procedures
+                    {
+                        ctx.ExecuteNonQuery("SELECT rfrsh_fti()");
+                    }
                 }
 
                 this.m_jobStateManager.SetState(this, JobStateType.Completed);

@@ -353,7 +353,8 @@ namespace SanteDB.Persistence.Data.Services
                             UserKey = userKey,
                             NotBefore = DateTimeOffset.Now,
                             RemoteEndpoint = remoteEp,
-                            Audience = audience
+                            Audience = audience,
+                            RefreshExpiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.RefreshLength, new TimeSpan(1, 0, 0)))
                         };
 
                         // Sessions with 
@@ -361,8 +362,12 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             refreshToken = new byte[32];
                             System.Security.Cryptography.RandomNumberGenerator.Create().GetBytes(refreshToken);
-                            dbSession.RefreshExpiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.RefreshLength, new TimeSpan(1, 0, 0)));
                             dbSession.RefreshToken = this.m_passwordHashingService.ComputeHash(refreshToken).HexEncode().ToLower();
+                        }
+                        if(isOverride) // Overrides cannot be extended
+                        {
+                            dbSession.RefreshToken = null;
+                            dbSession.RefreshExpiration = DateTimeOffset.Now;
                         }
 
                         // Is the original principal already a session principal from another service? If so we should use its expiration

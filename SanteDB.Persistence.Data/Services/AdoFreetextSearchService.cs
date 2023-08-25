@@ -132,6 +132,10 @@ namespace SanteDB.Persistence.Data.Services
                             ctx.Open();
                             ctx.ExecuteProcedure<object>("reindex_fti_ent", p);
                         }
+                        catch (Exception ex) when (ex.Message.Contains("CALL")) // HACK: PostgreSQL < 11 does not support procedures
+                        {
+                            ctx.ExecuteNonQuery("SELECT reindex_fti_ent(?)", p);
+                        }
                         catch (Exception e)
                         {
                             this.m_tracer.TraceWarning("Could not refresh fulltext index - {0}", e.Message);

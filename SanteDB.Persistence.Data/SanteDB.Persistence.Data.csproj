@@ -81,6 +81,7 @@
     <None Remove="SQL\PSQL\santedb-ddl.sql" />
     <None Remove="SQL\PSQL\santedb-fn.sql" />
     <None Remove="SQL\PSQL\santedb-init.sql" />
+    <None Remove="SQL\PSQL\Updates\20220112-PSQL-10.sql" />
     <None Remove="SQL\PSQL\Updates\20221027-PSQL.sql" />
     <None Remove="SQL\PSQL\Updates\20221130-PSQL.sql" />
     <None Remove="SQL\PSQL\Updates\20221214-PSQL.sql" />
@@ -215,6 +216,7 @@
     <EmbeddedResource Include="SQL\FBSQL\Updates\20230514-FBSQL.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20230509-FBSQL.sql">
     </EmbeddedResource>
+    <EmbeddedResource Include="SQL\PSQL\Updates\20220112-PSQL-10.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20221130-PSQL.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>

@@ -1,13 +1,11 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20221214-02" name="Update:20221214-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20221214-02" name="Update:20221214-01" applyRange="1.1.0.0-1.2.0.0" required="false"  invariantName="npgsql">
  *	<summary>Update: Convert refresh FTI to procedures</summary>
  *	<isInstalled>select ck_patch('20221214-02')</isInstalled>
+ *  <canInstall>SELECT TRUE FROM (SELECT version() v) i WHERE NOT (v ILIKE '%PostgreSQL 9.%' OR v ILIKE '%PostgreSQL 10.%')</canInstall>
  * </feature>
  */
 
- DROP INDEX IF EXISTS ent_addr_cmp_val_idx;
- DROP INDEX IF EXISTS ent_name_cmp_val_idx;
- DROP INDEX IF EXISTS ENT_NAME_CMP_SDX_IDX;
 DROP FUNCTION IF EXISTS rfrsh_fti;
 DROP FUNCTION IF EXISTS reindex_fti_ent;
 
@@ -74,21 +72,6 @@ BEGIN
 
 END;
 $$ LANGUAGE plpgsql;
-
-drop index sec_dev_pub_id_idx;
-create index sec_dev_pub_id_idx on sec_dev_tbl(lower(dev_pub_id));
-
-drop index sec_usr_name_pwd_idx;
-create index sec_usr_name_pwd_idx on sec_usr_tbl (lower(usr_name), passwd);
-
--- INDEX FOR PROTOCOL BY OID
-DROP INDEX IF EXISTS PROTO_NAME_UQ_IDX ;
-CREATE UNIQUE INDEX PROTO_OID_UQ_IDX ON PROTO_TBL(OID) WHERE (OBSLT_UTC IS NULL);
-ALTER TABLE FD_STG_SYSTBL ADD DESCR TEXT;
-ALTER TABLE sec_ses_tbl ALTER COLUMN rfrsh_exp_utc DROP NOT NULL;
-ALTER TABLE sec_ses_tbl ALTER COLUMN rfrsh_tkn DROP NOT NULL;
-ALTER TABLE sec_ses_tbl DROP CONSTRAINT ck_sec_ses_rfrsh_exp ;
-ALTER TABLE sec_ses_tbl ADD CONSTRAINT ck_sec_ses_rfrsh_exp CHECK (rfrsh_exp_utc IS NULL OR (rfrsh_exp_utc >= exp_utc));
 
 
 SELECT REG_PATCH('20221214-02'); 
