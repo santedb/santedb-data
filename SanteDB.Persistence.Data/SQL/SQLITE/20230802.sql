@@ -1,6 +1,6 @@
 /** 
  * <feature scope="SanteDB.Persistence.Data" id="20230802-01" name="Update:20230802-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="sqlite">
- *	<summary>Update: Adds application encryption master key configuration functions</summary>
+ *	<summary>Update: Adds application encryption master key configuration functions and adds free-text searching view</summary>
  *	<isInstalled>select count(*) > 0 from patch_db_systbl WHERE PATCH_ID = '20230802-01'</isInstalled>
  * </feature>
  */
@@ -8,5 +8,23 @@
 CREATE TABLE ALE_SYSTBL (
 	ALE_SMK BLOB NOT NULL -- MASTER KEY FOR THIS DATABASE
 );
+
+CREATE VIEW IF NOT EXISTS FT_ENT_SYSVW
+AS
+	WITH CTE_IDS AS (SELECT ENT_ID, ID_VAL FROM ENT_ID_TBL WHERE OBSLT_VRSN_SEQ_ID IS NULL),
+	CTE_ADDR_CMP AS (SELECT ENT_ID, VAL FROM ENT_ADDR_CMP_TBL INNER JOIN ENT_ADDR_TBL USING (ADDR_ID) WHERE OBSLT_VRSN_SEQ_ID IS NULL),
+	CTE_NAME_CMP AS (SELECT ENT_ID, VAL FROM ENT_NAME_CMP_TBL INNER JOIN ENT_NAME_TBL USING (NAME_ID) WHERE OBSLT_VRSN_SEQ_ID IS NULL),
+	CTE_TEL AS (SELECT ENT_ID, TEL_VAL FROM ENT_TEL_TBL),
+	CTE_TERMS AS (
+		SELECT ENT_ID, ID_VAL VAL FROM CTE_IDS
+		UNION ALL
+		SELECT ENT_ID, VAL FROM CTE_ADDR_CMP
+		UNION ALL 
+		SELECT ENT_ID, VAL FROM CTE_NAME_CMP
+		UNION ALL
+		SELECT ENT_ID, TEL_VAL VAL FROM CTE_TEL
+	)
+	SELECT ENT_ID, VAL AS TERM
+	FROM CTE_TERMS;
 
 INSERT INTO PATCH_DB_SYSTBL (PATCH_ID, APPLY_DATE, INFO_NAME) VALUES ('20230802-01', UNIXEPOCH(), 'Adds foreign data staging table'); 
