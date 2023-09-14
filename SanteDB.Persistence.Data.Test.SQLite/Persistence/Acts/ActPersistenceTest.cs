@@ -102,8 +102,6 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                             Sequence = 1,
                             Protocol = new Protocol()
                             {
-                                Definition = new byte[] {1, 2, 3, 4},
-                                HandlerClass = typeof(String),
                                 Name = "Some Name This Is",
                                 Oid = "2.25.40430439493043"
                             },
@@ -149,10 +147,8 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                         Sequence = 2,
                         Protocol = new Protocol()
                         {
-                            Definition = Encoding.UTF8.GetBytes("TesT"),
                             Name = "This is a name",
-                            Oid = "2.2.34343433",
-                            HandlerClass = typeof(String)
+                            Oid = "2.2.34343433"
                         }
                     });
                     return o;
@@ -325,8 +321,6 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                         {
                             Protocol = new Protocol()
                             {
-                                Definition = new byte[] { 1,2,3,4,5,6},
-                                HandlerClass = typeof(String),
                                 Name = "Allergy Testing Protocol",
                                 Oid = "2.25.404034939439433"
                             },
@@ -478,8 +472,6 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                         {
                             Protocol = new Protocol()
                             {
-                                Definition = new byte[] { 1, 2, 3, 4, 5, 6 },
-                                HandlerClass = typeof(String),
                                 Name = "Allergy Testing Protocol 2",
                                 Oid = "2.25.948483938383"
                             },

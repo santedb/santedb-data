@@ -20,15 +20,17 @@
  */
 using NUnit.Framework;
 using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Roles;
-using SanteDB.Core.Protocol;
+using SanteDB.Core.Cdss;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Text;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Acts
@@ -45,23 +47,33 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
         /// Protocol handler class
         /// </summary>
         [ExcludeFromCodeCoverage]
-        private class DummyProtocolHandler : IClinicalProtocol
+        private class DummyProtocolHandler : ICdssProtocolAsset
         {
 
             // Protocol
             private Protocol m_protocol;
 
-            public Guid Id => this.m_protocol.Key.Value;
+            public Guid Uuid => this.m_protocol.Key.Value;
 
             public string Name => this.m_protocol.Name;
 
             public string Version => "1.0";
-            public string GroupId => "SAMPLETESTS!";
+            public string Oid => "2.25.40309204923048273957348593";
+            public CdssAssetClassification Classification => CdssAssetClassification.DecisionSupportProtocol;
 
-            public IEnumerable<Act> Calculate(Patient p, IDictionary<string, object> parameters)
+            public string Id => "SAMPLE";
+
+            public string Documentation => "THIS IS A SAMPLE";
+
+            public IEnumerable<ICdssAssetGroup> Groups => new ICdssAssetGroup[0];
+
+            public IEnumerable<Act> ComputeProposals(Patient p, IDictionary<string, object> parameters, out IEnumerable<DetectedIssue> detectedIssues)
             {
-                yield break;
+                detectedIssues = null;
+                return new Act[0];
             }
+
+            public IEnumerable<DetectedIssue> Analyze(Act act) => new DetectedIssue[0];
 
             public DummyProtocolHandler()
             {
@@ -73,25 +85,20 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 this.m_protocol = protocol;
             }
 
-            public Protocol GetProtocolData()
-            {
-                return this.m_protocol;
-            }
-
-            public IClinicalProtocol Load(Protocol protocolData)
-            {
-                this.m_protocol = protocolData;
-                return this;
-            }
 
             public void Prepare(Patient p, IDictionary<string, object> parameters)
             {
                 ;
             }
 
-            public IEnumerable<Act> Update(Patient p, IEnumerable<Act> existingPlan)
+            public void Load(Stream definitionStream)
             {
-                yield break;
+                Assert.AreEqual(5, definitionStream.Read(new byte[5], 0, 5));
+            }
+
+            public void Save(Stream definitionStream)
+            {
+                definitionStream.Write(new byte[] { 0, 1, 2, 3, 4 }, 0, 5);
             }
         }
 
@@ -104,11 +111,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             // First we create a protocol
             var protocol = new Protocol()
             {
-                Definition = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-                HandlerClass = typeof(DummyProtocolHandler),
                 Oid = "1.2.3.4.5.6",
                 Name = "Teapot Protocol",
-                Narrative = Narrative.DocumentFromString("Teapot", "en", "text/plain", "I'm a little teapot!")
             };
 
             using (AuthenticationContext.EnterSystemContext())
@@ -117,33 +121,21 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 // Insert the protocol
                 var afterInsert = base.TestInsert(protocol);
                 Assert.AreEqual(AuthenticationContext.SystemUserSid, afterInsert.CreatedByKey.Value.ToString());
-                Assert.AreEqual(10, afterInsert.Definition.Length);
                 Assert.AreEqual("1.2.3.4.5.6", afterInsert.Oid);
-                Assert.IsNull(afterInsert.Narrative);
-                Assert.IsNotNull(afterInsert.LoadProperty(o => o.Narrative));
-                Assert.AreEqual("I'm a little teapot!", Encoding.UTF8.GetString(afterInsert.Narrative.Text));
 
                 // Test querying the protocol
                 var afterQuery = base.TestQuery<Protocol>(o => o.Oid == "1.2.3.4.5.6", 1).AsResultSet().First();
                 base.TestQuery<Protocol>(o => o.Oid == "1.2.3.4.5.76", 0);
                 base.TestQuery<Protocol>(o => o.ObsoletionTime == null && o.Name == "Teapot Protocol", 1);
                 Assert.AreEqual(AuthenticationContext.SystemUserSid, afterInsert.CreatedByKey.Value.ToString());
-                Assert.AreEqual(10, afterQuery.Definition.Length);
-                Assert.AreEqual("1.2.3.4.5.6", afterQuery.Oid);
-                Assert.IsNull(afterQuery.Narrative);
-                Assert.IsNotNull(afterQuery.LoadProperty(o => o.Narrative));
-                Assert.AreEqual("I'm a little teapot!", Encoding.UTF8.GetString(afterQuery.Narrative.Text));
 
                 // Test the update of a protocol
                 var afterUpdate = base.TestUpdate(afterQuery, o =>
                 {
-                    o.Narrative.SetText("I am not a little teapot!");
                     o.Name = "Non-Teapot Protocol";
                     o.Oid = "6.5.4.3.2.1";
-                    o.Definition = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
                     return o;
                 });
-                Assert.AreEqual(20, afterUpdate.Definition.Length);
                 Assert.AreEqual("Non-Teapot Protocol", afterUpdate.Name);
 
                 // Validate query
@@ -196,11 +188,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             // First we create a protocol
             var protocol = new Protocol()
             {
-                Definition = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-                HandlerClass = typeof(DummyProtocolHandler),
                 Oid = "1.2.3.4.5.7",
                 Name = "Teapot Protocol 2",
-                Narrative = Narrative.DocumentFromString("Teapot", "en", "text/plain", "I'm a little teapot!")
             };
 
             using (AuthenticationContext.EnterSystemContext())
@@ -208,18 +197,18 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
                 // We want to create the IClinicalProtocol instance
                 var tde = new DummyProtocolHandler(protocol);
-                var service = ApplicationServiceContext.Current.GetService<IClinicalProtocolRepositoryService>();
+                var service = ApplicationServiceContext.Current.GetService<ICdssAssetRepository>();
                 Assert.IsNotNull(service);
 
-                var afterInsert = service.InsertProtocol(tde);
+                var afterInsert = service.InsertOrUpdate(tde);
                 Assert.AreEqual(tde.Name, afterInsert.Name);
 
                 // Now attempt to load
-                var afterGet = service.GetProtocol(afterInsert.Id);
+                var afterGet = service.Get(afterInsert.Uuid);
                 Assert.AreEqual(tde.Name, afterGet.Name);
 
                 // Attempt to search
-                var afterSearch = service.FindProtocol(protocolName: "Teapot Protocol 2");
+                var afterSearch = service.Find(o=>o.Name == "Teapot Protocol 2");
                 Assert.AreEqual(1, afterSearch.Count());
                 Assert.AreEqual(tde.Name, afterSearch.First().Name);
             }
