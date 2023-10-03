@@ -13,25 +13,25 @@ namespace SanteDB.Persistence.Data.Cdss
     /// <summary>
     /// ADO clinical protocol
     /// </summary>
-    internal class AdoCdssProtocolAsset : AdoCdssAsset, ICdssProtocolAsset
+    internal class AdoCdssProtocolAsset : AdoCdssAsset, ICdssProtocol
     {
-        private readonly ICdssProtocolAsset m_wrapped;
+        private readonly ICdssProtocol m_wrapped;
 
 
         /// <inheritdoc/>
         public AdoCdssProtocolAsset(DbCdssAssetVersion dbVersionInformation) : base(dbVersionInformation, (IEnumerable<DbCdssGroup>)null)
         {
-            this.m_wrapped = base.Wrapped as ICdssProtocolAsset;
+            this.m_wrapped = base.Wrapped as ICdssProtocol;
         }
 
         /// <inheritdoc/>
         public AdoCdssProtocolAsset(DbCdssAssetVersion dbVersionInformation, IEnumerable<DbCdssGroup> groups) : base(dbVersionInformation, groups)
         {
-            this.m_wrapped = base.Wrapped as ICdssProtocolAsset;
+            this.m_wrapped = base.Wrapped as ICdssProtocol;
         }
 
         /// <inheritdoc/>
-        public AdoCdssProtocolAsset(DbCdssAssetVersion dbVersionInformation, ICdssProtocolAsset existingAsset) : base(dbVersionInformation, existingAsset)
+        public AdoCdssProtocolAsset(DbCdssAssetVersion dbVersionInformation, ICdssProtocol existingAsset) : base(dbVersionInformation, existingAsset)
         {
             this.m_wrapped = existingAsset;
         }

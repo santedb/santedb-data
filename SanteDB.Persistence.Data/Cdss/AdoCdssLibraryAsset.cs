@@ -9,25 +9,25 @@ namespace SanteDB.Persistence.Data.Cdss
     /// <summary>
     /// A protocol asset library loaded from ADO.NET
     /// </summary>
-    internal class AdoCdssLibraryAsset : AdoCdssAsset, ICdssLibraryAsset
+    internal class AdoCdssLibraryAsset : AdoCdssAsset, ICdssLibrary
     {
         // Wrapped asset library
-        private readonly ICdssLibraryAsset m_wrapped;
+        private readonly ICdssLibrary m_wrapped;
 
         /// <inheritdoc/>
         public AdoCdssLibraryAsset(DbCdssAssetVersion dbVersionInformation) : base(dbVersionInformation, (IEnumerable<DbCdssGroup>)null)
         {
-            this.m_wrapped = base.Wrapped as ICdssLibraryAsset;
+            this.m_wrapped = base.Wrapped as ICdssLibrary;
         }
 
         /// <inheritdoc/>
         public AdoCdssLibraryAsset(DbCdssAssetVersion dbVersionInformation, IEnumerable<DbCdssGroup> groups) : base(dbVersionInformation, groups)
         {
-            this.m_wrapped = base.Wrapped as ICdssLibraryAsset;
+            this.m_wrapped = base.Wrapped as ICdssLibrary;
         }
 
         /// <inheritdoc/>
-        public AdoCdssLibraryAsset(DbCdssAssetVersion dbVersionInformation, ICdssLibraryAsset protocolAssetLibrary) : base(dbVersionInformation, protocolAssetLibrary)
+        public AdoCdssLibraryAsset(DbCdssAssetVersion dbVersionInformation, ICdssLibrary protocolAssetLibrary) : base(dbVersionInformation, protocolAssetLibrary)
         {
             this.m_wrapped = protocolAssetLibrary;
         }

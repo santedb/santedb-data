@@ -31,7 +31,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// Represents an asset repository which uses the primary database to store assets
     /// </summary>
-    public class AdoCdssAssetRepository : ICdssAssetRepository, IMappedQueryProvider<ICdssAsset>
+    public class AdoCdssAssetRepository : ICdssLibraryRepository, IMappedQueryProvider<ICdssAsset>
     {
         private readonly AdoPersistenceConfigurationSection m_configuration;
         private readonly IQueryPersistenceService m_queryPersistence;
@@ -133,9 +133,9 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new ArgumentNullException(nameof(protocolAsset));
             }
-            else if (!(protocolAsset is ICdssProtocolAsset) && !(protocolAsset is ICdssLibraryAsset))
+            else if (!(protocolAsset is ICdssProtocol) && !(protocolAsset is ICdssLibrary))
             {
-                throw new ArgumentOutOfRangeException(nameof(protocolAsset), String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(ICdssProtocolAsset), protocolAsset.GetType()));
+                throw new ArgumentOutOfRangeException(nameof(protocolAsset), String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(ICdssProtocol), protocolAsset.GetType()));
             }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
@@ -251,10 +251,10 @@ namespace SanteDB.Persistence.Data.Services
 
                         switch (protocolAsset)
                         {
-                            case ICdssLibraryAsset lib:
+                            case ICdssLibrary lib:
                                 retVal = new AdoCdssLibraryAsset(current, lib);
                                 break;
-                            case ICdssProtocolAsset proto:
+                            case ICdssProtocol proto:
                                 retVal = new AdoCdssProtocolAsset(current, proto);
                                 break;
                             default:

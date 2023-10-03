@@ -47,7 +47,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
         /// Protocol handler class
         /// </summary>
         [ExcludeFromCodeCoverage]
-        private class DummyProtocolHandler : ICdssProtocolAsset
+        private class DummyProtocolHandler : ICdssProtocol
         {
 
             // Protocol
@@ -197,7 +197,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
                 // We want to create the IClinicalProtocol instance
                 var tde = new DummyProtocolHandler(protocol);
-                var service = ApplicationServiceContext.Current.GetService<ICdssAssetRepository>();
+                var service = ApplicationServiceContext.Current.GetService<ICdssLibraryRepository>();
                 Assert.IsNotNull(service);
 
                 var afterInsert = service.InsertOrUpdate(tde);
