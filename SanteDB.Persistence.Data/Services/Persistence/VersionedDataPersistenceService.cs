@@ -257,7 +257,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     if (!(DataPersistenceControlContext.Current?.AutoInsertChildren ?? this.m_configuration.AutoInsertChildren) || id.IdentityDomain == null) // we're not inserting it and it doesn't exist - raise the alarm!
                     {
-                        yield return new DetectedIssue(DetectedIssuePriorityType.Error, DataConstants.IdentifierDomainNotFound, $"Missing assigning authority with ID {String.Join(",", objectToVerify.Identifiers.Select(o => o.IdentityDomain.Key))}", DetectedIssueKeys.SafetyConcernIssue);
+                        yield return new DetectedIssue(DetectedIssuePriorityType.Error, DataConstants.IdentifierDomainNotFound, $"Missing assigning authority with ID {String.Join(",", objectToVerify.Identifiers.Select(o => o.IdentityDomain?.Key ?? o.IdentityDomainKey))}", DetectedIssueKeys.SafetyConcernIssue);
                     }
                     continue;
                 }
