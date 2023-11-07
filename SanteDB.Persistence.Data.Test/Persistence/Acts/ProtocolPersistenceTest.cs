@@ -105,7 +105,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 this.m_protocol = new DummyCdssProtocol(protocol);    
             }
 
-            public IEnumerable<ICdssProtocol> Protocols => new ICdssProtocol[] { this.m_protocol };
+            public IEnumerable<ICdssProtocol> GetProtocols(Type forType) => new ICdssProtocol[] { this.m_protocol };
 
             public Guid Uuid => this.m_protocol.Uuid;
 
@@ -120,6 +120,11 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             public string Documentation => this.m_protocol.Documentation;
 
             public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<Object> Execute(IdentifiedData target)
             {
                 throw new NotImplementedException();
             }
@@ -230,7 +235,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             {
 
                 // We want to create the IClinicalProtocol instance
-                var tde = new DummyProtocolLibrary(protocol);
+                var tde = new DummyCdssLibrary(protocol);
                 var service = ApplicationServiceContext.Current.GetService<ICdssLibraryRepository>();
                 Assert.IsNotNull(service);
 

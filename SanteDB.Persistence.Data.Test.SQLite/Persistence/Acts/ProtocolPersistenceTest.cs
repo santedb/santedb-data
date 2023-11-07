@@ -54,7 +54,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
 
             public DummyCdssLibrary()
             {
-                    
+
             }
 
             public DummyCdssLibrary(Protocol protocol)
@@ -65,12 +65,9 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
             /// <summary>
             /// Gets the protocols
             /// </summary>
-            public IEnumerable<ICdssProtocol> Protocols
+            public IEnumerable<ICdssProtocol> GetProtocols(Type forType)
             {
-                get
-                {
-                    yield return this.m_protocol;
-                }
+                yield return this.m_protocol;
             }
 
             public Guid Uuid => Guid.NewGuid();
@@ -86,6 +83,11 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
             public string Documentation => "Some demonstration protocol";
 
             public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget)
+            {
+                yield break;
+            }
+
+            public IEnumerable<object> Execute(IdentifiedData target)
             {
                 yield break;
             }
@@ -120,7 +122,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
             public string Oid => "2.25.340403403434234234234232423";
 
             public string Id => "SAMPLE";
-            
+
             public string Documentation => "THIS IS AN EXAMPLE";
 
             public IEnumerable<ICdssProtocolScope> Scopes => new ICdssProtocolScope[0];
@@ -266,7 +268,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                 Assert.AreEqual(tde.Name, afterGet.Name);
 
                 // Attempt to search
-                var afterSearch = service.Find(o=>o.Name == "Teapot Protocol 2");
+                var afterSearch = service.Find(o => o.Name == "Teapot Protocol 2");
                 Assert.AreEqual(1, afterSearch.Count());
                 Assert.AreEqual(tde.Name, afterSearch.First().Name);
             }
