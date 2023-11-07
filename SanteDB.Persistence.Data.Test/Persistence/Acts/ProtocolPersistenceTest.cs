@@ -32,6 +32,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
+using SanteDB.Core.Model;
+using System.Reflection;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 {
@@ -47,7 +49,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
         /// Protocol handler class
         /// </summary>
         [ExcludeFromCodeCoverage]
-        private class DummyProtocolHandler : ICdssProtocol
+        private class DummyCdssProtocol : ICdssProtocol
         {
 
             // Protocol
@@ -59,36 +61,67 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
             public string Version => "1.0";
             public string Oid => "2.25.40309204923048273957348593";
-            public CdssAssetClassification Classification => CdssAssetClassification.DecisionSupportProtocol;
 
             public string Id => "SAMPLE";
 
             public string Documentation => "THIS IS A SAMPLE";
 
-            public IEnumerable<ICdssAssetGroup> Groups => new ICdssAssetGroup[0];
+            public IEnumerable<ICdssProtocolScope> Scopes => new ICdssProtocolScope[0];
 
-            public IEnumerable<Act> ComputeProposals(Patient p, IDictionary<string, object> parameters, out IEnumerable<DetectedIssue> detectedIssues)
+            public IEnumerable<Act> ComputeProposals(IdentifiedData target, IDictionary<String, Object> parameters)
             {
-                detectedIssues = null;
                 return new Act[0];
             }
 
             public IEnumerable<DetectedIssue> Analyze(Act act) => new DetectedIssue[0];
 
-            public DummyProtocolHandler()
+            public DummyCdssProtocol()
             {
 
             }
 
-            public DummyProtocolHandler(Protocol protocol)
+            public DummyCdssProtocol(Protocol protocol)
             {
                 this.m_protocol = protocol;
             }
 
+        }
 
-            public void Prepare(Patient p, IDictionary<string, object> parameters)
+        /// <summary>
+        /// CDSS library for testing
+        /// </summary>
+        public class DummyCdssLibrary : ICdssLibrary
+        {
+
+            private DummyCdssProtocol m_protocol;
+            
+            public DummyCdssLibrary()
             {
-                ;
+                    
+            }
+
+            public DummyCdssLibrary(Protocol protocol)
+            {
+                this.m_protocol = new DummyCdssProtocol(protocol);    
+            }
+
+            public IEnumerable<ICdssProtocol> Protocols => new ICdssProtocol[] { this.m_protocol };
+
+            public Guid Uuid => this.m_protocol.Uuid;
+
+            public string Id => this.m_protocol.Id;
+
+            public string Name => this.m_protocol.Name;
+
+            public string Version => this.m_protocol.Version;
+
+            public string Oid => this.m_protocol.Oid;
+
+            public string Documentation => this.m_protocol.Documentation;
+
+            public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget)
+            {
+                throw new NotImplementedException();
             }
 
             public void Load(Stream definitionStream)
@@ -100,6 +133,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             {
                 definitionStream.Write(new byte[] { 0, 1, 2, 3, 4 }, 0, 5);
             }
+
         }
 
         /// <summary>
@@ -196,7 +230,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             {
 
                 // We want to create the IClinicalProtocol instance
-                var tde = new DummyProtocolHandler(protocol);
+                var tde = new DummyProtocolLibrary(protocol);
                 var service = ApplicationServiceContext.Current.GetService<ICdssLibraryRepository>();
                 Assert.IsNotNull(service);
 

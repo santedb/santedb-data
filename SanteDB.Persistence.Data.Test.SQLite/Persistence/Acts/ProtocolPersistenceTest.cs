@@ -32,6 +32,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
+using SanteDB.Matcher.Matchers;
+using SanteDB.Core.Model;
 
 namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
 {
@@ -44,10 +46,67 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
     {
 
         /// <summary>
+        /// CDSS library for testing
+        /// </summary>
+        private class DummyCdssLibrary : ICdssLibrary
+        {
+            private ICdssProtocol m_protocol;
+
+            public DummyCdssLibrary()
+            {
+                    
+            }
+
+            public DummyCdssLibrary(Protocol protocol)
+            {
+                this.m_protocol = new DummyCdssProtocol(protocol);
+            }
+
+            /// <summary>
+            /// Gets the protocols
+            /// </summary>
+            public IEnumerable<ICdssProtocol> Protocols
+            {
+                get
+                {
+                    yield return this.m_protocol;
+                }
+            }
+
+            public Guid Uuid => Guid.NewGuid();
+
+            public string Id => "123-SAMPLE";
+
+            public string Name => "Sample Protocol";
+
+            public string Version => "1.2";
+
+            public string Oid => "2.25.3029329232";
+
+            public string Documentation => "Some demonstration protocol";
+
+            public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget)
+            {
+                yield break;
+            }
+
+
+            public void Load(Stream definitionStream)
+            {
+                Assert.AreEqual(5, definitionStream.Read(new byte[5], 0, 5));
+            }
+
+            public void Save(Stream definitionStream)
+            {
+                definitionStream.Write(new byte[] { 0, 1, 2, 3, 4 }, 0, 5);
+            }
+        }
+
+        /// <summary>
         /// Protocol handler class
         /// </summary>
         [ExcludeFromCodeCoverage]
-        private class DummyProtocolHandler : ICdssProtocol
+        private class DummyCdssProtocol : ICdssProtocol
         {
 
             // Protocol
@@ -59,27 +118,25 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
 
             public string Version => "1.0";
             public string Oid => "2.25.340403403434234234234232423";
-            public CdssAssetClassification Classification => CdssAssetClassification.DecisionSupportProtocol;
 
             public string Id => "SAMPLE";
+            
             public string Documentation => "THIS IS AN EXAMPLE";
 
-            public IEnumerable<ICdssAssetGroup> Groups => new ICdssAssetGroup[0];
+            public IEnumerable<ICdssProtocolScope> Scopes => new ICdssProtocolScope[0];
 
-            public IEnumerable<Act> ComputeProposals(Patient p, IDictionary<string, object> parameters, out IEnumerable<DetectedIssue> detectedIssues)
+            public IEnumerable<Act> ComputeProposals(IdentifiedData p, IDictionary<string, object> parameters)
             {
-                detectedIssues = null;
                 return new Act[0];
             }
 
-            public IEnumerable<DetectedIssue> Analyze(Act act) => new DetectedIssue[0];
 
-            public DummyProtocolHandler()
+            public DummyCdssProtocol()
             {
 
             }
 
-            public DummyProtocolHandler(Protocol protocol)
+            public DummyCdssProtocol(Protocol protocol)
             {
                 this.m_protocol = protocol;
             }
@@ -100,15 +157,6 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                 ;
             }
 
-            public void Load(Stream definitionStream)
-            {
-                Assert.AreEqual(5, definitionStream.Read(new byte[5], 0, 5));
-            }
-
-            public void Save(Stream definitionStream)
-            {
-                definitionStream.Write(new byte[] { 0, 1, 2, 3, 4 }, 0, 5);
-            }
         }
 
         /// <summary>
@@ -206,7 +254,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
             {
 
                 // We want to create the IClinicalProtocol instance
-                var tde = new DummyProtocolHandler(protocol);
+                var tde = new DummyCdssLibrary(protocol);
                 var service = ApplicationServiceContext.Current.GetService<ICdssLibraryRepository>();
                 Assert.IsNotNull(service);
 

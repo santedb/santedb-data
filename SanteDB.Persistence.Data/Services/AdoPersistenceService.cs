@@ -57,8 +57,7 @@ namespace SanteDB.Persistence.Data.Services
             typeof(AdoRecordMatchingConfigurationService),
             typeof(AdoRelationshipValidationProvider),
             typeof(AdoDataSigningCertificateManagerService),
-            typeof(AdoCertificateIdentityProvider),
-            typeof(AdoCdssAssetRepository)
+            typeof(AdoCertificateIdentityProvider)
         };
 
         // Gets the configuration
