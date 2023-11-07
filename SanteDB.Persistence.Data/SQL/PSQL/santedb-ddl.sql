@@ -177,13 +177,22 @@ INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('fa8642cb-2
 
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('d15b96ab-646c-4c00-9a58-ea09eee67d7c', '1.3.6.1.4.1.33349.3.1.5.9.2.1', 'Login', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67d7c', '1.3.6.1.4.1.33349.3.1.5.9.2.1.0', 'Login as a Service', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('f15b96ab-646c-4c00-9a58-ea09eee67d7c', '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.0', 'OAUTH Login', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('025b96ab-646c-4c00-9a58-ea09eee67d7c', '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.0.1', 'OAUTH client_credentials flow permission', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('125b96ab-646c-4c00-9a58-ea09eee67d7c', '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.0.1.0', 'OAUTH client_credentials flow permission no device cred', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('225b96ab-646c-4c00-9a58-ea09eee67d7c', '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.0.2', 'OAUTH password flow permission', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('325b96ab-646c-4c00-9a58-ea09eee67d7c', '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.0.2.0', 'OAUTH password flow permission no device cred', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('425b96ab-646c-4c00-9a58-ea09eee67d7c', '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.0.3', 'OAUTH authoization code grant flow permission', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('525b96ab-646c-4c00-9a58-ea09eee67d7c', '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.0.3.0', 'OAUTH authoization code grant flow permission no device cred', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('625b96ab-646c-4c00-9a58-ea09eee67d7c', '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.0.4', 'OAUTH Password Reset grant (extended permission)', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('725b96ab-646c-4c00-9a58-ea09eee67d7c', '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.0.4.0', 'OAUTH Password Reset grant (extended permission) no device cred', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
 
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('f6840336-4e20-4bc0-b965-baa6d7c80be3', '1.3.6.1.4.1.33349.3.1.5.9.2.2', 'Unrestricted Clinical Data', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('b81daf47-17a5-465e-a5fd-706b168b0265', '1.3.6.1.4.1.33349.3.1.5.9.2.2.0', 'Query Clinical Data', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('d7276921-a078-4348-95f2-ed3cde83e607', '1.3.6.1.4.1.33349.3.1.5.9.2.2.1', 'Write Clinical Data', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('2e027dee-ede4-4731-b7fa-cb67ae0586be', '1.3.6.1.4.1.33349.3.1.5.9.2.2.2', 'Delete Clinical Data', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('5fb731bf-4e59-4863-80bd-51757d58ea3b', '1.3.6.1.4.1.33349.3.1.5.9.2.2.3', 'Read Clinical Data', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
-INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('5fb731bf-4e59-4863-80bd-51757d58ea9a', '1.3.6.1.4.1.33349.3.1.5.9.2.2.4', 'Export Clinical Data', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('5fb731bf-4e59-4863-80bd-51757d58ea9a', '1.3.6.1.4.1.33349.3.1.5.9.2.2.4', 'Export Clinical Data (PHI)', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('dea891aa-224d-4859-81b3-c1eb2750067e', '1.3.6.1.4.1.33349.3.1.5.9.2.999', 'Override Disclosure', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('eea891aa-224d-4859-81b3-c1eb2750067e', '1.3.6.1.4.1.33349.3.1.5.9.2.4', 'Unrestricted Metadata', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
 INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('fea891aa-224d-4859-81b3-c1eb2750067e', '1.3.6.1.4.1.33349.3.1.5.9.2.4.0', 'Read Metadata', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
