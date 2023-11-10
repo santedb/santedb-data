@@ -272,17 +272,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     if(String.IsNullOrEmpty(id.CheckDigit))
                     {
-                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckDigitMissing, $"Identifier {id.Value} in domain {dbAuth.DomainName} is missing check digit", DetectedIssueKeys.InvalidDataIssue, objectToVerify.Key.GetValueOrDefault());
+                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckDigitMissing, $"Identifier {id.Value} in domain {dbAuth.DomainName} is missing check digit", DetectedIssueKeys.InvalidDataIssue, objectToVerify.ToString());
                     }
                     var validatorType = Type.GetType(dbAuth.CheckDigitAlgorithm);
                     if(validatorType == null)
                     {
-                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckProviderNotFound, $"Check digit provider {dbAuth.CheckDigitAlgorithm} is not found", DetectedIssueKeys.OtherIssue, objectToVerify.Key.GetValueOrDefault());
+                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckProviderNotFound, $"Check digit provider {dbAuth.CheckDigitAlgorithm} is not found", DetectedIssueKeys.OtherIssue, objectToVerify.ToString());
                     }
                     var validator = Activator.CreateInstance(validatorType) as ICheckDigitAlgorithm;
                     if(validator?.ValidateCheckDigit(id.Value, id.CheckDigit) != true)
                     {
-                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckDigitFailed, $"Check digit {id.CheckDigit} is not valid for identifier {id.Value}", DetectedIssueKeys.InvalidDataIssue, objectToVerify.Key.GetValueOrDefault());
+                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckDigitFailed, $"Check digit {id.CheckDigit} is not valid for identifier {id.Value}", DetectedIssueKeys.InvalidDataIssue, objectToVerify.ToString());
                     }
                 }
 
@@ -338,14 +338,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     && !ownedByOthers
                     && !ownedByMe) // Unless it was already associated to another type of object related to me
                 {
-                    yield return new DetectedIssue(validation.Scope.ToPriority(), DataConstants.IdentifierInvalidTargetScope, $"Identifier of type {dbAuth.DomainName} cannot be assigned to object of type {classObject.ClassConceptKey}", DetectedIssueKeys.BusinessRuleViolationIssue, objectToVerify.Key.GetValueOrDefault());
+                    yield return new DetectedIssue(validation.Scope.ToPriority(), DataConstants.IdentifierInvalidTargetScope, $"Identifier of type {dbAuth.DomainName} cannot be assigned to object of type {classObject.ClassConceptKey}", DetectedIssueKeys.BusinessRuleViolationIssue, objectToVerify.ToString());
                 }
 
                 // If the identity domain is unique, and we've been asked to raid identifier uq issues
                 if (dbAuth.IsUnique &&
                     ownedByOthers)
                 {
-                    yield return new DetectedIssue(validation.Uniqueness.ToPriority(), DataConstants.IdentifierNotUnique, $"Identifier {id.Value} in domain {dbAuth.DomainName} violates unique constraint", DetectedIssueKeys.FormalConstraintIssue, objectToVerify.Key.GetValueOrDefault());
+                    yield return new DetectedIssue(validation.Uniqueness.ToPriority(), DataConstants.IdentifierNotUnique, $"Identifier {id.Value} in domain {dbAuth.DomainName} violates unique constraint", DetectedIssueKeys.FormalConstraintIssue, objectToVerify.ToString());
                 }
 
                 var asgnAppKeys = this.m_adhocCache?.Get<Dictionary<Guid, IdentifierReliability>>($"{DataConstants.AdhocAuthorityAssignerKey}{dbAuth.Key}");
@@ -365,7 +365,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     {
                         id.Reliability = IdentifierReliability.Informative;
                         // Is the validation set to deny unauthorized assignment?
-                        yield return new DetectedIssue(validation.Authority.ToPriority(), DataConstants.IdentifierNoAuthorityToAssign, $"Application does not have permission to assign {dbAuth.DomainName}", DetectedIssueKeys.SecurityIssue, objectToVerify.Key.GetValueOrDefault());
+                        yield return new DetectedIssue(validation.Authority.ToPriority(), DataConstants.IdentifierNoAuthorityToAssign, $"Application does not have permission to assign {dbAuth.DomainName}", DetectedIssueKeys.SecurityIssue, objectToVerify.ToString());
                     }
                 }
 
@@ -374,7 +374,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     var nonMatch = !new Regex(dbAuth.ValidationRegex).IsMatch(id.Value);
                     if (nonMatch)
                     {
-                        yield return new DetectedIssue(validation.Format.ToPriority(), DataConstants.IdentifierPatternFormatFail, $"Identifier {id.Value} in domain {dbAuth.DomainName} failed format validation", DetectedIssueKeys.FormalConstraintIssue, objectToVerify.Key.GetValueOrDefault());
+                        yield return new DetectedIssue(validation.Format.ToPriority(), DataConstants.IdentifierPatternFormatFail, $"Identifier {id.Value} in domain {dbAuth.DomainName} failed format validation", DetectedIssueKeys.FormalConstraintIssue, objectToVerify.ToString());
                     }
                 }
 
@@ -383,12 +383,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     var type = Type.GetType(dbAuth.CustomValidator);
                     if (type == null)
                     {
-                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierValidatorProviderNotFound, $"Custom validator {dbAuth.CustomValidator} not found", DetectedIssueKeys.OtherIssue, objectToVerify.Key.GetValueOrDefault());
+                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierValidatorProviderNotFound, $"Custom validator {dbAuth.CustomValidator} not found", DetectedIssueKeys.OtherIssue, objectToVerify.ToString());
                     }
                     var validator = Activator.CreateInstance(type) as IIdentifierValidator;
                     if (validator?.IsValid(id) != true)
                     {
-                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierValidatorFailed, $"Custom validator for {id.Value} in {dbAuth.DomainName} failed", DetectedIssueKeys.FormalConstraintIssue, objectToVerify.Key.GetValueOrDefault());
+                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierValidatorFailed, $"Custom validator for {id.Value} in {dbAuth.DomainName} failed", DetectedIssueKeys.FormalConstraintIssue, objectToVerify.ToString());
                     }
                 }
             }
