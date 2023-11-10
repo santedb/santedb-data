@@ -65,7 +65,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
             /// <summary>
             /// Gets the protocols
             /// </summary>
-            public IEnumerable<ICdssProtocol> GetProtocols(Type forType)
+            public IEnumerable<ICdssProtocol> GetProtocols(String forType)
             {
                 yield return this.m_protocol;
             }
@@ -82,12 +82,12 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
 
             public string Documentation => "Some demonstration protocol";
 
-            public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget)
+            public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget, IDictionary<string, object> parameters)
             {
                 yield break;
             }
 
-            public IEnumerable<object> Execute(IdentifiedData target)
+            public IEnumerable<object> Execute(IdentifiedData target, IDictionary<string, object> parameters)
             {
                 yield break;
             }
@@ -127,7 +127,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
 
             public IEnumerable<ICdssProtocolScope> Scopes => new ICdssProtocolScope[0];
 
-            public IEnumerable<Act> ComputeProposals(IdentifiedData p, IDictionary<string, object> parameters)
+            public IEnumerable<Act> ComputeProposals(Patient p, IDictionary<string, object> parameters)
             {
                 return new Act[0];
             }

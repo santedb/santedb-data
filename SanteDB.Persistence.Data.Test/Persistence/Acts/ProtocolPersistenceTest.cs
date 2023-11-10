@@ -68,12 +68,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
             public IEnumerable<ICdssProtocolScope> Scopes => new ICdssProtocolScope[0];
 
-            public IEnumerable<Act> ComputeProposals(IdentifiedData target, IDictionary<String, Object> parameters)
+            public IEnumerable<Act> ComputeProposals(Patient target, IDictionary<String, Object> parameters)
             {
                 return new Act[0];
             }
-
-            public IEnumerable<DetectedIssue> Analyze(Act act) => new DetectedIssue[0];
 
             public DummyCdssProtocol()
             {
@@ -105,7 +103,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 this.m_protocol = new DummyCdssProtocol(protocol);    
             }
 
-            public IEnumerable<ICdssProtocol> GetProtocols(Type forType) => new ICdssProtocol[] { this.m_protocol };
+            public IEnumerable<ICdssProtocol> GetProtocols(String forType) => new ICdssProtocol[] { this.m_protocol };
 
             public Guid Uuid => this.m_protocol.Uuid;
 
@@ -119,12 +117,12 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
             public string Documentation => this.m_protocol.Documentation;
 
-            public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget)
+            public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget, IDictionary<String, object> parameters)
             {
                 throw new NotImplementedException();
             }
 
-            public IEnumerable<Object> Execute(IdentifiedData target)
+            public IEnumerable<Object> Execute(IdentifiedData target, IDictionary<String, object> parameters)
             {
                 throw new NotImplementedException();
             }
