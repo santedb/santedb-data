@@ -127,7 +127,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
 
             public IEnumerable<ICdssProtocolScope> Scopes => new ICdssProtocolScope[0];
 
-            public IEnumerable<Act> ComputeProposals(Patient p, IDictionary<string, object> parameters)
+            public IEnumerable<Object> ComputeProposals(Patient p, IDictionary<string, object> parameters)
             {
                 return new Act[0];
             }
