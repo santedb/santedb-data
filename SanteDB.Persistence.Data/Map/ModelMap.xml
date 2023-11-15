@@ -409,7 +409,7 @@
 
   <!-- Represents Act Model -->
   <class modelClass="SanteDB.Core.Model.Acts.CarePlan, SanteDB.Core.Model"
-         domainClass="SanteDB.Persistence.Data.Model.Acts.DbActVersion, SanteDB.Persistence.Data">
+         domainClass="SanteDB.Persistence.Data.Model.Acts.DbCarePlan, SanteDB.Persistence.Data">
     <property modelName="PreviousVersionKey" domainName="ReplacesVersionKey" />
     <property modelName="VersionSequence" domainName="VersionSequenceId" />
     <property modelName="ModifiedOn" domainName="CreationTime" />
