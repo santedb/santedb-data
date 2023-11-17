@@ -55,7 +55,11 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             // Protocol
             private Protocol m_protocol;
 
-            public Guid Uuid => this.m_protocol.Key.Value;
+            public Guid Uuid
+            {
+                get => this.m_protocol.Key.Value;
+                set => this.m_protocol.Key = value;
+            }
 
             public string Name => this.m_protocol.Name;
 
@@ -105,7 +109,11 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
             public IEnumerable<ICdssProtocol> GetProtocols(String forType) => new ICdssProtocol[] { this.m_protocol };
 
-            public Guid Uuid => this.m_protocol.Uuid;
+            public Guid Uuid
+            {
+                get => this.m_protocol.Uuid;
+                set { }
+            }
 
             public string Id => this.m_protocol.Id;
 
