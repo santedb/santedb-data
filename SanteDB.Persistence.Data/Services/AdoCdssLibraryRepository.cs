@@ -16,6 +16,7 @@ using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
@@ -36,19 +37,18 @@ namespace SanteDB.Persistence.Data.Services
         private readonly AdoPersistenceConfigurationSection m_configuration;
         private readonly IPolicyEnforcementService m_pepService;
         private readonly ILocalizationService m_localizationService;
-        private readonly IAdhocCacheService m_adhocCache;
         private readonly ModelMapper m_modelMapper;
         private readonly IQueryPersistenceService m_queryPersistence;
+        private readonly ConcurrentDictionary<String, ICdssLibrary> m_cdssLibraryLoaded = new ConcurrentDictionary<string, ICdssLibrary>();
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public AdoCdssLibraryRepository(IConfigurationManager configurationManager, IPolicyEnforcementService pepService, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IQueryPersistenceService queryPersistenceService = null)
+        public AdoCdssLibraryRepository(IConfigurationManager configurationManager, IPolicyEnforcementService pepService, ILocalizationService localizationService, IQueryPersistenceService queryPersistenceService = null)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_pepService = pepService;
             this.m_localizationService = localizationService;
-            this.m_adhocCache = adhocCacheService;
             this.m_queryPersistence = queryPersistenceService;
             this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
 
@@ -127,7 +127,7 @@ namespace SanteDB.Persistence.Data.Services
             // Attempt to load from ad-hoc cache first
             var cacheKey = this.CreateCacheKey(key);
             ICdssLibrary library = null;
-            if (this.m_adhocCache?.TryGet<ICdssLibrary>(cacheKey, out library) != true)
+            if (this.m_cdssLibraryLoaded.TryGetValue(cacheKey, out library) != true)
             {
                 var queryStmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCdssLibrary), typeof(DbCdssLibraryVersion))
                     .InnerJoin<DbCdssLibrary, DbCdssLibraryVersion>(o => o.Key, o => o.Key)
@@ -136,7 +136,7 @@ namespace SanteDB.Persistence.Data.Services
                 if (result != null)
                 {
                     library = this.ToModelInstance(context, result);
-                    this.m_adhocCache?.Add(cacheKey, library);
+                    _ = this.m_cdssLibraryLoaded.TryAdd(cacheKey, library);
                 }
             }
             return library;
@@ -229,7 +229,8 @@ namespace SanteDB.Persistence.Data.Services
                         tx.Commit();
 
                         var retVal = this.ToModelInstance(context, new CompositeResult<DbCdssLibrary, DbCdssLibraryVersion>(existingLibrary, newVersion));
-                        this.m_adhocCache?.Add(this.CreateCacheKey(libraryToInsert.Uuid), retVal);
+                        _ = this.m_cdssLibraryLoaded.TryRemove(this.CreateCacheKey(libraryToInsert.Uuid), out _);
+                        _ = this.m_cdssLibraryLoaded.TryAdd(this.CreateCacheKey(libraryToInsert.Uuid), retVal);
                         return retVal;
                     }
                 }
@@ -282,7 +283,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         tx.Commit();
-                        this.m_adhocCache?.Remove(this.CreateCacheKey(existingRegistration.Key));
+                        _ = this.m_cdssLibraryLoaded.TryRemove(this.CreateCacheKey(existingRegistration.Key), out _);
 
                         return this.ToModelInstance(context, new CompositeResult<DbCdssLibrary, DbCdssLibraryVersion>(existingRegistration, currentVersion));                        
                     }
