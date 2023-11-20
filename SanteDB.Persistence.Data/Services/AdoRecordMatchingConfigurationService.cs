@@ -22,13 +22,16 @@ using SanteDB.Core.Configuration;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Matching;
+using SanteDB.Core.Model.Audit;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Matcher.Definition;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Sys;
+using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -40,7 +43,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// Record matching persistence service using the database
     /// </summary>
-    public class AdoRecordMatchingConfigurationService : IRecordMatchingConfigurationService
+    public class AdoRecordMatchingConfigurationService : IRecordMatchingConfigurationService, IAdoTrimProvider
     {
         private readonly AdoPersistenceConfigurationSection m_configuration;
         private readonly ILocalizationService m_localizationService;
@@ -232,6 +235,32 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.MATCH_CONFIG_ERR, new { id = configuration.Id, error = e }));
             }
+        }
+
+        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        {
+            // Trim old versions
+            context.DeleteAll<DbMatchConfigurationVersion>(o => !o.IsHeadVersion && o.ObsoletionTime != null && o.ObsoletionTime < oldVersionCutoff);
+            foreach(var itm in context.Query<DbMatchConfigurationVersion>(o=>o.IsHeadVersion && o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff))
+            {
+                context.Delete(itm);
+                var root = context.FirstOrDefault<DbMatchConfiguration>(o => o.Key == itm.Key);
+                context.Delete(root);
+                auditBuilder.WithAuditableObjects(new AuditableObject()
+                {
+                    IDTypeCode = AuditableObjectIdType.Custom,
+                    CustomIdTypeCode = new AuditCode(root.Id, "http://santedb.org/matching"),
+                    LifecycleType = AuditableObjectLifecycle.PermanentErasure,
+                    NameData = $"{nameof(DbMatchConfiguration)}/{itm.Key}",
+                    ObjectData = new List<ObjectDataExtension>()
+                    {
+                        new ObjectDataExtension("appliedTo", itm.AppliesToType)
+                    },
+                    Role = AuditableObjectRole.Resource,
+                    Type = AuditableObjectType.SystemObject
+                });
+            }
+            yield break;
         }
 
         /// <summary>

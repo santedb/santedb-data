@@ -1,13 +1,17 @@
-﻿using SanteDB.Core;
+﻿using SanteDB.BI.Model;
+using SanteDB.Core;
 using SanteDB.Core.Cdss;
 using SanteDB.Core.Data.Import;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Audit;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -15,6 +19,7 @@ using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Sys;
+using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -30,7 +35,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// Represents a CDSS library repository
     /// </summary>
-    public class AdoCdssLibraryRepository : ICdssLibraryRepository, IMappedQueryProvider<ICdssLibrary>
+    public class AdoCdssLibraryRepository : ICdssLibraryRepository, IMappedQueryProvider<ICdssLibrary>, IAdoTrimProvider
     {
         // Tracer.
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoJobManager));
@@ -40,6 +45,64 @@ namespace SanteDB.Persistence.Data.Services
         private readonly ModelMapper m_modelMapper;
         private readonly IQueryPersistenceService m_queryPersistence;
         private readonly ConcurrentDictionary<String, ICdssLibrary> m_cdssLibraryLoaded = new ConcurrentDictionary<string, ICdssLibrary>();
+
+        /// <summary>
+        /// Represents an ADO class library entry
+        /// </summary>
+        private class AdoCdssLibraryEntry : ICdssLibraryRepositoryMetadata
+        {
+
+            /// <summary>
+            /// Version data
+            /// </summary>
+            private readonly DbCdssLibraryVersion m_versionData;
+
+            public AdoCdssLibraryEntry(DbCdssLibrary library, DbCdssLibraryVersion version)
+            {
+                this.m_versionData = version;
+            }
+
+            public long? VersionSequence
+            {
+                get => this.m_versionData.VersionSequenceId;
+                set => throw new NotSupportedException();
+            }
+
+            public Guid? VersionKey
+            {
+                get => this.m_versionData.VersionKey;
+                set => throw new NotSupportedException();
+            }
+
+            public Guid? PreviousVersionKey {
+                get => this.m_versionData.ReplacesVersionKey;
+                set => throw new NotSupportedException();
+            }
+
+            public bool IsHeadVersion
+            {
+                get => this.m_versionData.IsHeadVersion;
+                set => throw new NotSupportedException();
+            }
+
+            public Guid? Key
+            {
+                get => this.m_versionData.Key;
+                set => throw new NotSupportedException();
+            }
+
+            public string Tag => this.VersionKey.ToString();
+
+            public DateTimeOffset ModifiedOn => this.m_versionData.ObsoletionTime ??  this.m_versionData.CreationTime;
+
+            public Guid? CreatedByKey => this.m_versionData.CreatedByKey;
+
+            public Guid? ObsoletedByKey => this.m_versionData.ObsoletedByKey;
+
+            public DateTimeOffset CreationTime => this.m_versionData.CreationTime;
+
+            public DateTimeOffset? ObsoletionTime => this.m_versionData.ObsoletionTime;
+        }
 
         /// <summary>
         /// DI constructor
@@ -53,6 +116,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
 
         }
+
 
         /// <inheritdoc/>
         public string ServiceName => "ADO.NET CDSS LIBRARY MANAGER";
@@ -96,7 +160,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public ICdssLibrary Get(Guid libraryUuid)
+        public ICdssLibrary Get(Guid libraryUuid, Guid? versionUuuid)
         {
             if(libraryUuid == Guid.Empty)
             {
@@ -108,7 +172,14 @@ namespace SanteDB.Persistence.Data.Services
                 using(var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     context.Open();
-                    return this.Get(context, libraryUuid);
+                    if (versionUuuid.HasValue)
+                    {
+                        return this.Get(context, libraryUuid, versionUuuid);
+                    }
+                    else
+                    {
+                        return this.Get(context, libraryUuid);
+                    }
                 }
             }
             catch(DbException e)
@@ -129,17 +200,35 @@ namespace SanteDB.Persistence.Data.Services
             ICdssLibrary library = null;
             if (this.m_cdssLibraryLoaded.TryGetValue(cacheKey, out library) != true)
             {
-                var queryStmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCdssLibrary), typeof(DbCdssLibraryVersion))
-                    .InnerJoin<DbCdssLibrary, DbCdssLibraryVersion>(o => o.Key, o => o.Key)
-                    .Where<DbCdssLibraryVersion>(o => o.Key == key && o.IsHeadVersion == true);
-                var result = context.FirstOrDefault<CompositeResult<DbCdssLibrary, DbCdssLibraryVersion>>(queryStmt.Statement);
-                if (result != null)
-                {
-                    library = this.ToModelInstance(context, result);
-                    _ = this.m_cdssLibraryLoaded.TryAdd(cacheKey, library);
-                }
+                library = this.Get(context, key, null);
+                this.m_cdssLibraryLoaded.TryAdd(cacheKey, library);
             }
             return library;
+        }
+
+        private ICdssLibrary Get(DataContext context, Guid key, Guid? versionKey)
+        {
+            var queryStmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCdssLibrary), typeof(DbCdssLibraryVersion))
+                   .InnerJoin<DbCdssLibrary, DbCdssLibraryVersion>(o => o.Key, o => o.Key);
+
+            if(versionKey.HasValue)
+            {
+                queryStmt = queryStmt.Where<DbCdssLibraryVersion>(o => o.Key == key && o.VersionKey == versionKey.Value);
+            }
+            else
+            {
+                queryStmt = queryStmt.Where<DbCdssLibraryVersion>(o => o.Key == key && o.IsHeadVersion == true);
+            }
+
+            var result = context.FirstOrDefault<CompositeResult<DbCdssLibrary, DbCdssLibraryVersion>>(queryStmt.Statement);
+            if (result != null)
+            {
+                return this.ToModelInstance(context, result);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -213,7 +302,7 @@ namespace SanteDB.Persistence.Data.Services
                         var currentVersion = context.Query<DbCdssLibraryVersion>(o => o.Key == existingLibrary.Key).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault();
                         if(currentVersion != null)
                         {
-                            if(!SHA1.Create().ComputeHash(newVersion.Definition).SequenceEqual(SHA1.Create().ComputeHash(currentVersion.Definition)))
+                            if(SHA1.Create().ComputeHash(newVersion.Definition).SequenceEqual(SHA1.Create().ComputeHash(currentVersion.Definition)))
                             {
                                 this.m_tracer.TraceWarning("Not updating CDSS definition since it has not changed.");
                                 return this.ToModelInstance(context, new CompositeResult<DbCdssLibrary, DbCdssLibraryVersion>(existingLibrary, currentVersion)); 
@@ -304,24 +393,55 @@ namespace SanteDB.Persistence.Data.Services
         {
             if (result is CompositeResult<DbCdssLibrary, DbCdssLibraryVersion> cdssResult)
             {
-                var retType = Type.GetType(cdssResult.Object1.CdssLibraryFormat);
-                if (retType == null)
+                var libraryType = Type.GetType(cdssResult.Object1.CdssLibraryFormat);
+                if(libraryType == null)
                 {
                     throw new InvalidOperationException(String.Format(ErrorMessages.TYPE_NOT_FOUND, cdssResult.Object1.CdssLibraryFormat));
                 }
-
-                var retVal = Activator.CreateInstance(retType) as ICdssLibrary;
-                using (var ms = new MemoryStream(cdssResult.Object2.Definition))
-                {
-                    retVal.Load(ms);
+                var libraryInstance = Activator.CreateInstance(libraryType) as ICdssLibrary;
+                libraryInstance.StorageMetadata = new AdoCdssLibraryEntry(cdssResult.Object1, cdssResult.Object2);
+                using (var ms = new MemoryStream(cdssResult.Object2.Definition)) {
+                    libraryInstance.Load(ms);
                 }
-                retVal.Uuid = cdssResult.Object1.Key;
-                return retVal;
+                return libraryInstance;
             }
             else
             {
                 throw new ArgumentOutOfRangeException(string.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(CompositeResult<DbCdssLibrary, DbCdssLibraryVersion>), result.GetType()));
             }
         }
+
+
+        /// <inheritdoc/>
+        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        {
+
+            // Trim out any deleted versions where the head is deleted beyond the deleted cutoff
+            foreach (var itm in context.Query<DbCdssLibraryVersion>(o => o.IsHeadVersion && o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff).ToArray())
+            {
+                context.Delete(itm);
+                context.DeleteAll<DbCdssLibrary>(o => o.Key == itm.Key);
+                auditBuilder.WithAuditableObjects(new AuditableObject()
+                {
+                    IDTypeCode = AuditableObjectIdType.ReportName,
+                    ObjectId = itm.Name,
+                    LifecycleType = AuditableObjectLifecycle.PermanentErasure,
+                    NameData = $"{nameof(DbCdssLibrary)}/{itm.Key}",
+                    Type = AuditableObjectType.SystemObject,
+                    Role = AuditableObjectRole.Resource,
+                    ObjectData = new List<ObjectDataExtension>()
+                    {
+                        new ObjectDataExtension("cdss.library.name", itm.Name),
+                        new ObjectDataExtension("cdss.library.id", itm.Id),
+                        new ObjectDataExtension("cdss.library.oid", itm.Oid)
+                    }
+                });
+                yield return new KeyValuePair<Type, Guid>(typeof(DbCdssLibrary), itm.Key);
+            }
+
+            // Trim out old versions of BI definitions & prune any deleted 
+            context.DeleteAll<DbCdssLibraryVersion>(o => o.ObsoletionTime != null && o.ObsoletionTime < oldVersionCutoff && !o.IsHeadVersion);
+        }
+
     }
 }

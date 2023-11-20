@@ -36,6 +36,7 @@ using SanteDB.Matcher.Matchers;
 using SanteDB.Core.Model;
 using NUnit.Framework.Constraints;
 using System.Xml.Serialization;
+using SanteDB.Core.Model.Interfaces;
 
 namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
 {
@@ -83,6 +84,8 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
 
             public string Documentation => this.m_protocol.Documentation;
 
+            public ICdssLibraryRepositoryMetadata StorageMetadata { get; set; }
+
             public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget, IDictionary<string, object> parameters)
             {
                 yield break;
@@ -102,6 +105,31 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
             public void Save(Stream definitionStream)
             {
                 new XmlSerializer(this.m_protocol.Protocol.GetType()).Serialize(definitionStream, this.m_protocol.Protocol);
+            }
+
+            public void RemoveAnnotation(object annotation)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RemoveAnnotations<T>()
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<T> GetAnnotations<T>()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void AddAnnotation<T>(T annotation)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IAnnotatedResource CopyAnnotations(IAnnotatedResource other)
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -267,7 +295,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                 Assert.AreEqual(tde.Name, afterInsert.Name);
 
                 // Now attempt to load
-                var afterGet = service.Get(afterInsert.Uuid);
+                var afterGet = service.Get(afterInsert.Uuid, null);
                 Assert.AreEqual(tde.Name, afterGet.Name);
 
                 // Attempt to search

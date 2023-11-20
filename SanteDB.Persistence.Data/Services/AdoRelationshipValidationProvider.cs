@@ -30,6 +30,7 @@ using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -53,7 +54,7 @@ namespace SanteDB.Persistence.Data.Services
     /// </summary>
     /// <remarks>This class allows for the management of validation rules between entities, 
     /// acts, or entities and acts</remarks>
-    public class AdoRelationshipValidationProvider : IRelationshipValidationProvider, IMappedQueryProvider<RelationshipValidationRule>, IAdoPersistenceProvider<RelationshipValidationRule>
+    public class AdoRelationshipValidationProvider : IRelationshipValidationProvider, IMappedQueryProvider<RelationshipValidationRule>, IAdoPersistenceProvider<RelationshipValidationRule>, IAdoTrimProvider
     {
         // Tracer
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoRelationshipValidationProvider));
@@ -449,5 +450,12 @@ namespace SanteDB.Persistence.Data.Services
 
         /// <inheritdoc/>
         public bool Exists(DataContext context, Guid key) => context.Any<DbRelationshipValidationRule>(o => o.Key == key);
+
+        /// <inheritdoc/>
+        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        {
+            context.DeleteAll<DbRelationshipValidationRule>(o => o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff);
+            yield break;
+        }
     }
 }

@@ -34,6 +34,7 @@ using System.IO;
 using System.Text;
 using SanteDB.Core.Model;
 using System.Reflection;
+using SanteDB.Core.Model.Interfaces;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 {
@@ -125,6 +126,24 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
             public string Documentation => this.m_protocol.Documentation;
 
+            public ICdssProtocol PreviousVersion => throw new NotImplementedException();
+
+            public Guid? CreatedByKey => throw new NotImplementedException();
+
+            public Guid? ObsoletedByKey => throw new NotImplementedException();
+
+            public DateTimeOffset CreationTime => throw new NotImplementedException();
+
+            public DateTimeOffset? ObsoletionTime => throw new NotImplementedException();
+
+            public Guid? Key { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public string Tag => throw new NotImplementedException();
+
+            public DateTimeOffset ModifiedOn => throw new NotImplementedException();
+
+            public ICdssLibraryRepositoryMetadata StorageMetadata { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
             public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget, IDictionary<String, object> parameters)
             {
                 throw new NotImplementedException();
@@ -145,6 +164,30 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 definitionStream.Write(new byte[] { 0, 1, 2, 3, 4 }, 0, 5);
             }
 
+            public void RemoveAnnotation(object annotation)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RemoveAnnotations<T>()
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<T> GetAnnotations<T>()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void AddAnnotation<T>(T annotation)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IAnnotatedResource CopyAnnotations(IAnnotatedResource other)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         /// <summary>
@@ -249,7 +292,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 Assert.AreEqual(tde.Name, afterInsert.Name);
 
                 // Now attempt to load
-                var afterGet = service.Get(afterInsert.Uuid);
+                var afterGet = service.Get(afterInsert.Uuid, null);
                 Assert.AreEqual(tde.Name, afterGet.Name);
 
                 // Attempt to search
