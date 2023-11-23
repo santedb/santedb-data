@@ -21,6 +21,11 @@ namespace SanteDB.Persistence.Data.Model.Sys
         [Column("cls"), NotNull]
         public string CdssLibraryFormat { get; set; }
 
+        /// <summary>
+        /// True if the protocol was defined as a system protocol (cannot be updated by the user)
+        /// </summary>
+        [Column("is_sys")]
+        public bool IsSystem { get; set; }
     }
 
     /// <summary>
