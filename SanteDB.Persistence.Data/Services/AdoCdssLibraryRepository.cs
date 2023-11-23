@@ -264,16 +264,27 @@ namespace SanteDB.Persistence.Data.Services
                         var existingLibrary = context.FirstOrDefault<DbCdssLibrary>(o => o.Key == libraryToInsert.Uuid);
                         if(existingLibrary == null) // Doesn't exist
                         {
+                            this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateClinicalProtocolConfigurationDefinition);
                             existingLibrary = context.Insert(new DbCdssLibrary()
                             {
                                 Key = libraryToInsert.Uuid,
-                                CdssLibraryFormat = libraryToInsert.GetType().AssemblyQualifiedNameWithoutVersion()
+                                CdssLibraryFormat = libraryToInsert.GetType().AssemblyQualifiedNameWithoutVersion(),
+                                IsSystem = AuthenticationContext.Current.Principal == AuthenticationContext.SystemPrincipal
                             });
                             libraryToInsert.Uuid = existingLibrary.Key;
                         }
                         else if(Type.GetType(existingLibrary.CdssLibraryFormat) != libraryToInsert.GetType()) // Not allowed to change types
                         {
                             throw new InvalidOperationException(String.Format(ErrorMessages.ARGUMENT_INVALID_TYPE, existingLibrary.CdssLibraryFormat, libraryToInsert.GetType()));
+                        }
+                        else if(existingLibrary.IsSystem && 
+                            AuthenticationContext.Current.Principal != AuthenticationContext.SystemPrincipal)
+                        {
+                            this.m_pepService.Demand(PermissionPolicyIdentifiers.UnrestrictedAll);
+                        }
+                        else
+                        {
+                            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterClinicalProtocolConfigurationDefinition);
                         }
 
                         // If there's not material change then we shouldn't persist the change
@@ -302,7 +313,7 @@ namespace SanteDB.Persistence.Data.Services
                         var currentVersion = context.Query<DbCdssLibraryVersion>(o => o.Key == existingLibrary.Key).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault();
                         if(currentVersion != null)
                         {
-                            if(SHA1.Create().ComputeHash(newVersion.Definition).SequenceEqual(SHA1.Create().ComputeHash(currentVersion.Definition)))
+                            if(SHA1.Create().ComputeHash(newVersion.Definition).SequenceEqual(SHA1.Create().ComputeHash(currentVersion.Definition)) && !currentVersion.ObsoletionTime.HasValue)
                             {
                                 this.m_tracer.TraceWarning("Not updating CDSS definition since it has not changed.");
                                 return this.ToModelInstance(context, new CompositeResult<DbCdssLibrary, DbCdssLibraryVersion>(existingLibrary, currentVersion)); 
@@ -348,6 +359,7 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(libraryUuid));
             }
 
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.DeleteClinicalProtocolConfigurationDefinition);
             try
             {
                 using(var context = this.m_configuration.Provider.GetWriteConnection())
