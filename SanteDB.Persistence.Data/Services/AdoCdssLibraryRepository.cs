@@ -172,7 +172,7 @@ namespace SanteDB.Persistence.Data.Services
                 using(var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     context.Open();
-                    if (versionUuuid.HasValue)
+                    if (versionUuuid.GetValueOrDefault() != Guid.Empty)
                     {
                         return this.Get(context, libraryUuid, versionUuuid);
                     }
