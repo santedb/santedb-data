@@ -313,7 +313,7 @@ namespace SanteDB.Persistence.Data.Services
                         var currentVersion = context.Query<DbCdssLibraryVersion>(o => o.Key == existingLibrary.Key).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault();
                         if(currentVersion != null)
                         {
-                            if(SHA1.Create().ComputeHash(newVersion.Definition).SequenceEqual(SHA1.Create().ComputeHash(currentVersion.Definition)))
+                            if(SHA1.Create().ComputeHash(newVersion.Definition).SequenceEqual(SHA1.Create().ComputeHash(currentVersion.Definition)) && !currentVersion.ObsoletionTime.HasValue)
                             {
                                 this.m_tracer.TraceWarning("Not updating CDSS definition since it has not changed.");
                                 return this.ToModelInstance(context, new CompositeResult<DbCdssLibrary, DbCdssLibraryVersion>(existingLibrary, currentVersion)); 
