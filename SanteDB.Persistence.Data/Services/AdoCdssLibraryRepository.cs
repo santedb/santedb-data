@@ -4,6 +4,7 @@ using SanteDB.Core.Cdss;
 using SanteDB.Core.Data.Import;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Http.Compression;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Audit;
@@ -302,11 +303,14 @@ namespace SanteDB.Persistence.Data.Services
                             IsHeadVersion = true
                         };
 
-                        using(var ms = new MemoryStream())
+                        using (var ms = new MemoryStream())
                         {
-                            libraryToInsert.Save(ms);
+                            using (var cs = CompressionUtil.GetCompressionScheme(Core.Http.Description.HttpCompressionAlgorithm.Gzip).CreateCompressionStream(ms))
+                            {
+                                libraryToInsert.Save(cs);
+                            }
                             newVersion.Definition = ms.ToArray();
-                            
+
                         }
 
                         // Is there a current version?
@@ -413,7 +417,10 @@ namespace SanteDB.Persistence.Data.Services
                 var libraryInstance = Activator.CreateInstance(libraryType) as ICdssLibrary;
                 libraryInstance.StorageMetadata = new AdoCdssLibraryEntry(cdssResult.Object1, cdssResult.Object2);
                 using (var ms = new MemoryStream(cdssResult.Object2.Definition)) {
-                    libraryInstance.Load(ms);
+                    using (var cs = CompressionUtil.GetCompressionScheme(Core.Http.Description.HttpCompressionAlgorithm.Gzip).CreateDecompressionStream(ms))
+                    {
+                        libraryInstance.Load(cs);
+                    }
                 }
                 return libraryInstance;
             }
