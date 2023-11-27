@@ -31,7 +31,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
     /// <remarks>
     /// The care plan storage has no specific storage requirements for care plans
     /// </remarks>
-    public class CarePlanPersistenceService : ActDerivedPersistenceService<CarePlan>
+    public class CarePlanPersistenceService : ActDerivedPersistenceService<CarePlan, DbCarePlan>
     {
         /// <summary>
         /// DI constructor

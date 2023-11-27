@@ -293,9 +293,9 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
 
                 var afterInsert = service.InsertOrUpdate(tde);
                 Assert.AreEqual(tde.Name, afterInsert.Name);
-
+                Assert.IsNotNull(afterInsert.StorageMetadata);
                 // Now attempt to load
-                var afterGet = service.Get(afterInsert.Uuid, null);
+                var afterGet = service.Get(afterInsert.StorageMetadata.Key.Value, null);
                 Assert.AreEqual(tde.Name, afterGet.Name);
 
                 // Attempt to search

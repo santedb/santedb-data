@@ -35,6 +35,7 @@ using System.Text;
 using SanteDB.Core.Model;
 using System.Reflection;
 using SanteDB.Core.Model.Interfaces;
+using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 {
@@ -47,74 +48,30 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
     {
 
         /// <summary>
-        /// Protocol handler class
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        private class DummyCdssProtocol : ICdssProtocol
-        {
-
-            // Protocol
-            private Protocol m_protocol;
-
-            public Guid Uuid
-            {
-                get => this.m_protocol.Key.Value;
-                set => this.m_protocol.Key = value;
-            }
-
-            public string Name => this.m_protocol.Name;
-
-            public string Version => "1.0";
-            public string Oid => "2.25.40309204923048273957348593";
-
-            public string Id => "SAMPLE";
-
-            public string Documentation => "THIS IS A SAMPLE";
-
-            public IEnumerable<ICdssProtocolScope> Scopes => new ICdssProtocolScope[0];
-
-            public IEnumerable<Object> ComputeProposals(Patient target, IDictionary<String, Object> parameters)
-            {
-                return new Act[0];
-            }
-
-            public DummyCdssProtocol()
-            {
-
-            }
-
-            public DummyCdssProtocol(Protocol protocol)
-            {
-                this.m_protocol = protocol;
-            }
-
-        }
-
-        /// <summary>
         /// CDSS library for testing
         /// </summary>
-        public class DummyCdssLibrary : ICdssLibrary
+        private class DummyCdssLibrary : ICdssLibrary
         {
-
             private DummyCdssProtocol m_protocol;
-            
+
             public DummyCdssLibrary()
             {
-                    
             }
 
             public DummyCdssLibrary(Protocol protocol)
             {
-                this.m_protocol = new DummyCdssProtocol(protocol);    
+                this.m_protocol = new DummyCdssProtocol(protocol);
             }
 
-            public IEnumerable<ICdssProtocol> GetProtocols(String forType) => new ICdssProtocol[] { this.m_protocol };
-
-            public Guid Uuid
+            /// <summary>
+            /// Gets the protocols
+            /// </summary>
+            public IEnumerable<ICdssProtocol> GetProtocols(Patient forPatient, String forType)
             {
-                get => this.m_protocol.Uuid;
-                set { }
+                yield return this.m_protocol;
             }
+
+            public Guid Uuid { get; set; }
 
             public string Id => this.m_protocol.Id;
 
@@ -126,42 +83,27 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
             public string Documentation => this.m_protocol.Documentation;
 
-            public ICdssProtocol PreviousVersion => throw new NotImplementedException();
+            public ICdssLibraryRepositoryMetadata StorageMetadata { get; set; }
 
-            public Guid? CreatedByKey => throw new NotImplementedException();
-
-            public Guid? ObsoletedByKey => throw new NotImplementedException();
-
-            public DateTimeOffset CreationTime => throw new NotImplementedException();
-
-            public DateTimeOffset? ObsoletionTime => throw new NotImplementedException();
-
-            public Guid? Key { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            public string Tag => throw new NotImplementedException();
-
-            public DateTimeOffset ModifiedOn => throw new NotImplementedException();
-
-            public ICdssLibraryRepositoryMetadata StorageMetadata { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget, IDictionary<String, object> parameters)
+            public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget, IDictionary<string, object> parameters)
             {
-                throw new NotImplementedException();
+                yield break;
             }
 
-            public IEnumerable<Object> Execute(IdentifiedData target, IDictionary<String, object> parameters)
+            public IEnumerable<object> Execute(IdentifiedData target, IDictionary<string, object> parameters)
             {
-                throw new NotImplementedException();
+                yield break;
             }
+
 
             public void Load(Stream definitionStream)
             {
-                Assert.AreEqual(5, definitionStream.Read(new byte[5], 0, 5));
+                this.m_protocol = new DummyCdssProtocol(new XmlSerializer(typeof(Protocol)).Deserialize(definitionStream) as Protocol);
             }
 
             public void Save(Stream definitionStream)
             {
-                definitionStream.Write(new byte[] { 0, 1, 2, 3, 4 }, 0, 5);
+                new XmlSerializer(this.m_protocol.Protocol.GetType()).Serialize(definitionStream, this.m_protocol.Protocol);
             }
 
             public void RemoveAnnotation(object annotation)
@@ -188,6 +130,65 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             {
                 throw new NotImplementedException();
             }
+        }
+
+        /// <summary>
+        /// Protocol handler class
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private class DummyCdssProtocol : ICdssProtocol
+        {
+
+            // Protocol
+            private Protocol m_protocol;
+
+            public Guid Uuid { get; set; }
+
+            public string Name => this.m_protocol.Name;
+
+            public string Version => "1.0";
+            public string Oid => this.m_protocol.Oid;
+
+            public string Id => "SAMPLE";
+
+            public string Documentation => "THIS IS AN EXAMPLE";
+
+            public IEnumerable<ICdssProtocolScope> Scopes => new ICdssProtocolScope[0];
+
+            internal Protocol Protocol => this.m_protocol;
+
+            public IEnumerable<Object> ComputeProposals(Patient p, IDictionary<string, object> parameters)
+            {
+                return new Act[0];
+            }
+
+
+            public DummyCdssProtocol()
+            {
+
+            }
+
+            public DummyCdssProtocol(Protocol protocol)
+            {
+                this.m_protocol = protocol;
+            }
+
+            public Protocol GetProtocolData()
+            {
+                return this.m_protocol;
+            }
+
+            public ICdssProtocol Load(Protocol protocolData)
+            {
+                this.m_protocol = protocolData;
+                return this;
+            }
+
+            public void Prepare(Patient p, IDictionary<string, object> parameters)
+            {
+                ;
+            }
+
         }
 
         /// <summary>
@@ -277,7 +278,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             var protocol = new Protocol()
             {
                 Oid = "1.2.3.4.5.7",
-                Name = "Teapot Protocol 2",
+                Name = "Teapot Protocol 2"
             };
 
             using (AuthenticationContext.EnterSystemContext())
@@ -290,13 +291,13 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
                 var afterInsert = service.InsertOrUpdate(tde);
                 Assert.AreEqual(tde.Name, afterInsert.Name);
-
+                Assert.IsNotNull(afterInsert.StorageMetadata);
                 // Now attempt to load
-                var afterGet = service.Get(afterInsert.Uuid, null);
+                var afterGet = service.Get(afterInsert.StorageMetadata.Key.Value, null);
                 Assert.AreEqual(tde.Name, afterGet.Name);
 
                 // Attempt to search
-                var afterSearch = service.Find(o=>o.Name == "Teapot Protocol 2");
+                var afterSearch = service.Find(o => o.Name == "Teapot Protocol 2");
                 Assert.AreEqual(1, afterSearch.Count());
                 Assert.AreEqual(tde.Name, afterSearch.First().Name);
             }

@@ -137,6 +137,10 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                 var afterInsert = base.TestInsert(cp);
                 Assert.IsInstanceOf<CarePlan>(afterInsert);
 
+                // By protocol 
+                base.TestQuery<CarePlan>(o => o.Protocols.Any(p => p.Protocol.Oid == protocol1.Oid), 1);
+                base.TestQuery<CarePlan>(o => o.Relationships.Any(r => r.TargetAct.Protocols.Any(p => p.Protocol.Oid == protocol1.Oid) && r.TargetAct.MoodConceptKey == ActMoodKeys.Propose), 1);
+
                 // Test query
                 // By patient
                 base.TestQuery<CarePlan>(o => o.Participations.Where(p => p.ParticipationRoleKey == ActParticipationKeys.RecordTarget).Any(p => p.PlayerEntity.Identifiers.Any(i => i.Value == "123-CP-1")), 1);
@@ -146,9 +150,6 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                 base.TestQuery<CarePlan>(o => o.Relationships.Where(p => p.RelationshipTypeKey == ActRelationshipTypeKeys.HasComponent).Any(p => p.TargetAct.StatusConceptKey == StatusKeys.New), 1);
                 base.TestQuery<CarePlan>(o => o.Relationships.Where(p => p.RelationshipTypeKey == ActRelationshipTypeKeys.HasComponent).Any(p => p.TargetAct.StatusConceptKey == StatusKeys.Completed), 0);
 
-                // By protocol 
-                base.TestQuery<CarePlan>(o => o.Protocols.Any(p => p.Protocol.Oid == protocol1.Oid), 1);
-                base.TestQuery<CarePlan>(o => o.Relationships.Any(r => r.TargetAct.Protocols.Any(p => p.Protocol.Oid == protocol1.Oid) && r.TargetAct.MoodConceptKey == ActMoodKeys.Propose), 1);
                 // Test loading
                 var afterQuery = base.TestQuery<CarePlan>(o => o.Key == afterInsert.Key, 1).AsResultSet().First();
                 Assert.AreEqual(2, afterQuery.LoadProperty(o => o.Protocols).Count);

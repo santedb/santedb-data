@@ -262,7 +262,8 @@ namespace SanteDB.Persistence.Data.Services
                     {
 
                         // Is there an existing version?
-                        var existingLibrary = context.FirstOrDefault<DbCdssLibrary>(o => o.Key == libraryToInsert.Uuid);
+                        var storageKey = libraryToInsert?.StorageMetadata?.Key;
+                        var existingLibrary = context.FirstOrDefault<DbCdssLibrary>(o => o.Key == libraryToInsert.Uuid || o.Key == storageKey);
                         if(existingLibrary == null) // Doesn't exist
                         {
                             this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateClinicalProtocolConfigurationDefinition);
