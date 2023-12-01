@@ -97,24 +97,26 @@ namespace SanteDB.Persistence.Data.Jobs
         {
             try
             {
-                this.m_jobStateManager.SetState(this, JobStateType.Running);
-                using (var ctx = this.m_configuration.Provider.GetWriteConnection())
+                if (this.m_configuration.Provider.StatementFactory.Features.HasFlag(OrmLite.Providers.SqlEngineFeatures.StoredFreetextIndex))
                 {
-                    ctx.Open();
-                    ctx.CommandTimeout = 360000;
-                    try
+                    this.m_jobStateManager.SetState(this, JobStateType.Running);
+                    using (var ctx = this.m_configuration.Provider.GetWriteConnection())
                     {
-                        ctx.ExecuteProcedure<object>("rfrsh_fti");
+                        ctx.Open();
+                        ctx.CommandTimeout = 360000;
+                        try
+                        {
+                            ctx.ExecuteProcedure<object>("rfrsh_fti");
+                        }
+                        catch (Exception ex) when (ex.Message.Contains("CALL")) // HACK: PostgreSQL < 11 does not support procedures
+                        {
+                            ctx.ExecuteNonQuery("SELECT rfrsh_fti()");
+                        }
                     }
-                    catch(Exception ex) when (ex.Message.Contains("CALL")) // HACK: PostgreSQL < 11 does not support procedures
-                    {
-                        ctx.ExecuteNonQuery("SELECT rfrsh_fti()");
-                    }
+
+                    this.m_jobStateManager.SetState(this, JobStateType.Completed);
+                    this.m_jobStateManager.SetProgress(this, UserMessages.COMPLETE, 1.0f);
                 }
-
-                this.m_jobStateManager.SetState(this, JobStateType.Completed);
-                this.m_jobStateManager.SetProgress(this, UserMessages.COMPLETE, 1.0f);
-
             }
             catch (Exception ex)
             {
