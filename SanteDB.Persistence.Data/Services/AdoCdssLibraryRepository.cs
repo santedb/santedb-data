@@ -425,6 +425,10 @@ namespace SanteDB.Persistence.Data.Services
                 }
                 return libraryInstance;
             }
+            else if(result == null)
+            {
+                return null;
+            }
             else
             {
                 throw new ArgumentOutOfRangeException(string.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(CompositeResult<DbCdssLibrary, DbCdssLibraryVersion>), result.GetType()));
