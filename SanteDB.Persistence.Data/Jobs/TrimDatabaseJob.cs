@@ -28,6 +28,7 @@ using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Services.Persistence;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -159,7 +160,8 @@ namespace SanteDB.Persistence.Data.Jobs
                                 this.m_jobStateManager.SetState(this, JobStateType.Cancelled);
                                 return;
                             }
-                            this.m_jobStateManager.SetProgress(this, this.m_localizationService.GetString(UserMessageStrings.DB_TRIM_OBJECTS), c++ / (float)trimHelpers.Length * 0.7f + 0.3f);
+                            this.m_tracer.TraceInfo("Trimming {0}...", th.GetType().Name);
+                            this.m_jobStateManager.SetProgress(this, this.m_localizationService.GetString(UserMessageStrings.DB_TRIM_OBJECTS, new { objectType = th.GetType().Name }), c++ / (float)trimHelpers.Length * 0.7f + 0.3f);
                             th.Trim(context, DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxOldVersionRetention.Value), DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxDeletedDataRetention.Value), audit);
                         }
 

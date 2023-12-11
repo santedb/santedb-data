@@ -20,16 +20,22 @@
  */
 using NUnit.Framework;
 using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Roles;
-using SanteDB.Core.Protocol;
+using SanteDB.Core.Cdss;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Text;
+using SanteDB.Core.Model;
+using System.Reflection;
+using SanteDB.Core.Model.Interfaces;
+using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 {
@@ -42,33 +48,127 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
     {
 
         /// <summary>
+        /// CDSS library for testing
+        /// </summary>
+        private class DummyCdssLibrary : ICdssLibrary
+        {
+            private DummyCdssProtocol m_protocol;
+
+            public DummyCdssLibrary()
+            {
+            }
+
+            public DummyCdssLibrary(Protocol protocol)
+            {
+                this.m_protocol = new DummyCdssProtocol(protocol);
+            }
+
+            /// <summary>
+            /// Gets the protocols
+            /// </summary>
+            public IEnumerable<ICdssProtocol> GetProtocols(Patient forPatient, String forType)
+            {
+                yield return this.m_protocol;
+            }
+
+            public Guid Uuid { get; set; }
+
+            public string Id => this.m_protocol.Id;
+
+            public string Name => this.m_protocol.Name;
+
+            public string Version => this.m_protocol.Version;
+
+            public string Oid => this.m_protocol.Oid;
+
+            public string Documentation => this.m_protocol.Documentation;
+
+            public ICdssLibraryRepositoryMetadata StorageMetadata { get; set; }
+
+            public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget, IDictionary<string, object> parameters)
+            {
+                yield break;
+            }
+
+            public IEnumerable<object> Execute(IdentifiedData target, IDictionary<string, object> parameters)
+            {
+                yield break;
+            }
+
+
+            public void Load(Stream definitionStream)
+            {
+                this.m_protocol = new DummyCdssProtocol(new XmlSerializer(typeof(Protocol)).Deserialize(definitionStream) as Protocol);
+            }
+
+            public void Save(Stream definitionStream)
+            {
+                new XmlSerializer(this.m_protocol.Protocol.GetType()).Serialize(definitionStream, this.m_protocol.Protocol);
+            }
+
+            public void RemoveAnnotation(object annotation)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RemoveAnnotations<T>()
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<T> GetAnnotations<T>()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void AddAnnotation<T>(T annotation)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IAnnotatedResource CopyAnnotations(IAnnotatedResource other)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
         /// Protocol handler class
         /// </summary>
         [ExcludeFromCodeCoverage]
-        private class DummyProtocolHandler : IClinicalProtocol
+        private class DummyCdssProtocol : ICdssProtocol
         {
 
             // Protocol
             private Protocol m_protocol;
 
-            public Guid Id => this.m_protocol.Key.Value;
+            public Guid Uuid { get; set; }
 
             public string Name => this.m_protocol.Name;
 
             public string Version => "1.0";
-            public string GroupId => "SAMPLETESTS!";
+            public string Oid => this.m_protocol.Oid;
 
-            public IEnumerable<Act> Calculate(Patient p, IDictionary<string, object> parameters)
+            public string Id => "SAMPLE";
+
+            public string Documentation => "THIS IS AN EXAMPLE";
+
+            public IEnumerable<ICdssProtocolScope> Scopes => new ICdssProtocolScope[0];
+
+            internal Protocol Protocol => this.m_protocol;
+
+            public IEnumerable<Object> ComputeProposals(Patient p, IDictionary<string, object> parameters)
             {
-                yield break;
+                return new Act[0];
             }
 
-            public DummyProtocolHandler()
+
+            public DummyCdssProtocol()
             {
 
             }
 
-            public DummyProtocolHandler(Protocol protocol)
+            public DummyCdssProtocol(Protocol protocol)
             {
                 this.m_protocol = protocol;
             }
@@ -78,7 +178,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 return this.m_protocol;
             }
 
-            public IClinicalProtocol Load(Protocol protocolData)
+            public ICdssProtocol Load(Protocol protocolData)
             {
                 this.m_protocol = protocolData;
                 return this;
@@ -89,10 +189,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 ;
             }
 
-            public IEnumerable<Act> Update(Patient p, IEnumerable<Act> existingPlan)
-            {
-                yield break;
-            }
         }
 
         /// <summary>
@@ -104,11 +200,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             // First we create a protocol
             var protocol = new Protocol()
             {
-                Definition = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-                HandlerClass = typeof(DummyProtocolHandler),
                 Oid = "1.2.3.4.5.6",
                 Name = "Teapot Protocol",
-                Narrative = Narrative.DocumentFromString("Teapot", "en", "text/plain", "I'm a little teapot!")
             };
 
             using (AuthenticationContext.EnterSystemContext())
@@ -117,33 +210,21 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 // Insert the protocol
                 var afterInsert = base.TestInsert(protocol);
                 Assert.AreEqual(AuthenticationContext.SystemUserSid, afterInsert.CreatedByKey.Value.ToString());
-                Assert.AreEqual(10, afterInsert.Definition.Length);
                 Assert.AreEqual("1.2.3.4.5.6", afterInsert.Oid);
-                Assert.IsNull(afterInsert.Narrative);
-                Assert.IsNotNull(afterInsert.LoadProperty(o => o.Narrative));
-                Assert.AreEqual("I'm a little teapot!", Encoding.UTF8.GetString(afterInsert.Narrative.Text));
 
                 // Test querying the protocol
                 var afterQuery = base.TestQuery<Protocol>(o => o.Oid == "1.2.3.4.5.6", 1).AsResultSet().First();
                 base.TestQuery<Protocol>(o => o.Oid == "1.2.3.4.5.76", 0);
                 base.TestQuery<Protocol>(o => o.ObsoletionTime == null && o.Name == "Teapot Protocol", 1);
                 Assert.AreEqual(AuthenticationContext.SystemUserSid, afterInsert.CreatedByKey.Value.ToString());
-                Assert.AreEqual(10, afterQuery.Definition.Length);
-                Assert.AreEqual("1.2.3.4.5.6", afterQuery.Oid);
-                Assert.IsNull(afterQuery.Narrative);
-                Assert.IsNotNull(afterQuery.LoadProperty(o => o.Narrative));
-                Assert.AreEqual("I'm a little teapot!", Encoding.UTF8.GetString(afterQuery.Narrative.Text));
 
                 // Test the update of a protocol
                 var afterUpdate = base.TestUpdate(afterQuery, o =>
                 {
-                    o.Narrative.SetText("I am not a little teapot!");
                     o.Name = "Non-Teapot Protocol";
                     o.Oid = "6.5.4.3.2.1";
-                    o.Definition = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
                     return o;
                 });
-                Assert.AreEqual(20, afterUpdate.Definition.Length);
                 Assert.AreEqual("Non-Teapot Protocol", afterUpdate.Name);
 
                 // Validate query
@@ -196,30 +277,27 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             // First we create a protocol
             var protocol = new Protocol()
             {
-                Definition = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-                HandlerClass = typeof(DummyProtocolHandler),
                 Oid = "1.2.3.4.5.7",
-                Name = "Teapot Protocol 2",
-                Narrative = Narrative.DocumentFromString("Teapot", "en", "text/plain", "I'm a little teapot!")
+                Name = "Teapot Protocol 2"
             };
 
             using (AuthenticationContext.EnterSystemContext())
             {
 
                 // We want to create the IClinicalProtocol instance
-                var tde = new DummyProtocolHandler(protocol);
-                var service = ApplicationServiceContext.Current.GetService<IClinicalProtocolRepositoryService>();
+                var tde = new DummyCdssLibrary(protocol);
+                var service = ApplicationServiceContext.Current.GetService<ICdssLibraryRepository>();
                 Assert.IsNotNull(service);
 
-                var afterInsert = service.InsertProtocol(tde);
+                var afterInsert = service.InsertOrUpdate(tde);
                 Assert.AreEqual(tde.Name, afterInsert.Name);
-
+                Assert.IsNotNull(afterInsert.StorageMetadata);
                 // Now attempt to load
-                var afterGet = service.GetProtocol(afterInsert.Id);
+                var afterGet = service.Get(afterInsert.StorageMetadata.Key.Value, null);
                 Assert.AreEqual(tde.Name, afterGet.Name);
 
                 // Attempt to search
-                var afterSearch = service.FindProtocol(protocolName: "Teapot Protocol 2");
+                var afterSearch = service.Find(o => o.Name == "Teapot Protocol 2");
                 Assert.AreEqual(1, afterSearch.Count());
                 Assert.AreEqual(tde.Name, afterSearch.First().Name);
             }

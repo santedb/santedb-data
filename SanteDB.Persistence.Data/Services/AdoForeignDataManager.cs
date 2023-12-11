@@ -28,6 +28,7 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -37,6 +38,7 @@ using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.ForeignData;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Sys;
+using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -49,7 +51,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// Foreign data manager which stores data about staged foreign data into the database
     /// </summary>
-    public class AdoForeignDataManager : IForeignDataManagerService, IReportProgressChanged, IMappedQueryProvider<IForeignDataSubmission>
+    public class AdoForeignDataManager : IForeignDataManagerService, IReportProgressChanged, IMappedQueryProvider<IForeignDataSubmission>, IAdoTrimProvider
     {
         private readonly AdoPersistenceConfigurationSection m_configuration;
         private readonly ILocalizationService m_localizationService;
@@ -149,7 +151,7 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             this.m_streamManager.Remove(existing.SourceStreamKey);
                         }
-                        catch(FileNotFoundException) { }
+                        catch (FileNotFoundException) { }
 
                         existing.RejectStreamKey = null;
                         existing.SourceStreamKey = Guid.Empty;
@@ -665,6 +667,21 @@ namespace SanteDB.Persistence.Data.Services
             var tableMap = TableMapping.Get(typeof(DbForeignDataStage));
             var obsltCol = tableMap.GetColumn(nameof(DbForeignDataStage.ObsoletionTime));
             return new SqlStatement($"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        {
+            foreach (var itm in context.Query<DbForeignDataStage>(o => o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff).ToArray())
+            {
+                context.DeleteAll<DbForeignDataStageParameter>(o => o.SourceKey == itm.Key);
+                context.DeleteAll<DbForeignDataIssue>(o => o.SourceKey == itm.Key);
+                context.Delete(itm);
+            }
+
+            // Now mark the old (already imported) versions for deletion
+            context.UpdateAll<DbForeignDataStage>(o => o.ObsoletionTime == null && o.Status != ForeignDataStatus.Staged && o.CreationTime < oldVersionCutoff, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId);
+            yield break;
         }
     }
 }

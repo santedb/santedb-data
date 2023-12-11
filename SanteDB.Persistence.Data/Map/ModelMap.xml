@@ -31,6 +31,7 @@
          domainClass="SanteDB.Persistence.Data.Model.Sys.DbBiQueryResult, SanteDB.Persistence.Data" >
     
   </class>
+
   
   <!-- Foreign Data Import -->
   <!--<class modelClass="SanteDB.Core.Data.Import.IForeignDataSubmission, SanteDB.Core.Api"
@@ -409,11 +410,7 @@
 
   <!-- Represents Act Model -->
   <class modelClass="SanteDB.Core.Model.Acts.CarePlan, SanteDB.Core.Model"
-         domainClass="SanteDB.Persistence.Data.Model.Acts.DbActVersion, SanteDB.Persistence.Data">
-    <property modelName="PreviousVersionKey" domainName="ReplacesVersionKey" />
-    <property modelName="VersionSequence" domainName="VersionSequenceId" />
-    <property modelName="ModifiedOn" domainName="CreationTime" />
-     <property modelName="Tag" queryOnly="true" domainName="VersionKey" /> 
+         domainClass="SanteDB.Persistence.Data.Model.Acts.DbCarePlan, SanteDB.Persistence.Data">
   </class>
 
   <!-- Represents Act Model -->

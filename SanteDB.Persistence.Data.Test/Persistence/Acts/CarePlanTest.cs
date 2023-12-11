@@ -49,14 +49,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             {
                 Protocol protocol1 = base.TestInsert(new Protocol()
                 {
-                    Definition = new byte[] { 1, 2, 3, 4, 5 },
-                    HandlerClass = typeof(String),
                     Name = "Sample Care Plan Protocol 1",
                     Oid = "2.25.400494949494949944"
                 }), protocol2 = base.TestInsert(new Protocol()
                 {
-                    Definition = new byte[] { 1, 2, 3, 4, 5 },
-                    HandlerClass = typeof(String),
                     Name = "Sample Care Plan Protocol 2",
                     Oid = "2.25.9483443938383"
                 });

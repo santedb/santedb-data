@@ -120,9 +120,10 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public void ReIndex<TEntity>(TEntity entity) where TEntity : IdentifiedData
         {
-            if (this.m_configuration.Provider.StatementFactory.GetFilterFunction("freetext") != null)
+            if (this.m_configuration.Provider.StatementFactory.GetFilterFunction("freetext") != null &&
+                this.m_configuration.Provider.StatementFactory.Features.HasFlag(SqlEngineFeatures.StoredFreetextIndex))
+                
             {
-                // TODO: Detect type and reindex based on type
                 this.m_threadPool.QueueUserWorkItem(p =>
                 {
                     using (var ctx = this.m_configuration.Provider.GetWriteConnection())
@@ -131,6 +132,10 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             ctx.Open();
                             ctx.ExecuteProcedure<object>("reindex_fti_ent", p);
+                        }
+                        catch (Exception ex) when (ex.Message.Contains("CALL")) // HACK: PostgreSQL < 11 does not support procedures
+                        {
+                            ctx.ExecuteNonQuery("SELECT reindex_fti_ent(?)", p);
                         }
                         catch (Exception e)
                         {

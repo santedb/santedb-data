@@ -389,7 +389,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     this.DoDeleteReferencesInternal(context, key);
 
-                    if (this.m_configuration.Provider.StatementFactory.GetFilterFunction("freetext") != null)
+                    if (this.m_configuration.Provider.StatementFactory.Features.HasFlag(SqlEngineFeatures.StoredFreetextIndex))
                     {
                         this.DoDeleteFreeTextIndexInternal(context, key);
                     }

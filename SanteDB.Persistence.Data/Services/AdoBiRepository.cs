@@ -25,9 +25,11 @@ using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
+using SanteDB.Core.Model.Audit;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.MappedResultSets;
@@ -35,6 +37,7 @@ using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Sys;
+using SanteDB.Persistence.Data.Services.Persistence;
 using SharpCompress;
 using System;
 using System.Collections.Generic;
@@ -49,7 +52,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// Represents a repository for BI assets in the database
     /// </summary>
-    public class AdoBiRepository : IBiMetadataRepository
+    public class AdoBiRepository : IBiMetadataRepository, IAdoTrimProvider
     {
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoBiRepository));
         private readonly AdoPersistenceConfigurationSection m_configuration;
@@ -602,6 +605,31 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.BI_STORE_ERR, new { id = id }), e);
             }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        {
+
+            // Trim out any deleted versions where the head is deleted beyond the deleted cutoff
+            foreach(var itm in context.Query<DbBiDefinitionVersion>(o=>o.IsHeadVersion && o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff).ToArray())
+            {
+                context.Delete(itm);
+                context.DeleteAll<DbBiDefinition>(o => o.Key == itm.Key);
+                auditBuilder.WithAuditableObjects(new AuditableObject()
+                {
+                    IDTypeCode = AuditableObjectIdType.ReportName,
+                    ObjectId = itm.Name,
+                    LifecycleType = AuditableObjectLifecycle.PermanentErasure,
+                    NameData = $"{nameof(BiDefinition)}/{itm.Key}",
+                    Type = AuditableObjectType.SystemObject,
+                    Role = AuditableObjectRole.Resource
+                });
+                yield return new KeyValuePair<Type, Guid>(typeof(DbBiDefinition), itm.Key);
+            }
+
+            // Trim out old versions of BI definitions & prune any deleted 
+            context.DeleteAll<DbBiDefinitionVersion>(o => o.ObsoletionTime != null && o.ObsoletionTime < oldVersionCutoff && !o.IsHeadVersion);
         }
     }
 }

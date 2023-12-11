@@ -33,6 +33,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.Configuration;
+using SanteDB.OrmLite.Providers;
 using SanteDB.OrmLite.Providers.Postgres;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Services.Persistence;

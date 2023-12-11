@@ -77,7 +77,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// Gets or sets the sequence number
         /// </summary>
         [Column("seq_id")]
-        public int SequenceId { get; set; }
+        public int? SequenceId { get; set; }
 
     }
 }

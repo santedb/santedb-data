@@ -4,6 +4,27 @@
  *	<isInstalled>select ck_patch('20230118-01')</isInstalled>
  * </feature>
  */
+
+ 
+drop index sec_dev_pub_id_idx;
+create index sec_dev_pub_id_idx on sec_dev_tbl(lower(dev_pub_id));
+
+drop index sec_usr_name_pwd_idx;
+create index sec_usr_name_pwd_idx on sec_usr_tbl (lower(usr_name), passwd);
+
+-- INDEX FOR PROTOCOL BY OID
+DROP INDEX IF EXISTS PROTO_NAME_UQ_IDX ;
+CREATE UNIQUE INDEX PROTO_OID_UQ_IDX ON PROTO_TBL(OID) WHERE (OBSLT_UTC IS NULL);
+ALTER TABLE FD_STG_SYSTBL ADD DESCR TEXT;
+ALTER TABLE sec_ses_tbl ALTER COLUMN rfrsh_exp_utc DROP NOT NULL;
+ALTER TABLE sec_ses_tbl ALTER COLUMN rfrsh_tkn DROP NOT NULL;
+ALTER TABLE sec_ses_tbl DROP CONSTRAINT ck_sec_ses_rfrsh_exp ;
+ALTER TABLE sec_ses_tbl ADD CONSTRAINT ck_sec_ses_rfrsh_exp CHECK (rfrsh_exp_utc IS NULL OR (rfrsh_exp_utc >= exp_utc));
+
+ DROP INDEX IF EXISTS ent_addr_cmp_val_idx;
+ DROP INDEX IF EXISTS ent_name_cmp_val_idx;
+ DROP INDEX IF EXISTS ENT_NAME_CMP_SDX_IDX;
+
 ALTER TABLE PSN_TBL ADD VIP_STS_CD_ID UUID;
 ALTER TABLE PSN_TBL ADD CONSTRAINT CK_VIP_STS_CD CHECK (((VIP_STS_CD_ID IS NULL) OR IS_CD_SET_MEM(VIP_STS_CD_ID, 'VeryImportantPersonStatus') OR IS_CD_SET_MEM(VIP_STS_CD_ID, 'NullReason')));
 ALTER TABLE PSN_TBL ADD NAT_CD_ID UUID;

@@ -2,6 +2,7 @@
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
@@ -9,6 +10,7 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Security;
+using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +23,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// ADO data signing certificate 
     /// </summary>
-    public class AdoDataSigningCertificateManagerService : IDataSigningCertificateManagerService
+    public class AdoDataSigningCertificateManagerService : IDataSigningCertificateManagerService, IAdoTrimProvider
     {
         // Tracer
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoDataSigningCertificateManagerService));
@@ -263,6 +265,13 @@ namespace SanteDB.Persistence.Data.Services
                     subject = x509Certificate.Subject
                 }), e);
             }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        {
+            context.DeleteAll<DbCertificateMapping>(o => o.Use == CertificateMappingUse.Signature && o.ObsoletionTime < deletedCutoff && o.ObsoletionTime != null);
+            yield break;
         }
 
         /// <inheritdoc/>

@@ -22,6 +22,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Security.Principal;
@@ -32,6 +33,7 @@ using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Exceptions;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
+using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +48,7 @@ namespace SanteDB.Persistence.Data.Services
     /// Implementation of the <see cref="ICertificateIdentityProvider"/> which can authenticate 
     /// principals from an X509 certificiate
     /// </summary>
-    public class AdoCertificateIdentityProvider : ICertificateIdentityProvider
+    public class AdoCertificateIdentityProvider : ICertificateIdentityProvider, IAdoTrimProvider
     {
 
         // Tracer
@@ -488,6 +490,13 @@ namespace SanteDB.Persistence.Data.Services
                 this.m_tracer.TraceError("Error removing identity mapping {0} with {1} - {2}", identityToBeUnMapped.Name, authenticationCertificate.Subject, e.Message);
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_CERT_CREATE_GEN, new { identity = identityToBeUnMapped.Name, subject = authenticationCertificate.Subject }), e);
             }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        {
+            context.DeleteAll<DbCertificateMapping>(o => o.Use == CertificateMappingUse.Authentication && o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff);
+            yield break;
         }
     }
 }
