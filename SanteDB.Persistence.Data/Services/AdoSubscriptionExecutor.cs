@@ -220,6 +220,7 @@ namespace SanteDB.Persistence.Data.Services
                 });
 
                 // Now we want to append the new definitional query (with parameter substitutions) to our main select statement
+                query = query.Prepare();
                 domainQuery.Append(" FROM (").Append(definitionQuery, arguments.ToArray()).Append($") AS {tableMapping.TableName} ");
                 domainQuery.Append(query.ToString().Substring(query.ToString().IndexOf("WHERE ")), query.Arguments.ToArray()); // Then we add the filters supplied by the caller 
 
