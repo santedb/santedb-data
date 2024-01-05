@@ -34,7 +34,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Trim the specified object from the database 
         /// </summary>
-        IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder);
+        /// <param name="auditBuilder">The audit build so the trimming process can audit the logical or perminent removal</param>
+        /// <param name="context">The data context on which the trim process is running</param>
+        /// <param name="deletedCutoff">The date/time whereby a logically deleted resource needs to be purged</param>
+        /// <param name="oldVersionCutoff">The date/time of a historical version where the version should be removed</param>
+        void Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder);
 
     }
 }

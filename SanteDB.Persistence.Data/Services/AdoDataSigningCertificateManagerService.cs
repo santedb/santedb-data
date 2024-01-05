@@ -268,10 +268,9 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        public void Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
         {
             context.DeleteAll<DbCertificateMapping>(o => o.Use == CertificateMappingUse.Signature && o.ObsoletionTime < deletedCutoff && o.ObsoletionTime != null);
-            yield break;
         }
 
         /// <inheritdoc/>

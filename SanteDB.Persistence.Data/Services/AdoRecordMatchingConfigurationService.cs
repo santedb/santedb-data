@@ -237,7 +237,7 @@ namespace SanteDB.Persistence.Data.Services
             }
         }
 
-        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        public void Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
         {
             // Trim old versions
             context.DeleteAll<DbMatchConfigurationVersion>(o => !o.IsHeadVersion && o.ObsoletionTime != null && o.ObsoletionTime < oldVersionCutoff);
@@ -260,7 +260,6 @@ namespace SanteDB.Persistence.Data.Services
                     Type = AuditableObjectType.SystemObject
                 });
             }
-            yield break;
         }
 
         /// <summary>

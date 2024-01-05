@@ -608,7 +608,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        public void Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
         {
 
             // Trim out any deleted versions where the head is deleted beyond the deleted cutoff
@@ -625,7 +625,6 @@ namespace SanteDB.Persistence.Data.Services
                     Type = AuditableObjectType.SystemObject,
                     Role = AuditableObjectRole.Resource
                 });
-                yield return new KeyValuePair<Type, Guid>(typeof(DbBiDefinition), itm.Key);
             }
 
             // Trim out old versions of BI definitions & prune any deleted 

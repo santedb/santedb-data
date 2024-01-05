@@ -452,10 +452,9 @@ namespace SanteDB.Persistence.Data.Services
         public bool Exists(DataContext context, Guid key) => context.Any<DbRelationshipValidationRule>(o => o.Key == key);
 
         /// <inheritdoc/>
-        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        public void Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
         {
             context.DeleteAll<DbRelationshipValidationRule>(o => o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff);
-            yield break;
         }
     }
 }

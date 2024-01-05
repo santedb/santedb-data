@@ -437,7 +437,7 @@ namespace SanteDB.Persistence.Data.Services
 
 
         /// <inheritdoc/>
-        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        public void Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
         {
 
             // Trim out any deleted versions where the head is deleted beyond the deleted cutoff
@@ -460,7 +460,6 @@ namespace SanteDB.Persistence.Data.Services
                         new ObjectDataExtension("cdss.library.oid", itm.Oid)
                     }
                 });
-                yield return new KeyValuePair<Type, Guid>(typeof(DbCdssLibrary), itm.Key);
             }
 
             // Trim out old versions of BI definitions & prune any deleted 
