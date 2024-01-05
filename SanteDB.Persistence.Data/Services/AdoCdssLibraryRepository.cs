@@ -253,6 +253,8 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(libraryToInsert));
             }
 
+            bool isSystemContext = AuthenticationContext.Current.Principal == AuthenticationContext.SystemPrincipal;
+
             try
             {
                 using(var context = this.m_configuration.Provider.GetWriteConnection())
@@ -266,7 +268,10 @@ namespace SanteDB.Persistence.Data.Services
                         var existingLibrary = context.FirstOrDefault<DbCdssLibrary>(o => o.Key == libraryToInsert.Uuid || o.Key == storageKey);
                         if(existingLibrary == null) // Doesn't exist
                         {
-                            this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateClinicalProtocolConfigurationDefinition);
+                            if (!isSystemContext)
+                            {
+                                this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateClinicalProtocolConfigurationDefinition);
+                            }
                             existingLibrary = context.Insert(new DbCdssLibrary()
                             {
                                 Key = libraryToInsert.Uuid,
@@ -280,11 +285,11 @@ namespace SanteDB.Persistence.Data.Services
                             throw new InvalidOperationException(String.Format(ErrorMessages.ARGUMENT_INVALID_TYPE, existingLibrary.CdssLibraryFormat, libraryToInsert.GetType()));
                         }
                         else if(existingLibrary.IsSystem && 
-                            AuthenticationContext.Current.Principal != AuthenticationContext.SystemPrincipal)
+                            !isSystemContext)
                         {
                             this.m_pepService.Demand(PermissionPolicyIdentifiers.UnrestrictedAll);
                         }
-                        else
+                        else if(!isSystemContext)
                         {
                             this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterClinicalProtocolConfigurationDefinition);
                         }
@@ -372,7 +377,6 @@ namespace SanteDB.Persistence.Data.Services
                     context.Open();
                     using(var tx = context.BeginTransaction())
                     {
-
                         var existingRegistration = context.FirstOrDefault<DbCdssLibrary>(o => o.Key == libraryUuid);
                         if(existingRegistration == null)
                         {

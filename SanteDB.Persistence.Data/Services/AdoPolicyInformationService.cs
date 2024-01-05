@@ -36,6 +36,7 @@ using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
 using SanteDB.Persistence.Data.Services.Persistence;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
@@ -708,17 +709,32 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
+                    // Find an existing policy which may have been created with a different key
+                    var existingPolicy = context.FirstOrDefault<DbSecurityPolicy>(o => o.Oid == policy.Oid);
+                    if(existingPolicy == null)
+                    {
+                        existingPolicy = new DbSecurityPolicy()
+                        {
+                            Key = policy.Key
+                        };
+                    }
+                    else if(existingPolicy.Key != policy.Key )
+                    {
+                        existingPolicy.ObsoletionTime = DateTimeOffset.Now;
+                        existingPolicy.ObsoletedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
+                        context.Update(existingPolicy);
+                        existingPolicy = new DbSecurityPolicy()
+                        {
+                            Key = policy.Key
+                        };
+                    }
 
-                    var dbpolicy = new DbSecurityPolicy();
-
-                    dbpolicy.CanOverride = policy.CanOverride;
-                    dbpolicy.IsPublic = true;
-                    dbpolicy.Key = policy.Key;
-                    dbpolicy.Name = policy.Name;
-                    dbpolicy.Oid = policy.Oid;
-                    dbpolicy.CreatedByKey = context.EstablishProvenance(principal, null);
-
-                    dbpolicy = context.Insert(dbpolicy);
+                    existingPolicy.CanOverride = policy.CanOverride;
+                    existingPolicy.IsPublic = true;
+                    existingPolicy.Name = policy.Name;
+                    existingPolicy.Oid = policy.Oid;
+                    existingPolicy.CreatedByKey = context.EstablishProvenance(principal, null);
+                    existingPolicy = context.Insert(existingPolicy);
                 }
                 catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
                 {
@@ -728,4 +744,4 @@ namespace SanteDB.Persistence.Data.Services
             }
         }
     }
-}
+} 

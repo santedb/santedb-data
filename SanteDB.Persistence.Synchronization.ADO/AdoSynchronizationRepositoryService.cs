@@ -28,6 +28,7 @@ using SanteDB.Persistence.Synchronization.ADO.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
 
@@ -175,7 +176,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
             using (var conn = _Provider.GetReadonlyConnection())
             {
                 conn.Open();
-                return conn.Query<Model.DbSynchronizationLogEntry>(e => e.QueryId == null);
+                return conn.Query<Model.DbSynchronizationLogEntry>(e => e.QueryId == null).ToArray(); // ToArray() is called because the conn is disposed 
             }
         }
 
