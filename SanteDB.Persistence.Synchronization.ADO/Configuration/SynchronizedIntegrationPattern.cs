@@ -74,7 +74,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                         typeof(LocalBiRenderService),
                         typeof(InMemoryPivotProvider),
                         typeof(AppletBiRepository),
-                        typeof(AdoSubscriptionExecutor)
+                        typeof(AdoSubscriptionExecutor),
                     };
     }
 }
