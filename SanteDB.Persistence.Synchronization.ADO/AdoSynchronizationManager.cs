@@ -27,37 +27,47 @@ using SanteDB.Persistence.Synchronization.ADO.Configuration;
 using SanteDB.Persistence.Synchronization.ADO.Model;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
+using SanteDB.Persistence.Data;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.i18n;
+using System.Collections.Concurrent;
+using SanteDB.Persistence.Data.Services.Persistence;
+using SanteDB.OrmLite;
+using SanteDB.Core.Security.Audit;
+using SharpCompress;
+using SanteDB.Core.Model.Map;
 
 namespace SanteDB.Persistence.Synchronization.ADO
 {
     /// <summary>
     /// 
     /// </summary>
-    public class AdoSynchronizationRepositoryService : IServiceImplementation, ISynchronizationLogService
+    public class AdoSynchronizationManager : IServiceImplementation, ISynchronizationLogService, ISynchronizationQueueManager
     {
         private Tracer _Tracer;
 
         /// <inheritdoc/>
         public string ServiceName => "ADO.NET Synchronization Repository";
 
-        readonly AdoSynchronizationConfigurationSection _Configuration;
-        readonly IDataCachingService _DataCachingService;
-        readonly IAdhocCacheService _AdhocCache;
-        readonly IDbProvider _Provider;
+        private readonly AdoSynchronizationConfigurationSection _Configuration;
+        private readonly IDataCachingService _DataCachingService;
+        private readonly IAdhocCacheService _AdhocCache;
+        private readonly IDbProvider _Provider;
+        private readonly IReadOnlyCollection<AdoSynchronizationQueue> _RegisteredQueues;
 
         //private ModelMapper _Mapper;
         //private QueryBuilder _QueryBuilder;
-
         /// <summary>
         /// Creates a new instance for the repository from Dependency Injection.
         /// </summary>
-        public AdoSynchronizationRepositoryService(IQueryPersistenceService queryPersistence, IConfigurationManager configurationManager, IDataCachingService dataCachingService, IAdhocCacheService adhocCache)
+        public AdoSynchronizationManager(IQueryPersistenceService queryPersistence, IConfigurationManager configurationManager, IDataCachingService dataCachingService, IAdhocCacheService adhocCache, IDataStreamManager dataStreamManager)
         {
-            _Tracer = new Tracer(nameof(AdoSynchronizationRepositoryService));
+            _Tracer = new Tracer(nameof(AdoSynchronizationManager));
             _Configuration = configurationManager.GetSection<AdoSynchronizationConfigurationSection>();
             _DataCachingService = dataCachingService;
             _AdhocCache = adhocCache;
@@ -66,6 +76,19 @@ namespace SanteDB.Persistence.Synchronization.ADO
             {
                 _Provider = _Configuration.Provider;
                 _Provider.UpgradeSchema("SanteDB.Persistence.Synchronization.ADO");
+
+                using (var mapStream = typeof(AdoSynchronizationQueue).Assembly.GetManifestResourceStream("SanteDB.Persistence.Synchronization.ADO.Map.ModelMap.xml"))
+                {
+                    var mapper = new ModelMapper(mapStream, "SynchronizationMap", true);
+                    // Load all queues 
+                    using (var ctx = _Provider.GetReadonlyConnection())
+                    {
+                        ctx.Open();
+                        _RegisteredQueues = new ConcurrentBag<AdoSynchronizationQueue>(ctx.Query<DbSynchronizationQueue>(o => true)
+                            .ToArray()
+                            .Select(o => new AdoSynchronizationQueue(this, dataStreamManager, _Provider, mapper, o)));
+                    }
+                }
             }
             catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
             {
@@ -283,5 +306,12 @@ namespace SanteDB.Persistence.Synchronization.ADO
                 }
             }
         }
+
+        /// <inheritdoc/>
+        public IEnumerable<ISynchronizationQueue> GetAll(SynchronizationPattern queueType) => this._RegisteredQueues.Where(o =>o.Type.HasFlag(queueType) || queueType.HasFlag(o.Type));
+
+        /// <inheritdoc/>
+        public ISynchronizationQueue Get(string queueName) => this._RegisteredQueues.FirstOrDefault(o => o.Name.Equals(queueName, StringComparison.OrdinalIgnoreCase));
+         
     }
 }

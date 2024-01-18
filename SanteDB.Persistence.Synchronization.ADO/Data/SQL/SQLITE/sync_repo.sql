@@ -2,7 +2,7 @@
  * <feature scope="SanteDB.Persistence.Synchronization.ADO" id="00010000-00" name="Initialize:001-01" invariantName="sqlite">
  *	<summary>Installs the core schema for SanteDB Synchronization Repository</summary>
  *	<remarks>This script installs the necessary core schema files for SanteDB</remarks>
- *  <isInstalled mustSucceed="true">SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE type='table' AND name='SYNC_LOG_TBL')</isInstalled>
+ *  <isInstalled mustSucceed="true">SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE type='table' AND (name='SYNC_LOG_TBL' OR name='SYNC_LOG_SYSTBL'))</isInstalled>
  * </feature>
  */
 

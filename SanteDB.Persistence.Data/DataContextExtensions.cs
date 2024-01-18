@@ -69,7 +69,7 @@ namespace SanteDB.Persistence.Data
     /// <summary>
     /// Data context extensions
     /// </summary>
-    internal static class DataContextExtensions
+    public static class DataContextExtensions
     {
         // Localization service
         private static readonly ILocalizationService s_localizationService = ApplicationServiceContext.Current.GetService<ILocalizationService>();
