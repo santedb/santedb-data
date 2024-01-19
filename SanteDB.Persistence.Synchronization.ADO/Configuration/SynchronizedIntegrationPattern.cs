@@ -21,11 +21,13 @@
 using SanteDB.BI.Services.Impl;
 using SanteDB.Client.Configuration;
 using SanteDB.Client.Disconnected.Data.Synchronization;
+using SanteDB.Client.Disconnected.Services;
 using SanteDB.Client.Upstream.Repositories;
 using SanteDB.Client.Upstream.Security;
 using SanteDB.Core.Data;
 using SanteDB.Core.Services.Impl.Repository;
 using SanteDB.Persistence.Data.Services;
+using SanteDB.Persistence.Synchronization.ADO.Services;
 using System;
 using System.Collections.Generic;
 
@@ -65,6 +67,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                         typeof(UpstreamPolicyInformationService),
                         typeof(UpstreamRoleProviderService),
                         typeof(LocalSecurityRepositoryService),
+                        typeof(SynchronizationAuditDispatcher),
                         typeof(UpstreamSecurityChallengeProvider),
                         typeof(PersistenceEntitySource),
                         typeof(AdoSynchronizationManager),

@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
+using SanteDB.Persistence.Synchronization.ADO.Services;
 using System;
 
 namespace SanteDB.Persistence.Synchronization.ADO.Configuration

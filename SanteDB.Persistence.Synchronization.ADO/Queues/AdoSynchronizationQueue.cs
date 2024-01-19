@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-5-19
  */
+using SanteDB;
 using SanteDB.Client.Disconnected.Data.Synchronization;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
@@ -45,7 +46,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using static SanteDB.Core.Services.Impl.FileSystemDispatcherQueueService;
 
-namespace SanteDB.Persistence.Synchronization.ADO
+namespace SanteDB.Persistence.Synchronization.ADO.Queues
 {
     /// <summary>
     /// An implementation of the <see cref="ISynchronizationQueue"/> which uses a database for storage of queue item metadata whilst
@@ -60,7 +61,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
         private readonly IDataStreamManager m_dataStreamManager;
         private readonly IDbProvider m_dataProvider;
         private readonly DbSynchronizationQueue m_queueRecord;
-        
+
         // Format of the messages in the data stream
         private readonly IBodySerializer m_messageSerializer = new XmlBodySerializer();  // new JsonBodySerializer();
         private readonly ModelSerializationBinder m_modelSerializationBinder = new ModelSerializationBinder();
@@ -78,26 +79,26 @@ namespace SanteDB.Persistence.Synchronization.ADO
         /// <param name="adoSynchronizationManager">The instance of the <see cref="ISynchronizationQueueManager"/> which holds this queue</param>
         internal AdoSynchronizationQueue(ISynchronizationQueueManager adoSynchronizationManager, IDataStreamManager dataStreamManager, IDbProvider dataProvider, ModelMapper mapper, DbSynchronizationQueue queueRecord)
         {
-            this.m_synchronizationManager = adoSynchronizationManager;
-            this.m_mapper = mapper;
-            this.m_dataStreamManager = dataStreamManager;
-            this.m_dataProvider = dataProvider;
-            this.m_queueRecord = queueRecord;
+            m_synchronizationManager = adoSynchronizationManager;
+            m_mapper = mapper;
+            m_dataStreamManager = dataStreamManager;
+            m_dataProvider = dataProvider;
+            m_queueRecord = queueRecord;
         }
 
         /// <summary>
         /// Gets the UUID of this queue
         /// </summary>
-        internal Guid Uuid => this.m_queueRecord.Key;
+        internal Guid Uuid => m_queueRecord.Key;
 
         /// <inheritdoc/>
-        public string Name => this.m_queueRecord.Name;
+        public string Name => m_queueRecord.Name;
 
         /// <inheritdoc/>
-        public SynchronizationPattern Type => this.m_queueRecord.Type;
+        public SynchronizationPattern Type => m_queueRecord.Type;
 
         /// <inheritdoc/>
-        public IDbProvider Provider => this.m_dataProvider;
+        public IDbProvider Provider => m_dataProvider;
 
         /// <inheritdoc/>
         public IQueryPersistenceService QueryPersistence => null;
@@ -115,9 +116,9 @@ namespace SanteDB.Persistence.Synchronization.ADO
         {
             var query = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbSynchronizationQueueEntry), typeof(DbSynchronizationDeadLetterQueueEntry), typeof(DbSynchronizationQueue))
                       .Join<DbSynchronizationQueueEntry, DbSynchronizationDeadLetterQueueEntry>("LEFT", o => o.Id, o => o.Id)
-                      .Join<DbSynchronizationDeadLetterQueueEntry, DbSynchronizationQueue>("LEFT", o=>o.OriginalQueue, o=>o.Key)
-                      .Where<DbSynchronizationQueueEntry>(o => o.QueueKey == this.m_queueRecord.Key)
-                      .OrderBy<DbSynchronizationQueueEntry>(o => o.Id, Core.Model.Map.SortOrderType.OrderBy);
+                      .Join<DbSynchronizationDeadLetterQueueEntry, DbSynchronizationQueue>("LEFT", o => o.OriginalQueue, o => o.Key)
+                      .Where<DbSynchronizationQueueEntry>(o => o.QueueKey == m_queueRecord.Key)
+                      .OrderBy<DbSynchronizationQueueEntry>(o => o.Id, SortOrderType.OrderBy);
 
             var dbData = context.FirstOrDefault<CompositeResult<DbSynchronizationQueueEntry, DbSynchronizationDeadLetterQueueEntry, DbSynchronizationQueue>>(query.Statement);
 
@@ -128,13 +129,13 @@ namespace SanteDB.Persistence.Synchronization.ADO
             else
             {
                 var retVal = dbData.Object2.OriginalQueue != Guid.Empty ?
-                                new AdoSynchronizationDeadLetterQueueEntry(this, this.m_synchronizationManager.Get(dbData.Object3.Name), dbData.Object1, dbData.Object2) :
+                                new AdoSynchronizationDeadLetterQueueEntry(this, m_synchronizationManager.Get(dbData.Object3.Name), dbData.Object1, dbData.Object2) :
                                 new AdoSynchronizationQueueEntry(this, dbData.Object1);
 
 
-                using (var queueData = this.m_dataStreamManager.Get(dbData.Object1.DataFileKey))
+                using (var queueData = m_dataStreamManager.Get(dbData.Object1.DataFileKey))
                 {
-                    retVal.Data = (IdentifiedData)this.m_messageSerializer.DeSerialize(queueData, new System.Net.Mime.ContentType(dbData.Object1.ContentType), this.m_modelSerializationBinder.BindToType(null, dbData.Object1.ResourceType));
+                    retVal.Data = (IdentifiedData)m_messageSerializer.DeSerialize(queueData, new System.Net.Mime.ContentType(dbData.Object1.ContentType), m_modelSerializationBinder.BindToType(null, dbData.Object1.ResourceType));
                 }
 
                 return retVal;
@@ -146,12 +147,12 @@ namespace SanteDB.Persistence.Synchronization.ADO
         {
             try
             {
-                lock (this.m_lock)
+                lock (m_lock)
                 {
-                    using (var context = this.m_dataProvider.GetReadonlyConnection())
+                    using (var context = m_dataProvider.GetReadonlyConnection())
                     {
                         context.Open();
-                        return (int)context.Count<DbSynchronizationQueueEntry>(o => o.QueueKey == this.m_queueRecord.Key);
+                        return (int)context.Count<DbSynchronizationQueueEntry>(o => o.QueueKey == m_queueRecord.Key);
                     }
                 }
             }
@@ -161,7 +162,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
             }
             catch (Exception e)
             {
-                throw new DataPersistenceException(String.Format(ErrorMessages.READ_ERROR, $"{nameof(AdoSynchronizationQueue)}/{this.Name}"), e);
+                throw new DataPersistenceException(string.Format(ErrorMessages.READ_ERROR, $"{nameof(AdoSynchronizationQueue)}/{Name}"), e);
             }
         }
 
@@ -170,17 +171,17 @@ namespace SanteDB.Persistence.Synchronization.ADO
         {
             try
             {
-                lock (this.m_lock)
+                lock (m_lock)
                 {
-                    using (var context = this.m_dataProvider.GetWriteConnection())
+                    using (var context = m_dataProvider.GetWriteConnection())
                     {
                         context.Open();
 
-                        var queueEntry = context.FirstOrDefault<DbSynchronizationQueueEntry>(o => o.Id == id && o.QueueKey == this.m_queueRecord.Key);
+                        var queueEntry = context.FirstOrDefault<DbSynchronizationQueueEntry>(o => o.Id == id && o.QueueKey == m_queueRecord.Key);
 
                         if (queueEntry == null)
                         {
-                            throw new KeyNotFoundException(String.Format(ErrorMessages.OBJECT_NOT_FOUND, $"{nameof(AdoSynchronizationQueue)}/{this.Name}/{id}"));
+                            throw new KeyNotFoundException(string.Format(ErrorMessages.OBJECT_NOT_FOUND, $"{nameof(AdoSynchronizationQueue)}/{Name}/{id}"));
                         }
 
                         using (var tx = context.BeginTransaction())
@@ -192,8 +193,8 @@ namespace SanteDB.Persistence.Synchronization.ADO
                             // Delete data stream
                             if (!context.Any<DbSynchronizationQueueEntry>(o => o.DataFileKey == queueEntry.DataFileKey)) // no other active entry is referencing the data file?
                             {
-                                this.m_tracer.TraceVerbose("Delete queue datastream {0}", queueEntry.DataFileKey);
-                                this.m_dataStreamManager.Remove(queueEntry.DataFileKey);
+                                m_tracer.TraceVerbose("Delete queue datastream {0}", queueEntry.DataFileKey);
+                                m_dataStreamManager.Remove(queueEntry.DataFileKey);
                             }
                             tx.Commit();
                         }
@@ -206,7 +207,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
             }
             catch (Exception e)
             {
-                throw new DataPersistenceException(String.Format(ErrorMessages.WRITE_ERROR, $"{nameof(AdoSynchronizationQueue)}/{this.Name}/{id}"), e);
+                throw new DataPersistenceException(string.Format(ErrorMessages.WRITE_ERROR, $"{nameof(AdoSynchronizationQueue)}/{Name}/{id}"), e);
             }
         }
 
@@ -215,12 +216,13 @@ namespace SanteDB.Persistence.Synchronization.ADO
         {
             try
             {
-                lock(this.m_lock) {
-                    using (var context = this.m_dataProvider.GetWriteConnection())
+                lock (m_lock)
+                {
+                    using (var context = m_dataProvider.GetWriteConnection())
                     {
                         context.Open();
 
-                        var nextEntry = this.GetNextQueueEntry(context);
+                        var nextEntry = GetNextQueueEntry(context);
 
                         // We want to read the queue entry data and delete since the requestor is calling dequeue
                         using (var tx = context.BeginTransaction())
@@ -232,8 +234,8 @@ namespace SanteDB.Persistence.Synchronization.ADO
                             // Delete data stream
                             if (!context.Any<DbSynchronizationQueueEntry>(o => o.DataFileKey == nextEntry.DataFileKey)) // no other active entry is referencing the data file?
                             {
-                                this.m_tracer.TraceVerbose("Delete queue datastream {0}", nextEntry.DataFileKey);
-                                this.m_dataStreamManager.Remove(nextEntry.DataFileKey);
+                                m_tracer.TraceVerbose("Delete queue datastream {0}", nextEntry.DataFileKey);
+                                m_dataStreamManager.Remove(nextEntry.DataFileKey);
                             }
 
                             tx.Commit();
@@ -249,7 +251,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
             }
             catch (Exception e)
             {
-                throw new DataPersistenceException(String.Format(ErrorMessages.WRITE_ERROR, $"DQ {nameof(AdoSynchronizationQueue)}/{this.Name}"), e);
+                throw new DataPersistenceException(string.Format(ErrorMessages.WRITE_ERROR, $"DQ {nameof(AdoSynchronizationQueue)}/{Name}"), e);
             }
         }
 
@@ -260,36 +262,37 @@ namespace SanteDB.Persistence.Synchronization.ADO
             {
                 throw new ArgumentNullException(nameof(data));
             }
-            else if (this.Type.HasFlag(SynchronizationPattern.DeadLetter))
+            else if (Type.HasFlag(SynchronizationPattern.DeadLetter))
             {
-                throw new NotSupportedException(String.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, nameof(Enqueue)));
+                throw new NotSupportedException(string.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, nameof(Enqueue)));
             }
 
-            var preEvent = new DataPersistingEventArgs<ISynchronizationQueueEntry>(new AdoSynchronizationQueueEntry(this, new DbSynchronizationQueueEntry() {  Operation = operation }) { Data = data }, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-            this.Enqueuing?.Invoke(this, preEvent);
-            if(preEvent.Cancel)
+            var preEvent = new DataPersistingEventArgs<ISynchronizationQueueEntry>(new AdoSynchronizationQueueEntry(this, new DbSynchronizationQueueEntry() { Operation = operation }) { Data = data }, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+            Enqueuing?.Invoke(this, preEvent);
+            if (preEvent.Cancel)
             {
-                this.m_tracer.TraceWarning("Pre-Event signals cancel of enqueue operation");
+                m_tracer.TraceWarning("Pre-Event signals cancel of enqueue operation");
                 return preEvent.Data;
             }
 
             try
             {
-                lock(this.m_lock) {
-                    using (var context = this.m_dataProvider.GetWriteConnection())
+                lock (m_lock)
+                {
+                    using (var context = m_dataProvider.GetWriteConnection())
                     {
                         context.Open();
                         using (var tx = context.BeginTransaction())
                         {
 
-                            this.m_modelSerializationBinder.BindToName(data.GetType(), out _, out var typeName);
+                            m_modelSerializationBinder.BindToName(data.GetType(), out _, out var typeName);
 
                             var queueEntry = new DbSynchronizationQueueEntry()
                             {
                                 Operation = operation,
                                 ResourceType = typeName,
                                 CorrelationKey = data.Key ?? Guid.NewGuid(),
-                                QueueKey = this.m_queueRecord.Key
+                                QueueKey = m_queueRecord.Key
                             };
 
                             // First, store the object in the identified data - compressing the data 
@@ -299,9 +302,9 @@ namespace SanteDB.Persistence.Synchronization.ADO
 
                                 using (var ms = new MemoryStream())
                                 {
-                                    this.m_messageSerializer.Serialize(ms, data, out var contentType);
+                                    m_messageSerializer.Serialize(ms, data, out var contentType);
                                     ms.Seek(0, SeekOrigin.Begin);
-                                    queueEntry.DataFileKey = this.m_dataStreamManager.Add(ms);
+                                    queueEntry.DataFileKey = m_dataStreamManager.Add(ms);
                                     queueEntry.ContentType = contentType.ToString();
                                 }
 
@@ -311,14 +314,14 @@ namespace SanteDB.Persistence.Synchronization.ADO
 
                                 var retVal = new AdoSynchronizationQueueEntry(this, queueEntry) { Data = data };
 
-                                this.Enqueued?.Invoke(this, new DataPersistedEventArgs<ISynchronizationQueueEntry>(retVal, TransactionMode.Commit, AuthenticationContext.Current.Principal));
+                                Enqueued?.Invoke(this, new DataPersistedEventArgs<ISynchronizationQueueEntry>(retVal, TransactionMode.Commit, AuthenticationContext.Current.Principal));
                                 return retVal;
                             }
                             catch
                             {
                                 if (queueEntry.DataFileKey != Guid.Empty)
                                 {
-                                    this.m_dataStreamManager.Remove(queueEntry.DataFileKey); // Undo data stream storage
+                                    m_dataStreamManager.Remove(queueEntry.DataFileKey); // Undo data stream storage
                                 }
                                 throw;
                             }
@@ -332,52 +335,52 @@ namespace SanteDB.Persistence.Synchronization.ADO
             }
             catch (Exception e)
             {
-                throw new DataPersistenceException(String.Format(ErrorMessages.WRITE_ERROR, $"EQ {nameof(AdoSynchronizationQueue)}/{this.Name}"), e);
+                throw new DataPersistenceException(string.Format(ErrorMessages.WRITE_ERROR, $"EQ {nameof(AdoSynchronizationQueue)}/{Name}"), e);
             }
         }
 
         /// <inheritdoc/>
-        public ISynchronizationQueueEntry Enqueue(ISynchronizationQueueEntry otherQueueEntry, String reasonText = null)
+        public ISynchronizationQueueEntry Enqueue(ISynchronizationQueueEntry otherQueueEntry, string reasonText = null)
         {
             // Enqueue another entry from another queue into this queue - moving it
             if (otherQueueEntry == null)
             {
                 throw new ArgumentNullException(nameof(otherQueueEntry));
             }
-            else if(this.m_queueRecord.Type.HasFlag(SynchronizationPattern.DeadLetter) && String.IsNullOrEmpty(reasonText))
+            else if (m_queueRecord.Type.HasFlag(SynchronizationPattern.DeadLetter) && string.IsNullOrEmpty(reasonText))
             {
                 throw new ArgumentNullException(nameof(reasonText));
             }
-            if(!(otherQueueEntry.Queue is AdoSynchronizationQueue otherAdoQueue))
+            if (!(otherQueueEntry.Queue is AdoSynchronizationQueue otherAdoQueue))
             {
-                throw new ArgumentException(nameof(otherQueueEntry), String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, otherQueueEntry.Queue.GetType(), typeof(AdoSynchronizationQueue)));
+                throw new ArgumentException(nameof(otherQueueEntry), string.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, otherQueueEntry.Queue.GetType(), typeof(AdoSynchronizationQueue)));
             }
 
             if (otherQueueEntry is ISynchronizationDeadLetterQueueEntry &&
-                this.Type.HasFlag(SynchronizationPattern.DeadLetter))
+                Type.HasFlag(SynchronizationPattern.DeadLetter))
             {
-                throw new InvalidOperationException(String.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, "DeadLetterQueueEntry cannot be copied to DeadLetter"));
+                throw new InvalidOperationException(string.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, "DeadLetterQueueEntry cannot be copied to DeadLetter"));
             }
-            
+
 
             var preEvent = new DataPersistingEventArgs<ISynchronizationQueueEntry>(otherQueueEntry, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-            this.Enqueuing?.Invoke(this, preEvent);
+            Enqueuing?.Invoke(this, preEvent);
             if (preEvent.Cancel)
             {
-                this.m_tracer.TraceWarning("Pre-event signals cancel of enqueue operation");
+                m_tracer.TraceWarning("Pre-event signals cancel of enqueue operation");
                 return preEvent.Data;
             }
 
             try
             {
-                lock (this.m_lock)
+                lock (m_lock)
                 {
-                    using (var context = this.m_dataProvider.GetWriteConnection())
+                    using (var context = m_dataProvider.GetWriteConnection())
                     {
                         context.Open();
 
                         var otherQueueObject = context.FirstOrDefault<DbSynchronizationQueueEntry>(o => o.Id == otherQueueEntry.Id);
-                        if(otherQueueObject == null)
+                        if (otherQueueObject == null)
                         {
                             throw new KeyNotFoundException($"{nameof(AdoSynchronizationQueue)}/{otherQueueEntry.Queue.Name}/{otherQueueEntry.Id}");
                         }
@@ -393,7 +396,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
                                 DataFileKey = otherQueueObject.DataFileKey,
                                 ResourceType = otherQueueObject.ResourceType,
                                 ContentType = otherQueueObject.ContentType,
-                                QueueKey = this.m_queueRecord.Key
+                                QueueKey = m_queueRecord.Key
                             };
 
                             if (otherQueueEntry is ISynchronizationDeadLetterQueueEntry idlqe)
@@ -404,7 +407,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
                             newQueueEntry = context.Insert(newQueueEntry);
 
                             ISynchronizationQueueEntry retVal = null;
-                            if (this.Type.HasFlag(SynchronizationPattern.DeadLetter))
+                            if (Type.HasFlag(SynchronizationPattern.DeadLetter))
                             {
                                 var dlQueueEntry = context.Insert(new DbSynchronizationDeadLetterQueueEntry()
                                 {
@@ -427,7 +430,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
 
                             tx.Commit();
 
-                            this.Enqueued?.Invoke(this, new DataPersistedEventArgs<ISynchronizationQueueEntry>(retVal, TransactionMode.Commit, AuthenticationContext.Current.Principal));
+                            Enqueued?.Invoke(this, new DataPersistedEventArgs<ISynchronizationQueueEntry>(retVal, TransactionMode.Commit, AuthenticationContext.Current.Principal));
                             return retVal;
                         }
                     }
@@ -439,7 +442,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
             }
             catch (Exception e)
             {
-                throw new DataPersistenceException(String.Format(ErrorMessages.WRITE_ERROR, $"EQ {nameof(AdoSynchronizationQueue)}/{this.Name}/{otherQueueEntry.CorrelationKey}"), e);
+                throw new DataPersistenceException(string.Format(ErrorMessages.WRITE_ERROR, $"EQ {nameof(AdoSynchronizationQueue)}/{Name}/{otherQueueEntry.CorrelationKey}"), e);
             }
         }
 
@@ -449,9 +452,9 @@ namespace SanteDB.Persistence.Synchronization.ADO
         {
             try
             {
-                lock (this.m_lock)
+                lock (m_lock)
                 {
-                    using (var context = this.m_dataProvider.GetReadonlyConnection())
+                    using (var context = m_dataProvider.GetReadonlyConnection())
                     {
                         context.Open();
 
@@ -459,37 +462,37 @@ namespace SanteDB.Persistence.Synchronization.ADO
                         var query = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbSynchronizationQueueEntry), typeof(DbSynchronizationDeadLetterQueueEntry), typeof(DbSynchronizationQueue))
                             .Join<DbSynchronizationQueueEntry, DbSynchronizationDeadLetterQueueEntry>("LEFT", o => o.Id, o => o.Id)
                             .Join<DbSynchronizationDeadLetterQueueEntry, DbSynchronizationQueue>("LEFT", o => o.OriginalQueue, o => o.Key)
-                            .Where<DbSynchronizationQueueEntry>(o => o.QueueKey == this.m_queueRecord.Key && o.Id == id)
-                            .OrderBy<DbSynchronizationQueueEntry>(o => o.Id, Core.Model.Map.SortOrderType.OrderBy);
+                            .Where<DbSynchronizationQueueEntry>(o => o.QueueKey == m_queueRecord.Key && o.Id == id)
+                            .OrderBy<DbSynchronizationQueueEntry>(o => o.Id, SortOrderType.OrderBy);
 
                         var queueEntry = context.FirstOrDefault<CompositeResult<DbSynchronizationQueueEntry, DbSynchronizationDeadLetterQueueEntry, DbSynchronizationQueue>>(query.Statement);
 
                         if (queueEntry == null)
                         {
-                            throw new KeyNotFoundException($"{nameof(AdoSynchronizationQueue)}/{this.Name}/{id}");
+                            throw new KeyNotFoundException($"{nameof(AdoSynchronizationQueue)}/{Name}/{id}");
                         }
 
                         var retVal = queueEntry.Object2.OriginalQueue != Guid.Empty ?
-                               new AdoSynchronizationDeadLetterQueueEntry(this, this.m_synchronizationManager.Get(queueEntry.Object3.Name), queueEntry.Object1, queueEntry.Object2) :
+                               new AdoSynchronizationDeadLetterQueueEntry(this, m_synchronizationManager.Get(queueEntry.Object3.Name), queueEntry.Object1, queueEntry.Object2) :
                                new AdoSynchronizationQueueEntry(this, queueEntry.Object1);
 
 
-                        using (var queueData = this.m_dataStreamManager.Get(queueEntry.Object1.DataFileKey))
+                        using (var queueData = m_dataStreamManager.Get(queueEntry.Object1.DataFileKey))
                         {
-                            retVal.Data = (IdentifiedData)this.m_messageSerializer.DeSerialize(queueData, new System.Net.Mime.ContentType(queueEntry.Object1.ContentType), this.m_modelSerializationBinder.BindToType(null, queueEntry.Object1.ResourceType));
+                            retVal.Data = (IdentifiedData)m_messageSerializer.DeSerialize(queueData, new System.Net.Mime.ContentType(queueEntry.Object1.ContentType), m_modelSerializationBinder.BindToType(null, queueEntry.Object1.ResourceType));
                         }
 
                         return retVal;
                     }
                 }
             }
-            catch(DbException e)
+            catch (DbException e)
             {
                 throw e.TranslateDbException();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                throw new DataPersistenceException(String.Format(ErrorMessages.READ_ERROR, $"{nameof(AdoSynchronizationQueue)}/{this.Name}/{id}"), e);
+                throw new DataPersistenceException(string.Format(ErrorMessages.READ_ERROR, $"{nameof(AdoSynchronizationQueue)}/{Name}/{id}"), e);
             }
         }
 
@@ -498,24 +501,24 @@ namespace SanteDB.Persistence.Synchronization.ADO
         {
             try
             {
-                lock (this.m_lock)
+                lock (m_lock)
                 {
-                    using (var context = this.m_dataProvider.GetReadonlyConnection())
+                    using (var context = m_dataProvider.GetReadonlyConnection())
                     {
                         context.Open();
 
-                        var entry = this.GetNextQueueEntry(context);
+                        var entry = GetNextQueueEntry(context);
                         return entry;
                     }
                 }
             }
-            catch(DbException e)
+            catch (DbException e)
             {
                 throw e.TranslateDbException();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                throw new DataPersistenceException(String.Format(ErrorMessages.READ_ERROR, $"PK {nameof(AdoSynchronizationQueue)}/{this.Name}"), e);
+                throw new DataPersistenceException(string.Format(ErrorMessages.READ_ERROR, $"PK {nameof(AdoSynchronizationQueue)}/{Name}"), e);
             }
         }
 
@@ -529,16 +532,16 @@ namespace SanteDB.Persistence.Synchronization.ADO
 
             try
             {
-                lock (this.m_lock)
+                lock (m_lock)
                 {
-                    using (var context = this.m_dataProvider.GetReadonlyConnection())
+                    using (var context = m_dataProvider.GetReadonlyConnection())
                     {
                         context.Open();
                         SqlStatement domainQuery = null;
-                        var domainLambda = this.m_mapper.MapModelExpression<ISynchronizationQueueEntry, DbSynchronizationQueueEntry, bool>(query, false);
+                        var domainLambda = m_mapper.MapModelExpression<ISynchronizationQueueEntry, DbSynchronizationQueueEntry, bool>(query, false);
                         if (domainLambda == null)
                         {
-                            domainQuery = context.GetQueryBuilder(this.m_mapper).CreateQuery<ISynchronizationQueueEntry>(query).Statement;
+                            domainQuery = context.GetQueryBuilder(m_mapper).CreateQuery(query).Statement;
                         }
                         else
                         {
@@ -546,7 +549,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
                         }
 
                         // Now we want to query 
-                        var matchingKeys = context.Query<DbSynchronizationQueueEntry>(domainQuery).Where(o=>o.QueueKey == this.m_queueRecord.Key).Select(o => o.Id).ToArray();
+                        var matchingKeys = context.Query<DbSynchronizationQueueEntry>(domainQuery).Where(o => o.QueueKey == m_queueRecord.Key).Select(o => o.Id).ToArray();
 
                         domainQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbSynchronizationQueueEntry), typeof(DbSynchronizationDeadLetterQueueEntry), typeof(DbSynchronizationQueue))
                             .Join<DbSynchronizationQueueEntry, DbSynchronizationDeadLetterQueueEntry>("LEFT", o => o.Id, o => o.Id)
@@ -556,7 +559,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
 
                         return new MemoryQueryResultSet<ISynchronizationQueueEntry>(context.Query<CompositeResult<DbSynchronizationQueueEntry, DbSynchronizationDeadLetterQueueEntry, DbSynchronizationQueue>>(domainQuery)
                             .ToArray()
-                            .Select(o => o.Object2.OriginalQueue == Guid.Empty ? new AdoSynchronizationQueueEntry(this, o.Object1) : new AdoSynchronizationDeadLetterQueueEntry(this, this.m_synchronizationManager.Get(o.Object3.Name), o.Object1, o.Object2))
+                            .Select(o => o.Object2.OriginalQueue == Guid.Empty ? new AdoSynchronizationQueueEntry(this, o.Object1) : new AdoSynchronizationDeadLetterQueueEntry(this, m_synchronizationManager.Get(o.Object3.Name), o.Object1, o.Object2))
                         );
                     }
                 }
@@ -567,7 +570,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
             }
             catch (Exception e)
             {
-                throw new DataPersistenceException(String.Format(ErrorMessages.READ_ERROR, $"{nameof(AdoSynchronizationQueue)}/{this.Name}?{query}"), e);
+                throw new DataPersistenceException(string.Format(ErrorMessages.READ_ERROR, $"{nameof(AdoSynchronizationQueue)}/{Name}?{query}"), e);
             }
         }
     }

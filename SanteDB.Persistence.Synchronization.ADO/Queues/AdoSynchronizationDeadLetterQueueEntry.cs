@@ -22,7 +22,7 @@ using SanteDB.Client.Disconnected.Data.Synchronization;
 using SanteDB.Core.Model;
 using SanteDB.Persistence.Synchronization.ADO.Model;
 
-namespace SanteDB.Persistence.Synchronization.ADO
+namespace SanteDB.Persistence.Synchronization.ADO.Queues
 {
 
     /// <summary>
@@ -32,16 +32,16 @@ namespace SanteDB.Persistence.Synchronization.ADO
     {
         private readonly DbSynchronizationDeadLetterQueueEntry m_deadLetterSource;
 
-        public AdoSynchronizationDeadLetterQueueEntry(AdoSynchronizationQueue currentQueue, ISynchronizationQueue originalQueue,  DbSynchronizationQueueEntry dbQueueEntry, DbSynchronizationDeadLetterQueueEntry dbDeadLetterEntry) : base(currentQueue, dbQueueEntry)
+        public AdoSynchronizationDeadLetterQueueEntry(AdoSynchronizationQueue currentQueue, ISynchronizationQueue originalQueue, DbSynchronizationQueueEntry dbQueueEntry, DbSynchronizationDeadLetterQueueEntry dbDeadLetterEntry) : base(currentQueue, dbQueueEntry)
         {
-            this.m_deadLetterSource = dbDeadLetterEntry;
-            this.OriginalQueue = originalQueue;
+            m_deadLetterSource = dbDeadLetterEntry;
+            OriginalQueue = originalQueue;
         }
 
         /// <inheritdoc/>
         public ISynchronizationQueue OriginalQueue { get; }
 
         /// <inheritdoc/>
-        public string ReasonForRejection => this.m_deadLetterSource.Reason;
+        public string ReasonForRejection => m_deadLetterSource.Reason;
     }
 }

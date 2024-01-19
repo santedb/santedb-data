@@ -41,8 +41,10 @@ using SanteDB.OrmLite;
 using SanteDB.Core.Security.Audit;
 using SharpCompress;
 using SanteDB.Core.Model.Map;
+using SanteDB.Persistence.Synchronization.ADO.Queues;
+using SanteDB;
 
-namespace SanteDB.Persistence.Synchronization.ADO
+namespace SanteDB.Persistence.Synchronization.ADO.Services
 {
     /// <summary>
     /// 
@@ -136,7 +138,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
             using (var connection = _Provider.GetReadonlyConnection())
             {
                 connection.Open();
-                var result = connection.Query<Model.DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == null).FirstOrDefault();
+                var result = connection.Query<DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == null).FirstOrDefault();
 
                 return result?.LastSync?.ToLocalTime();
             }
@@ -150,7 +152,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
             using (var connection = _Provider.GetReadonlyConnection())
             {
                 connection.Open();
-                var result = connection.Query<Model.DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == null).FirstOrDefault();
+                var result = connection.Query<DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == null).FirstOrDefault();
 
                 return result?.LastETag;
             }
@@ -164,11 +166,11 @@ namespace SanteDB.Persistence.Synchronization.ADO
             using (var conn = _Provider.GetWriteConnection())
             {
                 conn.Open();
-                var record = conn.Query<Model.DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == null).FirstOrDefault();
+                var record = conn.Query<DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == null).FirstOrDefault();
 
                 if (null == record)
                 {
-                    record = new Model.DbSynchronizationLogEntry()
+                    record = new DbSynchronizationLogEntry()
                     {
                         Filter = filter,
                         LastETag = eTag,
@@ -199,7 +201,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
             using (var conn = _Provider.GetReadonlyConnection())
             {
                 conn.Open();
-                return conn.Query<Model.DbSynchronizationLogEntry>(e => e.QueryId == null).ToArray(); // ToArray() is called because the conn is disposed 
+                return conn.Query<DbSynchronizationLogEntry>(e => e.QueryId == null).ToArray(); // ToArray() is called because the conn is disposed 
             }
         }
 
@@ -213,11 +215,11 @@ namespace SanteDB.Persistence.Synchronization.ADO
             using (var conn = _Provider.GetWriteConnection())
             {
                 conn.Open();
-                var record = conn.Query<Model.DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == queryId).FirstOrDefault();
+                var record = conn.Query<DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == queryId).FirstOrDefault();
 
                 if (null == record)
                 {
-                    record = conn.Insert(new Model.DbSynchronizationLogEntry()
+                    record = conn.Insert(new DbSynchronizationLogEntry()
                     {
                         Filter = filter,
                         QueryId = queryId,
@@ -266,7 +268,7 @@ namespace SanteDB.Persistence.Synchronization.ADO
             using (var conn = _Provider.GetReadonlyConnection())
             {
                 conn.Open();
-                return conn.Query<Model.DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId != null).FirstOrDefault();
+                return conn.Query<DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId != null).FirstOrDefault();
             }
         }
 
@@ -276,18 +278,18 @@ namespace SanteDB.Persistence.Synchronization.ADO
             using (var conn = _Provider.GetWriteConnection())
             {
                 conn.Open();
-                if (itm is Model.DbSynchronizationLogEntry dbsyncentry)
+                if (itm is DbSynchronizationLogEntry dbsyncentry)
                 {
                     conn.Delete(dbsyncentry);
                 }
                 else if (itm is ISynchronizationLogQuery lq)
                 {
-                    conn.DeleteAll<Model.DbSynchronizationLogEntry>(e => e.ResourceType == itm.ResourceType && e.Filter == e.Filter && e.QueryId == lq.QueryId);
+                    conn.DeleteAll<DbSynchronizationLogEntry>(e => e.ResourceType == itm.ResourceType && e.Filter == e.Filter && e.QueryId == lq.QueryId);
                 }
                 else
                 {
 
-                    conn.DeleteAll<Model.DbSynchronizationLogEntry>(e => e.ResourceType == itm.ResourceType && e.Filter == e.Filter && e.QueryId == null);
+                    conn.DeleteAll<DbSynchronizationLogEntry>(e => e.ResourceType == itm.ResourceType && e.Filter == e.Filter && e.QueryId == null);
                 }
             }
         }
@@ -308,10 +310,10 @@ namespace SanteDB.Persistence.Synchronization.ADO
         }
 
         /// <inheritdoc/>
-        public IEnumerable<ISynchronizationQueue> GetAll(SynchronizationPattern queueType) => this._RegisteredQueues.Where(o =>o.Type.HasFlag(queueType) || queueType.HasFlag(o.Type));
+        public IEnumerable<ISynchronizationQueue> GetAll(SynchronizationPattern queueType) => _RegisteredQueues.Where(o => o.Type.HasFlag(queueType) || queueType.HasFlag(o.Type));
 
         /// <inheritdoc/>
-        public ISynchronizationQueue Get(string queueName) => this._RegisteredQueues.FirstOrDefault(o => o.Name.Equals(queueName, StringComparison.OrdinalIgnoreCase));
-         
+        public ISynchronizationQueue Get(string queueName) => _RegisteredQueues.FirstOrDefault(o => o.Name.Equals(queueName, StringComparison.OrdinalIgnoreCase));
+
     }
 }

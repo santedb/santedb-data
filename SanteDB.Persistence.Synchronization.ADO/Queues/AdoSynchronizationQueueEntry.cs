@@ -23,7 +23,7 @@ using SanteDB.Core.Model;
 using SanteDB.Persistence.Synchronization.ADO.Model;
 using System;
 
-namespace SanteDB.Persistence.Synchronization.ADO
+namespace SanteDB.Persistence.Synchronization.ADO.Queues
 {
     /// <summary>
     /// An implementation of the <see cref="ISynchronizationQueueEntry"/> that is loaded from the ADO layer
@@ -38,35 +38,35 @@ namespace SanteDB.Persistence.Synchronization.ADO
         /// </summary>
         public AdoSynchronizationQueueEntry(AdoSynchronizationQueue queue, DbSynchronizationQueueEntry dbQueueEntry)
         {
-            this.m_queueEntry = dbQueueEntry;
-            this.m_sourceQueue = queue;
+            m_queueEntry = dbQueueEntry;
+            m_sourceQueue = queue;
         }
 
         /// <inheritdoc/>
-        public int Id => this.m_queueEntry.Id;
+        public int Id => m_queueEntry.Id;
 
         /// <inheritdoc/>
-        public Guid CorrelationKey => this.m_queueEntry.CorrelationKey;
+        public Guid CorrelationKey => m_queueEntry.CorrelationKey;
 
         /// <inheritdoc/>
-        public DateTimeOffset CreationTime => this.m_queueEntry.CreationTime;
+        public DateTimeOffset CreationTime => m_queueEntry.CreationTime;
 
         /// <inheritdoc/>
-        public string ResourceType => this.m_queueEntry.ResourceType;
+        public string ResourceType => m_queueEntry.ResourceType;
 
         /// <inheritdoc/>
-        public Guid DataFileKey => this.m_queueEntry.DataFileKey;
+        public Guid DataFileKey => m_queueEntry.DataFileKey;
 
         /// <inheritdoc/>
         public IdentifiedData Data { get; internal set; }
 
         /// <inheritdoc/>
-        public SynchronizationQueueEntryOperation Operation => this.m_queueEntry.Operation;
+        public SynchronizationQueueEntryOperation Operation => m_queueEntry.Operation;
 
         /// <inheritdoc/>
-        public int? RetryCount => this.m_queueEntry.RetryCount;
+        public int? RetryCount => m_queueEntry.RetryCount;
 
         /// <inheritdoc/>
-        public ISynchronizationQueue Queue => this.m_sourceQueue;
+        public ISynchronizationQueue Queue => m_sourceQueue;
     }
 }

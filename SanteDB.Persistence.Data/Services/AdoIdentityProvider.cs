@@ -54,7 +54,7 @@ namespace SanteDB.Persistence.Data.Services
 
         /// <inheritdoc/>
         public IIdentityProviderService LocalProvider => this;
-
+        
         // Secret claims which should not be disclosed 
         private readonly String[] m_nonIdentityClaims =
         {
@@ -63,6 +63,8 @@ namespace SanteDB.Persistence.Data.Services
 
         // Tracer
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoIdentityProvider));
+
+        private Guid? m_localUserGroupKey = null;
 
         // Session configuration
         private readonly AdoPersistenceConfigurationSection m_configuration;
@@ -239,7 +241,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <param name="password">If provided, the password to authenticated</param>
         /// <param name="tfaSecret">If provided the TFA challenge response</param>
         /// <returns>The authenticated principal</returns>
-        private IPrincipal AuthenticateInternal(String userName, String password, String tfaSecret)
+        protected virtual IPrincipal AuthenticateInternal(String userName, String password, String tfaSecret)
         {
             // Allow cancellation
             var preEvtArgs = new AuthenticatingEventArgs(userName);
@@ -536,6 +538,10 @@ namespace SanteDB.Persistence.Data.Services
             else
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateLocalIdentity, principal);
+                if(!this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts, false))
+                {
+                    throw new SecurityException(String.Format(ErrorMessages.POLICY_PREVENTS_ACTION, SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts));
+                }
             }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
@@ -577,6 +583,28 @@ namespace SanteDB.Persistence.Data.Services
                                 RoleKey = o.Key,
                                 UserKey = newIdentity.Key
                             }));
+
+                        // Is the user being created in a context where there should never be external auths?
+                        switch (ApplicationServiceContext.Current.HostType)
+                        {
+                            case SanteDBHostType.Server:
+                            case SanteDBHostType.Test:
+                                break;
+                            default:
+                                context.Insert(new DbUserClaim()
+                                {
+                                    SourceKey = newIdentity.Key,
+                                    ClaimType = SanteDBClaimTypes.LocalOnly,
+                                    ClaimValue = "true"
+                                });
+                                this.m_localUserGroupKey = m_localUserGroupKey ?? context.FirstOrDefault<DbSecurityRole>(o => o.Name == SanteDBConstants.LocalUserGroupName).Key;
+                                context.Insert(new DbSecurityUserRole()
+                                {
+                                    UserKey = newIdentity.Key,
+                                    RoleKey = this.m_localUserGroupKey.Value
+                                });
+                                break;
+                        }
 
                         tx.Commit();
                         return new AdoUserIdentity(newIdentity);
