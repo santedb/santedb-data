@@ -197,9 +197,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<DetectedIssue> VerifyEntity<TToVerify>(DataContext context, TToVerify objectToVerify)
             where TToVerify : TModel, IHasIdentifiers
         {
+
             // Validate unique values for IDs
             if (!this.m_validationConfiguration.TryGetValue(objectToVerify.GetType(), out var validation) &&
-                !this.m_validationConfiguration.TryGetValue(typeof(object), out validation))
+                !this.m_validationConfiguration.TryGetValue(typeof(object), out validation) ||
+                objectToVerify is ITaggable tag && tag.GetTag(SystemTagNames.UpstreamDataTag) != null)
             {
                 yield break;
             }
