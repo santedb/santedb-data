@@ -201,7 +201,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Validate unique values for IDs
             if (!this.m_validationConfiguration.TryGetValue(objectToVerify.GetType(), out var validation) &&
                 !this.m_validationConfiguration.TryGetValue(typeof(object), out validation) ||
-                objectToVerify is ITaggable tag && tag.GetTag(SystemTagNames.UpstreamDataTag) != null)
+                objectToVerify.GetAnnotations<String>().Contains(SystemTagNames.UpstreamDataTag))
             {
                 yield break;
             }
