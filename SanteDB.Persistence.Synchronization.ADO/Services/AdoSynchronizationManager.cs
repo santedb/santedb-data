@@ -215,7 +215,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
             using (var conn = _Provider.GetWriteConnection())
             {
                 conn.Open();
-                var record = conn.Query<DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == queryId).FirstOrDefault();
+                var record = conn.Query<DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter).FirstOrDefault();
 
                 if (null == record)
                 {
@@ -224,13 +224,14 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
                         Filter = filter,
                         QueryId = queryId,
                         ResourceType = modeltypename,
-                        QueryOffset = offset
+                        QueryOffset = offset,
+                        QueryStartTime = DateTimeOffset.Now
                     });
                 }
                 else
                 {
                     record.QueryOffset = offset;
-
+                    record.QueryStartTime = DateTimeOffset.Now;
                     conn.Update(record);
                 }
             }

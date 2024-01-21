@@ -47,7 +47,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Model
         [Column("qry_offst")]
         public int? QueryOffset { get; set; }
         [Column("qry_strt_utc")]
-        public DateTime? QueryStartTime { get; set; }
+        public DateTimeOffset? QueryStartTime { get; set; }
         [Column("last_err")]
         public String LastError { get; set; }
 
@@ -87,6 +87,6 @@ namespace SanteDB.Persistence.Synchronization.ADO.Model
         int ISynchronizationLogQuery.QueryOffset => this.QueryOffset.GetValueOrDefault();
 
         /// <inheritdoc/>
-        DateTime ISynchronizationLogQuery.QueryStartTime => this.QueryStartTime.GetValueOrDefault();
+        DateTime ISynchronizationLogQuery.QueryStartTime => this.QueryStartTime.GetValueOrDefault().DateTime;
     }
 }
