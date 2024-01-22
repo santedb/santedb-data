@@ -18,7 +18,9 @@
  * User: fyfej
  * Date: 2023-5-19
  */
+using SanteDB.Core;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite.Configuration;
 using System;
@@ -98,13 +100,13 @@ namespace SanteDB.Persistence.Data.Configuration
         public AdoPersistenceConfigurationSection()
         {
             this.Validation = new List<AdoValidationPolicy>();
+
             this.VersioningPolicy = AdoVersioningPolicyFlags.Default;
             this.CachingPolicy = new AdoPersistenceCachingPolicy()
             {
                 DataObjectExpiry = new TimeSpan(0, 1, 0),
                 Targets = AdoDataCachingPolicyTarget.ModelObjects
             };
-
         }
 
         /// <summary>

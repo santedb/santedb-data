@@ -24,8 +24,14 @@ using SanteDB.Client.Disconnected.Data.Synchronization;
 using SanteDB.Client.Disconnected.Services;
 using SanteDB.Client.Upstream.Repositories;
 using SanteDB.Client.Upstream.Security;
+using SanteDB.Core;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Data;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl.Repository;
+using SanteDB.Persistence.Auditing.ADO.Configuration;
+using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Services;
 using SanteDB.Persistence.Synchronization.ADO.Services;
 using System;
@@ -78,5 +84,42 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                         typeof(AppletBiRepository),
                         typeof(AdoSubscriptionExecutor),
                     };
+
+        /// <summary>
+        /// Set default configurations
+        /// </summary>
+        public void SetDefaults(SanteDBConfiguration configuration)
+        {
+            var adoConfiguration = configuration.GetSection<AdoPersistenceConfigurationSection>();
+
+            // Versioning policy default 
+            if (ApplicationServiceContext.Current.HostType == SanteDBHostType.Client) // Client configuration should not version data
+            {
+
+                adoConfiguration.VersioningPolicy = AdoVersioningPolicyFlags.None;
+                adoConfiguration.TrimSettings = new AdoTrimSettings()
+                {
+                    MaxDeletedDataRetention = new TimeSpan(30, 0, 0),
+                    MaxSessionRetention = new TimeSpan(30, 0, 0)
+                };
+                adoConfiguration.Validation = new List<AdoValidationPolicy>() {
+                    new AdoValidationPolicy() {
+                        Uniqueness = AdoValidationEnforcement.Loose,
+                        Target = new ResourceTypeReferenceConfiguration(typeof(Entity)),
+                        Authority = AdoValidationEnforcement.Strict,
+                        Format = AdoValidationEnforcement.Strict,
+                        CheckDigit = AdoValidationEnforcement.Strict,
+                        Scope = AdoValidationEnforcement.Strict
+                    }
+                };
+                adoConfiguration.AutoInsertChildren = true;
+                adoConfiguration.AutoUpdateExisting = true;
+                adoConfiguration.DeleteStrategy = DeleteMode.LogicalDelete;
+                adoConfiguration.LoadStrategy = LoadMode.FullLoad;
+                adoConfiguration.MaxPageSize = 25;
+
+            }
+           
+        }
     }
 }
