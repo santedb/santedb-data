@@ -314,7 +314,11 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
 
                                 var retVal = new AdoSynchronizationQueueEntry(this, queueEntry) { Data = data };
 
-                                Enqueued?.Invoke(this, new DataPersistedEventArgs<ISynchronizationQueueEntry>(retVal, TransactionMode.Commit, AuthenticationContext.Current.Principal));
+                                try
+                                {
+                                    this.Enqueued?.Invoke(this, new DataPersistedEventArgs<ISynchronizationQueueEntry>(retVal, TransactionMode.Commit, AuthenticationContext.Current.Principal));
+                                }
+                                catch { } // Some enqueued event handlers will be fired when the application context is shutting down 
                                 return retVal;
                             }
                             catch
@@ -430,7 +434,10 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
 
                             tx.Commit();
 
-                            Enqueued?.Invoke(this, new DataPersistedEventArgs<ISynchronizationQueueEntry>(retVal, TransactionMode.Commit, AuthenticationContext.Current.Principal));
+                            try
+                            {
+                                Enqueued?.Invoke(this, new DataPersistedEventArgs<ISynchronizationQueueEntry>(retVal, TransactionMode.Commit, AuthenticationContext.Current.Principal));
+                            } catch { } // Some service handlers cause exceptions which we don't really care about
                             return retVal;
                         }
                     }
