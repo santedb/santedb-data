@@ -43,6 +43,8 @@ using SharpCompress;
 using SanteDB.Core.Model.Map;
 using SanteDB.Persistence.Synchronization.ADO.Queues;
 using SanteDB;
+using DocumentFormat.OpenXml.Wordprocessing;
+using System.Drawing;
 
 namespace SanteDB.Persistence.Synchronization.ADO.Services
 {
@@ -100,21 +102,6 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="modelType"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        private string GetModelTypeName(Type modelType)
-        {
-            if (null == modelType)
-            {
-                throw new ArgumentNullException(nameof(modelType));
-            }
-
-            return modelType.GetCustomAttribute<XmlTypeAttribute>()?.TypeName ?? modelType?.Name;
-        }
 
         /// <summary>
         /// Checks the query id against known bad query ids. This does not validate a query in the database.
@@ -130,70 +117,6 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
             }
         }
 
-        /// <inheritdoc />
-        public DateTime? GetLastTime(Type modelType, string filter = null)
-        {
-            var modeltypename = GetModelTypeName(modelType);
-
-            using (var connection = _Provider.GetReadonlyConnection())
-            {
-                connection.Open();
-                var result = connection.Query<DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == null).FirstOrDefault();
-
-                return result?.LastSync?.ToLocalTime();
-            }
-        }
-
-        /// <inheritdoc />
-        public string GetLastEtag(Type modelType, string filter = null)
-        {
-            var modeltypename = GetModelTypeName(modelType);
-
-            using (var connection = _Provider.GetReadonlyConnection())
-            {
-                connection.Open();
-                var result = connection.Query<DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == null).FirstOrDefault();
-
-                return result?.LastETag;
-            }
-        }
-
-        /// <inheritdoc />
-        public void Save(Type modelType, string filter, string eTag, DateTime? since)
-        {
-            var modeltypename = GetModelTypeName(modelType);
-
-            using (var conn = _Provider.GetWriteConnection())
-            {
-                conn.Open();
-                var record = conn.Query<DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId == null).FirstOrDefault();
-
-                if (null == record)
-                {
-                    record = new DbSynchronizationLogEntry()
-                    {
-                        Filter = filter,
-                        LastETag = eTag,
-                        LastSync = since,
-                        ResourceType = modeltypename
-                    };
-
-                    conn.Insert(record);
-                }
-                else
-                {
-                    record.LastSync = since;
-                    record.LastError = null;
-                    record.LastErrorSpecified = true;
-                    if (!string.IsNullOrEmpty(eTag))
-                    {
-                        record.LastETag = eTag;
-                    }
-
-                    conn.Update(record);
-                }
-            }
-        }
 
         /// <inheritdoc />
         public IEnumerable<ISynchronizationLogEntry> GetAll()
@@ -206,106 +129,41 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
         }
 
         /// <inheritdoc />
-        public void SaveQuery(Type modelType, string filter, Guid queryId, int offset)
+        public ISynchronizationLogQuery GetCurrentQuery(ISynchronizationLogEntry entry)
         {
-            var modeltypename = GetModelTypeName(modelType);
-
-            ValidateQueryId(queryId);
-
-            using (var conn = _Provider.GetWriteConnection())
+            if (entry == null)
             {
-                conn.Open();
-                var record = conn.Query<DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter).FirstOrDefault();
-
-                if (null == record)
-                {
-                    record = conn.Insert(new DbSynchronizationLogEntry()
-                    {
-                        Filter = filter,
-                        QueryId = queryId,
-                        ResourceType = modeltypename,
-                        QueryOffset = offset,
-                        QueryStartTime = DateTimeOffset.Now
-                    });
-                }
-                else
-                {
-                    record.QueryOffset = offset;
-                    record.QueryStartTime = DateTimeOffset.Now;
-                    conn.Update(record);
-                }
+                throw new ArgumentNullException(nameof(entry));
             }
-        }
-
-        /// <inheritdoc />
-        public void CompleteQuery(Type modelType, string filter, Guid queryId)
-            => CompleteQuery(GetModelTypeName(modelType), filter, queryId);
-
-        /// <inheritdoc />
-        public void CompleteQuery(string modelType, string filter, Guid queryId)
-        {
-            ValidateQueryId(queryId);
-
-            using (var conn = _Provider.GetWriteConnection())
-            {
-                conn.Open();
-                var existing = conn.FirstOrDefault<DbSynchronizationLogEntry>(o => o.ResourceType == modelType && o.Filter == filter);
-                if (existing != null)
-                {
-                    existing.QueryId = null;
-                    existing.QueryOffset = null;
-                    existing.QueryStartTime = null;
-                    existing.QueryIdSpecified = existing.QueryOffsetSpecified = existing.QueryStartTimeSpecified = true;
-                    conn.Update(existing);
-                }
-            }
-        }
-
-        /// <inheritdoc />
-        public ISynchronizationLogQuery FindQueryData(Type modelType, string filter)
-        {
-            var modeltypename = GetModelTypeName(modelType);
 
             using (var conn = _Provider.GetReadonlyConnection())
             {
                 conn.Open();
-                return conn.Query<DbSynchronizationLogEntry>(e => e.ResourceType == modeltypename && e.Filter == filter && e.QueryId != null).FirstOrDefault();
+                if (entry is DbSynchronizationLogEntry dbs)
+                {
+                    return conn.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == dbs.Key && o.QueryId != null);
+                }
+                else
+                {
+                    return conn.Query<DbSynchronizationLogEntry>(e => e.ResourceType == entry.ResourceType && e.Filter == entry.Filter && e.QueryId != null).FirstOrDefault();
+                }
             }
         }
 
         /// <inheritdoc />
-        public void Delete(ISynchronizationLogEntry itm)
+        public void Delete(ISynchronizationLogEntry entry)
         {
             using (var conn = _Provider.GetWriteConnection())
             {
                 conn.Open();
-                if (itm is DbSynchronizationLogEntry dbsyncentry)
+                if (entry is DbSynchronizationLogEntry dbsyncentry)
                 {
                     conn.Delete(dbsyncentry);
-                }
-                else if (itm is ISynchronizationLogQuery lq)
-                {
-                    conn.DeleteAll<DbSynchronizationLogEntry>(e => e.ResourceType == itm.ResourceType && e.Filter == e.Filter && e.QueryId == lq.QueryId);
                 }
                 else
                 {
 
-                    conn.DeleteAll<DbSynchronizationLogEntry>(e => e.ResourceType == itm.ResourceType && e.Filter == e.Filter && e.QueryId == null);
-                }
-            }
-        }
-
-        /// <inheritdoc />
-        public void SaveError(Type modelType, string filter, Exception exception)
-        {
-            using (var conn = _Provider.GetWriteConnection())
-            {
-                conn.Open();
-                var existing = conn.FirstOrDefault<DbSynchronizationLogEntry>(o => o.ResourceType == modelType.Name && o.Filter == filter);
-                if (existing != null)
-                {
-                    existing.LastError = exception.ToHumanReadableString();
-                    conn.Update(existing);
+                    conn.DeleteAll<DbSynchronizationLogEntry>(e => e.ResourceType == entry.ResourceType && e.Filter == e.Filter);
                 }
             }
         }
@@ -316,5 +174,202 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
         /// <inheritdoc/>
         public ISynchronizationQueue Get(string queueName) => _RegisteredQueues.FirstOrDefault(o => o.Name.Equals(queueName, StringComparison.OrdinalIgnoreCase));
 
+        /// <inheritdoc/>
+        public ISynchronizationLogEntry Create(Type modelType, string filter = null)
+        {
+            if (modelType == null)
+            {
+                throw new ArgumentNullException(nameof(modelType));
+            }
+
+            using (var context = this._Provider.GetWriteConnection())
+            {
+                context.Open();
+                var modelName = modelType.GetSerializationName();
+                var existing = context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.ResourceType == modelName && o.Filter == filter);
+                if (existing != null)
+                {
+                    return existing;
+                }
+                else
+                {
+                    return context.Insert(new DbSynchronizationLogEntry()
+                    {
+                        Filter = filter,
+                        ResourceType = modelName
+                    });
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public ISynchronizationLogEntry Get(Type modelType, string filter = null)
+        {
+            if (modelType == null)
+            {
+                throw new ArgumentNullException(nameof(modelType));
+            }
+
+            using (var context = this._Provider.GetReadonlyConnection())
+            {
+                context.Open();
+                var modelName = modelType.GetSerializationName();
+                return context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.ResourceType == modelName && o.Filter == filter);
+            }
+        }
+
+        /// <inheritdoc/>
+        public ISynchronizationLogEntry Save(ISynchronizationLogEntry entry, string eTag, DateTimeOffset? since)
+        {
+            if (entry == null)
+            {
+                throw new ArgumentNullException(nameof(entry));
+            }
+
+            using (var context = this._Provider.GetWriteConnection())
+            {
+                context.Open();
+
+                var existing = context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == entry.Key || (o.ResourceType == entry.ResourceType && o.Filter == entry.Filter));
+                if (existing == null)
+                {
+                    throw new KeyNotFoundException(entry.Key.ToString());
+                }
+
+                if (!String.IsNullOrEmpty(eTag))
+                {
+                    existing.LastETag = eTag;
+                }
+                existing.LastSync = since;
+                existing.LastError = null;
+                existing.LastErrorSpecified = true;
+                return context.Update(existing);
+            }
+        }
+
+        /// <inheritdoc/>
+        public ISynchronizationLogEntry SaveError(ISynchronizationLogEntry entry, Exception exception)
+        {
+            if (entry == null)
+            {
+                throw new ArgumentNullException(nameof(entry));
+            }
+            else if (exception == null)
+            {
+                throw new ArgumentNullException(nameof(exception));
+            }
+
+            using (var context = this._Provider.GetWriteConnection())
+            {
+                context.Open();
+
+                var existing = context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == entry.Key || (o.ResourceType == entry.ResourceType && o.Filter == entry.Filter));
+                if (existing == null)
+                {
+                    throw new KeyNotFoundException(entry.Key.ToString());
+                }
+                existing.LastError = exception.ToHumanReadableString();
+                return context.Update(existing);
+            }
+        }
+
+        /// <inheritdoc/>
+        public ISynchronizationLogQuery StartQuery(ISynchronizationLogEntry entry)
+        {
+            if (entry == null)
+            {
+                throw new ArgumentNullException(nameof(entry));
+            }
+
+            using (var context = this._Provider.GetWriteConnection())
+            {
+                context.Open();
+
+                var existing =  context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == entry.Key || (o.ResourceType == entry.ResourceType && o.Filter == entry.Filter));
+                if (existing == null)
+                {
+                    throw new KeyNotFoundException(entry.Key.ToString());
+                }
+                else if(existing.QueryId.HasValue)
+                {
+                    throw new InvalidOperationException(String.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, nameof(StartQuery)));
+                }
+
+                existing.QueryId = Guid.NewGuid();
+                existing.QueryOffset = 0;
+                existing.QueryStartTime = DateTimeOffset.Now;
+                existing.QueryIdSpecified = existing.QueryOffsetSpecified = existing.QueryStartTimeSpecified = true;
+                return context.Update(existing);
+            }
+        }
+
+        /// <inheritdoc/>
+        public ISynchronizationLogQuery SaveQuery(ISynchronizationLogQuery query, int offset)
+        {
+            if(query == null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+            else if(query.QueryId == Guid.Empty)
+            {
+                throw new InvalidOperationException(String.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, nameof(SaveQuery)));
+            }
+
+            using(var context = this._Provider.GetWriteConnection())
+            {
+                context.Open();
+                DbSynchronizationLogEntry existing = context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == query.Key && o.QueryId != null || o.QueryId == query.QueryId);
+                if (existing == null)
+                {
+                    throw new KeyNotFoundException(query.Key.ToString());
+                }
+                existing.QueryOffset = offset;
+                existing.QueryOffsetSpecified = true;
+                return context.Update(existing);
+            }
+        }
+
+        /// <inheritdoc/>
+        public void CompleteQuery(ISynchronizationLogQuery query)
+        {
+            if(query == null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+            else if(query.QueryId == Guid.Empty)
+            {
+                throw new InvalidOperationException(String.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, nameof(CompleteQuery)));
+            }
+
+            using(var context = this._Provider.GetWriteConnection())
+            {
+                context.Open();
+                DbSynchronizationLogEntry existing = context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == query.Key || o.QueryId == query.QueryId);
+                if (existing == null)
+                {
+                    throw new KeyNotFoundException(query.Key.ToString());
+                }
+                existing.QueryStartTime = null;
+                existing.QueryOffset = null;
+                existing.QueryId = null;
+                existing.QueryIdSpecified = existing.QueryOffsetSpecified = existing.QueryStartTimeSpecified = true;
+                context.Update(existing);
+            }
+        }
+
+        /// <inheritdoc/>
+        public ISynchronizationLogQuery FindQueryData(ISynchronizationLogEntry entry)
+        {
+            if(entry == null)
+            {
+                throw new ArgumentNullException(nameof(entry));
+            }
+
+            using(var context = this._Provider.GetReadonlyConnection())
+            {
+                context.Open();
+                return context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == entry.Key && o.QueryId != null);
+            }
+        }
     }
 }

@@ -34,7 +34,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Model
         public string ResourceType { get; set; }
 
         [Column("lst_sync_utc")]
-        public DateTime? LastSync { get; set; }
+        public DateTimeOffset? LastSync { get; set; }
 
         [Column("lst_etag")]
         public string LastETag { get; set; }
@@ -72,7 +72,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Model
         string ISynchronizationLogEntry.Filter => this.Filter;
 
         /// <inheritdoc/>
-        DateTime ISynchronizationLogEntry.LastSync => this.LastSync.GetValueOrDefault();
+        DateTimeOffset? ISynchronizationLogEntry.LastSync => this.LastSync;
 
         /// <inheritdoc/>
         string ISynchronizationLogEntry.LastETag => this.LastETag;

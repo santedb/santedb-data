@@ -114,7 +114,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                 };
                 adoConfiguration.AutoInsertChildren = true;
                 adoConfiguration.AutoUpdateExisting = true;
-                adoConfiguration.DeleteStrategy = DeleteMode.LogicalDelete;
+                adoConfiguration.DeleteStrategy = DeleteMode.PermanentDelete;
                 adoConfiguration.LoadStrategy = LoadMode.FullLoad;
                 adoConfiguration.MaxPageSize = 25;
 
