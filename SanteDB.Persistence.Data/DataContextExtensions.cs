@@ -258,9 +258,9 @@ namespace SanteDB.Persistence.Data
         {
             me = me.Clone() as TData;
 
-            foreach (var pi in me.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+            foreach (var pi in me.GetType().GetNonMetadataProperties())
             {
-                if (!pi.CanWrite || pi.GetCustomAttribute<SerializationMetadataAttribute>() != null)
+                if (!pi.CanWrite)
                 {
                     continue;
                 }
