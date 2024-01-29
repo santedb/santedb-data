@@ -71,7 +71,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <inheritdoc/>
         public IQueryPersistenceService QueryPersistence { get; }
 
-        public Guid[] AssetClassIdentifiers => throw new NotImplementedException();
+        public Guid[] AssetClassIdentifiers => new Guid[] { AUDIT_DATABASE_ASSET_ID };
 
         // Lock object
         private object m_lockBox = new object();
