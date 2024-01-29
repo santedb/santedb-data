@@ -253,7 +253,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public bool Restore(IBackupAsset backupAsset)
         {
-            var assetFname = backupAsset.Name.Split('.');
+            var assetFname = backupAsset.Name.Split('#');
             if(assetFname.Length != 2 || !this.m_configuration.Provider.Invariant.Equals(assetFname[1]))
             {
                 throw new InvalidOperationException();
@@ -279,7 +279,7 @@ namespace SanteDB.Persistence.Data.Services
                 var tfs = new TemporaryFileStream();
                 dbb.BackupToStream(tfs);
                 tfs.Seek(0, SeekOrigin.Begin);
-                yield return new StreamBackupAsset(PRIMARY_DATABASE_ASSET_ID, $"{dbb.GetDatabaseName()}.{dbb.Invariant}", () => tfs);
+                yield return new StreamBackupAsset(PRIMARY_DATABASE_ASSET_ID, $"{dbb.GetDatabaseName()}#{dbb.Invariant}", () => tfs);
             }
             else
             {
