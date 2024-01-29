@@ -45,18 +45,24 @@ using SanteDB.Persistence.Synchronization.ADO.Queues;
 using SanteDB;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System.Drawing;
+using SanteDB.Core.Data.Backup;
+using SanteDB.Core.Data;
+using System.IO;
 
 namespace SanteDB.Persistence.Synchronization.ADO.Services
 {
     /// <summary>
     /// 
     /// </summary>
-    public class AdoSynchronizationManager : IServiceImplementation, ISynchronizationLogService, ISynchronizationQueueManager
+    public class AdoSynchronizationManager : IServiceImplementation, ISynchronizationLogService, ISynchronizationQueueManager, IProvideBackupAssets, IRestoreBackupAssets
     {
-        private Tracer _Tracer;
-
+        private readonly Tracer _Tracer;
+        private readonly Guid SYNC_DATABASE_ASSET_ID = Guid.Parse("3E3C4EF4-5C64-4EC6-BB82-26719F09F8B5");
         /// <inheritdoc/>
         public string ServiceName => "ADO.NET Synchronization Repository";
+        
+        /// <inheritdoc/>
+        public Guid[] AssetClassIdentifiers => new Guid[] { SYNC_DATABASE_ASSET_ID };
 
         private readonly AdoSynchronizationConfigurationSection _Configuration;
         private readonly IDataCachingService _DataCachingService;
@@ -369,6 +375,32 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
             {
                 context.Open();
                 return context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == entry.Key && o.QueryId != null);
+            }
+        }
+
+
+        /// <inheritdoc/>
+        public bool Restore(IBackupAsset backupAsset)
+        {
+            if(backupAsset == null)
+            {
+                throw new ArgumentNullException(nameof(backupAsset));
+            }
+            else if(backupAsset.AssetClassId != SYNC_DATABASE_ASSET_ID)
+            {
+                throw new InvalidOperationException();
+            }
+
+            return this._Configuration.Provider.RestoreBackupAsset(backupAsset);
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<IBackupAsset> GetBackupAssets()
+        {
+            var retVal = this._Configuration.Provider.CreateBackupAsset(SYNC_DATABASE_ASSET_ID);
+            if(retVal != null)
+            {
+                yield return retVal;
             }
         }
     }

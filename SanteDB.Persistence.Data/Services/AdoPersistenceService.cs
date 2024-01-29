@@ -253,37 +253,25 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public bool Restore(IBackupAsset backupAsset)
         {
-            var assetFname = backupAsset.Name.Split('#');
-            if(assetFname.Length != 2 || !this.m_configuration.Provider.Invariant.Equals(assetFname[1]))
+            if(backupAsset == null) {
+                throw new ArgumentNullException(nameof(backupAsset));
+            }
+            else if(backupAsset.AssetClassId != PRIMARY_DATABASE_ASSET_ID)
             {
                 throw new InvalidOperationException();
             }
-            if (this.m_configuration.Provider is IDbBackupProvider dbb)
-            {
-                using (var str = backupAsset.Open())
-                {
-                    return dbb.RestoreFromStream(str);
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException();
-            }
+
+
+            return this.m_configuration.Provider.RestoreBackupAsset(backupAsset);
         }
 
         /// <inheritdoc/>
         public IEnumerable<IBackupAsset> GetBackupAssets()
         {
-            if(this.m_configuration.Provider is IDbBackupProvider dbb)
+            var retVal = this.m_configuration.Provider.CreateBackupAsset(PRIMARY_DATABASE_ASSET_ID);
+            if (retVal != null)
             {
-                var tfs = new TemporaryFileStream();
-                dbb.BackupToStream(tfs);
-                tfs.Seek(0, SeekOrigin.Begin);
-                yield return new StreamBackupAsset(PRIMARY_DATABASE_ASSET_ID, $"{dbb.GetDatabaseName()}#{dbb.Invariant}", () => tfs);
-            }
-            else
-            {
-                yield break;
+                yield return retVal;
             }
         }
     }
