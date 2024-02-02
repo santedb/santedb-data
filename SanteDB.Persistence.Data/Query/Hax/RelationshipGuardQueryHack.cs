@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-5-19
  */
+using SanteDB;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -31,7 +32,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace SanteDB.Persistence.Data.Hax
+namespace SanteDB.Persistence.Data.Query.Hax
 {
     /// <summary>
     /// Represents a query hack for participations / relationships where the guard is being queried 
@@ -46,14 +47,14 @@ namespace SanteDB.Persistence.Data.Hax
         /// </summary>
         public RelationshipGuardQueryHack(ModelMapper map)
         {
-            this.m_mapper = map;
+            m_mapper = map;
         }
         /// <summary>
         /// Hack query builder based on clause
         /// </summary>
-        public bool HackQuery(QueryBuilder builder, SqlStatementBuilder sqlStatement, SqlStatementBuilder whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<String, string[]> queryFilter)
+        public bool HackQuery(QueryBuilder builder, SqlStatementBuilder sqlStatement, SqlStatementBuilder whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, string[] values, IEnumerable<TableMapping> scopedTables, IDictionary<string, string[]> queryFilter)
         {
-            string columnName = String.Empty;
+            string columnName = string.Empty;
             Type scanType = null;
 
             // Filter values
@@ -85,7 +86,7 @@ namespace SanteDB.Persistence.Data.Hax
                 }
 
                 // Now we scan
-                List<Object> qValues = new List<object>();
+                List<object> qValues = new List<object>();
                 if (values is IEnumerable)
                 {
                     foreach (var i in values as IEnumerable)
@@ -111,7 +112,7 @@ namespace SanteDB.Persistence.Data.Hax
                 }
 
                 // Now add to query
-                whereClause.And($"{columnName} IN ({String.Join(",", qValues.Select(o => $"'{o}'").ToArray())})");
+                whereClause.And($"{columnName} IN ({string.Join(",", qValues.Select(o => $"'{o}'").ToArray())})");
 
                 // Remove the inner join 
                 var remStack = new Stack<SqlStatement>();
