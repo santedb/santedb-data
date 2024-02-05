@@ -257,7 +257,7 @@ namespace SanteDB.Persistence.Data.Configuration
         public IEnumerable<String> GetPepperCombos(String secret)
         {
             var pepperSource = !String.IsNullOrEmpty(this.Pepper) ? this.Pepper : PEPPER_CHARS;
-            IEnumerable<String> pepperCombos = new String[] { secret };
+            IEnumerable<String> pepperCombos = new String[] { };
             if (!this.LegacyPepperSpecified || this.LegacyPepper)
             {
                 var pepper = Enumerable.Range(0, secret.Length / 2).Select(o => secret.Substring(o, 2) + $"{pepperSource}{pepperSource.Reverse()}".Substring(o % pepperSource.Length, (o + 1) % 5)).ToArray();

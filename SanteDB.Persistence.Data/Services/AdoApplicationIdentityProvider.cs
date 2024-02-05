@@ -555,7 +555,7 @@ namespace SanteDB.Persistence.Data.Services
         /// Create the specified identity
         /// </summary>
 
-        public IApplicationIdentity CreateIdentity(string applicationName, string password, IPrincipal principal)
+        public IApplicationIdentity CreateIdentity(string applicationName, string password, IPrincipal principal, Guid? withSid = null)
         {
             if (String.IsNullOrEmpty(applicationName))
             {
@@ -585,6 +585,7 @@ namespace SanteDB.Persistence.Data.Services
                         // Create the principal
                         DbSecurityApplication dbsa = new DbSecurityApplication()
                         {
+                            Key = withSid ?? Guid.NewGuid(),
                             PublicId = applicationName,
                             CreatedByKey = context.EstablishProvenance(principal, null),
                             CreationTime = DateTimeOffset.Now,
@@ -829,5 +830,6 @@ namespace SanteDB.Persistence.Data.Services
                 }
             }
         }
+
     }
 }

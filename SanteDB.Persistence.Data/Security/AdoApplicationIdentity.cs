@@ -23,6 +23,7 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Persistence.Data.Exceptions;
 using SanteDB.Persistence.Data.Model.Security;
+using SharpCompress;
 using System;
 
 namespace SanteDB.Persistence.Data.Security
@@ -72,6 +73,7 @@ namespace SanteDB.Persistence.Data.Security
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SecurityId, this.m_application.Key.ToString()));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim, this.m_application.Key.ToString()));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Actor, ActorTypeKeys.Application.ToString()));
+            this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBApplicationNameClaim, this.m_application.PublicId));
         }
 
         /// <summary>

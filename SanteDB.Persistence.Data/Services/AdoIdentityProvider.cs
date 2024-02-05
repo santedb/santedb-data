@@ -28,6 +28,7 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Configuration;
+using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Security.Tfa;
 using SanteDB.Core.Services;
@@ -511,7 +512,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <param name="password">The initial password to set for the principal</param>
         /// <param name="principal">The principal which is creating the identity</param>
         /// <returns>The created identity</returns>
-        public IIdentity CreateIdentity(string userName, string password, IPrincipal principal)
+        public IIdentity CreateIdentity(string userName, string password, IPrincipal principal, Guid? withSid = null)
         {
             if (String.IsNullOrEmpty(userName))
             {
@@ -521,7 +522,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new ArgumentNullException(nameof(password), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
-            else if (!this.m_passwordValidator.Validate(password))
+            else if (!this.m_passwordValidator.Validate(password) && principal != AuthenticationContext.SystemPrincipal)
             {
                 throw new SecurityException(this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_COMPLEXITY));
             }
@@ -531,19 +532,21 @@ namespace SanteDB.Persistence.Data.Services
             }
 
             // Validate create permission
-            if (ApplicationServiceContext.Current.HostType == SanteDBHostType.Server)
+            if (principal != AuthenticationContext.SystemPrincipal)
             {
-                this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateIdentity, principal);
-            }
-            else
-            {
-                this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateLocalIdentity, principal);
-                if(!this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts, false))
+                if (ApplicationServiceContext.Current.HostType == SanteDBHostType.Server)
                 {
-                    throw new SecurityException(String.Format(ErrorMessages.POLICY_PREVENTS_ACTION, SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts));
+                    this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateIdentity, principal);
+                }
+                else
+                {
+                    this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateLocalIdentity, principal);
+                    if (!this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts, false))
+                    {
+                        throw new SecurityException(String.Format(ErrorMessages.POLICY_PREVENTS_ACTION, SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts));
+                    }
                 }
             }
-
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
@@ -555,6 +558,7 @@ namespace SanteDB.Persistence.Data.Services
                         // Construct the request
                         var newIdentity = new DbSecurityUser()
                         {
+                            Key = withSid ?? Guid.NewGuid(),
                             UserName = userName,
                             Password = this.m_passwordHashingService.ComputeHash(this.m_configuration.AddPepper(password)),
                             SecurityHash = this.m_passwordHashingService.ComputeHash(userName + password),
@@ -575,7 +579,7 @@ namespace SanteDB.Persistence.Data.Services
                         // Register the group
                         context.InsertAll(context.Query<DbSecurityRole>(context.CreateSqlStatementBuilder()
                             .SelectFrom(typeof(DbSecurityRole))
-                            .Where<DbSecurityRole>(o => o.Name == "USERS")
+                            .Where<DbSecurityRole>(o => o.Name == SanteDBConstants.UserGroupName)
                             .Statement)
                             .ToArray()
                             .Select(o => new DbSecurityUserRole()
@@ -583,28 +587,6 @@ namespace SanteDB.Persistence.Data.Services
                                 RoleKey = o.Key,
                                 UserKey = newIdentity.Key
                             }));
-
-                        // Is the user being created in a context where there should never be external auths?
-                        switch (ApplicationServiceContext.Current.HostType)
-                        {
-                            case SanteDBHostType.Server:
-                            case SanteDBHostType.Test:
-                                break;
-                            default:
-                                context.Insert(new DbUserClaim()
-                                {
-                                    SourceKey = newIdentity.Key,
-                                    ClaimType = SanteDBClaimTypes.LocalOnly,
-                                    ClaimValue = "true"
-                                });
-                                this.m_localUserGroupKey = m_localUserGroupKey ?? context.FirstOrDefault<DbSecurityRole>(o => o.Name == SanteDBConstants.LocalUserGroupName).Key;
-                                context.Insert(new DbSecurityUserRole()
-                                {
-                                    UserKey = newIdentity.Key,
-                                    RoleKey = this.m_localUserGroupKey.Value
-                                });
-                                break;
-                        }
 
                         tx.Commit();
                         return new AdoUserIdentity(newIdentity);
@@ -1006,5 +988,7 @@ namespace SanteDB.Persistence.Data.Services
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.USR_GEN_ERR), e);
             }
         }
+
+
     }
 }

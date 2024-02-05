@@ -353,19 +353,16 @@ namespace SanteDB.Persistence.Data
                 foreach (var ident in cprincipal.Identities)
                 {
                     Guid sid = Guid.Empty;
-                    if (ident is AdoIdentity adoIdentity)
+                    switch(ident)
                     {
-                        sid = adoIdentity.Sid;
-                    }
-                    else if (ident is IClaimsIdentity cIdentity)
-                    {
-                        sid = Guid.Parse(cIdentity.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim)?.Value ??
-                            cIdentity.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim)?.Value ??
-                            cIdentity.FindFirst(SanteDBClaimTypes.SecurityId)?.Value);
-                    }
-                    else
-                    {
-                        throw new SecurityException(s_localizationService.GetString(ErrorMessageStrings.SEC_PROVENANCE_UNK_ID));
+                        case AdoIdentity adoIdentity:
+                            sid = adoIdentity.Sid;
+                            break;
+                        case IClaimsIdentity cIdentity:
+                            sid = Guid.Parse(cIdentity.FindFirst(SanteDBClaimTypes.SecurityId)?.Value);
+                            break;
+                        default:
+                            throw new SecurityException(s_localizationService.GetString(ErrorMessageStrings.SEC_PROVENANCE_UNK_ID));
                     }
 
                     // Set apporopriate property
