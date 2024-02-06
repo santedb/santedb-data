@@ -74,6 +74,7 @@ namespace SanteDB.Persistence.Data.Security
                 new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, sessionInfo.NotBefore.ToUniversalTime().ToString("o")),
                 new SanteDBClaim(SanteDBClaimTypes.Expiration, sessionInfo.NotAfter.ToUniversalTime().ToString("o")),
                 new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, sessionInfo.Key.ToString()),
+                new SanteDBClaim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim, sessionInfo.ApplicationKey.ToString()),
                 new SanteDBClaim(ClaimTypes.IsPersistent, "true")
             };
 
@@ -85,6 +86,14 @@ namespace SanteDB.Persistence.Data.Security
             {
                 addlClaims.Add(new SanteDBClaim(SanteDBClaimTypes.AudienceClaim, sessionInfo.Audience));
             }
+            if(sessionInfo.UserKey.HasValue)
+            {
+                addlClaims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBUserIdentifierClaim, sessionInfo.UserKey.ToString()));
+            }
+            if(sessionInfo.DeviceKey.HasValue)
+            {
+                addlClaims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim, sessionInfo.DeviceKey.ToString()));
+            } 
             this.Claims = addlClaims.Union(claims.Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue))).ToArray();
             this.Key = sessionInfo.Key;
             this.Id = token;

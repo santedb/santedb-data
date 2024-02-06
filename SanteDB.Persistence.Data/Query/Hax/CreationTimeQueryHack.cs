@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-5-19
  */
+using SanteDB;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.OrmLite;
@@ -27,7 +28,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace SanteDB.Persistence.Data.Hax
+namespace SanteDB.Persistence.Data.Query.Hax
 {
     /// <summary>
     /// Represents a hack for creation time that will correct to the creation time of the first version
@@ -49,13 +50,13 @@ namespace SanteDB.Persistence.Data.Hax
         /// </summary>
         public CreationTimeQueryHack(ModelMapper map)
         {
-            this.m_mapper = map;
+            m_mapper = map;
         }
 
         /// <summary>
         /// Query hack for creation time
         /// </summary>
-        public bool HackQuery(QueryBuilder builder, SqlStatementBuilder sqlStatement, SqlStatementBuilder whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<String, string[]> queryFilter)
+        public bool HackQuery(QueryBuilder builder, SqlStatementBuilder sqlStatement, SqlStatementBuilder whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, string[] values, IEnumerable<TableMapping> scopedTables, IDictionary<string, string[]> queryFilter)
         {
             if (property.Name == nameof(IBaseData.CreationTime) && typeof(IVersionedData).IsAssignableFrom(tmodel)) // filter by first creation time
             {

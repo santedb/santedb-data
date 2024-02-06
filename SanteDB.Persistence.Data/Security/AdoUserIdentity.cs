@@ -78,6 +78,7 @@ namespace SanteDB.Persistence.Data.Security
         {
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.NameIdentifier, this.m_securityUser.Key.ToString()));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Name, this.m_securityUser.UserName));
+            this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBUserIdentifierClaim, this.m_securityUser.Key.ToString()));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SecurityId, this.m_securityUser.Key.ToString()));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Actor, this.m_securityUser.UserClass.ToString()));
             if (!String.IsNullOrEmpty(this.m_securityUser.Email) && this.m_securityUser.EmailConfirmed)

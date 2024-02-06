@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
+using SanteDB.Persistence.Synchronization.ADO.Services;
 using System;
 
 namespace SanteDB.Persistence.Synchronization.ADO.Configuration
@@ -27,7 +28,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
     /// <summary>
     /// 
     /// </summary>
-    public class AdoSynchronizationFeature : GenericServiceFeature<AdoSynchronizationRepositoryService>
+    public class AdoSynchronizationFeature : GenericServiceFeature<AdoSynchronizationManager>
     {
         /// <inheritdoc />
         public override Type ConfigurationType => typeof(AdoSynchronizationConfigurationSection);

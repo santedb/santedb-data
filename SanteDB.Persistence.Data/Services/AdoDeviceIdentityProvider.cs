@@ -382,7 +382,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// Create a new device identity
         /// </summary>
-        public IDeviceIdentity CreateIdentity(string deviceId, string secret, IPrincipal principal)
+        public IDeviceIdentity CreateIdentity(string deviceId, string secret, IPrincipal principal, Guid? withSid = null)
         {
             if (String.IsNullOrEmpty(deviceId))
             {
@@ -417,6 +417,7 @@ namespace SanteDB.Persistence.Data.Services
                         // Create the principal
                         DbSecurityDevice dbsa = new DbSecurityDevice()
                         {
+                            Key = withSid ?? Guid.NewGuid(),
                             PublicId = deviceId,
                             CreatedByKey = context.EstablishProvenance(principal, null),
                             CreationTime = DateTimeOffset.Now,
@@ -652,5 +653,7 @@ namespace SanteDB.Persistence.Data.Services
                 }
             }
         }
+
+
     }
 }

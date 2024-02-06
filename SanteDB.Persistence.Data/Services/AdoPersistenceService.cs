@@ -20,6 +20,8 @@
  */
 using SanteDB.BI.Model;
 using SanteDB.BI.Services;
+using SanteDB.Core.Data;
+using SanteDB.Core.Data.Backup;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Jobs;
@@ -28,11 +30,13 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.Migration;
+using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Jobs;
 using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.Services
@@ -41,9 +45,12 @@ namespace SanteDB.Persistence.Data.Services
     /// A daemon service which registers the other persistence services
     /// </summary>
     [ServiceProvider("ADO.NET Persistence Service", Configuration = typeof(AdoPersistenceConfigurationSection))]
-    public class AdoPersistenceService : ISqlDataPersistenceService, IServiceFactory, IReportProgressChanged
+    public class AdoPersistenceService : ISqlDataPersistenceService, IServiceFactory, IReportProgressChanged, IProvideBackupAssets, IRestoreBackupAssets
     {
+        // Primary database asset
+        private readonly Guid PRIMARY_DATABASE_ASSET_ID = Guid.Parse("FB444942-4276-427C-A09C-9C65769837F0");
 
+        // Service factory types
         private readonly Type[] m_serviceFactoryTypes = new Type[]
         {
             typeof(AdoForeignDataManager),
@@ -181,6 +188,9 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public string ServiceName => "ADO Persistence Service";
 
+        /// <inheritdoc/>
+        public Guid[] AssetClassIdentifiers => new Guid[] { PRIMARY_DATABASE_ASSET_ID };
+
         /// <summary>
         /// Execute a non-query SQL script
         /// </summary>
@@ -238,6 +248,31 @@ namespace SanteDB.Persistence.Data.Services
             }
             serviceInstance = this.m_services.FirstOrDefault(o => serviceType.IsAssignableFrom(o.GetType()));
             return serviceInstance != null;
+        }
+
+        /// <inheritdoc/>
+        public bool Restore(IBackupAsset backupAsset)
+        {
+            if(backupAsset == null) {
+                throw new ArgumentNullException(nameof(backupAsset));
+            }
+            else if(backupAsset.AssetClassId != PRIMARY_DATABASE_ASSET_ID)
+            {
+                throw new InvalidOperationException();
+            }
+
+
+            return this.m_configuration.Provider.RestoreBackupAsset(backupAsset);
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<IBackupAsset> GetBackupAssets()
+        {
+            var retVal = this.m_configuration.Provider.CreateBackupAsset(PRIMARY_DATABASE_ASSET_ID);
+            if (retVal != null)
+            {
+                yield return retVal;
+            }
         }
     }
 }

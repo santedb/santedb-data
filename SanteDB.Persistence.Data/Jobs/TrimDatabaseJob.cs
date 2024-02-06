@@ -144,15 +144,10 @@ namespace SanteDB.Persistence.Data.Jobs
                             c += batch.Length;
                             this.m_jobStateManager.SetProgress(this, this.m_localizationService.GetString(UserMessageStrings.DB_TRIM_SESSION), (float)c / delSessions.Length * 0.3f);
                         }
-                        tx.Commit();
-                    }
-
-                    // Prune deleted objects
-                    using (var tx = context.BeginTransaction())
-                    {
+                   
                         var trimHelpers = this.m_serviceManager.GetServices().OfType<IAdoTrimProvider>().ToArray();
 
-                        var c = 0;
+                        c = 0;
                         foreach (var th in trimHelpers)
                         {
                             if (this.m_cancelRequest)

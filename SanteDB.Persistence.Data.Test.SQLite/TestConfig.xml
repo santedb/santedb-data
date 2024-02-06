@@ -61,6 +61,10 @@
            pepExemptionPolicy="devices">
     <!-- Sets policies for the system -->
     <securityPolicy>
+      <add enabled="true" policy="downstream.user.accounts">
+        <bool>true</bool>
+      </add>
+
       <add enabled="true" policy="auth.pwd.maxAge">
         <int>120</int>
       </add>

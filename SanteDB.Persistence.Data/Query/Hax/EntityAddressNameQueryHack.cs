@@ -28,7 +28,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace SanteDB.Persistence.Data.Hax
+namespace SanteDB.Persistence.Data.Query.Hax
 {
     /// <summary>
     /// Provides a much faster way of search by address and name on entities
@@ -43,15 +43,15 @@ namespace SanteDB.Persistence.Data.Hax
         /// </summary>
         public EntityAddressNameQueryHack(ModelMapper map)
         {
-            this.m_mapper = map;
+            m_mapper = map;
         }
 
         /// <summary>
         /// Hack the query
         /// </summary>
-        public bool HackQuery(QueryBuilder builder, SqlStatementBuilder sqlStatement, SqlStatementBuilder whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<String, String[]> queryFilter)
+        public bool HackQuery(QueryBuilder builder, SqlStatementBuilder sqlStatement, SqlStatementBuilder whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, string[] values, IEnumerable<TableMapping> scopedTables, IDictionary<string, string[]> queryFilter)
         {
-            String cmpTblType = String.Empty, keyName = String.Empty;
+            string cmpTblType = string.Empty, keyName = string.Empty;
             Type guardType = null, componentType = null;
             // We can attempt to hack the address
             if (typeof(EntityAddress).IsAssignableFrom(tmodel))
@@ -80,7 +80,7 @@ namespace SanteDB.Persistence.Data.Hax
             if (guardType == null ||
                 predicate.Path != "component" ||
                 predicate.SubPath != "value" ||
-                !String.IsNullOrEmpty(whereClause.Statement.Sql))
+                !string.IsNullOrEmpty(whereClause.Statement.Sql))
             {
                 return false;
             }
@@ -95,10 +95,10 @@ namespace SanteDB.Persistence.Data.Hax
             foreach (var itm in queryFilter)
             {
                 var pred = QueryPredicate.Parse(itm.Key);
-                String guardFilter = String.Empty;
+                string guardFilter = string.Empty;
 
                 // Do we have a guard for address?
-                if (!String.IsNullOrEmpty(pred.Guard))
+                if (!string.IsNullOrEmpty(pred.Guard))
                 {
                     // Translate Guards to UUIDs
                     var guards = pred.Guard.Split('|');
@@ -116,7 +116,7 @@ namespace SanteDB.Persistence.Data.Hax
                     }
 
                     // Add to where clause
-                    guardFilter = $"AND {queryPrefix}{cmpTblType}.typ_cd_id IN ({String.Join(",", guards.Select(o => $"'{o}'"))})";
+                    guardFilter = $"AND {queryPrefix}{cmpTblType}.typ_cd_id IN ({string.Join(",", guards.Select(o => $"'{o}'"))})";
                 }
 
                 // Filter based on type and prefix :)

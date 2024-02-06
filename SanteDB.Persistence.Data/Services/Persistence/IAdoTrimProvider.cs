@@ -28,7 +28,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// <summary>
     /// Implementers of this class can trim old data from the database
     /// </summary>
-    internal interface IAdoTrimProvider
+    public interface IAdoTrimProvider
     {
 
         /// <summary>
