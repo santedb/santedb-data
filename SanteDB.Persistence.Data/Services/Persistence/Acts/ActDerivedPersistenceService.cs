@@ -136,14 +136,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             // Update sub entity table
             var dbSubEntity = this.m_modelMapper.MapModelInstance<TAct, TDbTopLevelTable>(data);
             dbSubEntity.ParentKey = retVal.VersionKey.Value;
-            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
-            {
-                dbSubEntity = context.Insert(dbSubEntity);
-            }
-            else
-            {
-                dbSubEntity = context.Update(dbSubEntity);
-            }
+            dbSubEntity = context.Insert(dbSubEntity);
             retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbTopLevelTable, TAct>(dbSubEntity), onlyNullFields: true);
             return retVal;
         }
@@ -219,14 +212,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             // Update sub table
             var dbSubEntity = this.m_modelMapper.MapModelInstance<TAct, TDbActSubTable>(data);
             dbSubEntity.ParentKey = retVal.VersionKey.Value;
-            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
-            {
-                dbSubEntity = context.Insert(dbSubEntity);
-            }
-            else
-            {
-                dbSubEntity = context.Update(dbSubEntity);
-            }
+            dbSubEntity = context.Insert(dbSubEntity);
             retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbActSubTable, TAct>(dbSubEntity), onlyNullFields: true);
             return retVal;
         }

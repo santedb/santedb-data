@@ -94,7 +94,8 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
             var adoConfiguration = configuration.GetSection<AdoPersistenceConfigurationSection>();
 
             // Versioning policy default 
-            if (ApplicationServiceContext.Current.HostType == SanteDBHostType.Client) // Client configuration should not version data
+            if (ApplicationServiceContext.Current.HostType != SanteDBHostType.Gateway &&
+                ApplicationServiceContext.Current.HostType != SanteDBHostType.Server) // Client configuration should not version data
             {
 
                 adoConfiguration.VersioningPolicy = AdoVersioningPolicyFlags.None;

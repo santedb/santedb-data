@@ -939,7 +939,7 @@ namespace SanteDB.Persistence.Data.Services
                         .SelectFrom(typeof(DbSecurityRole))
                         .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                         .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key)
-                        .ToString();
+                        .Statement;
                     identity.AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
 
                     // Establish additional claims

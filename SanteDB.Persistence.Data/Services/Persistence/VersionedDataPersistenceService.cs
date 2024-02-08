@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-5-19
  */
+using DocumentFormat.OpenXml.Bibliography;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
@@ -101,17 +102,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     if (existing.Count() > 1) // We only keep recent and last
                     {
-                        context.DeleteAll<TDbModel>(o => o.Key == key && o.VersionSequenceId <= existing.Last().VersionSequenceId);
+                        var lastVersionSequence = existing[0].VersionSequenceId;
+
+                        this.DoDeleteAllModel(context, o => o.Key == key && o.VersionSequence < lastVersionSequence, DeleteMode.PermanentDelete);
                     }
                 }
-
-                // We want to obsolete the non current version(s)
-                foreach (var itm in context.Query<TDbModel>(o => o.Key == key && o.ObsoletionTime == null))
+                else
                 {
-                    itm.ObsoletionTime = DateTimeOffset.Now;
-                    itm.ObsoletedByKey = context.ContextId;
-                    itm.ObsoletedByKeySpecified = itm.ObsoletionTimeSpecified = true;
-                    context.Update(itm);
+                    // We want to obsolete the non current version(s)
+                    foreach (var itm in context.Query<TDbModel>(o => o.Key == key && o.ObsoletionTime == null))
+                    {
+                        itm.ObsoletionTime = DateTimeOffset.Now;
+                        itm.ObsoletedByKey = context.ContextId;
+                        itm.ObsoletedByKeySpecified = itm.ObsoletionTimeSpecified = true;
+                        context.Update(itm);
+                    }
                 }
 
                 // next - we create a new version of dbmodel
@@ -130,6 +135,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                 if (oldVersion.IsHeadVersion)
                 {
+                    oldVersion.ObsoletionTime = DateTimeOffset.Now;
+                    oldVersion.ObsoletedByKey = context.ContextId;
+                    oldVersion.ObsoletedByKeySpecified = oldVersion.ObsoletionTimeSpecified = true;
                     oldVersion.IsHeadVersion = false;
                     context.Update(oldVersion);
                 }
@@ -533,18 +541,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     if (existing.Count() > 1) // We only keep recent and last
                     {
-                        context.DeleteAll<TDbModel>(o => o.Key == model.Key && o.VersionSequenceId <= existing.Last().VersionSequenceId);
+                        var lastVersionSequence = existing[0].VersionSequenceId;
+                        this.DoDeleteAllModel(context, o => o.Key == model.Key && o.VersionSequence < lastVersionSequence, DeleteMode.PermanentDelete);
                     }
                 }
-
-                // We want to obsolete the non current version(s)
-                foreach (var itm in context.Query<TDbModel>(o => o.Key == model.Key && !o.ObsoletionTime.HasValue).ToArray())
+                else
                 {
-                    itm.ObsoletionTime = DateTimeOffset.Now;
-                    itm.ObsoletedByKey = context.ContextId;
-                    itm.IsHeadVersion = false;
-                    itm.ObsoletedByKeySpecified = itm.ObsoletionTimeSpecified = true;
-                    context.Update(itm);
+                    // We want to obsolete the non current version(s)
+                    foreach (var itm in context.Query<TDbModel>(o => o.Key == model.Key && !o.ObsoletionTime.HasValue).ToArray())
+                    {
+                        itm.ObsoletionTime = DateTimeOffset.Now;
+                        itm.ObsoletedByKey = context.ContextId;
+                        itm.IsHeadVersion = false;
+                        itm.ObsoletedByKeySpecified = itm.ObsoletionTimeSpecified = true;
+                        context.Update(itm);
+                    }
                 }
 
                 // next - we create a new version of dbmodel
@@ -564,7 +575,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                 if (oldVersion.IsHeadVersion)
                 {
+                    oldVersion.ObsoletionTime = DateTimeOffset.Now;
+                    oldVersion.ObsoletedByKey = context.ContextId;
                     oldVersion.IsHeadVersion = false;
+                    oldVersion.ObsoletedByKeySpecified = oldVersion.ObsoletionTimeSpecified = true;
                     context.Update(oldVersion);
                 }
 

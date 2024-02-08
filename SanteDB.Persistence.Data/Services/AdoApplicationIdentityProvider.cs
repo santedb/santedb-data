@@ -180,7 +180,7 @@ namespace SanteDB.Persistence.Data.Services
                         context.Update(app);
                         throw new InvalidIdentityAuthenticationException();
                     }
-
+                     
                     // Re-pepper the password
                     app.LastAuthentication = DateTimeOffset.Now;
                     app.Secret = this.m_hasher.ComputeHash(this.m_configuration.AddPepper(applicationSecret));

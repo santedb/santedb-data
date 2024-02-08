@@ -132,13 +132,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
 #endif
 
-                // If the user has not explicitly set the obsoletion time parameter then we will add it
-                if (!expression.ToString().Contains(nameof(BaseEntityData.ObsoletionTime)))
-                {
-                    var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(expression.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
-                    expression = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, expression.Body), expression.Parameters);
-                }
-
+               
                 // Convert the query to a domain query so that the object persistence layer can turn the
                 // structured LINQ query into a SQL statement
                 var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
