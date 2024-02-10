@@ -123,7 +123,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Jobs
             catch (Exception ex)
             {
                 this.m_tracer.TraceError("Error running Audit Retention Cleanup - {0}", ex.ToHumanReadableString());
-                this.m_jobStateManager.SetState(this, JobStateType.Aborted);
+                this.m_jobStateManager.SetState(this, JobStateType.Aborted, ex.ToHumanReadableString());
             }
         }
     }

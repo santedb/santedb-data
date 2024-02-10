@@ -100,7 +100,7 @@ namespace SanteDB.Persistence.Data.Jobs
             }
             catch (Exception ex)
             {
-                this.m_jobState.SetState(this, JobStateType.Aborted);
+                this.m_jobState.SetState(this, JobStateType.Aborted, ex.ToHumanReadableString());
                 this.m_jobState.SetProgress(this, ex.Message, 1.0f);
             }
         }

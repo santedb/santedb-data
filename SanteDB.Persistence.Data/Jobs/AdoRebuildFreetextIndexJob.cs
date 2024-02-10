@@ -121,7 +121,7 @@ namespace SanteDB.Persistence.Data.Jobs
             catch (Exception ex)
             {
                 this.m_tracer.TraceError("Error refreshing ADO FreeText indexes - {0}", ex);
-                this.m_jobStateManager.SetState(this, JobStateType.Aborted);
+                this.m_jobStateManager.SetState(this, JobStateType.Aborted, ex.ToHumanReadableString());
                 this.m_jobStateManager.SetProgress(this, ex.Message, 0.0f);
                 throw;
             }

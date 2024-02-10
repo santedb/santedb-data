@@ -169,8 +169,8 @@ namespace SanteDB.Persistence.Data.Jobs
             }
             catch (Exception ex)
             {
-                this.m_tracer.TraceError("Error running trim job: {0}", ex.ToHumanReadableString());
-                this.m_jobStateManager.SetState(this, JobStateType.Aborted);
+                this.m_tracer.TraceError("Error running trim job: {0}", ex);
+                this.m_jobStateManager.SetState(this, JobStateType.Aborted, ex.ToHumanReadableString());
                 audit.WithOutcome(OutcomeIndicator.SeriousFail);
             }
             finally

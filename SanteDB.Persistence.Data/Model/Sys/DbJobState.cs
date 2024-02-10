@@ -64,5 +64,16 @@ namespace SanteDB.Persistence.Data.Model.Sys
         /// True if <see cref="LastStop"/> is provided.
         /// </summary>
         public bool LastStopSpecified { get; internal set; }
+
+        /// <summary>
+        /// Last status text
+        /// </summary>
+        [Column("last_sts_txt")]
+        public string LastStatus { get; set; }
+
+        /// <summary>
+        /// True if the <see cref="LastStatus"/> value has been explicitly set
+        /// </summary>
+        public bool LastStatusSpecified { get; set; }
     }
 }

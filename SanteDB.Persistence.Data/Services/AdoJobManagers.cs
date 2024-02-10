@@ -34,6 +34,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace SanteDB.Persistence.Data.Services
@@ -274,7 +275,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public void SetState(IJob job, JobStateType state)
+        public void SetState(IJob job, JobStateType state, String statusText)
         {
             if (job == null)
             {
@@ -297,6 +298,7 @@ namespace SanteDB.Persistence.Data.Services
                             JobId = job.Id,
                             CurrentState = state,
                             Progress = 0.0f,
+                            StatusText = statusText,
                             LastStartTime = state == JobStateType.Starting || state == JobStateType.Running ? DateTime.Now : dbStatus?.LastStart?.DateTime,
                         };
                     }
@@ -329,6 +331,8 @@ namespace SanteDB.Persistence.Data.Services
                             break;
                     }
                     dbStatus.LastState = cacheStatus.CurrentState = state;
+                    dbStatus.LastStatus = statusText;
+                    dbStatus.LastStatusSpecified = true;
 
                     context.Update(dbStatus);
                     this.m_adhocCache.Add($"sts.job.{job.Id}", cacheStatus);
