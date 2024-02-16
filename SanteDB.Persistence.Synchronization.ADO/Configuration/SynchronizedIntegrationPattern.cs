@@ -28,6 +28,7 @@ using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Data;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl.Repository;
 using SanteDB.Persistence.Auditing.ADO.Configuration;
@@ -50,6 +51,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
         /// <inheritdoc/>
         public IEnumerable<Type> GetServices() => new Type[]
                     {
+                        typeof(DefaultTfaService),
                         typeof(AdoSessionProvider),
                         typeof(AdoPersistenceService),
                         typeof(UpstreamSynchronizationService),

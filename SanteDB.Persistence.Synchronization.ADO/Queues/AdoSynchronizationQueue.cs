@@ -407,6 +407,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
                             {
                                 newQueueEntry.RetryCount = (otherQueueEntry.RetryCount ?? 0) + 1;
                             }
+                            
 
                             newQueueEntry = context.Insert(newQueueEntry);
 
@@ -426,6 +427,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
                             }
                             else
                             {
+                                context.DeleteAll<DbSynchronizationDeadLetterQueueEntry>(o => o.Id == otherQueueObject.Id);
                                 retVal = new AdoSynchronizationQueueEntry(this, newQueueEntry)
                                 {
                                     Data = otherQueueEntry.Data

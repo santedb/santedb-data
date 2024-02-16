@@ -44,6 +44,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
         }
 
+        /// <inheritdoc/>
+        protected override TModel BeforePersisting(DataContext context, TModel data)
+        {
+            data.EffectiveVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, data.SourceEntityKey.Value);
+            return base.BeforePersisting(context, data);
+        }
         /// <summary>
         /// Get current version sequence
         /// </summary>

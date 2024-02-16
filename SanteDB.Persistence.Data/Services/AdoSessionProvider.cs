@@ -47,7 +47,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// An identity provider service that uses the ADO session table
     /// </summary>
-    public class AdoSessionProvider : ISessionIdentityProviderService, ISessionProviderService
+    public class AdoSessionProvider : ISessionIdentityProviderService, ISessionProviderService, ILocalServiceProvider<ISessionIdentityProviderService>, ILocalServiceProvider<ISessionProviderService>
     {
         // Tracer
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoSessionProvider));
@@ -131,6 +131,12 @@ namespace SanteDB.Persistence.Data.Services
         /// Gets the service name
         /// </summary>
         public string ServiceName => "Databased Session Authentication Provider";
+
+        /// <inheritdoc/>
+        ISessionProviderService ILocalServiceProvider<ISessionProviderService>.LocalProvider => this;
+
+        /// <inheritdoc/>
+        ISessionIdentityProviderService ILocalServiceProvider<ISessionIdentityProviderService>.LocalProvider => this;
 
         /// <summary>
         /// Fired when a new session is established

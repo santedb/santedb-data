@@ -168,6 +168,11 @@ namespace SanteDB.Persistence.Data.Model.Security
         public Guid? TwoFactorMechnaismKey { get; set; }
 
         /// <summary>
+        /// Gets or sets whether <see cref="TwoFactorMechnaismKey"/> is explicitly set
+        /// </summary>
+        public bool TwoFactorMechnaismKeySpecified { get; set; }
+
+        /// <summary>
         /// Password expiration
         /// </summary>
         [Column("pwd_exp_utc")]

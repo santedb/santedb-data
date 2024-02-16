@@ -144,7 +144,10 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
+            if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase) || !principal.Identity.IsAuthenticated)
+            {
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
+            }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
@@ -316,7 +319,7 @@ namespace SanteDB.Persistence.Data.Services
                             if (useMfa && String.IsNullOrEmpty(tfaSecret))
                             {
                                 var secretString = this.m_tfaRelay.SendSecret(mfaMechanism, new AdoUserIdentity(dbUser));
-                                throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ, new { message = secretString }));
+                                throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ, new { message = this.m_localizationService.GetString(secretString) }));
                             }
 
                             // TFA supplied?
@@ -439,7 +442,7 @@ namespace SanteDB.Persistence.Data.Services
             }
 
             // The user changing the password must be the user or an administrator
-            if (!principal.Identity.Name.Equals(userName, StringComparison.OrdinalIgnoreCase))
+            if (!principal.Identity.Name.Equals(userName, StringComparison.OrdinalIgnoreCase) || !principal.Identity.IsAuthenticated)
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.ChangePassword, principal);
             }
@@ -476,7 +479,7 @@ namespace SanteDB.Persistence.Data.Services
 
                         // Password expire policy
                         var pwdExpire = this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.MaxPasswordAge);
-                        if (pwdExpire != default(TimeSpan))
+                        if (pwdExpire != default(TimeSpan) && AuthenticationContext.Current.Principal != AuthenticationContext.SystemPrincipal) // system principal setting password doesn't expire
                         {
                             dbUser.PasswordExpiration = DateTimeOffset.Now.Add(pwdExpire);
                         }
@@ -781,7 +784,11 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
+            // User can remove their own claims
+            if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase) || !principal.Identity.IsAuthenticated)
+            {
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
+            }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
