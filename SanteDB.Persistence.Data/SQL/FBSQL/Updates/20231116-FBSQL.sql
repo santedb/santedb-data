@@ -1,7 +1,7 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20231116-02" name="Update:20231116-02" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
+ * <feature scope="SanteDB.Persistence.Data" id="20231116-03" name="Update:20231116-03" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
  *	<summary>Update: Updates the storage of care plans and CDSS library logic</summary>
- *	<isInstalled>select ck_patch('20231116-02') from rdb$database</isInstalled>
+ *	<isInstalled>select ck_patch('20231116-03') from rdb$database</isInstalled>
  * </feature>
  */
  -- OPTIONAL
@@ -68,4 +68,8 @@ UPDATE SEC_APP_TBL SET APP_SCRT = '734544ac69afe5549d33ecceadbbd3adf57650df52d30
 UPDATE SEC_APP_TBL SET APP_SCRT = 'eb859ef5298b63eca82f53fdeba480e5a62b2072f27d8c4bf0b4cac30a3cdd93' WHERE APP_SCRT = '0180cad1928b9b9887a60a123920a793e7aa7cd339577876f0c233fa2b9fb7d6';--#!
 UPDATE SEC_APP_TBL SET APP_SCRT = '517d8028957f60b2c7b5e7d1fe769f84060881f7c06386ba8d7ccf7a25621245' WHERE APP_SCRT = 'cba830db9a6f5a4b638ff95ef70e98aa82d414ac35b351389024ecb6be40ebf0';--#!
 
-SELECT REG_PATCH('20231116-02') FROM RDB$DATABASE; --#!
+-- OPTIONAL
+ALTER TABLE ent_rel_tbl ADD neg_ind BOOLEAN; --#!
+-- OPTIONAL
+ALTER TABLE act_rel_tbl ADD neg_ind BOOLEAN; --#!
+SELECT REG_PATCH('20231116-03') FROM RDB$DATABASE; --#!

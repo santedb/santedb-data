@@ -1,7 +1,7 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20240104-03" name="Update:20240104-03" applyRange="1.1.0.0-1.2.0.0"  invariantName="sqlite">
+ * <feature scope="SanteDB.Persistence.Data" id="20240104-04" name="Update:20240104-04" applyRange="1.1.0.0-1.2.0.0"  invariantName="sqlite">
  *	<summary>Update: Adds persistence of data quality rules in the primary database</summary>
- *	<isInstalled>select count(*) > 0 from patch_db_systbl WHERE PATCH_ID = '20240104-03'</isInstalled>
+ *	<isInstalled>select count(*) > 0 from patch_db_systbl WHERE PATCH_ID = '20240104-04'</isInstalled>
  * </feature>
  */
  --#!
@@ -57,5 +57,8 @@ UPDATE SEC_APP_TBL SET APP_SCRT = '517d8028957f60b2c7b5e7d1fe769f84060881f7c0638
 --#!
 -- OPTIONAL
 ALTER TABLE job_stat_systbl ADD last_sts_txt TEXT; --#!
-
-INSERT INTO PATCH_DB_SYSTBL (PATCH_ID, APPLY_DATE, INFO_NAME) VALUES ('20240104-03', UNIXEPOCH(), 'Adds DQ storage tables to database'); 
+-- OPTIONAL
+ALTER TABLE ent_rel_tbl ADD neg_ind BOOLEAN NOT NULL DEFAULT FALSE; --#!
+-- OPTIONAL
+ALTER TABLE act_rel_tbl ADD neg_ind BOOLEAN NOT NULL DEFAULT FALSE; --#!
+INSERT INTO PATCH_DB_SYSTBL (PATCH_ID, APPLY_DATE, INFO_NAME) VALUES ('20240104-04', UNIXEPOCH(), 'Adds DQ storage tables to database'); 

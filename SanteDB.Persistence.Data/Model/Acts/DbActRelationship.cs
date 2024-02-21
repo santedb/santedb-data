@@ -69,5 +69,10 @@ namespace SanteDB.Persistence.Data.Model.Acts
         [Column("ext_id")]
         public String ExternalKey { get; set; }
 
+        /// <summary>
+        /// Negation indicator
+        /// </summary>
+        [Column("neg_ind")]
+        public bool NegationIndicator { get; set; }
     }
 }

@@ -85,5 +85,10 @@ namespace SanteDB.Persistence.Data.Model.Entities
         [Column("ext_id")]
         public String ExternalKey { get; set; }
 
+        /// <summary>
+        /// Gets or sets the negation indicator
+        /// </summary>
+        [Column("neg_ind")]
+        public bool NegationIndicator { get; set; }
     }
 }
