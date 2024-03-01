@@ -481,7 +481,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(1, stateful.Skip(0).Take(1).Count());
                 Assert.AreEqual(1, stateful.Skip(1).Take(100).Count());
 
-//                Assert.Throws<NotSupportedException>(() => stateful.OrderBy(o => o.VersionSequence).Skip(0).Count());
+                Assert.Throws<NotSupportedException>(() => stateful.OrderBy(o => o.VersionSequence).Skip(0).Count());
                 Assert.Throws<NotSupportedException>(() => stateful.OrderByDescending(o => o.VersionSequence).Skip(0).Count());
                 Assert.Throws<InvalidOperationException>(() => stateful.AsStateful(Guid.NewGuid()));
 
