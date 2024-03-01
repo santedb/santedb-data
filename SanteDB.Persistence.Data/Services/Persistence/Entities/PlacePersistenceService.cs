@@ -41,7 +41,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var retVal = base.DoInsertModel(context, data);
 
-            if (!data.Services.IsNullOrEmpty())
+            if (data.Services != null)
             {
                 retVal.Services = this.UpdateModelVersionedAssociations(context, retVal, data.Services).ToList();
                 retVal.SetLoaded(o => o.Services);
@@ -55,7 +55,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var retVal = base.DoUpdateModel(context, data);
 
-            if (!data.Services.IsNullOrEmpty())
+            if (data.Services != null)
             {
                 retVal.Services = this.UpdateModelVersionedAssociations(context, retVal, data.Services).ToList();
                 retVal.SetLoaded(o => o.Services);

@@ -485,39 +485,39 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var retVal = base.DoInsertModel(context, data);
 
-            if (!data.Addresses.IsNullOrEmpty())
+            if (data.Addresses != null)
             {
                 retVal.Addresses = this.UpdateModelVersionedAssociations(context, retVal, data.Addresses).ToList();
                 retVal.SetLoaded(o => o.Addresses);
 
             }
 
-            if (!data.Extensions.IsNullOrEmpty())
+            if (data.Extensions != null)
             {
                 retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
                 retVal.SetLoaded(o => o.Extensions);
 
             }
 
-            if (!data.Identifiers.IsNullOrEmpty())
+            if (data.Identifiers != null)
             {
                 retVal.Identifiers = this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
                 retVal.SetLoaded(o => o.Identifiers);
             }
 
-            if (!data.Names.IsNullOrEmpty())
+            if (data.Names != null)
             {
                 retVal.Names = this.UpdateModelVersionedAssociations(context, retVal, data.Names).ToList();
                 retVal.SetLoaded(o => o.Names);
             }
 
-            if (!data.Notes.IsNullOrEmpty())
+            if (data.Notes != null)
             {
                 retVal.Notes = this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
                 retVal.SetLoaded(o => o.Notes);
             }
 
-            if (!data.Policies.IsNullOrEmpty())
+            if (data.Policies != null)
             {
                 retVal.Policies = this.UpdateInternalVersoinedAssociations(context, retVal.Key.Value, retVal.VersionSequence.GetValueOrDefault(), data.Policies.Select(o => new DbEntitySecurityPolicy()
                 {
@@ -525,19 +525,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 })).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
             }
 
-            if (!data.Relationships.IsNullOrEmpty())
+            if (data.Relationships != null)
             {
                 retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
                 retVal.SetLoaded(o => o.Relationships);
             }
 
-            if (!data.Tags.IsNullOrEmpty())
+            if (data.Tags != null)
             {
                 retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
                 retVal.SetLoaded(o => o.Tags);
             }
 
-            if (!data.Telecoms.IsNullOrEmpty())
+            if (data.Telecoms != null)
             {
                 retVal.Telecoms = this.UpdateModelVersionedAssociations(context, retVal, data.Telecoms).ToList();
                 retVal.SetLoaded(o => o.Telecoms);
@@ -558,37 +558,37 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
             var retVal = base.DoUpdateModel(context, data);
 
-            if (!data.Addresses.IsNullOrEmpty())
+            if (data.Addresses != null)
             {
                 retVal.Addresses = this.UpdateModelVersionedAssociations(context, retVal, data.Addresses).ToList();
                 retVal.SetLoaded(o => o.Addresses);
             }
 
-            if (!data.Extensions.IsNullOrEmpty())
+            if (data.Extensions != null)
             {
                 retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
                 retVal.SetLoaded(o => o.Extensions);
             }
 
-            if (!data.Identifiers.IsNullOrEmpty())
+            if (data.Identifiers != null)
             {
                 retVal.Identifiers = this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
                 retVal.SetLoaded(o => o.Identifiers);
             }
 
-            if (!data.Names.IsNullOrEmpty())
+            if (data.Names != null)
             {
                 retVal.Names = this.UpdateModelVersionedAssociations(context, retVal, data.Names).ToList();
                 retVal.SetLoaded(o => o.Names);
             }
 
-            if (!data.Notes.IsNullOrEmpty())
+            if (data.Notes != null)
             {
                 retVal.Notes = this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
                 retVal.SetLoaded(o => o.Notes);
             }
 
-            if (!data.Policies.IsNullOrEmpty())
+            if (data.Policies != null)
             {
                 retVal.Policies = this.UpdateInternalVersoinedAssociations(context, retVal.Key.Value, retVal.VersionSequence.Value, data.Policies.Select(o => new DbEntitySecurityPolicy()
                 {
@@ -596,19 +596,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 })).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
             }
 
-            if (!data.Relationships.IsNullOrEmpty())
+            if (data.Relationships != null)
             {
                 retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
                 retVal.SetLoaded(o => o.Relationships);
             }
 
-            if (!data.Tags.IsNullOrEmpty())
+            if (data.Tags != null)
             {
                 retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
                 retVal.SetLoaded(o => o.Tags);
             }
 
-            if (!data.Telecoms.IsNullOrEmpty())
+            if (data.Telecoms != null)
             {
                 retVal.Telecoms = this.UpdateModelVersionedAssociations(context, retVal, data.Telecoms).ToList();
                 retVal.SetLoaded(o => o.Telecoms);
