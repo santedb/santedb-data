@@ -56,7 +56,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var retVal = base.DoInsertModel(context, data);
 
-            if (data.LanguageCommunication != null)
+            if (!data.LanguageCommunication.IsNullOrEmpty())
             {
                 retVal.LanguageCommunication = this.UpdateModelVersionedAssociations(context, retVal, data.LanguageCommunication).ToList();
                 retVal.SetLoaded(o => o.LanguageCommunication);
@@ -72,7 +72,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var retVal = base.DoUpdateModel(context, data);
 
-            if (data.LanguageCommunication != null)
+            if (!data.LanguageCommunication.IsNullOrEmpty())
             {
                 retVal.LanguageCommunication = this.UpdateModelVersionedAssociations(context, retVal, data.LanguageCommunication).ToList();
                 retVal.SetLoaded(o => o.LanguageCommunication);

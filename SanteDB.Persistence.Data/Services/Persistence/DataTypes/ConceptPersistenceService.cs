@@ -77,7 +77,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             var retVal = base.DoInsertModel(context, data);
 
             // Insert names
-            if (data.ConceptNames != null)
+            if (!data.ConceptNames.IsNullOrEmpty())
             {
                 retVal.ConceptNames = base.UpdateModelVersionedAssociations<ConceptName>(context, retVal, data.ConceptNames).ToList();
                 retVal.SetLoaded(o => o.ConceptNames);
@@ -85,7 +85,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             }
 
             // Concept sets
-            if (data.ConceptSetsXml != null)
+            if (!data.ConceptSetsXml.IsNullOrEmpty())
             {
                 retVal.ConceptSetsXml = base.UpdateInternalAssociations<DbConceptSetConceptAssociation>(context, retVal.Key.Value,
                     data.ConceptSetsXml.Select(o => new DbConceptSetConceptAssociation()
@@ -96,7 +96,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             }
 
             // Reference terms
-            if (data.ReferenceTerms != null)
+            if (!data.ReferenceTerms.IsNullOrEmpty())
             {
                 retVal.ReferenceTerms = base.UpdateModelVersionedAssociations<ConceptReferenceTerm>(context, retVal, data.ReferenceTerms).ToList();
                 retVal.SetLoaded(o => o.ReferenceTerms);
@@ -104,7 +104,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             }
 
             // Relationships
-            if (data.Relationships != null)
+            if (!data.Relationships.IsNullOrEmpty())
             {
                 retVal.Relationships = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationships).ToList();
                 retVal.SetLoaded(o => o.Relationships);
@@ -121,7 +121,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             var retVal = base.DoUpdateModel(context, data);
 
             // Update names
-            if (data.ConceptNames != null)
+            if (!data.ConceptNames.IsNullOrEmpty())
             {
                 retVal.ConceptNames = base.UpdateModelVersionedAssociations<ConceptName>(context, retVal, data.ConceptNames).ToList();
                 retVal.SetLoaded(o => o.ConceptNames);
@@ -129,7 +129,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             }
 
             // Update concept sets
-            if (data.ConceptSetsXml != null)
+            if (!data.ConceptSetsXml.IsNullOrEmpty())
             {
                 retVal.ConceptSetsXml = base.UpdateInternalAssociations<DbConceptSetConceptAssociation>(context, retVal.Key.Value,
                     data.ConceptSetsXml.Select(o => new DbConceptSetConceptAssociation()
@@ -140,7 +140,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             }
 
             // Update reference terms
-            if (data.ReferenceTerms != null)
+            if (!data.ReferenceTerms.IsNullOrEmpty())
             {
                 retVal.ReferenceTerms = base.UpdateModelVersionedAssociations<ConceptReferenceTerm>(context, retVal, data.ReferenceTerms).ToList();
                 retVal.SetLoaded(o => o.ReferenceTerms);
@@ -148,7 +148,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             }
 
             // Relationships
-            if (data.Relationships != null)
+            if (!data.Relationships.IsNullOrEmpty())
             {
                 retVal.Relationships = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationships).ToList();
                 retVal.SetLoaded(o => o.Relationships);
