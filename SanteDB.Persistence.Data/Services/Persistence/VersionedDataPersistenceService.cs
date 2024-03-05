@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,9 +16,8 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
-using DocumentFormat.OpenXml.Bibliography;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
@@ -278,19 +277,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
 
                 // Is there a check digit algorithm indicated?
-                if(!String.IsNullOrEmpty(dbAuth.CheckDigitAlgorithm))
+                if (!String.IsNullOrEmpty(dbAuth.CheckDigitAlgorithm))
                 {
-                    if(String.IsNullOrEmpty(id.CheckDigit))
+                    if (String.IsNullOrEmpty(id.CheckDigit))
                     {
                         yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckDigitMissing, $"Identifier {id.Value} in domain {dbAuth.DomainName} is missing check digit", DetectedIssueKeys.InvalidDataIssue, objectToVerify.ToString());
                     }
                     var validatorType = Type.GetType(dbAuth.CheckDigitAlgorithm);
-                    if(validatorType == null)
+                    if (validatorType == null)
                     {
                         yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckProviderNotFound, $"Check digit provider {dbAuth.CheckDigitAlgorithm} is not found", DetectedIssueKeys.OtherIssue, objectToVerify.ToString());
                     }
                     var validator = Activator.CreateInstance(validatorType) as ICheckDigitAlgorithm;
-                    if(validator?.ValidateCheckDigit(id.Value, id.CheckDigit) != true)
+                    if (validator?.ValidateCheckDigit(id.Value, id.CheckDigit) != true)
                     {
                         yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckDigitFailed, $"Check digit {id.CheckDigit} is not valid for identifier {id.Value}", DetectedIssueKeys.InvalidDataIssue, objectToVerify.ToString());
                     }

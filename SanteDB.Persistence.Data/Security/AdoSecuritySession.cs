@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
@@ -86,14 +86,14 @@ namespace SanteDB.Persistence.Data.Security
             {
                 addlClaims.Add(new SanteDBClaim(SanteDBClaimTypes.AudienceClaim, sessionInfo.Audience));
             }
-            if(sessionInfo.UserKey.HasValue)
+            if (sessionInfo.UserKey.HasValue)
             {
                 addlClaims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBUserIdentifierClaim, sessionInfo.UserKey.ToString()));
             }
-            if(sessionInfo.DeviceKey.HasValue)
+            if (sessionInfo.DeviceKey.HasValue)
             {
                 addlClaims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim, sessionInfo.DeviceKey.ToString()));
-            } 
+            }
             this.Claims = addlClaims.Union(claims.Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue))).ToArray();
             this.Key = sessionInfo.Key;
             this.Id = token;

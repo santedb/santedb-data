@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using NUnit.Framework;
 using SanteDB.Core;
@@ -91,7 +91,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
                 // Test - cannot find map
                 using (var fds = typeof(AdoForeignDataManagerTest).Assembly.GetManifestResourceStream("SanteDB.Persistence.Data.Test.SQLite.Resources.BadPatients.csv"))
                 {
-                    var fdi = foreignDataManager.Stage(fds, "badpatients.csv", "test", Guid.NewGuid(), new Dictionary<String, String>() { {  "foo", "bar" } });
+                    var fdi = foreignDataManager.Stage(fds, "badpatients.csv", "test", Guid.NewGuid(), new Dictionary<String, String>() { { "foo", "bar" } });
                     Assert.AreEqual(1, fdi.Issues.Count());
                     foreignDataManager.Delete(fdi.Key.Value);
 
@@ -116,7 +116,9 @@ namespace SanteDB.Persistence.Data.Test.SQLite
                     Console.WriteLine("Testing Execute...");
 
                     if (foreignDataManager is IReportProgressChanged irpt)
+                    {
                         irpt.ProgressChanged += (o, e) => Console.WriteLine(e.State);
+                    }
 
                     fdi = foreignDataManager.Execute(results.First().Key.Value);
                     Assert.AreEqual(ForeignDataStatus.CompletedWithErrors, fdi.Status);

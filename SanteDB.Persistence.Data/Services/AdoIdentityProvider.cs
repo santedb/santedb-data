@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
@@ -28,7 +28,6 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Configuration;
-using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Security.Tfa;
 using SanteDB.Core.Services;
@@ -55,7 +54,7 @@ namespace SanteDB.Persistence.Data.Services
 
         /// <inheritdoc/>
         public IIdentityProviderService LocalProvider => this;
-        
+
         // Secret claims which should not be disclosed 
         private readonly String[] m_nonIdentityClaims =
         {
@@ -467,8 +466,8 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "password.history", this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_HISTORY), DetectedIssueKeys.SecurityIssue, null);
                         }
-                        
-                        if(isSynchronizationOperation) // the password is changing to synchronize 
+
+                        if (isSynchronizationOperation) // the password is changing to synchronize 
                         {
                             dbUser.LastLoginTime = DateTimeOffset.Now;
                         }

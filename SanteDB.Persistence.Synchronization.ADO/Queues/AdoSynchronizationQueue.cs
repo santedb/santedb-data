@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2024-1-23
  */
 using SanteDB;
 using SanteDB.Client.Disconnected.Data.Synchronization;
@@ -32,19 +32,15 @@ using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
-using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data;
 using SanteDB.Persistence.Synchronization.ADO.Model;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Data.Common;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using static SanteDB.Core.Services.Impl.FileSystemDispatcherQueueService;
 
 namespace SanteDB.Persistence.Synchronization.ADO.Queues
 {
@@ -407,7 +403,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
                             {
                                 newQueueEntry.RetryCount = (otherQueueEntry.RetryCount ?? 0) + 1;
                             }
-                            
+
 
                             newQueueEntry = context.Insert(newQueueEntry);
 
@@ -439,7 +435,8 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
                             try
                             {
                                 Enqueued?.Invoke(this, new DataPersistedEventArgs<ISynchronizationQueueEntry>(retVal, TransactionMode.Commit, AuthenticationContext.Current.Principal));
-                            } catch { } // Some service handlers cause exceptions which we don't really care about
+                            }
+                            catch { } // Some service handlers cause exceptions which we don't really care about
                             return retVal;
                         }
                     }

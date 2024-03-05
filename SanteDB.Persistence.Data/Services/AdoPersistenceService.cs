@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,11 +16,10 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.BI.Model;
 using SanteDB.BI.Services;
-using SanteDB.Core.Data;
 using SanteDB.Core.Data.Backup;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
@@ -30,13 +29,11 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.Migration;
-using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Jobs;
 using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.Services
@@ -253,10 +250,11 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public bool Restore(IBackupAsset backupAsset)
         {
-            if(backupAsset == null) {
+            if (backupAsset == null)
+            {
                 throw new ArgumentNullException(nameof(backupAsset));
             }
-            else if(backupAsset.AssetClassId != PRIMARY_DATABASE_ASSET_ID)
+            else if (backupAsset.AssetClassId != PRIMARY_DATABASE_ASSET_ID)
             {
                 throw new InvalidOperationException();
             }

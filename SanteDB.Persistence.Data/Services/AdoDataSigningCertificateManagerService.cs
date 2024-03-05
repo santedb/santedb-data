@@ -1,9 +1,28 @@
-﻿using SanteDB.Core.Diagnostics;
+﻿/*
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you 
+ * may not use this file except in compliance with the License. You may 
+ * obtain a copy of the License at 
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0 
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ * License for the specific language governing permissions and limitations under 
+ * the License.
+ * 
+ * User: fyfej
+ * Date: 2023-7-12
+ */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
-using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
@@ -16,7 +35,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -116,7 +134,7 @@ namespace SanteDB.Persistence.Data.Services
                         certificateRegistration.UpdatedTime = DateTimeOffset.Now;
                         context.Update(certificateRegistration);
                     }
-                    else if(existingMap != null)
+                    else if (existingMap != null)
                     {
                         throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.SIG_CERT_ALREADY_ASSIGNED));
                     }
@@ -287,12 +305,12 @@ namespace SanteDB.Persistence.Data.Services
 
             try
             {
-                using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+                using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     context.Open();
 
-                    var candidateCertificate = context.Query<DbCertificateMapping>(o => o.ObsoletionTime == null && o.Use == CertificateMappingUse.Signature && o.X509Thumbprint == x509Thumbprint).Select(o=>o.X509PublicKeyData).FirstOrDefault();
-                    if(candidateCertificate == null)
+                    var candidateCertificate = context.Query<DbCertificateMapping>(o => o.ObsoletionTime == null && o.Use == CertificateMappingUse.Signature && o.X509Thumbprint == x509Thumbprint).Select(o => o.X509PublicKeyData).FirstOrDefault();
+                    if (candidateCertificate == null)
                     {
                         certificate = null;
                         return false;
@@ -304,7 +322,7 @@ namespace SanteDB.Persistence.Data.Services
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceError("Could not lookup certificate information - {0}", e);
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SIG_CERT_GENERAL), e);
