@@ -816,6 +816,15 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
                 afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUseKey == AddressUseKeys.HomeAddress).Any(n => n.AddressUseKey == AddressUseKeys.HomeAddress && n.Component.Where(c => c.ComponentTypeKey == AddressComponentKeys.City).Any(c => c.Value == "Hometown")), 1);
                 afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUseKey == AddressUseKeys.HomeAddress).Any(n => n.Component.Where(c => c.ComponentTypeKey == AddressComponentKeys.City).Any(c => c.Value == "Hometown"))
                 && o.Names.Where(g => g.NameUseKey == NameUseKeys.Legal).Any(n => n.Component.Where(g => g.ComponentTypeKey == NameComponentKeys.Given).Any(c => c.Value == "John")), 1);
+
+
+                // Test that complex queries are mapped to SQL
+                // Use a reference term
+                afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUse.ReferenceTerms.Any(t=>t.ReferenceTerm.Mnemonic == "H")).Any(n => n.Component.Any(a => a.Value == "Hometown")), 1);
+                // Use two conditions
+                afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUse.ReferenceTerms.Any(t=>t.ReferenceTerm.Mnemonic == "H") && g.AddressUse.ConceptSets.Any(s=>s.Key == ConceptSetKeys.AddressUse)).Any(n => n.Component.Any(a => a.Value == "Hometown")), 1);
+                afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUse.StatusConceptKey == StatusKeys.Inactive).Any(n => n.Component.Any(a => a.Value == "Hometown")), 0);
+
             }
         }
 
