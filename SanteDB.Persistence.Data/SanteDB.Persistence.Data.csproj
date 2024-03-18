@@ -112,6 +112,7 @@
     <None Remove="SQL\SQLITE\20231116.sql" />
     <None Remove="SQL\SQLITE\20240104.sql" />
     <None Remove="SQL\SQLITE\20240120.sql" />
+    <None Remove="SQL\SQLITE\20240210.sql" />
     <None Remove="SQL\SQLITE\santedb-codes.sql" />
     <None Remove="SQL\SQLITE\santedb-ddl.sql" />
     <None Remove="SQL\SQLITE\santedb-init.sql" />
@@ -266,6 +267,7 @@
     <EmbeddedResource Include="SQL\SQLITE\20230514.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20230509.sql">
     </EmbeddedResource>
+    <EmbeddedResource Include="SQL\SQLITE\20240210.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20240120.sql" />
     <EmbeddedResource Include="SQL\SQLITE\santedb-codes.sql" />
     <EmbeddedResource Include="SQL\SQLITE\santedb-ddl.sql">

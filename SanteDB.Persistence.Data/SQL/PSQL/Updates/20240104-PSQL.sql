@@ -1,7 +1,7 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20240104-02" name="Update:20240104-02" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20240104-04" name="Update:20240104-04" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
  *	<summary>Update: Updates the database to provide persistence of configurable data quality rules</summary>
- *	<isInstalled>select ck_patch('20240104-02')</isInstalled>
+ *	<isInstalled>select ck_patch('20240104-04')</isInstalled>
  * </feature>
  */
 
@@ -53,4 +53,13 @@ UPDATE SEC_APP_TBL SET APP_SCRT = '734544ac69afe5549d33ecceadbbd3adf57650df52d30
 UPDATE SEC_APP_TBL SET APP_SCRT = 'eb859ef5298b63eca82f53fdeba480e5a62b2072f27d8c4bf0b4cac30a3cdd93' WHERE APP_SCRT = '0180cad1928b9b9887a60a123920a793e7aa7cd339577876f0c233fa2b9fb7d6';
 UPDATE SEC_APP_TBL SET APP_SCRT = '517d8028957f60b2c7b5e7d1fe769f84060881f7c06386ba8d7ccf7a25621245' WHERE APP_SCRT = 'cba830db9a6f5a4b638ff95ef70e98aa82d414ac35b351389024ecb6be40ebf0';
 
- SELECT REG_PATCH('20240104-02'); 
+--#!
+--OPTIONAL
+ALTER TABLE job_stat_systbl ADD last_sts_txt TEXT;--#!
+-- OPTIONAL
+ALTER TABLE ent_rel_tbl ADD neg_ind BOOLEAN NOT NULL DEFAULT FALSE; 
+--#!
+-- OPTIONAL
+ALTER TABLE act_rel_tbl ADD neg_ind BOOLEAN NOT NULL DEFAULT FALSE; --#!
+
+ SELECT REG_PATCH('20240104-04'); 

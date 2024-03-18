@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Jobs;
 using SanteDB.OrmLite.Attributes;
@@ -64,5 +64,16 @@ namespace SanteDB.Persistence.Data.Model.Sys
         /// True if <see cref="LastStop"/> is provided.
         /// </summary>
         public bool LastStopSpecified { get; internal set; }
+
+        /// <summary>
+        /// Last status text
+        /// </summary>
+        [Column("last_sts_txt")]
+        public string LastStatus { get; set; }
+
+        /// <summary>
+        /// True if the <see cref="LastStatus"/> value has been explicitly set
+        /// </summary>
+        public bool LastStatusSpecified { get; set; }
     }
 }

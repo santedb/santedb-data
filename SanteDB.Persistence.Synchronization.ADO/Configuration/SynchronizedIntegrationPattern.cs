@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.BI.Services.Impl;
 using SanteDB.Client.Configuration;
@@ -28,9 +28,9 @@ using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Data;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl.Repository;
-using SanteDB.Persistence.Auditing.ADO.Configuration;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Services;
 using SanteDB.Persistence.Synchronization.ADO.Services;
@@ -50,6 +50,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
         /// <inheritdoc/>
         public IEnumerable<Type> GetServices() => new Type[]
                     {
+                        typeof(DefaultTfaService),
                         typeof(AdoSessionProvider),
                         typeof(AdoPersistenceService),
                         typeof(UpstreamSynchronizationService),
@@ -94,7 +95,8 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
             var adoConfiguration = configuration.GetSection<AdoPersistenceConfigurationSection>();
 
             // Versioning policy default 
-            if (ApplicationServiceContext.Current.HostType == SanteDBHostType.Client) // Client configuration should not version data
+            if (ApplicationServiceContext.Current.HostType != SanteDBHostType.Gateway &&
+                ApplicationServiceContext.Current.HostType != SanteDBHostType.Server) // Client configuration should not version data
             {
 
                 adoConfiguration.VersioningPolicy = AdoVersioningPolicyFlags.None;
@@ -120,7 +122,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                 adoConfiguration.MaxPageSize = 25;
 
             }
-           
+
         }
     }
 }

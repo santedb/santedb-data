@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
@@ -101,17 +101,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     if (existing.Count() > 1) // We only keep recent and last
                     {
-                        context.DeleteAll<TDbModel>(o => o.Key == key && o.VersionSequenceId <= existing.Last().VersionSequenceId);
+                        var lastVersionSequence = existing[0].VersionSequenceId;
+
+                        this.DoDeleteAllModel(context, o => o.Key == key && o.VersionSequence < lastVersionSequence, DeleteMode.PermanentDelete);
                     }
                 }
-
-                // We want to obsolete the non current version(s)
-                foreach (var itm in context.Query<TDbModel>(o => o.Key == key && o.ObsoletionTime == null))
+                else
                 {
-                    itm.ObsoletionTime = DateTimeOffset.Now;
-                    itm.ObsoletedByKey = context.ContextId;
-                    itm.ObsoletedByKeySpecified = itm.ObsoletionTimeSpecified = true;
-                    context.Update(itm);
+                    // We want to obsolete the non current version(s)
+                    foreach (var itm in context.Query<TDbModel>(o => o.Key == key && o.ObsoletionTime == null))
+                    {
+                        itm.ObsoletionTime = DateTimeOffset.Now;
+                        itm.ObsoletedByKey = context.ContextId;
+                        itm.ObsoletedByKeySpecified = itm.ObsoletionTimeSpecified = true;
+                        context.Update(itm);
+                    }
                 }
 
                 // next - we create a new version of dbmodel
@@ -130,6 +134,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                 if (oldVersion.IsHeadVersion)
                 {
+                    oldVersion.ObsoletionTime = DateTimeOffset.Now;
+                    oldVersion.ObsoletedByKey = context.ContextId;
+                    oldVersion.ObsoletedByKeySpecified = oldVersion.ObsoletionTimeSpecified = true;
                     oldVersion.IsHeadVersion = false;
                     context.Update(oldVersion);
                 }
@@ -270,19 +277,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
 
                 // Is there a check digit algorithm indicated?
-                if(!String.IsNullOrEmpty(dbAuth.CheckDigitAlgorithm))
+                if (!String.IsNullOrEmpty(dbAuth.CheckDigitAlgorithm))
                 {
-                    if(String.IsNullOrEmpty(id.CheckDigit))
+                    if (String.IsNullOrEmpty(id.CheckDigit))
                     {
                         yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckDigitMissing, $"Identifier {id.Value} in domain {dbAuth.DomainName} is missing check digit", DetectedIssueKeys.InvalidDataIssue, objectToVerify.ToString());
                     }
                     var validatorType = Type.GetType(dbAuth.CheckDigitAlgorithm);
-                    if(validatorType == null)
+                    if (validatorType == null)
                     {
                         yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckProviderNotFound, $"Check digit provider {dbAuth.CheckDigitAlgorithm} is not found", DetectedIssueKeys.OtherIssue, objectToVerify.ToString());
                     }
                     var validator = Activator.CreateInstance(validatorType) as ICheckDigitAlgorithm;
-                    if(validator?.ValidateCheckDigit(id.Value, id.CheckDigit) != true)
+                    if (validator?.ValidateCheckDigit(id.Value, id.CheckDigit) != true)
                     {
                         yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckDigitFailed, $"Check digit {id.CheckDigit} is not valid for identifier {id.Value}", DetectedIssueKeys.InvalidDataIssue, objectToVerify.ToString());
                     }
@@ -533,18 +540,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     if (existing.Count() > 1) // We only keep recent and last
                     {
-                        context.DeleteAll<TDbModel>(o => o.Key == model.Key && o.VersionSequenceId <= existing.Last().VersionSequenceId);
+                        var lastVersionSequence = existing[0].VersionSequenceId;
+                        this.DoDeleteAllModel(context, o => o.Key == model.Key && o.VersionSequence < lastVersionSequence, DeleteMode.PermanentDelete);
                     }
                 }
-
-                // We want to obsolete the non current version(s)
-                foreach (var itm in context.Query<TDbModel>(o => o.Key == model.Key && !o.ObsoletionTime.HasValue).ToArray())
+                else
                 {
-                    itm.ObsoletionTime = DateTimeOffset.Now;
-                    itm.ObsoletedByKey = context.ContextId;
-                    itm.IsHeadVersion = false;
-                    itm.ObsoletedByKeySpecified = itm.ObsoletionTimeSpecified = true;
-                    context.Update(itm);
+                    // We want to obsolete the non current version(s)
+                    foreach (var itm in context.Query<TDbModel>(o => o.Key == model.Key && !o.ObsoletionTime.HasValue).ToArray())
+                    {
+                        itm.ObsoletionTime = DateTimeOffset.Now;
+                        itm.ObsoletedByKey = context.ContextId;
+                        itm.IsHeadVersion = false;
+                        itm.ObsoletedByKeySpecified = itm.ObsoletionTimeSpecified = true;
+                        context.Update(itm);
+                    }
                 }
 
                 // next - we create a new version of dbmodel
@@ -564,7 +574,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                 if (oldVersion.IsHeadVersion)
                 {
+                    oldVersion.ObsoletionTime = DateTimeOffset.Now;
+                    oldVersion.ObsoletedByKey = context.ContextId;
                     oldVersion.IsHeadVersion = false;
+                    oldVersion.ObsoletedByKeySpecified = oldVersion.ObsoletionTimeSpecified = true;
                     context.Update(oldVersion);
                 }
 

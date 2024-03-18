@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
@@ -274,7 +274,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public void SetState(IJob job, JobStateType state)
+        public void SetState(IJob job, JobStateType state, String statusText)
         {
             if (job == null)
             {
@@ -297,6 +297,7 @@ namespace SanteDB.Persistence.Data.Services
                             JobId = job.Id,
                             CurrentState = state,
                             Progress = 0.0f,
+                            StatusText = statusText,
                             LastStartTime = state == JobStateType.Starting || state == JobStateType.Running ? DateTime.Now : dbStatus?.LastStart?.DateTime,
                         };
                     }
@@ -329,6 +330,8 @@ namespace SanteDB.Persistence.Data.Services
                             break;
                     }
                     dbStatus.LastState = cacheStatus.CurrentState = state;
+                    dbStatus.LastStatus = statusText;
+                    dbStatus.LastStatusSpecified = true;
 
                     context.Update(dbStatus);
                     this.m_adhocCache.Add($"sts.job.{job.Id}", cacheStatus);

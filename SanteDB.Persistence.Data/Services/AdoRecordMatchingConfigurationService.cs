@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Exceptions;
@@ -241,7 +241,7 @@ namespace SanteDB.Persistence.Data.Services
         {
             // Trim old versions
             context.DeleteAll<DbMatchConfigurationVersion>(o => !o.IsHeadVersion && o.ObsoletionTime != null && o.ObsoletionTime < oldVersionCutoff);
-            foreach(var itm in context.Query<DbMatchConfigurationVersion>(o=>o.IsHeadVersion && o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff))
+            foreach (var itm in context.Query<DbMatchConfigurationVersion>(o => o.IsHeadVersion && o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff))
             {
                 context.Delete(itm);
                 var root = context.FirstOrDefault<DbMatchConfiguration>(o => o.Key == itm.Key);

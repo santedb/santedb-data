@@ -1,9 +1,28 @@
-﻿using SanteDB.Core.Data.Quality;
+﻿/*
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you 
+ * may not use this file except in compliance with the License. You may 
+ * obtain a copy of the License at 
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0 
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ * License for the specific language governing permissions and limitations under 
+ * the License.
+ * 
+ * User: fyfej
+ * Date: 2024-1-5
+ */
+using SanteDB.Core.Data.Quality;
 using SanteDB.Core.Data.Quality.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
-using SanteDB.Core.Model.Audit;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Services;
@@ -12,12 +31,10 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Sys;
 using SanteDB.Persistence.Data.Services.Persistence;
-using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -50,11 +67,11 @@ namespace SanteDB.Persistence.Data.Services
             try
             {
                 var dqConfigurationSection = configurationManager.GetSection<DataQualityConfigurationSection>();
-                if(dqConfigurationSection?.RuleSets.Any() == true)
+                if (dqConfigurationSection?.RuleSets.Any() == true)
                 {
-                    foreach(var rs in dqConfigurationSection.RuleSets)
+                    foreach (var rs in dqConfigurationSection.RuleSets)
                     {
-                        if(this.GetRuleSet(rs.Id) == null)
+                        if (this.GetRuleSet(rs.Id) == null)
                         {
                             this.SaveRuleSet(rs);
                         }
@@ -73,7 +90,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public DataQualityRulesetConfiguration GetRuleSet(string id)
         {
-            if(string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(id))
             {
                 throw new ArgumentNullException(nameof(id));
             }
@@ -82,26 +99,29 @@ namespace SanteDB.Persistence.Data.Services
             if (this.m_adhocCache?.TryGet(this.CreateCacheKey(id), out retVal) == true)
             {
                 return retVal;
-            } 
+            }
 
             try
             {
-                using(var ctx = this.m_configuration.Provider.GetReadonlyConnection())
+                using (var ctx = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     ctx.Open();
                     var ruleSet = ctx.FirstOrDefault<DbDataQualityConfiguration>(o => o.Id == id);
-                    if (ruleSet == null) return null;
+                    if (ruleSet == null)
+                    {
+                        return null;
+                    }
 
-                    retVal =  this.ConvertToRuleSet(ctx, ruleSet);
+                    retVal = this.ConvertToRuleSet(ctx, ruleSet);
                     this.m_adhocCache?.Add(this.CreateCacheKey(id), retVal);
                     return retVal;
                 }
             }
-            catch(DbException e)
+            catch (DbException e)
             {
                 throw e.TranslateDbException();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATAQUALITY_CONFIG_READ_ERROR), e);
             }
@@ -173,13 +193,13 @@ namespace SanteDB.Persistence.Data.Services
             DataQualityResourceConfiguration[] retVal = null;
             var serializationName = typeof(T).GetSerializationName();
 
-            if(this.m_adhocCache?.TryGet<DataQualityResourceConfiguration[]>($"dq.res.{serializationName}", out retVal) == true)
+            if (this.m_adhocCache?.TryGet<DataQualityResourceConfiguration[]>($"dq.res.{serializationName}", out retVal) == true)
             {
                 return retVal;
             }
             try
             {
-                using(var ctx = this.m_configuration.Provider.GetReadonlyConnection())
+                using (var ctx = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     ctx.Open();
 
@@ -207,7 +227,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public DataQualityRulesetConfiguration SaveRuleSet(DataQualityRulesetConfiguration configuration)
         {
-            if(configuration == null)
+            if (configuration == null)
             {
                 throw new ArgumentNullException(nameof(configuration));
             }
@@ -216,15 +236,15 @@ namespace SanteDB.Persistence.Data.Services
 
             try
             {
-                using(var ctx = this.m_configuration.Provider.GetWriteConnection())
+                using (var ctx = this.m_configuration.Provider.GetWriteConnection())
                 {
                     ctx.Open();
-                    using(var tx = ctx.BeginTransaction())
+                    using (var tx = ctx.BeginTransaction())
                     {
                         this.m_adhocCache?.Remove(this.CreateCacheKey(configuration.Id));
 
                         var existingConfiguration = ctx.FirstOrDefault<DbDataQualityConfiguration>(o => o.Id == configuration.Id);
-                        if(existingConfiguration != null)
+                        if (existingConfiguration != null)
                         {
                             existingConfiguration.ObsoletionTime = null;
                             existingConfiguration.ObsoletedByKey = null;
@@ -248,11 +268,11 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         // Save the resource configurations
-                        var resourceConfigIds = ctx.Query<DbDataQualityResourceConfiguration>(o => o.DataQualityConfigurationKey == existingConfiguration.Key).Select(o=>o.Key).ToArray();
+                        var resourceConfigIds = ctx.Query<DbDataQualityResourceConfiguration>(o => o.DataQualityConfigurationKey == existingConfiguration.Key).Select(o => o.Key).ToArray();
                         ctx.DeleteAll<DbDataQualityResourceAssertion>(r => resourceConfigIds.Contains(r.DataQualityResourceKey));
                         ctx.DeleteAll<DbDataQualityResourceConfiguration>(r => resourceConfigIds.Contains(r.Key));
 
-                        foreach(var config in configuration.Resources)
+                        foreach (var config in configuration.Resources)
                         {
                             var dbConfiguration = ctx.Insert(new DbDataQualityResourceConfiguration()
                             {
@@ -274,15 +294,15 @@ namespace SanteDB.Persistence.Data.Services
 
                         var retVal = this.ConvertToRuleSet(ctx, existingConfiguration);
                         this.m_adhocCache?.Add(this.CreateCacheKey(configuration.Id), retVal);
-                        return retVal;  
+                        return retVal;
                     }
                 }
             }
-            catch(DbException e)
+            catch (DbException e)
             {
                 throw e.TranslateDbException();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATAQUALITY_CONFIG_WRITE_ERROR), e);
             }
@@ -291,7 +311,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public void RemoveRuleSet(string id)
         {
-            if(String.IsNullOrEmpty(id))
+            if (String.IsNullOrEmpty(id))
             {
                 throw new ArgumentNullException(nameof(id));
             }
@@ -299,16 +319,16 @@ namespace SanteDB.Persistence.Data.Services
 
             try
             {
-                using(var ctx = this.m_configuration.Provider.GetWriteConnection())
+                using (var ctx = this.m_configuration.Provider.GetWriteConnection())
                 {
                     ctx.Open();
 
                     var existing = ctx.FirstOrDefault<DbDataQualityConfiguration>(o => o.Id == id);
-                    if(existing == null)
+                    if (existing == null)
                     {
                         throw new KeyNotFoundException(id);
                     }
-                    else if(existing.ObsoletionTime == null) // set obsoletion (soft delete)
+                    else if (existing.ObsoletionTime == null) // set obsoletion (soft delete)
                     {
                         existing.ObsoletionTime = DateTimeOffset.Now;
                         existing.ObsoletedByKey = ctx.EstablishProvenance(AuthenticationContext.Current.Principal);
@@ -330,11 +350,11 @@ namespace SanteDB.Persistence.Data.Services
                     this.m_adhocCache?.RemoveAll("dq\\.res\\..*");
                 }
             }
-            catch(DbException e)
+            catch (DbException e)
             {
                 throw e.TranslateDbException();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATAQUALITY_CONFIG_WRITE_ERROR), e);
             }
@@ -343,14 +363,14 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public void Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
         {
-            
+
             // Get all logically deleted past cutoff
-            foreach(var configId in context.Query<DbDataQualityConfiguration>(o=>o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff).Select(o=>o.Key).ToArray())
+            foreach (var configId in context.Query<DbDataQualityConfiguration>(o => o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff).Select(o => o.Key).ToArray())
             {
                 var resourceConfigIds = context.Query<DbDataQualityResourceConfiguration>(o => o.DataQualityConfigurationKey == configId).Select(o => o.Key).ToArray();
                 context.DeleteAll<DbDataQualityResourceAssertion>(r => resourceConfigIds.Contains(r.DataQualityResourceKey));
                 context.DeleteAll<DbDataQualityResourceConfiguration>(r => resourceConfigIds.Contains(r.Key));
-                context.DeleteAll<DbDataQualityConfiguration>(o=>o.Key == configId);
+                context.DeleteAll<DbDataQualityConfiguration>(o => o.Key == configId);
             }
         }
     }

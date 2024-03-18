@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.i18n;
@@ -144,7 +144,7 @@ namespace SanteDB.Persistence.Data.Jobs
                             c += batch.Length;
                             this.m_jobStateManager.SetProgress(this, this.m_localizationService.GetString(UserMessageStrings.DB_TRIM_SESSION), (float)c / delSessions.Length * 0.3f);
                         }
-                   
+
                         var trimHelpers = this.m_serviceManager.GetServices().OfType<IAdoTrimProvider>().ToArray();
 
                         c = 0;
@@ -169,8 +169,8 @@ namespace SanteDB.Persistence.Data.Jobs
             }
             catch (Exception ex)
             {
-                this.m_tracer.TraceError("Error running trim job: {0}", ex.ToHumanReadableString());
-                this.m_jobStateManager.SetState(this, JobStateType.Aborted);
+                this.m_tracer.TraceError("Error running trim job: {0}", ex);
+                this.m_jobStateManager.SetState(this, JobStateType.Aborted, ex.ToHumanReadableString());
                 audit.WithOutcome(OutcomeIndicator.SeriousFail);
             }
             finally
