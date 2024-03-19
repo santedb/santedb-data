@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20171023-01" name="Update:20171023-01" applyRange="0.2.0.4-0.9.0.6"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20171023-01" name="Update:20171023-01"   invariantName="npgsql">
  *	<summary>Update: Adds the Procedure table to the OpenIZ schema</summary>
  *	<remarks></remarks>
  *	<isInstalled>select ck_patch('20171023-01')</isInstalled>

@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20200522-01" name="Update:20200522-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20200522-01" name="Update:20200522-01"   invariantName="npgsql">
  *	<summary>Update: Add relationship types for MPI Role</summary>
  *	<remarks>This adds various relationship types MPI MDM roles</remarks>
  *	<isInstalled>select ck_patch('20200522-01')</isInstalled>

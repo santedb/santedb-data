@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20220112-02" name="Update:20220112-02" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20220112-02" name="Update:20220112-02"   invariantName="npgsql">
  *	<summary>Adds and initializes fulltext searching to the SanteDB entity tables (may take up to 30 minutes to initialize)</summary>
  *	<isInstalled>select ck_patch('20220112-02')</isInstalled>
  * </feature>

@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20230413-01" name="Update:20230411-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20230413-01" name="Update:20230411-01"   invariantName="npgsql">
  *	<summary>Update: Adds Datamart Metadata Tables</summary>
  *	<isInstalled>select ck_patch('20230413-01')</isInstalled>
  * </feature>

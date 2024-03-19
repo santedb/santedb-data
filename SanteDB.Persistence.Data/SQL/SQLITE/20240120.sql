@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20240120" name="Update:Adds relationship validation to only server" applyRange="0.2.0.0-0.9.0.0" environment="Server" invariantName="sqlite">
+ * <feature scope="SanteDB.Persistence.Data" id="20240120" name="Update:Adds relationship validation to only server"  environment="Server" invariantName="sqlite">
  *	<summary>Update:Add relationship validation for server environment</summary>
  *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE name='ENT_REL_VRFY_TRG')</isInstalled>
  * </feature>

@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20221003" name="Update:Cumulative Updates For 3.0" applyRange="0.2.0.0-0.9.0.0" invariantName="sqlite">
+ * <feature scope="SanteDB.Persistence.Data" id="20221003" name="Update:Cumulative Updates For 3.0"  invariantName="sqlite">
  *	<summary>Update:Cumulative update for SQLite</summary>
  *	<remarks>Updates the SQLite database to latest SanteDB</remarks>
  *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE type='table' AND name='PAT_ENC_ARG_TBL')</isInstalled>

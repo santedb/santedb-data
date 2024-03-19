@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20200812-01" name="Update:20200812-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
+ * <feature scope="SanteDB.Persistence.Data" id="20200812-01" name="Update:20200812-01"   invariantName="FirebirdSQL">
  *	<summary>Update: Removes phonetic value columns (built in db functions should be used)</summary>
  *	<remarks>This removes phonetic value columns</remarks>
  *	<isInstalled>select ck_patch('20200812-01') from rdb$database</isInstalled>

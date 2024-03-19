@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20181112-01" name="Update:20181112-01" applyRange="1.0.0.0-1.9.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20181112-01" name="Update:20181112-01"   invariantName="npgsql">
  *	<summary>Update: Add lockout function to applications and devices</summary>
  *	<remarks>This patch adds lockout and update provenance to the application and device tables</remarks>
  *	<isInstalled>select ck_patch('20181112-01')</isInstalled>

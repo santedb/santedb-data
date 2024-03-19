@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20201109-01" name="Update:20201109-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20201109-01" name="Update:20201109-01"   invariantName="npgsql">
  *	<summary>Update: Allow Impersonation</summary>
  *	<remarks>Adds policies which control impersination</remarks>
  *	<isInstalled>select ck_patch('20201109-01')</isInstalled>

@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20180131-01" name="Update:20180131-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20180131-01" name="Update:20180131-01"   invariantName="npgsql">
  *	<summary>Update: Add relationship "replaces" between all entities of the same class</summary>
  *	<remarks>Any entity is technically allowed to replace itself :)</remarks>
  *	<isInstalled>select ck_patch('20180131-01')</isInstalled>

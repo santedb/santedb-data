@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20170803-01" name="Update:20170803-01" applyRange="0.2.0.0-0.9.0.2"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20170803-01" name="Update:20170803-01"   invariantName="npgsql">
  *	<summary>Update: Adds sequencing to the participation table</summary>
  *	<remarks>This will add sequence identifiers to the participation table so that data can be returned 
  *	in proper order</remarks>
