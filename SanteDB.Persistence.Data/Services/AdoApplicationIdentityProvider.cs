@@ -399,8 +399,7 @@ namespace SanteDB.Persistence.Data.Services
             // Rule - Application can change its own password or ALTER_IDENTITY
             if (!principal.Identity.IsAuthenticated || !principal.Identity.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
             {
-                this.m_pepService.Demand(ApplicationServiceContext.Current.HostType == SanteDBHostType.Server ?
-                    PermissionPolicyIdentifiers.AlterIdentity : PermissionPolicyIdentifiers.AlterLocalIdentity, principal);
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
             }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
@@ -515,8 +514,7 @@ namespace SanteDB.Persistence.Data.Services
 
             if (!principal.Identity.IsAuthenticated || principal != AuthenticationContext.SystemPrincipal)
             {
-                this.m_pepService.Demand(ApplicationServiceContext.Current.HostType == SanteDBHostType.Server ?
-                    PermissionPolicyIdentifiers.AlterIdentity : PermissionPolicyIdentifiers.AlterLocalIdentity, principal);
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
             }
 
             // Get the write connection

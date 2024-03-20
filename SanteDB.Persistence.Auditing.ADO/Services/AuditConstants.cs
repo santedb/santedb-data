@@ -29,6 +29,11 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
     {
 
         /// <summary>
+        /// Audit database asset
+        /// </summary>
+        internal static readonly Guid AUDIT_ASSET_ID = Guid.Parse("EFF684F2-7641-4697-A4A0-CA0F5171BAA7");
+
+        /// <summary>
         /// Configuration section name
         /// </summary>
         public const string ConfigurationSectionName = "santedb.persistence.auditing.ado";

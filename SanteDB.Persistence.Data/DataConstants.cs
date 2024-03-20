@@ -18,6 +18,8 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using System;
+
 namespace SanteDB.Persistence.Data
 {
     /// <summary>
@@ -25,6 +27,11 @@ namespace SanteDB.Persistence.Data
     /// </summary>
     public static class DataConstants
     {
+        /// <summary>
+        /// Primary database backup asset
+        /// </summary>
+        internal static readonly Guid PRIMARY_DATABASE_ASSET_ID = Guid.Parse("FB444942-4276-427C-A09C-9C65769837F0");
+
         /// <summary>
         /// Mapper resource name
         /// </summary>

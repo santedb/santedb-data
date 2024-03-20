@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20240104-04" name="Update:20240104-04"   invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20240104-04" name="Update:20240104-04"  invariantName="npgsql">
  *	<summary>Update: Updates the database to provide persistence of configurable data quality rules</summary>
  *	<isInstalled>select ck_patch('20240104-04')</isInstalled>
  * </feature>

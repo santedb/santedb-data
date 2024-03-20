@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using Microsoft.Data.Sqlite;
 using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.Model.Constants;

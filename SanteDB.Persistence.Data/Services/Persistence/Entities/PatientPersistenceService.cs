@@ -18,12 +18,19 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using SanteDB.Core.i18n;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.Exceptions;
 using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Roles;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
@@ -33,21 +40,93 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// </summary>
     public class PatientPersistenceService : PersonDerivedPersistenceService<Patient, DbPatient>
     {
+        // Fields which are restricted by default
+        private readonly bool m_allowReligion;
+        private readonly bool m_allowEthnicity;
+        private readonly bool m_allowLivingArrangement;
+        private readonly bool m_allowMaritalStatus;
+        private readonly bool m_allowEducationLevel;
+
+        // Fields which are permitted by default
+        private readonly Guid[] m_forbiddenComponents;
+        private readonly Dictionary<String, Guid> m_fobiddenComponentSettings = new Dictionary<string, Guid>()
+        {
+            { FieldRestrictionSettings.ForbidAddressCity, AddressComponentKeys.City },
+            { FieldRestrictionSettings.ForbidAddressCounty, AddressComponentKeys.County },
+            { FieldRestrictionSettings.ForbidAddressPostal, AddressComponentKeys.PostalCode },
+            { FieldRestrictionSettings.ForbidAddressPrecinct, AddressComponentKeys.Precinct },
+            { FieldRestrictionSettings.ForbidAddressState, AddressComponentKeys.State },
+            { FieldRestrictionSettings.ForbidAddressStreet, AddressComponentKeys.StreetAddressLine },
+            { FieldRestrictionSettings.ForbidNameGiven, NameComponentKeys.Given },
+            { FieldRestrictionSettings.ForbidNameFamily, NameComponentKeys.Family },
+            { FieldRestrictionSettings.ForbidNamePrefix, NameComponentKeys.Prefix },
+            { FieldRestrictionSettings.ForbidNameSuffix, NameComponentKeys.Suffix }
+        };
+
         /// <summary>
         /// DI Constructor
         /// </summary>
         public PatientPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
+            _ = Boolean.TryParse(configurationManager.GetAppSetting(FieldRestrictionSettings.AllowReligion), out m_allowReligion);
+            _ = Boolean.TryParse(configurationManager.GetAppSetting(FieldRestrictionSettings.AllowLivingArrangement), out m_allowLivingArrangement);
+            _ = Boolean.TryParse(configurationManager.GetAppSetting(FieldRestrictionSettings.AllowEthnicity), out m_allowEthnicity);
+            _ = Boolean.TryParse(configurationManager.GetAppSetting(FieldRestrictionSettings.AllowMaritalStatus), out m_allowMaritalStatus);
+            _ = Boolean.TryParse(configurationManager.GetAppSetting(FieldRestrictionSettings.AllowEducationLevel), out m_allowEducationLevel);
+
+            this.m_forbiddenComponents = this.m_fobiddenComponentSettings.Select(o => Boolean.TryParse(configurationManager.GetAppSetting(o.Key), out var forbid) && forbid ? o.Value : Guid.Empty)
+                .Where(g => g != Guid.Empty).ToArray();
         }
 
         /// <inheritdoc />
         protected override Patient BeforePersisting(DataContext context, Patient data)
         {
             data.EducationLevelKey = this.EnsureExists(context, data.EducationLevel)?.Key ?? data.EducationLevelKey;
+            if (data.EducationLevelKey.HasValue && !m_allowEducationLevel)
+            {
+                throw new FieldRestrictionException(nameof(Patient.EducationLevel));
+            }
+
             data.EthnicGroupKey = this.EnsureExists(context, data.EthnicGroup)?.Key ?? data.EthnicGroupKey;
+            if (data.EthnicGroupKey.HasValue && !m_allowEthnicity)
+            {
+                throw new FieldRestrictionException(nameof(Patient.EthnicGroup));
+            }
+
             data.MaritalStatusKey = this.EnsureExists(context, data.MaritalStatus)?.Key ?? data.MaritalStatusKey;
+            if (data.MaritalStatusKey.HasValue && !m_allowMaritalStatus)
+            {
+                throw new FieldRestrictionException(nameof(Patient.MaritalStatus));
+            }
+
             data.LivingArrangementKey = this.EnsureExists(context, data.LivingArrangement)?.Key ?? data.LivingArrangementKey;
+            if (data.LivingArrangementKey.HasValue && !m_allowLivingArrangement)
+            {
+                throw new FieldRestrictionException(nameof(Patient.LivingArrangement));
+            }
+
             data.ReligiousAffiliationKey = this.EnsureExists(context, data.ReligiousAffiliation)?.Key ?? data.ReligiousAffiliationKey;
+            if (data.ReligiousAffiliationKey.HasValue && !m_allowReligion)
+            {
+                throw new FieldRestrictionException(nameof(Patient.ReligiousAffiliation));
+            }
+
+            // Addresses and names containing forbidden fields?
+            data.Addresses?.ForEach(a =>
+            {
+                if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
+                {
+                    throw new FieldRestrictionException(nameof(EntityAddress.Component));
+                }
+            });
+            data.Names?.ForEach(a =>
+            {
+                if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
+                {
+                    throw new FieldRestrictionException(nameof(EntityName.Component));
+                }
+            });
+
             return base.BeforePersisting(context, data);
         }
 

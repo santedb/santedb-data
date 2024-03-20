@@ -145,7 +145,13 @@ namespace SanteDB.Persistence.Data.Services
 
             if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase) || !principal.Identity.IsAuthenticated)
             {
+
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
+                if (ApplicationServiceContext.Current.HostType != SanteDBHostType.Server && !this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts, false))
+                {
+                    throw new SecurityException(String.Format(ErrorMessages.POLICY_PREVENTS_ACTION, SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts));
+                }
+
             }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
@@ -313,7 +319,7 @@ namespace SanteDB.Persistence.Data.Services
                             }
 
                             // User requires TFA but the secret is empty
-                            var useMfa = dbUser.TwoFactorEnabled || this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.ForceMfa, false);
+                            var useMfa = dbUser.TwoFactorEnabled || this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.RequireMfa, false);
                             var mfaMechanism = dbUser.TwoFactorMechnaismKey ?? this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.DefaultMfaMethod, (Guid?)null) ?? TfaEmailMechanism.MechanismId;
                             if (useMfa && String.IsNullOrEmpty(tfaSecret))
                             {
@@ -536,18 +542,11 @@ namespace SanteDB.Persistence.Data.Services
             // Validate create permission
             if (principal != AuthenticationContext.SystemPrincipal)
             {
-                if (ApplicationServiceContext.Current.HostType == SanteDBHostType.Server)
-                {
                     this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateIdentity, principal);
-                }
-                else
-                {
-                    this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateLocalIdentity, principal);
-                    if (!this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts, false))
+                    if (ApplicationServiceContext.Current.HostType != SanteDBHostType.Server && !this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts, false))
                     {
                         throw new SecurityException(String.Format(ErrorMessages.POLICY_PREVENTS_ACTION, SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts));
                     }
-                }
             }
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
@@ -616,14 +615,7 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            if (ApplicationServiceContext.Current.HostType == SanteDBHostType.Server)
-            {
-                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
-            }
-            else
-            {
-                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterLocalIdentity, principal);
-            }
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
@@ -787,6 +779,10 @@ namespace SanteDB.Persistence.Data.Services
             if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase) || !principal.Identity.IsAuthenticated)
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
+                if (ApplicationServiceContext.Current.HostType != SanteDBHostType.Server && !this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts, false))
+                {
+                    throw new SecurityException(String.Format(ErrorMessages.POLICY_PREVENTS_ACTION, SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts));
+                }
             }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
@@ -836,14 +832,7 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            if (ApplicationServiceContext.Current.HostType == SanteDBHostType.Server)
-            {
-                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
-            }
-            else
-            {
-                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterLocalIdentity, principal);
-            }
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
