@@ -19,6 +19,7 @@
  * Date: 2023-6-21
  */
 using SanteDB.Core.Configuration;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 
@@ -60,36 +61,43 @@ namespace SanteDB.Persistence.Data.Configuration
         /// Gets or sets the targets
         /// </summary>
         [XmlElement("target")]
+        [DisplayName("Resource Type"), Description("The resource types that this validation applies to")]
+        [Editor("SanteDB.Configuration.Editors.ResourceCollectionEditor, SanteDB.Configuration", "System.Drawing.Design.UITypeEditor, System.Drawing, Version=4.0.0.0")]
         public ResourceTypeReferenceConfiguration Target { get; set; }
 
         /// <summary>
         /// Enforce uniqueness
         /// </summary>
         [XmlAttribute("unique")]
+        [DisplayName("Uniqueness"), Description("Controls the validation of the IdentityDomain.Unique setting")]
         public AdoValidationEnforcement Uniqueness { get; set; }
 
         /// <summary>
         /// Enforce scope
         /// </summary>
         [XmlAttribute("scope")]
+        [DisplayName("Scope"), Description("Controls the validation of the IdentityDomain.Scope setting")]
         public AdoValidationEnforcement Scope { get; set; }
 
         /// <summary>
         /// Enforce authority
         /// </summary>
         [XmlAttribute("authority")]
+        [DisplayName("Authority"), Description("Controls the validation of the IdentityDomain.AssigningAuthority setting")]
         public AdoValidationEnforcement Authority { get; set; }
 
         /// <summary>
         /// Ensure format of identifier
         /// </summary>
         [XmlAttribute("format")]
+        [DisplayName("Format"), Description("Controls the validation of the IdentityDomain.ValidationRegex")]
         public AdoValidationEnforcement Format { get; set; }
 
         /// <summary>
         /// Ensure check-digit of identifier
         /// </summary>
         [XmlAttribute("checkDigit")]
+        [DisplayName("Check Digit"), Description("Controls the validation of the IdentityDomain.CheckDigitAlgorithm setting")]
         public AdoValidationEnforcement CheckDigit { get; set; }
     }
 }
