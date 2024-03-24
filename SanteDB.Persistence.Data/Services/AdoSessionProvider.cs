@@ -395,6 +395,7 @@ namespace SanteDB.Persistence.Data.Services
                             }
                         }
 
+
                         dbSession = context.Insert(dbSession);
 
                         // Default = *
@@ -430,6 +431,12 @@ namespace SanteDB.Persistence.Data.Services
                         if (!String.IsNullOrEmpty(lang))
                         {
                             claims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, lang));
+                        }
+
+                        // Local session/authentication
+                        if(claimsPrincipal.HasClaim(o=>o.Type == SanteDBClaimTypes.LocalOnly && Boolean.TryParse(o.Value, out var b) && b))
+                        {
+                            claims.Add(new SanteDBClaim(SanteDBClaimTypes.LocalOnly, "true"));
                         }
 
                         // Insert claims to database
@@ -546,8 +553,8 @@ namespace SanteDB.Persistence.Data.Services
                         //var signedRefresh = refreshTokenId.ToByteArray().Concat(m_dataSigningService.SignData(refreshTokenId.ToByteArray())).ToArray();
                         var session = new AdoSecuritySession(dbSession.Key.ToByteArray(), newRefreshToken, dbSession, dbClaims);
                         this.Extended?.Invoke(this, new SessionEstablishedEventArgs(null, session, true, false,
-                            session.FindFirst(SanteDBClaimTypes.PurposeOfUse).Value,
-                            session.Find(SanteDBClaimTypes.SanteDBScopeClaim).Select(o => o.Value).ToArray()));
+                            session.FindFirst(SanteDBClaimTypes.PurposeOfUse)?.Value,
+                            session.Find(SanteDBClaimTypes.SanteDBScopeClaim)?.Select(o => o.Value).ToArray()));
 
                         this.m_adhocCacheService?.Add(this.CreateCacheKey(session.Key), session, dbSession.RefreshExpiration.Subtract(DateTimeOffset.Now));
                         return session;

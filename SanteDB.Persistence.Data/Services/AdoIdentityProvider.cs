@@ -80,6 +80,7 @@ namespace SanteDB.Persistence.Data.Services
 
         // TFA generator
         private readonly ITfaService m_tfaRelay;
+        private readonly IDataCachingService m_dataCachingService;
 
         // The password validator
         private readonly IPasswordValidatorService m_passwordValidator;
@@ -95,6 +96,7 @@ namespace SanteDB.Persistence.Data.Services
             IPasswordHashingService passwordHashingService,
             IPolicyEnforcementService policyEnforcementService,
             IPasswordValidatorService passwordValidator,
+            IDataCachingService dataCachingService = null,
             ITfaService twoFactorSecretGenerator = null)
         {
             this.m_configuration = configuration.GetSection<AdoPersistenceConfigurationSection>();
@@ -102,6 +104,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_passwordHashingService = passwordHashingService;
             this.m_pepService = policyEnforcementService;
             this.m_tfaRelay = twoFactorSecretGenerator;
+            this.m_dataCachingService = dataCachingService;
             this.m_passwordValidator = passwordValidator;
             this.m_localizationService = localizationService;
         }
@@ -193,6 +196,8 @@ namespace SanteDB.Persistence.Data.Services
                         context.Update(dbUser);
                         tx.Commit();
                     }
+
+                    this.m_dataCachingService?.Remove(dbUser.Key);
                 }
                 catch (Exception e)
                 {
@@ -291,7 +296,7 @@ namespace SanteDB.Persistence.Data.Services
                             }
 
                             // Claims to add to the principal
-                            var claims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Key && o.ClaimExpiry < DateTimeOffset.Now).ToList();
+                            var claims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Key && (o.ClaimExpiry == null || o.ClaimExpiry < DateTimeOffset.Now)).ToList();
 
                             if (!String.IsNullOrEmpty(password))
                             {
@@ -354,7 +359,6 @@ namespace SanteDB.Persistence.Data.Services
                             // Establish additional claims
                             identity.AddClaims(claims.Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
                             identity.AddXspaClaims(context);
-
 
                             // Add the default language 
                             var prefLangSql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbPersonLanguageCommunication))
@@ -503,6 +507,8 @@ namespace SanteDB.Persistence.Data.Services
                         dbUser = context.Update(dbUser);
 
                         tx.Commit();
+                        this.m_dataCachingService?.Remove(dbUser.Key);
+
                     }
                 }
                 catch (Exception e)
@@ -532,7 +538,7 @@ namespace SanteDB.Persistence.Data.Services
             }
             else if (!this.m_passwordValidator.Validate(password) && principal != AuthenticationContext.SystemPrincipal)
             {
-                throw new SecurityException(this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_COMPLEXITY));
+                throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "password.complexity", this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_COMPLEXITY), DetectedIssueKeys.SecurityIssue, null);
             }
             else if (principal == null)
             {
@@ -633,6 +639,8 @@ namespace SanteDB.Persistence.Data.Services
                     dbUser.ObsoletionTime = DateTimeOffset.Now;
                     dbUser.ObsoletedByKey = context.EstablishProvenance(principal, null);
                     context.Update(dbUser);
+                    this.m_dataCachingService?.Remove(dbUser.Key);
+
                 }
                 catch (Exception e)
                 {
@@ -806,6 +814,8 @@ namespace SanteDB.Persistence.Data.Services
                         context.Update(dbUser);
                         tx.Commit();
                     }
+                    this.m_dataCachingService?.Remove(dbUser.Key);
+
                 }
                 catch (Exception e)
                 {
@@ -850,8 +860,10 @@ namespace SanteDB.Persistence.Data.Services
                     dbUser.UpdatedTime = DateTimeOffset.Now;
                     dbUser.Lockout = lockout ? (DateTimeOffset?)DateTimeOffset.MaxValue.ToLocalTime() : null;
                     dbUser.LockoutSpecified = true;
-
+                    
                     context.Update(dbUser);
+                    this.m_dataCachingService?.Remove(dbUser.Key);
+
                 }
                 catch (Exception e)
                 {
