@@ -375,7 +375,7 @@ namespace SanteDB.Persistence.Data.Services
         public LambdaExpression MapExpression<TReturn>(Expression<Func<ICdssLibrary, TReturn>> sortExpression)
         {
             var sortQuery = this.m_modelMapper.MapModelExpression<ICdssLibrary, DbCdssLibraryVersion, TReturn>(sortExpression, false);
-            if(sortQuery == null)
+            if(sortQuery == null && sortExpression.ToString().Contains("Storage"))
             {
                 var propertySelector = QueryExpressionBuilder.BuildPropertySelector(sortExpression).Replace("storage.", ""); // HACK:
                 var parameter = Expression.Parameter(typeof(DbCdssLibraryVersion));
