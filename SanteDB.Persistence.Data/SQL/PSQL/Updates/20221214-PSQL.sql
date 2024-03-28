@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20221214-02" name="Update:20221214-01" applyRange="1.1.0.0-1.2.0.0" required="false"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20221214-02" name="Update:20221214-01"  required="false"  invariantName="npgsql">
  *	<summary>Update: Convert refresh FTI to procedures</summary>
  *	<isInstalled>select ck_patch('20221214-02')</isInstalled>
  *  <canInstall>SELECT TRUE FROM (SELECT version() v) i WHERE NOT (v ILIKE '%PostgreSQL 9.%' OR v ILIKE '%PostgreSQL 10.%')</canInstall>

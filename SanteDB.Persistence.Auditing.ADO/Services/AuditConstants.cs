@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using System;
 
@@ -27,6 +27,11 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
     /// </summary>
     internal class AuditConstants
     {
+
+        /// <summary>
+        /// Audit database asset
+        /// </summary>
+        internal static readonly Guid AUDIT_ASSET_ID = Guid.Parse("EFF684F2-7641-4697-A4A0-CA0F5171BAA7");
 
         /// <summary>
         /// Configuration section name

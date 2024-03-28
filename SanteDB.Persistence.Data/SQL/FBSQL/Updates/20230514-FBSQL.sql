@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20230514-01" name="Update:20230514-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
+ * <feature scope="SanteDB.Persistence.Data" id="20230514-01" name="Update:20230514-01"   invariantName="FirebirdSQL">
  *	<summary>Update: Added creation time fields to the REL_VRFY_SYSTBL</summary>
  *	<isInstalled>select ck_patch('20230514-01') from rdb$database</isInstalled>
  * </feature>

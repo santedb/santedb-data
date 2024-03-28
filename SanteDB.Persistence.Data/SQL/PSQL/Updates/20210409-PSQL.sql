@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20210409-01" name="Update:20210409-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20210409-01" name="Update:20210409-01"   invariantName="npgsql">
  *	<summary>Update: Refactored persistence layer patch </summary>
  *	<isInstalled>select ck_patch('20210409-01')</isInstalled>
  * </feature>

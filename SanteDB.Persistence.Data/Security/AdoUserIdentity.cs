@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security.Claims;
@@ -26,6 +26,7 @@ using SanteDB.Persistence.Data.Model.Concepts;
 using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Roles;
 using SanteDB.Persistence.Data.Model.Security;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,6 +104,14 @@ namespace SanteDB.Persistence.Data.Security
         /// Get the SID of this object
         /// </summary>
         internal override Guid Sid => this.m_securityUser.Key;
+
+        /// <summary>
+        /// Add relevant DCDR claims to the identity 
+        /// </summary>
+        internal void AddDcdrClaims(IEnumerable<DbUserClaim> contextClaims)
+        {
+            contextClaims.Where(o => o.ClaimType == SanteDBClaimTypes.LocalOnly).ForEach(c => this.AddClaim(new SanteDBClaim(c.ClaimType, c.ClaimValue)));
+        }
 
         /// <summary>
         /// Add XSPA claims

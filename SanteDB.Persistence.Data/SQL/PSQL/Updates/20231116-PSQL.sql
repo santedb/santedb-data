@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20231116-01" name="Update:20231116-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20231116-01" name="Update:20231116-01"   invariantName="npgsql">
  *	<summary>Update: Updates the storage of care plans and CDSS library logic</summary>
  *	<isInstalled>select ck_patch('20231116-01')</isInstalled>
  * </feature>

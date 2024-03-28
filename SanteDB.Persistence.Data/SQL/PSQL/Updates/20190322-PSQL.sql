@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20190322-01" name="Update:20190322-01" applyRange="1.0.0.0-1.9.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20190322-01" name="Update:20190322-01"   invariantName="npgsql">
  *	<summary>Update: Allow same entitie classes to be children of each other</summary>
  *	<remarks>Updates the relationships</remarks>
  *	<isInstalled>select ck_patch('20190322-01')</isInstalled>

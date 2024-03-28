@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,53 +16,37 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2024-1-23
  */
+using SanteDB;
 using SanteDB.Client.Disconnected.Data.Synchronization;
+using SanteDB.Core.Data.Backup;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.i18n;
+using SanteDB.Core.Model.Map;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite.Migration;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Synchronization.ADO.Configuration;
 using SanteDB.Persistence.Synchronization.ADO.Model;
+using SanteDB.Persistence.Synchronization.ADO.Queues;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Xml.Serialization;
-using SanteDB.Persistence.Data;
-using SanteDB.Core.Exceptions;
-using SanteDB.Core.i18n;
-using System.Collections.Concurrent;
-using SanteDB.Persistence.Data.Services.Persistence;
-using SanteDB.OrmLite;
-using SanteDB.Core.Security.Audit;
-using SharpCompress;
-using SanteDB.Core.Model.Map;
-using SanteDB.Persistence.Synchronization.ADO.Queues;
-using SanteDB;
-using DocumentFormat.OpenXml.Wordprocessing;
-using System.Drawing;
-using SanteDB.Core.Data.Backup;
-using SanteDB.Core.Data;
-using System.IO;
 
 namespace SanteDB.Persistence.Synchronization.ADO.Services
 {
     /// <summary>
     /// 
     /// </summary>
-    public class AdoSynchronizationManager : IServiceImplementation, ISynchronizationLogService, ISynchronizationQueueManager, IProvideBackupAssets, IRestoreBackupAssets
+    public class AdoSynchronizationManager : IServiceImplementation, ISynchronizationLogService, ISynchronizationQueueManager, IProvideBackupAssets, IDisposable
     {
         private readonly Tracer _Tracer;
-        private readonly Guid SYNC_DATABASE_ASSET_ID = Guid.Parse("3E3C4EF4-5C64-4EC6-BB82-26719F09F8B5");
         /// <inheritdoc/>
         public string ServiceName => "ADO.NET Synchronization Repository";
-        
-        /// <inheritdoc/>
-        public Guid[] AssetClassIdentifiers => new Guid[] { SYNC_DATABASE_ASSET_ID };
+
 
         private readonly AdoSynchronizationConfigurationSection _Configuration;
         private readonly IDataCachingService _DataCachingService;
@@ -291,12 +275,12 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
             {
                 context.Open();
 
-                var existing =  context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == entry.Key || (o.ResourceType == entry.ResourceType && o.Filter == entry.Filter));
+                var existing = context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == entry.Key || (o.ResourceType == entry.ResourceType && o.Filter == entry.Filter));
                 if (existing == null)
                 {
                     throw new KeyNotFoundException(entry.Key.ToString());
                 }
-                else if(existing.QueryId.HasValue)
+                else if (existing.QueryId.HasValue)
                 {
                     throw new InvalidOperationException(String.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, nameof(StartQuery)));
                 }
@@ -312,16 +296,16 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
         /// <inheritdoc/>
         public ISynchronizationLogQuery SaveQuery(ISynchronizationLogQuery query, int offset)
         {
-            if(query == null)
+            if (query == null)
             {
                 throw new ArgumentNullException(nameof(query));
             }
-            else if(query.QueryId == Guid.Empty)
+            else if (query.QueryId == Guid.Empty)
             {
                 throw new InvalidOperationException(String.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, nameof(SaveQuery)));
             }
 
-            using(var context = this._Provider.GetWriteConnection())
+            using (var context = this._Provider.GetWriteConnection())
             {
                 context.Open();
                 DbSynchronizationLogEntry existing = context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == query.Key && o.QueryId != null || o.QueryId == query.QueryId);
@@ -338,16 +322,16 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
         /// <inheritdoc/>
         public void CompleteQuery(ISynchronizationLogQuery query)
         {
-            if(query == null)
+            if (query == null)
             {
                 throw new ArgumentNullException(nameof(query));
             }
-            else if(query.QueryId == Guid.Empty)
+            else if (query.QueryId == Guid.Empty)
             {
                 throw new InvalidOperationException(String.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, nameof(CompleteQuery)));
             }
 
-            using(var context = this._Provider.GetWriteConnection())
+            using (var context = this._Provider.GetWriteConnection())
             {
                 context.Open();
                 DbSynchronizationLogEntry existing = context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == query.Key || o.QueryId == query.QueryId);
@@ -366,42 +350,36 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
         /// <inheritdoc/>
         public ISynchronizationLogQuery FindQueryData(ISynchronizationLogEntry entry)
         {
-            if(entry == null)
+            if (entry == null)
             {
                 throw new ArgumentNullException(nameof(entry));
             }
 
-            using(var context = this._Provider.GetReadonlyConnection())
+            using (var context = this._Provider.GetReadonlyConnection())
             {
                 context.Open();
                 return context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == entry.Key && o.QueryId != null);
             }
         }
 
-
-        /// <inheritdoc/>
-        public bool Restore(IBackupAsset backupAsset)
-        {
-            if(backupAsset == null)
-            {
-                throw new ArgumentNullException(nameof(backupAsset));
-            }
-            else if(backupAsset.AssetClassId != SYNC_DATABASE_ASSET_ID)
-            {
-                throw new InvalidOperationException();
-            }
-
-            return this._Configuration.Provider.RestoreBackupAsset(backupAsset);
-        }
-
         /// <inheritdoc/>
         public IEnumerable<IBackupAsset> GetBackupAssets()
         {
-            var retVal = this._Configuration.Provider.CreateBackupAsset(SYNC_DATABASE_ASSET_ID);
-            if(retVal != null)
+            var retVal = this._Configuration.Provider.CreateBackupAsset(Constants.SYNC_DATABASE_ASSET_ID);
+            if (retVal != null)
             {
                 yield return retVal;
             }
         }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            if (this._Configuration.Provider is IDisposable dispose)
+            {
+                dispose.Dispose();
+            }
+        }
+
     }
 }

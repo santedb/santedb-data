@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="00-OPENIZ" name="Upgrade from OpenIZ 1.1.0.0" applyRange="1.1.0.0-1.1.0.0" invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="00-OPENIZ" name="Upgrade from OpenIZ 1.1.0.0"  invariantName="npgsql">
  *	<summary>Upgrades an OpenIZ 1.1.0.0 database SanteDB</summary>
  *	<remarks>This update will perform the necessary steps to upgrade an existing OpenIZ database to SanteDB</remarks>
  *	<canInstall>SELECT COUNT(distinct usr_id) > 0 FROM SEC_USR_TBL;</canInstall>

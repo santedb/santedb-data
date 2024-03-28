@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20230327" name="Update:Cumulative Update for SQLite" applyRange="0.2.0.0-0.9.0.0" invariantName="sqlite">
+ * <feature scope="SanteDB.Persistence.Data" id="20230327" name="Update:Cumulative Update for SQLite"  invariantName="sqlite">
  *	<summary>Update:Fix StateOrProvince and CountyOrParish relationship</summary>
  *  <isInstalled>SELECT EXISTS (SELECT 1 FROM REL_VRFY_SYSTBL WHERE REL_TYP_CD_ID = x'45B3CBBFDB86BA43B47EE7411276AC7C' AND SRC_CLS_CD_ID = x'285C1A4DB7DE1E41B75FD524F90DFA63')</isInstalled>
  * </feature>

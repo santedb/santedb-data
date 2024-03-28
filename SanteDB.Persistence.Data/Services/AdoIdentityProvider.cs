@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
@@ -28,7 +28,6 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Configuration;
-using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Security.Tfa;
 using SanteDB.Core.Services;
@@ -55,7 +54,7 @@ namespace SanteDB.Persistence.Data.Services
 
         /// <inheritdoc/>
         public IIdentityProviderService LocalProvider => this;
-        
+
         // Secret claims which should not be disclosed 
         private readonly String[] m_nonIdentityClaims =
         {
@@ -81,6 +80,7 @@ namespace SanteDB.Persistence.Data.Services
 
         // TFA generator
         private readonly ITfaService m_tfaRelay;
+        private readonly IDataCachingService m_dataCachingService;
 
         // The password validator
         private readonly IPasswordValidatorService m_passwordValidator;
@@ -96,6 +96,7 @@ namespace SanteDB.Persistence.Data.Services
             IPasswordHashingService passwordHashingService,
             IPolicyEnforcementService policyEnforcementService,
             IPasswordValidatorService passwordValidator,
+            IDataCachingService dataCachingService = null,
             ITfaService twoFactorSecretGenerator = null)
         {
             this.m_configuration = configuration.GetSection<AdoPersistenceConfigurationSection>();
@@ -103,6 +104,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_passwordHashingService = passwordHashingService;
             this.m_pepService = policyEnforcementService;
             this.m_tfaRelay = twoFactorSecretGenerator;
+            this.m_dataCachingService = dataCachingService;
             this.m_passwordValidator = passwordValidator;
             this.m_localizationService = localizationService;
         }
@@ -144,7 +146,16 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
+            if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase) || !principal.Identity.IsAuthenticated)
+            {
+
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
+                if (ApplicationServiceContext.Current.HostType != SanteDBHostType.Server && !this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts, false))
+                {
+                    throw new SecurityException(String.Format(ErrorMessages.POLICY_PREVENTS_ACTION, SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts));
+                }
+
+            }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
@@ -185,6 +196,8 @@ namespace SanteDB.Persistence.Data.Services
                         context.Update(dbUser);
                         tx.Commit();
                     }
+
+                    this.m_dataCachingService?.Remove(dbUser.Key);
                 }
                 catch (Exception e)
                 {
@@ -283,7 +296,7 @@ namespace SanteDB.Persistence.Data.Services
                             }
 
                             // Claims to add to the principal
-                            var claims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Key && o.ClaimExpiry < DateTimeOffset.Now).ToList();
+                            var claims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Key && (o.ClaimExpiry == null || o.ClaimExpiry < DateTimeOffset.Now)).ToList();
 
                             if (!String.IsNullOrEmpty(password))
                             {
@@ -311,12 +324,12 @@ namespace SanteDB.Persistence.Data.Services
                             }
 
                             // User requires TFA but the secret is empty
-                            var useMfa = dbUser.TwoFactorEnabled || this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.ForceMfa, false);
+                            var useMfa = dbUser.TwoFactorEnabled || this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.RequireMfa, false);
                             var mfaMechanism = dbUser.TwoFactorMechnaismKey ?? this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.DefaultMfaMethod, (Guid?)null) ?? TfaEmailMechanism.MechanismId;
                             if (useMfa && String.IsNullOrEmpty(tfaSecret))
                             {
                                 var secretString = this.m_tfaRelay.SendSecret(mfaMechanism, new AdoUserIdentity(dbUser));
-                                throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ, new { message = secretString }));
+                                throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ, new { message = this.m_localizationService.GetString(secretString) }));
                             }
 
                             // TFA supplied?
@@ -346,7 +359,6 @@ namespace SanteDB.Persistence.Data.Services
                             // Establish additional claims
                             identity.AddClaims(claims.Where(o => !this.m_nonIdentityClaims.Contains(o.ClaimType)).Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)));
                             identity.AddXspaClaims(context);
-
 
                             // Add the default language 
                             var prefLangSql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbPersonLanguageCommunication))
@@ -439,7 +451,7 @@ namespace SanteDB.Persistence.Data.Services
             }
 
             // The user changing the password must be the user or an administrator
-            if (!principal.Identity.Name.Equals(userName, StringComparison.OrdinalIgnoreCase))
+            if (!principal.Identity.Name.Equals(userName, StringComparison.OrdinalIgnoreCase) || !principal.Identity.IsAuthenticated)
             {
                 this.m_pepService.Demand(PermissionPolicyIdentifiers.ChangePassword, principal);
             }
@@ -464,8 +476,8 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "password.history", this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_HISTORY), DetectedIssueKeys.SecurityIssue, null);
                         }
-                        
-                        if(isSynchronizationOperation) // the password is changing to synchronize 
+
+                        if (isSynchronizationOperation) // the password is changing to synchronize 
                         {
                             dbUser.LastLoginTime = DateTimeOffset.Now;
                         }
@@ -476,7 +488,7 @@ namespace SanteDB.Persistence.Data.Services
 
                         // Password expire policy
                         var pwdExpire = this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.MaxPasswordAge);
-                        if (pwdExpire != default(TimeSpan))
+                        if (pwdExpire != default(TimeSpan) && AuthenticationContext.Current.Principal != AuthenticationContext.SystemPrincipal) // system principal setting password doesn't expire
                         {
                             dbUser.PasswordExpiration = DateTimeOffset.Now.Add(pwdExpire);
                         }
@@ -495,6 +507,8 @@ namespace SanteDB.Persistence.Data.Services
                         dbUser = context.Update(dbUser);
 
                         tx.Commit();
+                        this.m_dataCachingService?.Remove(dbUser.Key);
+
                     }
                 }
                 catch (Exception e)
@@ -524,7 +538,7 @@ namespace SanteDB.Persistence.Data.Services
             }
             else if (!this.m_passwordValidator.Validate(password) && principal != AuthenticationContext.SystemPrincipal)
             {
-                throw new SecurityException(this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_COMPLEXITY));
+                throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "password.complexity", this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_COMPLEXITY), DetectedIssueKeys.SecurityIssue, null);
             }
             else if (principal == null)
             {
@@ -534,18 +548,11 @@ namespace SanteDB.Persistence.Data.Services
             // Validate create permission
             if (principal != AuthenticationContext.SystemPrincipal)
             {
-                if (ApplicationServiceContext.Current.HostType == SanteDBHostType.Server)
-                {
                     this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateIdentity, principal);
-                }
-                else
-                {
-                    this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateLocalIdentity, principal);
-                    if (!this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts, false))
+                    if (ApplicationServiceContext.Current.HostType != SanteDBHostType.Server && !this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts, false))
                     {
                         throw new SecurityException(String.Format(ErrorMessages.POLICY_PREVENTS_ACTION, SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts));
                     }
-                }
             }
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
@@ -614,14 +621,7 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            if (ApplicationServiceContext.Current.HostType == SanteDBHostType.Server)
-            {
-                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
-            }
-            else
-            {
-                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterLocalIdentity, principal);
-            }
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
@@ -639,6 +639,8 @@ namespace SanteDB.Persistence.Data.Services
                     dbUser.ObsoletionTime = DateTimeOffset.Now;
                     dbUser.ObsoletedByKey = context.EstablishProvenance(principal, null);
                     context.Update(dbUser);
+                    this.m_dataCachingService?.Remove(dbUser.Key);
+
                 }
                 catch (Exception e)
                 {
@@ -781,7 +783,15 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
+            // User can remove their own claims
+            if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase) || !principal.Identity.IsAuthenticated)
+            {
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
+                if (ApplicationServiceContext.Current.HostType != SanteDBHostType.Server && !this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts, false))
+                {
+                    throw new SecurityException(String.Format(ErrorMessages.POLICY_PREVENTS_ACTION, SecurityPolicyIdentification.AllowLocalDownstreamUserAccounts));
+                }
+            }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
@@ -804,6 +814,8 @@ namespace SanteDB.Persistence.Data.Services
                         context.Update(dbUser);
                         tx.Commit();
                     }
+                    this.m_dataCachingService?.Remove(dbUser.Key);
+
                 }
                 catch (Exception e)
                 {
@@ -830,14 +842,7 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            if (ApplicationServiceContext.Current.HostType == SanteDBHostType.Server)
-            {
-                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
-            }
-            else
-            {
-                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterLocalIdentity, principal);
-            }
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
@@ -855,8 +860,10 @@ namespace SanteDB.Persistence.Data.Services
                     dbUser.UpdatedTime = DateTimeOffset.Now;
                     dbUser.Lockout = lockout ? (DateTimeOffset?)DateTimeOffset.MaxValue.ToLocalTime() : null;
                     dbUser.LockoutSpecified = true;
-
+                    
                     context.Update(dbUser);
+                    this.m_dataCachingService?.Remove(dbUser.Key);
+
                 }
                 catch (Exception e)
                 {

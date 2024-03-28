@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.PubSub.ADO" id="20210311-01" name="Update:20210311-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="sqlite">
+ * <feature scope="SanteDB.Persistence.PubSub.ADO" id="20210311-01" name="Update:20210311-01"   invariantName="sqlite">
  *	<summary>Update: Installs the Pub/Sub ADO Tables</summary>
  *	<remarks>This table is used to register channels and subscriptions</remarks>
  *  <isInstalled mustSucceed="true">SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE type='table' AND name='SUB_CHNL_TBL')</isInstalled>

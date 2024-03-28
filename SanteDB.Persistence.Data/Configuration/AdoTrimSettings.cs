@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using System;
 using System.ComponentModel;
@@ -34,18 +34,21 @@ namespace SanteDB.Persistence.Data.Configuration
         /// Gets or sets the maximum session retention policy
         /// </summary>
         [XmlElement("maxSession"), DisplayName("Session Retention"), Description("Sets the maximum amount of time that old sessions should be retained (default: 30 days)")]
+        [Editor("SanteDB.Configuration.Editors.TimespanPickerEditor, SanteDB.Configuration", "System.Drawing.Design.UITypeEditor, System.Drawing")]
         public TimeSpan? MaxSessionRetention { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum old version retention
         /// </summary>
         [XmlElement("maxVersion"), DisplayName("Version Retention"), Description("Sets the maximum amount of time that old versions should be retained (default: 30 days)")]
+        [Editor("SanteDB.Configuration.Editors.TimespanPickerEditor, SanteDB.Configuration", "System.Drawing.Design.UITypeEditor, System.Drawing")]
         public TimeSpan? MaxOldVersionRetention { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum deleted data restoration availability.
         /// </summary>
         [XmlElement("maxRestore"), DisplayName("Restore Time"), Description("Sets the maximum amount of time that old data can be un-deleted (default: 30 days)")]
+        [Editor("SanteDB.Configuration.Editors.TimespanPickerEditor, SanteDB.Configuration", "System.Drawing.Design.UITypeEditor, System.Drawing")]
         public TimeSpan? MaxDeletedDataRetention { get; set; }
 
     }

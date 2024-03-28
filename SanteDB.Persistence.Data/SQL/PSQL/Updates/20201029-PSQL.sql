@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20201029-01" name="Update:20201029-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20201029-01" name="Update:20201029-01"   invariantName="npgsql">
  *	<summary>Update: Place of Death Associations</summary>
  *	<remarks>Adds allowed relationship types between places of death</remarks>
  *	<isInstalled>select ck_patch('20201029-01')</isInstalled>

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,27 +16,23 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using NUnit.Framework;
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
-using SanteDB.Core.Exceptions;
-using SanteDB.Core.Model.Acts;
-using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Cdss;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
-using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
-using SanteDB.Matcher.Matchers;
-using SanteDB.Core.Model;
-using NUnit.Framework.Constraints;
 using System.Xml.Serialization;
-using SanteDB.Core.Model.Interfaces;
 
 namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
 {

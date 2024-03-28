@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
@@ -47,7 +47,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// An identity provider service that uses the ADO session table
     /// </summary>
-    public class AdoSessionProvider : ISessionIdentityProviderService, ISessionProviderService
+    public class AdoSessionProvider : ISessionIdentityProviderService, ISessionProviderService, ILocalServiceProvider<ISessionIdentityProviderService>, ILocalServiceProvider<ISessionProviderService>
     {
         // Tracer
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoSessionProvider));
@@ -131,6 +131,12 @@ namespace SanteDB.Persistence.Data.Services
         /// Gets the service name
         /// </summary>
         public string ServiceName => "Databased Session Authentication Provider";
+
+        /// <inheritdoc/>
+        ISessionProviderService ILocalServiceProvider<ISessionProviderService>.LocalProvider => this;
+
+        /// <inheritdoc/>
+        ISessionIdentityProviderService ILocalServiceProvider<ISessionIdentityProviderService>.LocalProvider => this;
 
         /// <summary>
         /// Fired when a new session is established
@@ -364,7 +370,7 @@ namespace SanteDB.Persistence.Data.Services
                             System.Security.Cryptography.RandomNumberGenerator.Create().GetBytes(refreshToken);
                             dbSession.RefreshToken = this.m_passwordHashingService.ComputeHash(refreshToken).HexEncode().ToLower();
                         }
-                        if(isOverride) // Overrides cannot be extended
+                        if (isOverride) // Overrides cannot be extended
                         {
                             dbSession.RefreshToken = null;
                             dbSession.RefreshExpiration = DateTimeOffset.Now;
@@ -388,6 +394,7 @@ namespace SanteDB.Persistence.Data.Services
                                 dbSession.NotAfter = DateTimeOffset.Now.AddSeconds(120); //TODO: Need to set this somewhere as a configuration setting. This means they have ~2 minutes to click on a password reset.
                             }
                         }
+
 
                         dbSession = context.Insert(dbSession);
 
@@ -424,6 +431,12 @@ namespace SanteDB.Persistence.Data.Services
                         if (!String.IsNullOrEmpty(lang))
                         {
                             claims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, lang));
+                        }
+
+                        // Local session/authentication
+                        if(claimsPrincipal.HasClaim(o=>o.Type == SanteDBClaimTypes.LocalOnly && Boolean.TryParse(o.Value, out var b) && b))
+                        {
+                            claims.Add(new SanteDBClaim(SanteDBClaimTypes.LocalOnly, "true"));
                         }
 
                         // Insert claims to database
@@ -540,8 +553,8 @@ namespace SanteDB.Persistence.Data.Services
                         //var signedRefresh = refreshTokenId.ToByteArray().Concat(m_dataSigningService.SignData(refreshTokenId.ToByteArray())).ToArray();
                         var session = new AdoSecuritySession(dbSession.Key.ToByteArray(), newRefreshToken, dbSession, dbClaims);
                         this.Extended?.Invoke(this, new SessionEstablishedEventArgs(null, session, true, false,
-                            session.FindFirst(SanteDBClaimTypes.PurposeOfUse).Value,
-                            session.Find(SanteDBClaimTypes.SanteDBScopeClaim).Select(o => o.Value).ToArray()));
+                            session.FindFirst(SanteDBClaimTypes.PurposeOfUse)?.Value,
+                            session.Find(SanteDBClaimTypes.SanteDBScopeClaim)?.Select(o => o.Value).ToArray()));
 
                         this.m_adhocCacheService?.Add(this.CreateCacheKey(session.Key), session, dbSession.RefreshExpiration.Subtract(DateTimeOffset.Now));
                         return session;

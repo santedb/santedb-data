@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20230514-01" name="Update:20230514-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20230514-01" name="Update:20230514-01"   invariantName="npgsql">
  *	<summary>Update: Adds provenance data to the relationship verification table</summary>
  *	<isInstalled>select ck_patch('20230514-01')</isInstalled>
  * </feature>
@@ -11,7 +11,7 @@
  ALTER TABLE REL_VRFY_SYSTBL ADD OBSLT_PROV_ID UUID;
  ALTER TABLE REL_VRFY_SYSTBL ADD CONSTRAINT FK_OBSLT_PROV_TBL FOREIGN KEY (OBSLT_PROV_ID) REFERENCES SEC_PROV_TBL(PROV_ID);
  ALTER TABLE BI_DM_REG_SYSTBL ADD HASH BYTEA;
- DROP INDEX rel_vrfy_src_trg_unq;
+ DROP INDEX IF EXISTS rel_vrfy_src_trg_unq;
  --#!
  -- OPTIONAL
  CREATE UNIQUE INDEX rel_vrfy_src_trg_unq ON rel_vrfy_systbl USING btree (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id) WHERE (obslt_utc IS NULL);
