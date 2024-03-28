@@ -374,7 +374,23 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public LambdaExpression MapExpression<TReturn>(Expression<Func<ICdssLibrary, TReturn>> sortExpression)
         {
-            return this.m_modelMapper.MapModelExpression<ICdssLibrary, DbCdssLibraryVersion, TReturn>(sortExpression, false);
+            var sortQuery = this.m_modelMapper.MapModelExpression<ICdssLibrary, DbCdssLibraryVersion, TReturn>(sortExpression, false);
+            if(sortQuery == null)
+            {
+                var propertySelector = QueryExpressionBuilder.BuildPropertySelector(sortExpression).Replace("storage.", ""); // HACK:
+                var parameter = Expression.Parameter(typeof(DbCdssLibraryVersion));
+                Expression selector = null;
+                switch(propertySelector)
+                {
+                    case "creationTime":
+                    case "modifiedOn":
+                    case "updatedTime":
+                        return Expression.Lambda<Func<DbCdssLibraryVersion, TReturn>>(Expression.Convert(Expression.MakeMemberAccess(parameter, typeof(DbCdssLibraryVersion).GetProperty(nameof(DbCdssLibraryVersion.CreationTime))), typeof(TReturn)), parameter);
+                    default:
+                        throw new InvalidOperationException();
+                }
+            }
+            return sortQuery;
         }
 
         /// <inheritdoc/>

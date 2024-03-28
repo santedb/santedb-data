@@ -80,6 +80,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
             public string Documentation => this.m_protocol.Documentation;
 
+            public DateTimeOffset? ModifiedOn => DateTime.Now;
+
             public ICdssLibraryRepositoryMetadata StorageMetadata { get; set; }
 
             public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget, IDictionary<string, object> parameters)
@@ -149,6 +151,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             public string Id => "SAMPLE";
 
             public string Documentation => "THIS IS AN EXAMPLE";
+
+            public DateTimeOffset? ModifiedOn => DateTime.Now;
 
             public IEnumerable<ICdssProtocolScope> Scopes => new ICdssProtocolScope[0];
 
