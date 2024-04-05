@@ -55,7 +55,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     FormConceptKey = Guid.Parse("66cbce3a-2e77-401d-95d8-ee0361f4f076"), // Oral Drops
                     QuantityConceptKey = Guid.Parse("a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76"), // dose
                     Quantity = 1,
-                    IsAdministrative = true,
+                    IsAdministrable = true,
                     Notes = new List<Core.Model.DataTypes.EntityNote>()
                     {
                         new Core.Model.DataTypes.EntityNote()
@@ -75,7 +75,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // Perform the insert
                 var afterInsert = base.TestInsert(material);
                 Assert.AreEqual(new DateTime(2021, 01, 01), afterInsert.ExpiryDate);
-                Assert.IsTrue(afterInsert.IsAdministrative);
+                Assert.IsTrue(afterInsert.IsAdministrable);
                 Assert.AreEqual(Guid.Parse("66cbce3a-2e77-401d-95d8-ee0361f4f076"), afterInsert.FormConceptKey);
                 Assert.IsNotNull(afterInsert.LoadProperty(o => o.FormConcept));
                 Assert.IsTrue(afterInsert.FormConcept.Mnemonic.Contains("Oral"));
@@ -83,9 +83,9 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(1, afterInsert.Quantity);
 
                 // Now we want to query
-                var afterQuery = base.TestQuery<Material>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Oral Polio Vaccine")) && o.IsAdministrative == true && o.FormConcept.Mnemonic == "AdministrableDrugForm-OralDrops" && o.QuantityConcept.Mnemonic == "UnitOfMeasure-Dose", 1).AsResultSet().First();
+                var afterQuery = base.TestQuery<Material>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Oral Polio Vaccine")) && o.IsAdministrable == true && o.FormConcept.Mnemonic == "AdministrableDrugForm-OralDrops" && o.QuantityConcept.Mnemonic == "UnitOfMeasure-Dose", 1).AsResultSet().First();
                 Assert.AreEqual(new DateTime(2021, 01, 01), afterQuery.ExpiryDate);
-                Assert.IsTrue(afterQuery.IsAdministrative);
+                Assert.IsTrue(afterQuery.IsAdministrable);
                 Assert.AreEqual(Guid.Parse("66cbce3a-2e77-401d-95d8-ee0361f4f076"), afterQuery.FormConceptKey);
                 Assert.IsNotNull(afterQuery.LoadProperty(o => o.FormConcept));
                 Assert.IsTrue(afterQuery.FormConcept.Mnemonic.Contains("Oral"));
@@ -106,7 +106,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 afterQuery = base.TestQuery<Material>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Oral Polio Vaccine")) && o.ExpiryDate >= date && o.FormConcept.Mnemonic == "AdministrableDrugForm-OralDrops", 0).AsResultSet().FirstOrDefault();
                 afterQuery = base.TestQuery<Material>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Oral Polio Vaccine")) && o.ExpiryDate >= date && o.FormConcept.Mnemonic == "AdministrableDrugForm-OticDrops", 1).AsResultSet().FirstOrDefault();
                 Assert.AreEqual(new DateTime(2021, 07, 01), afterQuery.ExpiryDate);
-                Assert.IsTrue(afterQuery.IsAdministrative);
+                Assert.IsTrue(afterQuery.IsAdministrable);
                 Assert.AreEqual(Guid.Parse("af3a5fa5-7889-45f3-8809-2294129d49c8"), afterQuery.FormConceptKey);
                 Assert.IsNotNull(afterQuery.LoadProperty(o => o.FormConcept));
                 Assert.IsTrue(afterQuery.FormConcept.Mnemonic.Contains("Otic"));
@@ -135,7 +135,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     FormConceptKey = Guid.Parse("9902267c-8f77-4233-bfd3-e6b068ab326a"), // Injection
                     QuantityConceptKey = Guid.Parse("a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76"), // dose
                     Quantity = 1,
-                    IsAdministrative = true
+                    IsAdministrable = true
                 };
 
                 // Perform the insert

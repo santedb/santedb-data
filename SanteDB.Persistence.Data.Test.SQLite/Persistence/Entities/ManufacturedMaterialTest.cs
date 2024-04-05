@@ -55,7 +55,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
                     FormConceptKey = Guid.Parse("66cbce3a-2e77-401d-95d8-ee0361f4f076"), // Oral Drops
                     QuantityConceptKey = Guid.Parse("a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76"), // dose
                     Quantity = 1,
-                    IsAdministrative = true,
+                    IsAdministrable = true,
                     LotNumber = "1234-203",
                     Notes = new List<Core.Model.DataTypes.EntityNote>()
                     {
@@ -77,7 +77,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
                 var afterInsert = base.TestInsert(material);
                 Assert.AreEqual(new DateTime(2021, 01, 01), afterInsert.ExpiryDate);
                 Assert.AreEqual("1234-203", afterInsert.LotNumber);
-                Assert.IsTrue(afterInsert.IsAdministrative);
+                Assert.IsTrue(afterInsert.IsAdministrable);
                 Assert.AreEqual(Guid.Parse("66cbce3a-2e77-401d-95d8-ee0361f4f076"), afterInsert.FormConceptKey);
                 Assert.IsNotNull(afterInsert.LoadProperty(o => o.FormConcept));
                 Assert.IsTrue(afterInsert.FormConcept.Mnemonic.Contains("Oral"));
@@ -85,9 +85,9 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
                 Assert.AreEqual(1, afterInsert.Quantity);
 
                 // Now we want to query
-                var afterQuery = base.TestQuery<ManufacturedMaterial>(o => o.IsAdministrative == true && o.LotNumber == "1234-203" && o.FormConcept.Mnemonic == "AdministrableDrugForm-OralDrops" && o.QuantityConcept.Mnemonic == "UnitOfMeasure-Dose", 1).AsResultSet().First();
+                var afterQuery = base.TestQuery<ManufacturedMaterial>(o => o.IsAdministrable == true && o.LotNumber == "1234-203" && o.FormConcept.Mnemonic == "AdministrableDrugForm-OralDrops" && o.QuantityConcept.Mnemonic == "UnitOfMeasure-Dose", 1).AsResultSet().First();
                 Assert.AreEqual(new DateTime(2021, 01, 01), afterQuery.ExpiryDate);
-                Assert.IsTrue(afterQuery.IsAdministrative);
+                Assert.IsTrue(afterQuery.IsAdministrable);
                 Assert.AreEqual("1234-203", afterQuery.LotNumber);
                 Assert.AreEqual(Guid.Parse("66cbce3a-2e77-401d-95d8-ee0361f4f076"), afterQuery.FormConceptKey);
                 Assert.IsNotNull(afterQuery.LoadProperty(o => o.FormConcept));
@@ -106,7 +106,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
                 var date = new DateTime(2021, 01, 01);
                 afterQuery = base.TestQuery<ManufacturedMaterial>(o => o.ExpiryDate >= date && o.LotNumber == "1234-203" && o.FormConcept.Mnemonic == "AdministrableDrugForm-OralDrops", 0).AsResultSet().FirstOrDefault();
                 afterQuery = base.TestQuery<ManufacturedMaterial>(o => o.ExpiryDate >= date && o.LotNumber == "432-42" && o.FormConcept.Mnemonic == "AdministrableDrugForm-OralDrops", 1).AsResultSet().FirstOrDefault();
-                Assert.IsTrue(afterQuery.IsAdministrative);
+                Assert.IsTrue(afterQuery.IsAdministrable);
                 Assert.AreEqual("432-42", afterQuery.LotNumber);
                 Assert.IsNotNull(afterQuery.LoadProperty(o => o.FormConcept));
                 Assert.IsNotNull(afterQuery.LoadProperty(o => o.QuantityConcept));
@@ -135,7 +135,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
                     QuantityConceptKey = Guid.Parse("a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76"), // dose
                     Quantity = 1,
                     LotNumber = "59494-40",
-                    IsAdministrative = true
+                    IsAdministrable = true
                 };
 
                 // Perform the insert

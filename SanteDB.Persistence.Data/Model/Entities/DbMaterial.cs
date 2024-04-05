@@ -99,7 +99,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// </summary>
         /// <value><c>true</c> if this instance is administrative; otherwise, <c>false</c>.</value>
         [Column("is_adm")]
-        public bool IsAdministrative
+        public bool IsAdministrable
         {
             get;
             set;
