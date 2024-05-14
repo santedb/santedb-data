@@ -298,23 +298,6 @@ namespace SanteDB.Persistence.Data.Services
                             // Claims to add to the principal
                             var claims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Key && (o.ClaimExpiry == null || o.ClaimExpiry < DateTimeOffset.Now)).ToList();
 
-                            
-
-                            // User requires TFA but the secret is empty
-                            var useMfa = dbUser.TwoFactorEnabled || this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.RequireMfa, false);
-                            var mfaMechanism = dbUser.TwoFactorMechnaismKey ?? this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.DefaultMfaMethod, (Guid?)null) ?? TfaEmailMechanism.MechanismId;
-                            if (useMfa && String.IsNullOrEmpty(tfaSecret))
-                            {
-                                var secretString = this.m_tfaRelay.SendSecret(mfaMechanism, new AdoUserIdentity(dbUser));
-                                throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ, new { message = this.m_localizationService.GetString(secretString) }));
-                            }
-
-                            // TFA supplied?
-                            if (useMfa && !this.m_tfaRelay.ValidateSecret(mfaMechanism, new AdoUserIdentity(dbUser), tfaSecret))
-                            {
-                                throw new InvalidIdentityAuthenticationException();
-                            }
-
                             if (!String.IsNullOrEmpty(password))
                             {
                                 // Peppered authentication
@@ -335,6 +318,21 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                             }
                             else
+                            {
+                                throw new InvalidIdentityAuthenticationException();
+                            }
+
+                            // User requires TFA but the secret is empty
+                            var useMfa = dbUser.TwoFactorEnabled || this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.RequireMfa, false);
+                            var mfaMechanism = dbUser.TwoFactorMechnaismKey ?? this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.DefaultMfaMethod, (Guid?)null) ?? TfaEmailMechanism.MechanismId;
+                            if (useMfa && String.IsNullOrEmpty(tfaSecret))
+                            {
+                                var secretString = this.m_tfaRelay.SendSecret(mfaMechanism, new AdoUserIdentity(dbUser));
+                                throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ, new { message = this.m_localizationService.GetString(secretString) }));
+                            }
+
+                            // TFA supplied?
+                            if (useMfa && !this.m_tfaRelay.ValidateSecret(mfaMechanism, new AdoUserIdentity(dbUser), tfaSecret))
                             {
                                 throw new InvalidIdentityAuthenticationException();
                             }
