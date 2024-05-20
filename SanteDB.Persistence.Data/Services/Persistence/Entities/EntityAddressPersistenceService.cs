@@ -53,6 +53,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override EntityAddress BeforePersisting(DataContext context, EntityAddress data)
         {
             data.AddressUseKey = this.EnsureExists(context, data.AddressUse)?.Key ?? data.AddressUseKey;
+            
+            // If the address has a place reference we want to strip out the place reference data
+            if(Guid.TryParse(data.Component?.Find(p=>p.ComponentTypeKey == AddressComponentKeys.PlaceReference)?.Value, out var placeUuid))
+            {
+                var dbPlaceQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityAddress), typeof(DbEntityAddressComponent))
+                   .InnerJoin<DbEntityAddress, DbEntityAddressComponent>(o => o.Key, o => o.SourceKey)
+                   .Where<DbEntityAddress>(o => o.SourceKey == placeUuid && o.ObsoleteVersionSequenceId == null && s_placeRefAddressTypes.Contains(o.UseConceptKey));
+                var components = context.Query<DbEntityAddressComponent>(dbPlaceQuery.Statement).Select(o=>o.ComponentTypeKey).ToArray();
+                data.Component.RemoveAll(o => components.Contains(o.ComponentTypeKey.Value));
+
+            }
             return base.BeforePersisting(context, data);
         }
 
