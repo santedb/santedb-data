@@ -20,7 +20,12 @@
  */
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Extensibility;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
@@ -34,6 +39,52 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// </summary>
         public ExtensionTypePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
+        }
+
+        /// <inheritdoc/>
+        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
+        {
+            context.DeleteAll<DbExtensionTypeScope>(o => o.SourceKey == key);
+            base.DoDeleteReferencesInternal(context, key);
+        }
+
+        /// <inheritdoc/>
+        protected override ExtensionType DoInsertModel(DataContext context, ExtensionType data)
+        {
+            var retVal = base.DoInsertModel(context, data);
+
+            if (data.ScopeXml?.Any() == true)
+            {
+                retVal.ScopeXml= base.UpdateInternalAssociations(context, retVal.Key.Value, data.ScopeXml.Select(o => new DbExtensionTypeScope()
+                {
+                    ClassCodeKey= o
+                })).Select(o => o.ClassCodeKey).ToList();
+            }
+            return retVal;
+        }
+
+        /// <inheritdoc/>
+        protected override ExtensionType DoUpdateModel(DataContext context, ExtensionType data)
+        {
+            var retVal = base.DoUpdateModel(context, data); // updates the core properties
+            if (data.ScopeXml!= null)
+            {
+                retVal.ScopeXml = base.UpdateInternalAssociations(context, retVal.Key.Value,
+                    data.ScopeXml?.Select(o => new DbExtensionTypeScope()
+                    {
+                        ClassCodeKey = o
+                    })).Select(o => o.ClassCodeKey).ToList();
+            }
+
+            return retVal;
+        }
+
+        /// <inheritdoc/>
+        protected override ExtensionType DoConvertToInformationModel(DataContext context, DbExtensionType dbModel, params object[] referenceObjects)
+        {
+            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+            retVal.ScopeXml = context.Query<DbExtensionTypeScope>(s => s.SourceKey == retVal.Key).Select(o => o.ClassCodeKey).ToList();
+            return retVal;
         }
     }
 }

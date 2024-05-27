@@ -18,10 +18,14 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using System;
+
 namespace SanteDB.Persistence.Synchronization.ADO
 {
     internal class Constants
     {
         public const string ModelMapName = "SynchronizationModelMap";
+        public static readonly Guid SYNC_DATABASE_ASSET_ID = Guid.Parse("3E3C4EF4-5C64-4EC6-BB82-26719F09F8B5");
+
     }
 }

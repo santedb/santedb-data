@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20210107-01" name="Update:20210107-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20210107-01" name="Update:20210107-01"   invariantName="npgsql">
  *	<summary>Update: Updates the authentication functions to fix bugs related to locking</summary>
  *	<isInstalled>select ck_patch('20210107-01')</isInstalled>
  * </feature>

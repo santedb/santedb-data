@@ -181,7 +181,7 @@ namespace SanteDB.Persistence.Data.Model.Security
         /// <summary>
         /// True if password expiry was specified
         /// </summary>
-        public bool PasswordExpirySpecified { get; set; }
+        public bool PasswordExpirationSpecified { get; set; }
 
     }
 

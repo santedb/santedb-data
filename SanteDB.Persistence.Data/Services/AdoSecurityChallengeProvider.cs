@@ -116,10 +116,6 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new ArgumentNullException(nameof(userName), ErrorMessages.ARGUMENT_NULL);
             }
-            else if (challengeKey == default(Guid))
-            {
-                throw new ArgumentOutOfRangeException(nameof(challengeKey), ErrorMessages.ARGUMENT_NULL);
-            }
             else if (String.IsNullOrEmpty(response))
             {
                 throw new ArgumentNullException(nameof(response), ErrorMessages.ARGUMENT_NULL);
@@ -184,8 +180,20 @@ namespace SanteDB.Persistence.Data.Services
                             throw new InvalidIdentityAuthenticationException();
                         }
 
+                        // HACK: User is using an expiration reset
+                        bool isChallengeResponseValid = false;
+                        if(challengeKey == Guid.Empty && dbUser.PasswordExpiration.HasValue)
+                        {
+                            isChallengeResponseValid = context.Any<DbSecurityUser>(a => a.UserName.ToLowerInvariant() == userName.ToLower() && pepperResponses.Contains(a.Password));
+                        }
+                        else
+                        {
+                            isChallengeResponseValid = context.Any<DbSecurityUserChallengeAssoc>(c => pepperResponses.Contains(c.ChallengeResponse) && c.ChallengeKey == challengeKey && c.ExpiryTime > DateTimeOffset.Now);
+                        }
+
+
                         if (challengeIsMfa && this.m_tfaRelay?.ValidateSecret(challengeKey, identity, response) == true ||
-                            !challengeIsMfa && !context.Any<DbSecurityUserChallengeAssoc>(c => pepperResponses.Contains(c.ChallengeResponse) && c.ChallengeKey == challengeKey && c.ExpiryTime > DateTimeOffset.Now)) // Increment invalid
+                            !challengeIsMfa && !isChallengeResponseValid) // Increment invalid
                         {
                             dbUser.InvalidLoginAttempts++;
                             if (dbUser.InvalidLoginAttempts > this.m_securityConfiguration.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxInvalidLogins, 5))

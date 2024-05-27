@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20200320-01" name="Update:20200320-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20200320-01" name="Update:20200320-01"   invariantName="npgsql">
  *	<summary>Update: Add removal of duplicate versions</summary>
  *	<remarks>This allows devices to be tracked to facilities and users</remarks>
  *	<isInstalled>select ck_patch('20200320-01')</isInstalled>

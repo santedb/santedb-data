@@ -41,15 +41,12 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
     /// <summary>
     /// 
     /// </summary>
-    public class AdoSynchronizationManager : IServiceImplementation, ISynchronizationLogService, ISynchronizationQueueManager, IProvideBackupAssets, IRestoreBackupAssets
+    public class AdoSynchronizationManager : IServiceImplementation, ISynchronizationLogService, ISynchronizationQueueManager, IProvideBackupAssets, IDisposable
     {
         private readonly Tracer _Tracer;
-        private readonly Guid SYNC_DATABASE_ASSET_ID = Guid.Parse("3E3C4EF4-5C64-4EC6-BB82-26719F09F8B5");
         /// <inheritdoc/>
         public string ServiceName => "ADO.NET Synchronization Repository";
 
-        /// <inheritdoc/>
-        public Guid[] AssetClassIdentifiers => new Guid[] { SYNC_DATABASE_ASSET_ID };
 
         private readonly AdoSynchronizationConfigurationSection _Configuration;
         private readonly IDataCachingService _DataCachingService;
@@ -365,30 +362,24 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
             }
         }
 
-
-        /// <inheritdoc/>
-        public bool Restore(IBackupAsset backupAsset)
-        {
-            if (backupAsset == null)
-            {
-                throw new ArgumentNullException(nameof(backupAsset));
-            }
-            else if (backupAsset.AssetClassId != SYNC_DATABASE_ASSET_ID)
-            {
-                throw new InvalidOperationException();
-            }
-
-            return this._Configuration.Provider.RestoreBackupAsset(backupAsset);
-        }
-
         /// <inheritdoc/>
         public IEnumerable<IBackupAsset> GetBackupAssets()
         {
-            var retVal = this._Configuration.Provider.CreateBackupAsset(SYNC_DATABASE_ASSET_ID);
+            var retVal = this._Configuration.Provider.CreateBackupAsset(Constants.SYNC_DATABASE_ASSET_ID);
             if (retVal != null)
             {
                 yield return retVal;
             }
         }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            if (this._Configuration.Provider is IDisposable dispose)
+            {
+                dispose.Dispose();
+            }
+        }
+
     }
 }

@@ -34,18 +34,21 @@ namespace SanteDB.Persistence.Data.Configuration
         /// Gets or sets the maximum session retention policy
         /// </summary>
         [XmlElement("maxSession"), DisplayName("Session Retention"), Description("Sets the maximum amount of time that old sessions should be retained (default: 30 days)")]
+        [Editor("SanteDB.Configuration.Editors.TimespanPickerEditor, SanteDB.Configuration", "System.Drawing.Design.UITypeEditor, System.Drawing")]
         public TimeSpan? MaxSessionRetention { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum old version retention
         /// </summary>
         [XmlElement("maxVersion"), DisplayName("Version Retention"), Description("Sets the maximum amount of time that old versions should be retained (default: 30 days)")]
+        [Editor("SanteDB.Configuration.Editors.TimespanPickerEditor, SanteDB.Configuration", "System.Drawing.Design.UITypeEditor, System.Drawing")]
         public TimeSpan? MaxOldVersionRetention { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum deleted data restoration availability.
         /// </summary>
         [XmlElement("maxRestore"), DisplayName("Restore Time"), Description("Sets the maximum amount of time that old data can be un-deleted (default: 30 days)")]
+        [Editor("SanteDB.Configuration.Editors.TimespanPickerEditor, SanteDB.Configuration", "System.Drawing.Design.UITypeEditor, System.Drawing")]
         public TimeSpan? MaxDeletedDataRetention { get; set; }
 
     }

@@ -74,7 +74,7 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(jobSchedule));
             }
 
-            this.m_pepService.Demand(PermissionPolicyIdentifiers.AccessClientAdministrativeFunction);
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterSystemJobSchedule);
 
             try
             {
@@ -146,7 +146,7 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(job));
             }
 
-            this.m_pepService.Demand(PermissionPolicyIdentifiers.AccessClientAdministrativeFunction);
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterSystemJobSchedule);
 
             try
             {

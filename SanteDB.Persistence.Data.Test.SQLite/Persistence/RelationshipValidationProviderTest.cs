@@ -133,6 +133,8 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence
                     RelationshipTypeKey = ActRelationshipTypeKeys.HasComponent
                 };
 
+                base.TestInsert(e1);
+                base.TestInsert(e2);
                 // First - we try to insert two entities that don't make sense - this should throw an exception
                 try
                 {

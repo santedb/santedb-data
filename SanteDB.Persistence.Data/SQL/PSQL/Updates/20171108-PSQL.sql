@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20171108-01"  name="Update:20171108-01" applyRange="0.9.0.0-1.1.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20171108-01"  name="Update:20171108-01"   invariantName="npgsql">
  *	<summary>Update: Add relationship types between patients and locations</summary>
  *	<remarks></remarks>
  *	<isInstalled>select ck_patch('20171108-01')</isInstalled>

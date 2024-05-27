@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20230727-01" name="Update:20230727-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="sqlite">
+ * <feature scope="SanteDB.Persistence.Data" id="20230727-01" name="Update:20230727-01"   invariantName="sqlite">
  *	<summary>Update: Adds foreign data staging table parameter</summary>
  *	<isInstalled>select count(*) > 0 from patch_db_systbl WHERE PATCH_ID = '20230727-01'</isInstalled>
  * </feature>

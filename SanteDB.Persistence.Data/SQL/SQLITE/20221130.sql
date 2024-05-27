@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20221027" name="Update:Foreign Data Manager" applyRange="0.2.0.0-0.9.0.0" invariantName="sqlite">
+ * <feature scope="SanteDB.Persistence.Data" id="20221027" name="Update:Foreign Data Manager"  invariantName="sqlite">
  *	<summary>Update:Adds Foreign Data Manager</summary>
  *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE type='table' AND name='FD_STG_SYSTBL')</isInstalled>
  * </feature>

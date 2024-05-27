@@ -42,11 +42,9 @@ namespace SanteDB.Persistence.Data.Services
     /// A daemon service which registers the other persistence services
     /// </summary>
     [ServiceProvider("ADO.NET Persistence Service", Configuration = typeof(AdoPersistenceConfigurationSection))]
-    public class AdoPersistenceService : ISqlDataPersistenceService, IServiceFactory, IReportProgressChanged, IProvideBackupAssets, IRestoreBackupAssets
+    public class AdoPersistenceService : ISqlDataPersistenceService, IServiceFactory, IReportProgressChanged, IProvideBackupAssets, IDisposable
     {
-        // Primary database asset
-        private readonly Guid PRIMARY_DATABASE_ASSET_ID = Guid.Parse("FB444942-4276-427C-A09C-9C65769837F0");
-
+        
         // Service factory types
         private readonly Type[] m_serviceFactoryTypes = new Type[]
         {
@@ -185,9 +183,6 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public string ServiceName => "ADO Persistence Service";
 
-        /// <inheritdoc/>
-        public Guid[] AssetClassIdentifiers => new Guid[] { PRIMARY_DATABASE_ASSET_ID };
-
         /// <summary>
         /// Execute a non-query SQL script
         /// </summary>
@@ -247,29 +242,23 @@ namespace SanteDB.Persistence.Data.Services
             return serviceInstance != null;
         }
 
-        /// <inheritdoc/>
-        public bool Restore(IBackupAsset backupAsset)
-        {
-            if (backupAsset == null)
-            {
-                throw new ArgumentNullException(nameof(backupAsset));
-            }
-            else if (backupAsset.AssetClassId != PRIMARY_DATABASE_ASSET_ID)
-            {
-                throw new InvalidOperationException();
-            }
-
-
-            return this.m_configuration.Provider.RestoreBackupAsset(backupAsset);
-        }
 
         /// <inheritdoc/>
         public IEnumerable<IBackupAsset> GetBackupAssets()
         {
-            var retVal = this.m_configuration.Provider.CreateBackupAsset(PRIMARY_DATABASE_ASSET_ID);
+            var retVal = this.m_configuration.Provider.CreateBackupAsset(DataConstants.PRIMARY_DATABASE_ASSET_ID);
             if (retVal != null)
             {
                 yield return retVal;
+            }
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            if(this.m_configuration.Provider is IDisposable dispose)
+            {
+                dispose.Dispose();
             }
         }
     }

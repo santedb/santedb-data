@@ -26,6 +26,7 @@ using SanteDB.Persistence.Data.Model.Concepts;
 using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Roles;
 using SanteDB.Persistence.Data.Model.Security;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,6 +104,14 @@ namespace SanteDB.Persistence.Data.Security
         /// Get the SID of this object
         /// </summary>
         internal override Guid Sid => this.m_securityUser.Key;
+
+        /// <summary>
+        /// Add relevant DCDR claims to the identity 
+        /// </summary>
+        internal void AddDcdrClaims(IEnumerable<DbUserClaim> contextClaims)
+        {
+            contextClaims.Where(o => o.ClaimType == SanteDBClaimTypes.LocalOnly).ForEach(c => this.AddClaim(new SanteDBClaim(c.ClaimType, c.ClaimValue)));
+        }
 
         /// <summary>
         /// Add XSPA claims

@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20220112-04" name="Update:20220112-04" required="false" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20220112-04" name="Update:20220112-04" required="false"   invariantName="npgsql">
  *	<summary>Special patch for PostgreSQL 10 and lower</summary>
  *	<isInstalled>select ck_patch('20220112-04')</isInstalled>
  *  <canInstall>SELECT TRUE FROM (SELECT version() v) i WHERE (v ILIKE '%PostgreSQL 9.%' OR v ILIKE '%PostgreSQL 10.%')</canInstall>

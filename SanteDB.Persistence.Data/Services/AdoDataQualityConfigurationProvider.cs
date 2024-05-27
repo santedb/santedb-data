@@ -144,7 +144,14 @@ namespace SanteDB.Persistence.Data.Services
             {
                 Enabled = ruleSet.Enabled,
                 Id = ruleSet.Id,
-                Name = ruleSet.Name
+                Name = ruleSet.Name,
+                Key = ruleSet.Key,
+                CreatedByKey = ruleSet.CreatedByKey,
+                ObsoletedByKey = ruleSet.ObsoletedByKey,
+                UpdatedByKey = ruleSet.UpdatedByKey,
+                CreationTime = ruleSet.CreationTime,
+                ObsoletionTime = ruleSet.ObsoletionTime,
+                UpdatedTime = ruleSet.UpdatedTime
             };
             retVal.Resources = ctx.Query<DbDataQualityResourceConfiguration>(o => o.DataQualityConfigurationKey == ruleSet.Key).ToArray().Select(o => this.ConvertToResourceConfiguration(ctx, o)).ToList();
             return retVal;
@@ -162,7 +169,7 @@ namespace SanteDB.Persistence.Data.Services
                 Expressions = a.Expressions.Split(';').ToList(),
                 Id = a.Id,
                 Text = a.Text,
-                Priority = a.Priority
+                Priority = a.Priority,
             }).ToList()
         };
 
@@ -188,10 +195,13 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public IEnumerable<DataQualityResourceConfiguration> GetRulesForType<T>()
-        {
+        public IEnumerable<DataQualityResourceConfiguration> GetRulesForType<T>() => this.GetRulesForType(typeof(T));
+
+
+        /// <inheritdoc/>
+        public IEnumerable<DataQualityResourceConfiguration> GetRulesForType(Type forType) { 
             DataQualityResourceConfiguration[] retVal = null;
-            var serializationName = typeof(T).GetSerializationName();
+            var serializationName = forType.GetSerializationName();
 
             if (this.m_adhocCache?.TryGet<DataQualityResourceConfiguration[]>($"dq.res.{serializationName}", out retVal) == true)
             {
@@ -263,7 +273,8 @@ namespace SanteDB.Persistence.Data.Services
                                 CreationTime = DateTimeOffset.Now,
                                 Enabled = configuration.Enabled,
                                 Id = configuration.Id,
-                                Name = configuration.Name
+                                Name = configuration.Name,
+                                Key = configuration.Key ?? Guid.NewGuid()
                             });
                         }
 
@@ -290,9 +301,9 @@ namespace SanteDB.Persistence.Data.Services
                             }));
                         }
 
-                        tx.Commit();
 
                         var retVal = this.ConvertToRuleSet(ctx, existingConfiguration);
+                        tx.Commit();
                         this.m_adhocCache?.Add(this.CreateCacheKey(configuration.Id), retVal);
                         return retVal;
                     }

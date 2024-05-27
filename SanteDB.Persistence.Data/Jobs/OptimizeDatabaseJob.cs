@@ -86,13 +86,7 @@ namespace SanteDB.Persistence.Data.Jobs
                     optimizedConnections.Add(configuration.ReadWriteConnectionString);
 
                     this.m_jobState.SetProgress(this, $"Optimizing {configuration.ReadWriteConnectionString}", (float)i / (float)dataConnections.Length);
-                    using (var context = configuration.Provider.GetWriteConnection())
-                    {
-                        context.Open();
-                        context.ExecuteNonQuery(configuration.Provider.StatementFactory.CreateSqlKeyword(OrmLite.Providers.SqlKeyword.Vacuum));
-                        context.ExecuteNonQuery(configuration.Provider.StatementFactory.CreateSqlKeyword(OrmLite.Providers.SqlKeyword.Reindex));
-                        context.ExecuteNonQuery(configuration.Provider.StatementFactory.CreateSqlKeyword(OrmLite.Providers.SqlKeyword.Analyze));
-                    }
+                    configuration.Provider.Optimize();
                 }
 
 

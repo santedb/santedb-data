@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20230514-01" name="Update:20230514-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20230514-01" name="Update:20230514-01"   invariantName="npgsql">
  *	<summary>Update: Adds provenance data to the relationship verification table</summary>
  *	<isInstalled>select ck_patch('20230514-01')</isInstalled>
  * </feature>

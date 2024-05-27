@@ -228,11 +228,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                     {
                         context.EstablishProvenance(principal, null);
 
-                        data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty);
+                        data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty, this.m_configuration.StrictKeyAgreement);
 
                         data = this.Insert(context, data);
 
-                        data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
+                        data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
 
                         if (transactionMode == TransactionMode.Commit)
                         {

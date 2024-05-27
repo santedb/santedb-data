@@ -55,10 +55,8 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
     /// </summary>
     /// TODO: Change this to wrapped call method
     [ServiceProvider("ADO.NET Audit Repository", Configuration = typeof(AdoAuditConfigurationSection))]
-    public class AdoAuditRepositoryService : IDataPersistenceService<AuditEventData>, IMappedQueryProvider<AuditEventData>, IProvideBackupAssets, IRestoreBackupAssets
+    public class AdoAuditRepositoryService : IDataPersistenceService<AuditEventData>, IMappedQueryProvider<AuditEventData>, IProvideBackupAssets, IDisposable
     {
-
-        private readonly Guid AUDIT_DATABASE_ASSET_ID = Guid.Parse("EFF684F2-7641-4697-A4A0-CA0F5171BAA7");
 
         /// <summary>
         /// Gets the service name
@@ -70,8 +68,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
         /// <inheritdoc/>
         public IQueryPersistenceService QueryPersistence { get; }
-
-        public Guid[] AssetClassIdentifiers => new Guid[] { AUDIT_DATABASE_ASSET_ID };
 
         // Lock object
         private object m_lockBox = new object();
@@ -725,27 +721,21 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
 
         /// <inheritdoc/>
-        public bool Restore(IBackupAsset backupAsset)
-        {
-            if (backupAsset == null)
-            {
-                throw new ArgumentNullException(nameof(backupAsset));
-            }
-            else if (backupAsset.AssetClassId != AUDIT_DATABASE_ASSET_ID)
-            {
-                throw new InvalidOperationException();
-            }
-
-            return this.m_configuration.Provider.RestoreBackupAsset(backupAsset);
-        }
-
-        /// <inheritdoc/>
         public IEnumerable<IBackupAsset> GetBackupAssets()
         {
-            var retVal = this.m_configuration.Provider.CreateBackupAsset(AUDIT_DATABASE_ASSET_ID);
+            var retVal = this.m_configuration.Provider.CreateBackupAsset(AuditConstants.AUDIT_ASSET_ID);
             if (retVal != null)
             {
                 yield return retVal;
+            }
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            if (this.m_configuration.Provider is IDisposable dispose)
+            {
+                dispose.Dispose();
             }
         }
 

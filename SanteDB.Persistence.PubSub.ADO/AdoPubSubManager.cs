@@ -360,7 +360,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                 DispatcherFactoryId = dispatcherFactoryId,
                 Endpoint = endpoint.ToString(),
                 IsActive = false,
-                Settings = settings.Select(o => new PubSubChannelSetting() { Name = o.Key, Value = o.Value }).ToList()
+                Settings = settings?.Select(o => new PubSubChannelSetting() { Name = o.Key, Value = o.Value }).ToList()
             };
 
             using (var conn = this.m_configuration.Provider.GetWriteConnection())
@@ -385,7 +385,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                         dbChannel = conn.Insert(dbChannel);
 
                         // Insert settings
-                        foreach (var itm in channel.Settings)
+                        foreach (var itm in channel.Settings ?? new List<PubSubChannelSetting>())
                         {
                             conn.Insert(new DbChannelSetting()
                             {

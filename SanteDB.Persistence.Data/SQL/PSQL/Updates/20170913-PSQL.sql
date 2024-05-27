@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20170913-01" name="Update:20170913-01" applyRange="0.2.0.3-0.9.0.3"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20170913-01" name="Update:20170913-01"   invariantName="npgsql">
  *	<summary>Update: Adds BAD to the type of name uses</summary>
  *	<remarks>Fixes issue with locked accounts</remarks>
  *	<isInstalled>select ck_patch('20170913-01')</isInstalled>
