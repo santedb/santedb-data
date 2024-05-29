@@ -31,8 +31,10 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl.Repository;
+using SanteDB.Persistence.Auditing.ADO.Services;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Services;
+using SanteDB.Persistence.PubSub.ADO;
 using SanteDB.Persistence.Synchronization.ADO.Services;
 using System;
 using System.Collections.Generic;
@@ -68,6 +70,8 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                         typeof(AdoPolicyInformationService),
                         typeof(AdoCdssLibraryRepository),
                         typeof(AdoRelationshipValidationProvider),
+                        typeof(AdoAuditRepositoryService),
+                        typeof(AdoPubSubManager),
                         typeof(BridgedSecurityRepositoryService),
                         typeof(UpstreamSecurityRepository),
                         typeof(BridgedIdentityProvider),
