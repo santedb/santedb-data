@@ -18,14 +18,26 @@
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="7.0.5" />
     <PackageReference Include="NUnit" Version="3.13.3">
     </PackageReference>
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlcipher" Version="2.1.8" />
+    <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.1.8" Exclude="Build,Analyzers" />
+    <PackageReference Include="SQLiteSpellfix.lib.e_sqlite3mc" Version="2.1.8" Exclude="Build,Analyzers" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
   </ItemGroup>
 
   <Import Project="..\..\santedb-data\SanteDB.Core.TestFramework.Sqlite\SanteDB.Core.TestFramework.Sqlite.targets" />
 
   <Choose>
-    <When Condition="$(SolutionName.Contains('-ext'))">
+    <When Condition="$(SolutionName.Contains('-nuget'))">
+      <ItemGroup>
+        <PackageReference Include="SanteDB.Core.Api" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Model" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.i18n" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Caching.Memory" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.TestFramework" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.TestFramework.Sqlite" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Persistence.Data" Version="$(VersionNumber)" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
       <ItemGroup>
         <ProjectReference Include="..\..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
         </ProjectReference>
@@ -41,17 +53,6 @@
         <ProjectReference Include="..\SanteDB.Core.TestFramework.Sqlite\SanteDB.Core.TestFramework.Sqlite.csproj" />
         <ProjectReference Include="..\SanteDB.Persistence.Data\SanteDB.Persistence.Data.csproj">
         </ProjectReference>
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="$(VersionNumber)" />
-        <PackageReference Include="SanteDB.Core.Model" Version="$(VersionNumber)" />
-        <PackageReference Include="SanteDB.Core.i18n" Version="$(VersionNumber)" />
-        <PackageReference Include="SanteDB.Caching.Memory" Version="$(VersionNumber)" />
-        <PackageReference Include="SanteDB.Core.TestFramework" Version="$(VersionNumber)" />
-        <PackageReference Include="SanteDB.Core.TestFramework.Sqlite" Version="$(VersionNumber)" />
-        <PackageReference Include="SanteDB.Persistence.Data" Version="$(VersionNumber)" />
       </ItemGroup>
     </Otherwise>
   </Choose>
