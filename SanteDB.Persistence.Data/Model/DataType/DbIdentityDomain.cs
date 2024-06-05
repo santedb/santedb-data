@@ -100,6 +100,11 @@ namespace SanteDB.Persistence.Data.Model.DataType
         [Column("is_unq")]
         public bool IsUnique { get; set; }
 
+        /// <summary>
+        /// Classification key 
+        /// </summary>
+        [Column("cls_cd_id"), ForeignKey(typeof(DbConceptVersion), nameof(DbConceptVersion.Key))]
+        public Guid? IdentifierClassificationKey { get; set; }
     }
 
     /// <summary>

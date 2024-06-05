@@ -1,23 +1,7 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20240521" name="Update:20240521"  invariantName="sqlite">
- *	<summary>Update:Adds extension type scoping to database</summary>
- *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE name='EXT_TYP_SCP_TBL')</isInstalled>
+ * <feature scope="SanteDB.Persistence.Data" id="20240605" name="Update:20240605"  invariantName="sqlite">
+ *	<summary>Update: Adds the identifier classification code column</summary>
+ *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE name='ID_DMN_TBL' AND sql LIKE '%cls_cd_id%')</isInstalled>
  * </feature>
  */
-
- ALTER TABLE EXT_TYP_TBL ADD EXT_URI VARCHAR(512);
- CREATE UNIQUE INDEX EXT_TYP_URI_IDX ON EXT_TYP_TBL(EXT_URI) WHERE OBSLT_UTC IS NULL;
- --#!
- -- OPTIONAL
- DROP INDEX EXT_TYP_NAME_IDX;
- --#!
- UPDATE EXT_TYP_TBL SET EXT_URI = EXT_NAME;
- ALTER TABLE EXT_TYP_TBL DROP EXT_NAME;
- ALTER TABLE EXT_TYP_TBL ADD EXT_NAME VARCHAR(512);
- CREATE TABLE EXT_TYP_SCP_TBL (
-	EXT_TYP_ID blob(16) NOT NULL, 
-	CLS_CD_ID blob(16) NOT NULL,
-	CONSTRAINT PK_EXT_TYP_SCP_TBL PRIMARY KEY (EXT_TYP_ID, CLS_CD_ID),
-	CONSTRAINT FK_EXT_TYP_SCP_EXT_TYP FOREIGN KEY (EXT_TYP_ID) REFERENCES EXT_TYP_TBL(EXT_TYP_ID),
-	CONSTRAINT FK_EXT_TYP_SCP_CLS_CD FOREIGN KEY (CLS_CD_ID) REFERENCES CD_TBL(CD_ID)
-);
+ALTER TABLE ID_DMN_TBL ADD CLS_CD_ID BLOB(16);

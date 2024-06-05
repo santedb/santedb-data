@@ -77,8 +77,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 
             switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                case LoadMode.SyncLoad:
                 case LoadMode.FullLoad:
+                    retVal.IdentifierClassification = retVal.IdentifierClassification.GetRelatedPersistenceService().Get(context, dbModel.IdentifierClassificationKey.GetValueOrDefault());
+                    retVal.SetLoaded(o => o.IdentifierClassification);
+                    goto case LoadMode.SyncLoad;
+                case LoadMode.SyncLoad:
                     retVal.AssigningAuthority = retVal.AssigningAuthority.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
                     retVal.SetLoaded(o => o.AssigningAuthority);
                     break;
