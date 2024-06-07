@@ -27,10 +27,12 @@ using SanteDB.Client.Upstream.Security;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Data;
+using SanteDB.Core.Data.Management;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl.Repository;
+using SanteDB.Matcher.Matchers;
 using SanteDB.Persistence.Auditing.ADO.Services;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Services;
@@ -83,6 +85,8 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                         typeof(LocalSecurityRepositoryService),
                         typeof(SynchronizationAuditDispatcher),
                         typeof(UpstreamSecurityChallengeProvider),
+                        typeof(WeightedRecordMatchingService),
+                        typeof(AdoRecordMatchingConfigurationService),
                         typeof(PersistenceEntitySource),
                         typeof(AdoSynchronizationManager),
                         typeof(LocalRepositoryFactory),
