@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
@@ -399,8 +399,7 @@ namespace SanteDB.Persistence.Data.Services
             // Rule - Application can change its own password or ALTER_IDENTITY
             if (!principal.Identity.IsAuthenticated || !principal.Identity.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
             {
-                this.m_pepService.Demand(ApplicationServiceContext.Current.HostType == SanteDBHostType.Server ?
-                    PermissionPolicyIdentifiers.AlterIdentity : PermissionPolicyIdentifiers.AlterLocalIdentity, principal);
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
             }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
@@ -515,8 +514,7 @@ namespace SanteDB.Persistence.Data.Services
 
             if (!principal.Identity.IsAuthenticated || principal != AuthenticationContext.SystemPrincipal)
             {
-                this.m_pepService.Demand(ApplicationServiceContext.Current.HostType == SanteDBHostType.Server ?
-                    PermissionPolicyIdentifiers.AlterIdentity : PermissionPolicyIdentifiers.AlterLocalIdentity, principal);
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterIdentity, principal);
             }
 
             // Get the write connection
@@ -555,7 +553,7 @@ namespace SanteDB.Persistence.Data.Services
         /// Create the specified identity
         /// </summary>
 
-        public IApplicationIdentity CreateIdentity(string applicationName, string password, IPrincipal principal)
+        public IApplicationIdentity CreateIdentity(string applicationName, string password, IPrincipal principal, Guid? withSid = null)
         {
             if (String.IsNullOrEmpty(applicationName))
             {
@@ -585,6 +583,7 @@ namespace SanteDB.Persistence.Data.Services
                         // Create the principal
                         DbSecurityApplication dbsa = new DbSecurityApplication()
                         {
+                            Key = withSid ?? Guid.NewGuid(),
                             PublicId = applicationName,
                             CreatedByKey = context.EstablishProvenance(principal, null),
                             CreationTime = DateTimeOffset.Now,
@@ -829,5 +828,6 @@ namespace SanteDB.Persistence.Data.Services
                 }
             }
         }
+
     }
 }

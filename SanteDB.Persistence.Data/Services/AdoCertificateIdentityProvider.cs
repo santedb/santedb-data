@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
@@ -493,10 +493,9 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        public void Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
         {
             context.DeleteAll<DbCertificateMapping>(o => o.Use == CertificateMappingUse.Authentication && o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff);
-            yield break;
         }
     }
 }

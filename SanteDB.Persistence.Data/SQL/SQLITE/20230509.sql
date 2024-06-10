@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20230509-02" name="Update:20230509-02" applyRange="1.1.0.0-1.2.0.0"  invariantName="sqlite">
+ * <feature scope="SanteDB.Persistence.Data" id="20230509-02" name="Update:20230509-02"   invariantName="sqlite">
  *	<summary>Update: Adds external tagging / key tracking to the database</summary>
  *	<isInstalled>select count(*) > 0 from patch_db_systbl WHERE PATCH_ID = '20230509-02'</isInstalled>
  * </feature>

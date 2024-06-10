@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,8 +16,9 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -32,6 +33,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// </summary>
     public class EntityAddressPersistenceService : EntityAssociationPersistenceService<EntityAddress, DbEntityAddress>
     {
+
+        private static readonly Guid[] s_placeRefAddressTypes = new Guid[]
+        {
+            AddressUseKeys.Direct,
+            AddressUseKeys.PhysicalVisit
+        };
+
         /// <summary>
         /// Dependency injection ctor
         /// </summary>
@@ -45,6 +53,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override EntityAddress BeforePersisting(DataContext context, EntityAddress data)
         {
             data.AddressUseKey = this.EnsureExists(context, data.AddressUse)?.Key ?? data.AddressUseKey;
+            
+            // If the address has a place reference we want to strip out the place reference data
+            if(Guid.TryParse(data.Component?.Find(p=>p.ComponentTypeKey == AddressComponentKeys.PlaceReference)?.Value, out var placeUuid))
+            {
+                var dbPlaceQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityAddress), typeof(DbEntityAddressComponent))
+                   .InnerJoin<DbEntityAddress, DbEntityAddressComponent>(o => o.Key, o => o.SourceKey)
+                   .Where<DbEntityAddress>(o => o.SourceKey == placeUuid && o.ObsoleteVersionSequenceId == null && s_placeRefAddressTypes.Contains(o.UseConceptKey));
+                var components = context.Query<DbEntityAddressComponent>(dbPlaceQuery.Statement).Select(o=>o.ComponentTypeKey).ToArray();
+                data.Component.RemoveAll(o => components.Contains(o.ComponentTypeKey.Value));
+
+            }
             return base.BeforePersisting(context, data);
         }
 
@@ -98,6 +117,24 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     retVal.Component = retVal.Component.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).OrderBy(o => o.OrderSequence).ToList();
                     retVal.SetLoaded(nameof(EntityAddress.Component));
                     break;
+            }
+
+            // If there is a place ref we want to set the components based on the place's address
+            if(Guid.TryParse(retVal.Component?.Find(o => o.ComponentTypeKey == AddressComponentKeys.PlaceReference)?.Value, out var placeUuid))
+            {
+                var dbPlaceQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityAddress), typeof(DbEntityAddressComponent))
+                    .InnerJoin<DbEntityAddress, DbEntityAddressComponent>(o => o.Key, o => o.SourceKey)
+                    .Where<DbEntityAddress>(o => o.SourceKey == placeUuid && o.ObsoleteVersionSequenceId == null && s_placeRefAddressTypes.Contains(o.UseConceptKey));
+                var components = context.Query<DbEntityAddressComponent>(dbPlaceQuery.Statement);
+
+                // Now we cascade - the address component in our retVal overrides 
+                foreach(var itm in components)
+                {
+                    if(!retVal.Component.Any(o=>o.ComponentTypeKey == itm.ComponentTypeKey))
+                    {
+                        retVal.Component.Add(new EntityAddressComponent(itm.ComponentTypeKey.Value, itm.Value));
+                    }
+                }
             }
             return retVal;
         }

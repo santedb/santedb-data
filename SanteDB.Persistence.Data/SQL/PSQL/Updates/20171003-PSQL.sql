@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20171003-01" name="Update:20171003-01" applyRange="0.2.0.4-0.9.0.4"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20171003-01" name="Update:20171003-01"   invariantName="npgsql">
  *	<summary>Update: Adds several performance enhancing indexes</summary>
  *	<remarks></remarks>
  *	<isInstalled>select ck_patch('20171003-01')</isInstalled>

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,25 +16,28 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Security.Audit;
 using SanteDB.OrmLite;
 using System;
-using System.Collections.Generic;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
     /// <summary>
     /// Implementers of this class can trim old data from the database
     /// </summary>
-    internal interface IAdoTrimProvider
+    public interface IAdoTrimProvider
     {
 
         /// <summary>
         /// Trim the specified object from the database 
         /// </summary>
-        IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder);
+        /// <param name="auditBuilder">The audit build so the trimming process can audit the logical or perminent removal</param>
+        /// <param name="context">The data context on which the trim process is running</param>
+        /// <param name="deletedCutoff">The date/time whereby a logically deleted resource needs to be purged</param>
+        /// <param name="oldVersionCutoff">The date/time of a historical version where the version should be removed</param>
+        void Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder);
 
     }
 }

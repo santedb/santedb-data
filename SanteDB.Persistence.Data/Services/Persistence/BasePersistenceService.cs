@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
@@ -596,7 +596,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                         // Is there an ad-hoc version from the database?
                         retVal = this.DoGetModel(context, key, versionKey, true);
-                        retVal?.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
+                        retVal?.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
 
                     }
                     catch (DbException e)
@@ -675,7 +675,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             context.EstablishProvenance(principal, null);
                         }
 
-                        data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty);
+                        data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty, this.m_configuration.StrictKeyAgreement);
                         // Is this an update or insert?
                         if ((DataPersistenceControlContext.Current?.AutoUpdate ?? this.m_configuration.AutoUpdateExisting) && data.Key.HasValue && this.Exists(context, data.Key.Value))
                         {
@@ -689,7 +689,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
 
                         }
-                        data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
+                        data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
 
                         if (mode == TransactionMode.Commit)
                         {
@@ -898,10 +898,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             context.EstablishProvenance(principal, null);
                         }
 
-                        data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty);
+                        data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty, this.m_configuration.StrictKeyAgreement);
                         data = this.DoUpdateModel(context, data);
                         data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
-                        data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
+                        data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
                         if (mode == TransactionMode.Commit)
                         {
                             tx.Commit();

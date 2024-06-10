@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20170725-01" name="Update:20170725-01" applyRange="0.2.0.0-0.9.0.1"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20170725-01" name="Update:20170725-01"   invariantName="npgsql">
  *	<summary>Update: Switches high volume tables to integer keys rather than UUIDs</summary>
  *	<remarks>This update will add numeric keys to tables and updates linkages between these
  *	for data which is not submitted by or exposed to external parties.</remarks>

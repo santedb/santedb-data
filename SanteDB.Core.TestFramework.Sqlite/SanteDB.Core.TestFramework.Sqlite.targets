@@ -2,7 +2,7 @@
 <Project>
 
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)\santedb_test.sqlite" >
+    <None Include="$(MSBuildThisFileDirectory)\santedb_test.sqlite*" >
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

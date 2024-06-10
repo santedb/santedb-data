@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,8 +16,9 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2024-2-2
  */
+using SanteDB;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Security;
@@ -29,7 +30,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace SanteDB.Persistence.Data.Hax
+namespace SanteDB.Persistence.Data.Query.Hax
 {
     /// <summary>
     /// Query builder hack 
@@ -44,12 +45,12 @@ namespace SanteDB.Persistence.Data.Hax
         /// </summary>
         public SecurityUserEntityQueryHack(ModelMapper map)
         {
-            this.m_mapper = map;
+            m_mapper = map;
         }
         /// <summary>
         /// Hack the query
         /// </summary>
-        public bool HackQuery(QueryBuilder builder, SqlStatementBuilder sqlStatement, SqlStatementBuilder whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<string, string[]> queryFilter)
+        public bool HackQuery(QueryBuilder builder, SqlStatementBuilder sqlStatement, SqlStatementBuilder whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, string[] values, IEnumerable<TableMapping> scopedTables, IDictionary<string, string[]> queryFilter)
         {
             if (typeof(SecurityUser) == tmodel && property.Name == nameof(SecurityUser.UserEntity))
             {

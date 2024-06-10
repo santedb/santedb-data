@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
@@ -24,7 +24,6 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
-using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
@@ -41,35 +40,16 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Reflection;
 using System.Security;
 using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data
 {
-    /// <summary>
-    /// Key harmonization mode
-    /// </summary>
-    internal enum KeyHarmonizationMode
-    {
-        /// <summary>
-        /// When the harmonization process occurs, the priority is:
-        /// Key, if set is used and property is cleared
-        /// Property, if set overrides Key
-        /// </summary>
-        KeyOverridesProperty,
-
-        /// <summary>
-        /// When the harmonization process occurs, the priority is:
-        /// Property, if set overrides Key
-        /// </summary>
-        PropertyOverridesKey
-    }
-
+   
     /// <summary>
     /// Data context extensions
     /// </summary>
-    internal static class DataContextExtensions
+    public static class DataContextExtensions
     {
         // Localization service
         private static readonly ILocalizationService s_localizationService = ApplicationServiceContext.Current.GetService<ILocalizationService>();
@@ -250,71 +230,6 @@ namespace SanteDB.Persistence.Data
             }
         }
 
-        /// <summary>
-        /// Harmonize the keys with the delay load properties
-        /// </summary>
-        internal static TData HarmonizeKeys<TData>(this TData me, KeyHarmonizationMode harmonizationMode)
-            where TData : IdentifiedData
-        {
-            me = me.Clone() as TData;
-
-            foreach (var pi in me.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
-            {
-                if (!pi.CanWrite || pi.GetCustomAttribute<SerializationMetadataAttribute>() != null)
-                {
-                    continue;
-                }
-
-                var piValue = pi.GetValue(me);
-
-                // Is the property a key?
-                if (piValue is IdentifiedData iddata && iddata.Key.HasValue)
-                {
-                    // Get the object which references this
-                    var keyProperty = pi.GetSerializationRedirectProperty();
-                    var keyValue = keyProperty?.GetValue(me);
-                    switch (harmonizationMode)
-                    {
-                        case KeyHarmonizationMode.KeyOverridesProperty:
-                            if (keyValue != null && !keyValue.Equals(iddata.Key)) // There is a key for this which is populated, we want to use the key and clear the property
-                            {
-                                if (s_configuration.StrictKeyAgreement)
-                                {
-                                    throw new DataPersistenceException(s_localizationService.GetString(ErrorMessageStrings.DATA_KEY_PROPERTY_DISAGREEMENT, new { keyProperty = keyProperty.ToString(), dataProperty = pi.ToString() }));
-                                }
-                                else
-                                {
-                                    pi.SetValue(me, null);
-                                }
-                            }
-                            else
-                            {
-                                keyProperty.SetValue(me, iddata.Key);
-                            }
-                            break;
-
-                        case KeyHarmonizationMode.PropertyOverridesKey:
-                            if (iddata.Key.HasValue) // Data has value
-                            {
-                                keyProperty.SetValue(me, iddata.Key);
-                            }
-                            else
-                            {
-                                pi.SetValue(me, null); // Let the identifier data stand
-                            }
-                            break;
-                    }
-                }
-                else if (piValue is IList list)
-                {
-                    for (var i = 0; i < list.Count; i++)
-                    {
-                        list[i] = (list[i] as IdentifiedData)?.HarmonizeKeys(harmonizationMode) ?? list[i];
-                    }
-                }
-            }
-            return me;
-        }
 
         /// <summary>
         /// Get provenance from the context
@@ -353,19 +268,16 @@ namespace SanteDB.Persistence.Data
                 foreach (var ident in cprincipal.Identities)
                 {
                     Guid sid = Guid.Empty;
-                    if (ident is AdoIdentity adoIdentity)
+                    switch (ident)
                     {
-                        sid = adoIdentity.Sid;
-                    }
-                    else if (ident is IClaimsIdentity cIdentity)
-                    {
-                        sid = Guid.Parse(cIdentity.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim)?.Value ??
-                            cIdentity.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim)?.Value ??
-                            cIdentity.FindFirst(SanteDBClaimTypes.SecurityId)?.Value);
-                    }
-                    else
-                    {
-                        throw new SecurityException(s_localizationService.GetString(ErrorMessageStrings.SEC_PROVENANCE_UNK_ID));
+                        case AdoIdentity adoIdentity:
+                            sid = adoIdentity.Sid;
+                            break;
+                        case IClaimsIdentity cIdentity:
+                            sid = Guid.Parse(cIdentity.FindFirst(SanteDBClaimTypes.SecurityId)?.Value);
+                            break;
+                        default:
+                            throw new SecurityException(s_localizationService.GetString(ErrorMessageStrings.SEC_PROVENANCE_UNK_ID));
                     }
 
                     // Set apporopriate property

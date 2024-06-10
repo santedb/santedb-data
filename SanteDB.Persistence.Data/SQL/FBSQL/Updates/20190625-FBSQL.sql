@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20190625-01" name="Update:20190625-01" applyRange="0.2.0.0-0.9.0.0" invariantName="FirebirdSQL">
+ * <feature scope="SanteDB.Persistence.Data" id="20190625-01" name="Update:20190625-01"  invariantName="FirebirdSQL">
  *	<summary>Update:Cumulative update for FirebirdSQL</summary>
  *	<remarks>Updates the FirebirdSQL database to latest SanteDB</remarks>
  *  <isInstalled>select ck_patch('20190625-01') from rdb$database</isInstalled>

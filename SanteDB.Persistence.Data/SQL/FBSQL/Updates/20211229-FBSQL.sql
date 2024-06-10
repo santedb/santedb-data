@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20211229-01" name="Update:20211229-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
+ * <feature scope="SanteDB.Persistence.Data" id="20211229-01" name="Update:20211229-01"   invariantName="FirebirdSQL">
  *	<summary>Update: Adds narrative structures to database</summary>
  *	<isInstalled>select ck_patch('20211229-01') from RDB$DATABASE</isInstalled>
  * </feature>

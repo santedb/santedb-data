@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,16 +16,28 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.BI.Services.Impl;
 using SanteDB.Client.Configuration;
 using SanteDB.Client.Disconnected.Data.Synchronization;
+using SanteDB.Client.Disconnected.Services;
 using SanteDB.Client.Upstream.Repositories;
 using SanteDB.Client.Upstream.Security;
+using SanteDB.Core;
+using SanteDB.Core.Configuration;
 using SanteDB.Core.Data;
+using SanteDB.Core.Data.Management;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Security;
+using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl.Repository;
+using SanteDB.Matcher.Matchers;
+using SanteDB.Persistence.Auditing.ADO.Services;
+using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Services;
+using SanteDB.Persistence.PubSub.ADO;
+using SanteDB.Persistence.Synchronization.ADO.Services;
 using System;
 using System.Collections.Generic;
 
@@ -42,6 +54,10 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
         /// <inheritdoc/>
         public IEnumerable<Type> GetServices() => new Type[]
                     {
+                        typeof(ClientPolicyDecisionProviderService),
+                        typeof(DefaultTfaService),
+                        typeof(BridgedSessionManager),
+                        typeof(AdoSessionProvider),
                         typeof(AdoPersistenceService),
                         typeof(UpstreamSynchronizationService),
                         typeof(AdoIdentityProvider),
@@ -56,6 +72,8 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                         typeof(AdoPolicyInformationService),
                         typeof(AdoCdssLibraryRepository),
                         typeof(AdoRelationshipValidationProvider),
+                        typeof(AdoAuditRepositoryService),
+                        typeof(AdoPubSubManager),
                         typeof(BridgedSecurityRepositoryService),
                         typeof(UpstreamSecurityRepository),
                         typeof(BridgedIdentityProvider),
@@ -65,16 +83,56 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                         typeof(UpstreamPolicyInformationService),
                         typeof(UpstreamRoleProviderService),
                         typeof(LocalSecurityRepositoryService),
+                        typeof(SynchronizationAuditDispatcher),
                         typeof(UpstreamSecurityChallengeProvider),
+                        typeof(WeightedRecordMatchingService),
+                        typeof(AdoRecordMatchingConfigurationService),
                         typeof(PersistenceEntitySource),
-                        typeof(AdoSynchronizationRepositoryService),
-                        typeof(DefaultSynchronizationQueueManager),
+                        typeof(AdoSynchronizationManager),
                         typeof(LocalRepositoryFactory),
                         typeof(DefaultDatamartManager),
                         typeof(LocalBiRenderService),
                         typeof(InMemoryPivotProvider),
                         typeof(AppletBiRepository),
-                        typeof(AdoSubscriptionExecutor)
+                        typeof(AdoSubscriptionExecutor),
                     };
+
+        /// <summary>
+        /// Set default configurations
+        /// </summary>
+        public void SetDefaults(SanteDBConfiguration configuration)
+        {
+            var adoConfiguration = configuration.GetSection<AdoPersistenceConfigurationSection>();
+
+            // Versioning policy default 
+            if (ApplicationServiceContext.Current.HostType != SanteDBHostType.Gateway &&
+                ApplicationServiceContext.Current.HostType != SanteDBHostType.Server) // Client configuration should not version data
+            {
+
+                adoConfiguration.VersioningPolicy = AdoVersioningPolicyFlags.None;
+                adoConfiguration.TrimSettings = new AdoTrimSettings()
+                {
+                    MaxDeletedDataRetention = new TimeSpan(30, 0, 0),
+                    MaxSessionRetention = new TimeSpan(30, 0, 0)
+                };
+                adoConfiguration.Validation = new List<AdoValidationPolicy>() {
+                    new AdoValidationPolicy() {
+                        Uniqueness = AdoValidationEnforcement.Loose,
+                        Target = new ResourceTypeReferenceConfiguration(typeof(Entity)),
+                        Authority = AdoValidationEnforcement.Strict,
+                        Format = AdoValidationEnforcement.Strict,
+                        CheckDigit = AdoValidationEnforcement.Strict,
+                        Scope = AdoValidationEnforcement.Strict
+                    }
+                };
+                adoConfiguration.AutoInsertChildren = true;
+                adoConfiguration.AutoUpdateExisting = true;
+                adoConfiguration.DeleteStrategy = DeleteMode.PermanentDelete;
+                adoConfiguration.LoadStrategy = LoadMode.FullLoad;
+                adoConfiguration.MaxPageSize = 25;
+
+            }
+
+        }
     }
 }

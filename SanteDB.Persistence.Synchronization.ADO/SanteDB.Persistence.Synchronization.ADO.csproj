@@ -27,26 +27,7 @@
     <BaseOutputPath>..\bin\</BaseOutputPath>
   </PropertyGroup>
   <Choose>
-    <When Condition="$(SolutionName.Contains('-ext'))">
-      <ItemGroup>
-        <ProjectReference Include="..\..\restsrvr\RestSrvr\RestSrvr.csproj">
-        </ProjectReference>
-        <ProjectReference Include="..\..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
-        </ProjectReference>
-        <ProjectReference Include="..\..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
-        </ProjectReference>
-        <ProjectReference Include="..\..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
-        </ProjectReference>
-        <ProjectReference Include="..\..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj">
-        </ProjectReference>
-        <ProjectReference Include="..\..\santedb-orm\SanteDB.OrmLite\SanteDB.OrmLite.csproj">
-        </ProjectReference>
-        <ProjectReference Include="..\..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
-        </ProjectReference>
-        <ProjectReference Include="..\..\santedb-dc-core\SanteDB.Client.Disconnected\SanteDB.Client.Disconnected.csproj" />
-      </ItemGroup>
-    </When>
-    <Otherwise>
+    <When Condition="$(SolutionName.Contains('-nuget'))">
       <ItemGroup>
         <PackageReference Include="RestSrvr" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.Core.Api" Version="$(VersionNumber)" />
@@ -57,19 +38,41 @@
         <PackageReference Include="SanteDB.Docker.Core" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.Client.Disconnected" Version="$(VersionNumber)" />
       </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <ProjectReference Include="..\..\restsrvr\RestSrvr\RestSrvr.csproj" />
+        <ProjectReference Include="..\..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj" />
+        <ProjectReference Include="..\..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj" />
+        <ProjectReference Include="..\..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj" />
+        <ProjectReference Include="..\..\santedb-restsvc\SanteDB.Rest.Common\SanteDB.Rest.Common.csproj" />
+        <ProjectReference Include="..\..\santedb-orm\SanteDB.OrmLite\SanteDB.OrmLite.csproj" />
+        <ProjectReference Include="..\..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj" />
+        <ProjectReference Include="..\..\santedb-dc-core\SanteDB.Client.Disconnected\SanteDB.Client.Disconnected.csproj" />
+      </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <None Remove="Data\SQL\PSQL\20240117.sql" />
     <None Remove="Data\SQL\PSQL\sync_repo.sql" />
+    <None Remove="Data\SQL\SQLITE\20240117.sql" />
     <None Remove="Data\SQL\SQLITE\sync_repo.sql" />
+    <None Remove="Map\ModelMap.xml" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Data\SQL\PSQL\20240117.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\PSQL\sync_repo.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\SQL\SQLITE\20240117.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Data\SQL\SQLITE\sync_repo.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Map\ModelMap.xml" />
   </ItemGroup>
   <!--<ItemGroup>
     <ProjectReference Include="..\..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj">

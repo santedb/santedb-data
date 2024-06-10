@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Services;
@@ -98,13 +98,14 @@ namespace SanteDB.Persistence.Data.Configuration
         public AdoPersistenceConfigurationSection()
         {
             this.Validation = new List<AdoValidationPolicy>();
+
             this.VersioningPolicy = AdoVersioningPolicyFlags.Default;
             this.CachingPolicy = new AdoPersistenceCachingPolicy()
             {
                 DataObjectExpiry = new TimeSpan(0, 1, 0),
                 Targets = AdoDataCachingPolicyTarget.ModelObjects
             };
-
+            this.TrimSettings = new AdoTrimSettings();
         }
 
         /// <summary>
@@ -184,19 +185,19 @@ namespace SanteDB.Persistence.Data.Configuration
         [Description("When set, instructs the provider to automatically insert any child objects to ensure integrity of the object")]
         public bool AutoInsertChildren { get; set; }
 
-        /// <summary>
-        /// True if statements should be prepared
-        /// </summary>
-        [XmlAttribute("prepareStatements")]
-        [Category("Performance")]
-        [DisplayName("Prepare SQL Queries")]
-        [Description("When true, instructs the provider to prepare statements and reuse them during a transaction")]
-        public bool PrepareStatements { get; set; }
+        ///// <summary>
+        ///// True if statements should be prepared
+        ///// </summary>
+        //[XmlAttribute("prepareStatements")]
+        //[Category("Performance")]
+        //[DisplayName("Prepare SQL Queries")]
+        //[Description("When true, instructs the provider to prepare statements and reuse them during a transaction")]
+        //public bool PrepareStatements { get; set; }
 
         /// <summary>
         /// Validation flags
         /// </summary>
-        [XmlElement("validation"), Category("Data Quality"), DisplayName("Validation"), Description("When set, enables data validation parameters")]
+        [XmlElement("validation"), Category("Data Quality"), DisplayName("Identifier Validation"), Description("When set, enables data validation parameters")]
         public List<AdoValidationPolicy> Validation { get; set; }
 
         /// <summary>
@@ -216,12 +217,6 @@ namespace SanteDB.Persistence.Data.Configuration
         /// </summary>
         [XmlAttribute("loadStrategy"), Category("Performance"), DisplayName("Load Strategy"), Description("Sets the loading strategy - Quick = No extended loading of properties , Sync = Only synchornization/serialization properties are deep loaded, Full = All properties are loaded")]
         public LoadMode LoadStrategy { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether public keys should be encrypted
-        /// </summary>
-        [XmlAttribute("encryptPublicKeys"), Category("Security"), DisplayName("Encrypt Public Keys"), Description("When true, public keys on applications should be encrypted")]
-        public bool EncryptPublicKeys { get; set; }
 
         /// <summary>
         /// Gets or sets the deletion strategy
@@ -255,7 +250,7 @@ namespace SanteDB.Persistence.Data.Configuration
         public IEnumerable<String> GetPepperCombos(String secret)
         {
             var pepperSource = !String.IsNullOrEmpty(this.Pepper) ? this.Pepper : PEPPER_CHARS;
-            IEnumerable<String> pepperCombos = new String[] { secret };
+            IEnumerable<String> pepperCombos = new String[] { };
             if (!this.LegacyPepperSpecified || this.LegacyPepper)
             {
                 var pepper = Enumerable.Range(0, secret.Length / 2).Select(o => secret.Substring(o, 2) + $"{pepperSource}{pepperSource.Reverse()}".Substring(o % pepperSource.Length, (o + 1) % 5)).ToArray();

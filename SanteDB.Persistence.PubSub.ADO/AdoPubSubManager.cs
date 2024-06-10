@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
@@ -360,7 +360,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                 DispatcherFactoryId = dispatcherFactoryId,
                 Endpoint = endpoint.ToString(),
                 IsActive = false,
-                Settings = settings.Select(o => new PubSubChannelSetting() { Name = o.Key, Value = o.Value }).ToList()
+                Settings = settings?.Select(o => new PubSubChannelSetting() { Name = o.Key, Value = o.Value }).ToList()
             };
 
             using (var conn = this.m_configuration.Provider.GetWriteConnection())
@@ -385,7 +385,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                         dbChannel = conn.Insert(dbChannel);
 
                         // Insert settings
-                        foreach (var itm in channel.Settings)
+                        foreach (var itm in channel.Settings ?? new List<PubSubChannelSetting>())
                         {
                             conn.Insert(new DbChannelSetting()
                             {

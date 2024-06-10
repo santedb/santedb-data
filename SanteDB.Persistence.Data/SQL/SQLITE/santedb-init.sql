@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="00010000-04" name="Data Initialization" invariantName="sqlite">
+ * <feature scope="SanteDB.Persistence.Data" id="00010000-04" name="Data Initialization" environment="Server"  invariantName="sqlite">
  *	<summary>Initialize Data</summary>
  *	<remarks>Initializes the SanteDB database with default usernames, passwords, and applications</remarks>
  *	<isInstalled>SELECT COUNT(1) = 1 FROM SEC_USR_TBL WHERE USR_NAME = 'Administrator'</isInstalled>
@@ -10,7 +10,7 @@ DELETE FROM SEC_USR_TBL WHERE USR_NAME IN ('Bob','Allison', 'SyncUser', 'Adminis
 DELETE FROM SEC_APP_POL_ASSOC_TBL WHERE APP_ID IN (SELECT APP_ID FROM SEC_APP_TBL WHERE APP_PUB_ID = 'fiddler');
 DELETE FROM SEC_APP_TBL WHERE APP_PUB_ID = 'fiddler';
 
-INSERT INTO SEC_USR_TBL (USR_NAME, SEC_STMP, PASSWD, EMAIL, PHN_NUM, EMAIL_CNF, PHN_CNF, CRT_PROV_ID)
+INSERT INTO SEC_USR_TBL ( USR_NAME, SEC_STMP, PASSWD, EMAIL, PHN_NUM, EMAIL_CNF, PHN_CNF, CRT_PROV_ID)
 	VALUES ('Administrator', randomblob(16), '59ff5973691ff75f8baa45f1e38fae24875f77ef00987ed22b02df075fb144f9', 'administrator@santedb.org', 'tel:+19055751212;ext=4085', TRUE, TRUE, x'76A0DCFA90366E4AAF9EF1CD68E8C7E8');
 	
 INSERT INTO ent_tbl (ent_id) 

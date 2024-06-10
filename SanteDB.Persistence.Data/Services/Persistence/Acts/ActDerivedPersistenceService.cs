@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
@@ -136,14 +136,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             // Update sub entity table
             var dbSubEntity = this.m_modelMapper.MapModelInstance<TAct, TDbTopLevelTable>(data);
             dbSubEntity.ParentKey = retVal.VersionKey.Value;
-            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
-            {
-                dbSubEntity = context.Insert(dbSubEntity);
-            }
-            else
-            {
-                dbSubEntity = context.Update(dbSubEntity);
-            }
+            dbSubEntity = context.Insert(dbSubEntity);
             retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbTopLevelTable, TAct>(dbSubEntity), onlyNullFields: true);
             return retVal;
         }
@@ -219,14 +212,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             // Update sub table
             var dbSubEntity = this.m_modelMapper.MapModelInstance<TAct, TDbActSubTable>(data);
             dbSubEntity.ParentKey = retVal.VersionKey.Value;
-            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
-            {
-                dbSubEntity = context.Insert(dbSubEntity);
-            }
-            else
-            {
-                dbSubEntity = context.Update(dbSubEntity);
-            }
+            dbSubEntity = context.Insert(dbSubEntity);
             retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbActSubTable, TAct>(dbSubEntity), onlyNullFields: true);
             return retVal;
         }

@@ -1,14 +1,30 @@
-﻿using SanteDB.BI.Model;
+﻿/*
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you 
+ * may not use this file except in compliance with the License. You may 
+ * obtain a copy of the License at 
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0 
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ * License for the specific language governing permissions and limitations under 
+ * the License.
+ * 
+ * User: fyfej
+ * Date: 2023-11-27
+ */
 using SanteDB.Core;
 using SanteDB.Core.Cdss;
-using SanteDB.Core.Data.Import;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Http.Compression;
 using SanteDB.Core.i18n;
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Audit;
-using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
@@ -29,7 +45,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -75,7 +90,8 @@ namespace SanteDB.Persistence.Data.Services
                 set => throw new NotSupportedException();
             }
 
-            public Guid? PreviousVersionKey {
+            public Guid? PreviousVersionKey
+            {
                 get => this.m_versionData.ReplacesVersionKey;
                 set => throw new NotSupportedException();
             }
@@ -94,7 +110,7 @@ namespace SanteDB.Persistence.Data.Services
 
             public string Tag => this.VersionKey.ToString();
 
-            public DateTimeOffset ModifiedOn => this.m_versionData.ObsoletionTime ??  this.m_versionData.CreationTime;
+            public DateTimeOffset ModifiedOn => this.m_versionData.ObsoletionTime ?? this.m_versionData.CreationTime;
 
             public Guid? CreatedByKey => this.m_versionData.CreatedByKey;
 
@@ -163,14 +179,14 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public ICdssLibrary Get(Guid libraryUuid, Guid? versionUuuid)
         {
-            if(libraryUuid == Guid.Empty)
+            if (libraryUuid == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(libraryUuid));
             }
 
             try
             {
-                using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+                using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     context.Open();
                     if (versionUuuid.GetValueOrDefault() != Guid.Empty)
@@ -183,11 +199,11 @@ namespace SanteDB.Persistence.Data.Services
                     }
                 }
             }
-            catch(DbException e)
+            catch (DbException e)
             {
                 throw e.TranslateDbException();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.CDSS_LIBRARY_MANAGE_ERROR), e);
             }
@@ -212,7 +228,7 @@ namespace SanteDB.Persistence.Data.Services
             var queryStmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCdssLibrary), typeof(DbCdssLibraryVersion))
                    .InnerJoin<DbCdssLibrary, DbCdssLibraryVersion>(o => o.Key, o => o.Key);
 
-            if(versionKey.HasValue)
+            if (versionKey.HasValue)
             {
                 queryStmt = queryStmt.Where<DbCdssLibraryVersion>(o => o.Key == key && o.VersionKey == versionKey.Value);
             }
@@ -248,25 +264,30 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public ICdssLibrary InsertOrUpdate(ICdssLibrary libraryToInsert)
         {
-            if(libraryToInsert == null)
+            if (libraryToInsert == null)
             {
                 throw new ArgumentNullException(nameof(libraryToInsert));
             }
 
+            bool isSystemContext = AuthenticationContext.Current.Principal == AuthenticationContext.SystemPrincipal;
+
             try
             {
-                using(var context = this.m_configuration.Provider.GetWriteConnection())
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open();
-                    using(var tx = context.BeginTransaction())
+                    using (var tx = context.BeginTransaction())
                     {
 
                         // Is there an existing version?
                         var storageKey = libraryToInsert?.StorageMetadata?.Key;
                         var existingLibrary = context.FirstOrDefault<DbCdssLibrary>(o => o.Key == libraryToInsert.Uuid || o.Key == storageKey);
-                        if(existingLibrary == null) // Doesn't exist
+                        if (existingLibrary == null) // Doesn't exist
                         {
-                            this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateClinicalProtocolConfigurationDefinition);
+                            if (!isSystemContext)
+                            {
+                                this.m_pepService.Demand(PermissionPolicyIdentifiers.CreateClinicalProtocolConfigurationDefinition);
+                            }
                             existingLibrary = context.Insert(new DbCdssLibrary()
                             {
                                 Key = libraryToInsert.Uuid,
@@ -275,16 +296,16 @@ namespace SanteDB.Persistence.Data.Services
                             });
                             libraryToInsert.Uuid = existingLibrary.Key;
                         }
-                        else if(Type.GetType(existingLibrary.CdssLibraryFormat) != libraryToInsert.GetType()) // Not allowed to change types
+                        else if (Type.GetType(existingLibrary.CdssLibraryFormat) != libraryToInsert.GetType()) // Not allowed to change types
                         {
                             throw new InvalidOperationException(String.Format(ErrorMessages.ARGUMENT_INVALID_TYPE, existingLibrary.CdssLibraryFormat, libraryToInsert.GetType()));
                         }
-                        else if(existingLibrary.IsSystem && 
-                            AuthenticationContext.Current.Principal != AuthenticationContext.SystemPrincipal)
+                        else if (existingLibrary.IsSystem &&
+                            !isSystemContext)
                         {
                             this.m_pepService.Demand(PermissionPolicyIdentifiers.UnrestrictedAll);
                         }
-                        else
+                        else if (!isSystemContext)
                         {
                             this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterClinicalProtocolConfigurationDefinition);
                         }
@@ -316,12 +337,12 @@ namespace SanteDB.Persistence.Data.Services
 
                         // Is there a current version?
                         var currentVersion = context.Query<DbCdssLibraryVersion>(o => o.Key == existingLibrary.Key).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault();
-                        if(currentVersion != null)
+                        if (currentVersion != null)
                         {
-                            if(SHA1.Create().ComputeHash(newVersion.Definition).SequenceEqual(SHA1.Create().ComputeHash(currentVersion.Definition)) && !currentVersion.ObsoletionTime.HasValue)
+                            if (SHA1.Create().ComputeHash(newVersion.Definition).SequenceEqual(SHA1.Create().ComputeHash(currentVersion.Definition)) && !currentVersion.ObsoletionTime.HasValue)
                             {
                                 this.m_tracer.TraceWarning("Not updating CDSS definition since it has not changed.");
-                                return this.ToModelInstance(context, new CompositeResult<DbCdssLibrary, DbCdssLibraryVersion>(existingLibrary, currentVersion)); 
+                                return this.ToModelInstance(context, new CompositeResult<DbCdssLibrary, DbCdssLibraryVersion>(existingLibrary, currentVersion));
                             }
                             currentVersion.ObsoletionTime = newVersion.CreationTime;
                             currentVersion.ObsoletedByKey = newVersion.CreatedByKey;
@@ -340,11 +361,11 @@ namespace SanteDB.Persistence.Data.Services
                     }
                 }
             }
-            catch(DbException e)
+            catch (DbException e)
             {
                 throw e.TranslateDbException();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.CDSS_LIBRARY_MANAGE_ERROR), e);
             }
@@ -353,13 +374,29 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public LambdaExpression MapExpression<TReturn>(Expression<Func<ICdssLibrary, TReturn>> sortExpression)
         {
-            return this.m_modelMapper.MapModelExpression<ICdssLibrary, DbCdssLibraryVersion, TReturn>(sortExpression, false);
+            var sortQuery = this.m_modelMapper.MapModelExpression<ICdssLibrary, DbCdssLibraryVersion, TReturn>(sortExpression, false);
+            if(sortQuery == null && sortExpression.ToString().Contains("Storage"))
+            {
+                var propertySelector = QueryExpressionBuilder.BuildPropertySelector(sortExpression).Replace("storage.", ""); // HACK:
+                var parameter = Expression.Parameter(typeof(DbCdssLibraryVersion));
+                Expression selector = null;
+                switch(propertySelector)
+                {
+                    case "creationTime":
+                    case "modifiedOn":
+                    case "updatedTime":
+                        return Expression.Lambda<Func<DbCdssLibraryVersion, TReturn>>(Expression.Convert(Expression.MakeMemberAccess(parameter, typeof(DbCdssLibraryVersion).GetProperty(nameof(DbCdssLibraryVersion.CreationTime))), typeof(TReturn)), parameter);
+                    default:
+                        throw new InvalidOperationException();
+                }
+            }
+            return sortQuery;
         }
 
         /// <inheritdoc/>
         public ICdssLibrary Remove(Guid libraryUuid)
         {
-            if(libraryUuid == Guid.Empty)
+            if (libraryUuid == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(libraryUuid));
             }
@@ -367,21 +404,20 @@ namespace SanteDB.Persistence.Data.Services
             this.m_pepService.Demand(PermissionPolicyIdentifiers.DeleteClinicalProtocolConfigurationDefinition);
             try
             {
-                using(var context = this.m_configuration.Provider.GetWriteConnection())
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open();
-                    using(var tx = context.BeginTransaction())
+                    using (var tx = context.BeginTransaction())
                     {
-
                         var existingRegistration = context.FirstOrDefault<DbCdssLibrary>(o => o.Key == libraryUuid);
-                        if(existingRegistration == null)
+                        if (existingRegistration == null)
                         {
                             throw new KeyNotFoundException(String.Format(ErrorMessages.OBJECT_NOT_FOUND, libraryUuid));
                         }
 
                         // Get the current version
                         var currentVersion = context.FirstOrDefault<DbCdssLibraryVersion>(o => o.IsHeadVersion && o.Key == libraryUuid);
-                        if(currentVersion != null)
+                        if (currentVersion != null)
                         {
                             currentVersion.ObsoletedByKey = context.EstablishProvenance(AuthenticationContext.Current.Principal);
                             currentVersion.ObsoletionTime = DateTimeOffset.Now;
@@ -391,15 +427,15 @@ namespace SanteDB.Persistence.Data.Services
                         tx.Commit();
                         _ = this.m_cdssLibraryLoaded.TryRemove(this.CreateCacheKey(existingRegistration.Key), out _);
 
-                        return this.ToModelInstance(context, new CompositeResult<DbCdssLibrary, DbCdssLibraryVersion>(existingRegistration, currentVersion));                        
+                        return this.ToModelInstance(context, new CompositeResult<DbCdssLibrary, DbCdssLibraryVersion>(existingRegistration, currentVersion));
                     }
                 }
             }
-            catch(DbException e)
+            catch (DbException e)
             {
                 throw e.TranslateDbException();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.CDSS_LIBRARY_MANAGE_ERROR), e);
             }
@@ -411,13 +447,14 @@ namespace SanteDB.Persistence.Data.Services
             if (result is CompositeResult<DbCdssLibrary, DbCdssLibraryVersion> cdssResult)
             {
                 var libraryType = Type.GetType(cdssResult.Object1.CdssLibraryFormat);
-                if(libraryType == null)
+                if (libraryType == null)
                 {
                     throw new InvalidOperationException(String.Format(ErrorMessages.TYPE_NOT_FOUND, cdssResult.Object1.CdssLibraryFormat));
                 }
                 var libraryInstance = Activator.CreateInstance(libraryType) as ICdssLibrary;
                 libraryInstance.StorageMetadata = new AdoCdssLibraryEntry(cdssResult.Object1, cdssResult.Object2);
-                using (var ms = new MemoryStream(cdssResult.Object2.Definition)) {
+                using (var ms = new MemoryStream(cdssResult.Object2.Definition))
+                {
                     using (var cs = CompressionUtil.GetCompressionScheme(Core.Http.Description.HttpCompressionAlgorithm.Gzip).CreateDecompressionStream(ms))
                     {
                         libraryInstance.Load(cs);
@@ -425,7 +462,7 @@ namespace SanteDB.Persistence.Data.Services
                 }
                 return libraryInstance;
             }
-            else if(result == null)
+            else if (result == null)
             {
                 return null;
             }
@@ -437,7 +474,7 @@ namespace SanteDB.Persistence.Data.Services
 
 
         /// <inheritdoc/>
-        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        public void Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
         {
 
             // Trim out any deleted versions where the head is deleted beyond the deleted cutoff
@@ -460,7 +497,6 @@ namespace SanteDB.Persistence.Data.Services
                         new ObjectDataExtension("cdss.library.oid", itm.Oid)
                     }
                 });
-                yield return new KeyValuePair<Type, Guid>(typeof(DbCdssLibrary), itm.Key);
             }
 
             // Trim out old versions of BI definitions & prune any deleted 

@@ -30,23 +30,7 @@
   </PropertyGroup>
   
   <Choose>
-    <When Condition="$(SolutionName.Contains('-ext'))">
-      <ItemGroup>
-        <ProjectReference Include="..\..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
-        </ProjectReference>
-        <ProjectReference Include="..\..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
-        </ProjectReference>
-        <ProjectReference Include="..\..\santedb-orm\SanteDB.OrmLite\SanteDB.OrmLite.csproj">
-        </ProjectReference>
-        <ProjectReference Include="..\..\santedb-bis\SanteDB.BI\SanteDB.BI.csproj">
-        </ProjectReference>
-        <ProjectReference Include="..\..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
-        </ProjectReference>
-        <ProjectReference Include="..\..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj" />
-        
-      </ItemGroup>
-    </When>
-    <Otherwise>
+    <When Condition="$(SolutionName.Contains('-nuget'))">
       <ItemGroup>
         <PackageReference Include="SanteDB.Core.Api" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.Core.Model" Version="$(VersionNumber)" />
@@ -55,6 +39,16 @@
         <PackageReference Include="SanteDB.Core.i18n" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.Docker.Core" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.Core.i18n" Version="$(VersionNumber)" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <ProjectReference Include="..\..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj" />
+        <ProjectReference Include="..\..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj" />
+        <ProjectReference Include="..\..\santedb-orm\SanteDB.OrmLite\SanteDB.OrmLite.csproj" />
+        <ProjectReference Include="..\..\santedb-bis\SanteDB.BI\SanteDB.BI.csproj" />
+        <ProjectReference Include="..\..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj" />
+        <ProjectReference Include="..\..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -78,6 +72,8 @@
     <None Remove="SQL\FBSQL\Updates\20230514-FBSQL.sql" />
     <None Remove="SQL\FBSQL\Updates\20230711-FBSQL.sql" />
     <None Remove="SQL\FBSQL\Updates\20230727-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20240521-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20240605-FBSQL.sql" />
     <None Remove="SQL\PSQL\santedb-codes.sql" />
     <None Remove="SQL\PSQL\santedb-ddl.sql" />
     <None Remove="SQL\PSQL\santedb-fn.sql" />
@@ -99,6 +95,10 @@
     <None Remove="SQL\PSQL\Updates\20230727-PSQL.sql" />
     <None Remove="SQL\PSQL\Updates\20230802-PSQL.sql" />
     <None Remove="SQL\PSQL\Updates\20231116-PSQL.sql" />
+    <None Remove="SQL\PSQL\Updates\20240104-PSQL.sql" />
+    <None Remove="SQL\PSQL\Updates\20240320-PSQL.sql" />
+    <None Remove="SQL\PSQL\Updates\20240521-PSQL.sql" />
+    <None Remove="SQL\PSQL\Updates\20240605-PSQL.sql" />
     <None Remove="SQL\SQLITE\20221003.SQL" />
     <None Remove="SQL\SQLITE\20221027.sql" />
     <None Remove="SQL\SQLITE\20221130.sql" />
@@ -115,6 +115,12 @@
     <None Remove="SQL\SQLITE\20230727.sql" />
     <None Remove="SQL\SQLITE\20230802.sql" />
     <None Remove="SQL\SQLITE\20231116.sql" />
+    <None Remove="SQL\SQLITE\20240104.sql" />
+    <None Remove="SQL\SQLITE\20240120.sql" />
+    <None Remove="SQL\SQLITE\20240210.sql" />
+    <None Remove="SQL\SQLITE\20240320.sql" />
+    <None Remove="SQL\SQLITE\20240521.sql" />
+    <None Remove="SQL\SQLITE\20240605.sql" />
     <None Remove="SQL\SQLITE\santedb-codes.sql" />
     <None Remove="SQL\SQLITE\santedb-ddl.sql" />
     <None Remove="SQL\SQLITE\santedb-init.sql" />
@@ -196,6 +202,8 @@
   
   <ItemGroup>
     <EmbeddedResource Include="Map\ModelMap.xml" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20240605-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20240521-FBSQL.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20231116-FBSQL.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20230227-FBSQL.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -227,6 +235,10 @@
     <EmbeddedResource Include="SQL\PSQL\Updates\20230227-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20230118-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20221214-PSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20240605-PSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20240521-PSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20240320-PSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20240104-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20231116-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20230802-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20230727-PSQL.sql" />
@@ -260,6 +272,7 @@
     <EmbeddedResource Include="SQL\SQLITE\20230330.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="SQL\SQLITE\20240104.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20231116.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20230802.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20230727.sql" />
@@ -267,6 +280,11 @@
     <EmbeddedResource Include="SQL\SQLITE\20230514.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20230509.sql">
     </EmbeddedResource>
+    <EmbeddedResource Include="SQL\SQLITE\20240605.sql" />
+    <EmbeddedResource Include="SQL\SQLITE\20240521.sql" />
+    <EmbeddedResource Include="SQL\SQLITE\20240320.sql" />
+    <EmbeddedResource Include="SQL\SQLITE\20240210.sql" />
+    <EmbeddedResource Include="SQL\SQLITE\20240120.sql" />
     <EmbeddedResource Include="SQL\SQLITE\santedb-codes.sql" />
     <EmbeddedResource Include="SQL\SQLITE\santedb-ddl.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20231116-01" name="Update:20231116-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="sqlite">
+ * <feature scope="SanteDB.Persistence.Data" id="20231116-01" name="Update:20231116-01"   invariantName="sqlite">
  *	<summary>Update: Adds CDSS storage to the primary database</summary>
  *	<isInstalled>select count(*) > 0 from patch_db_systbl WHERE PATCH_ID = '20231116-01'</isInstalled>
  * </feature>

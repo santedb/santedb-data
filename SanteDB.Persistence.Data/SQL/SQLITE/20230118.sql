@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20230118" name="Update:Cumulative Update for SQLite" applyRange="0.2.0.0-0.9.0.0" invariantName="sqlite">
+ * <feature scope="SanteDB.Persistence.Data" id="20230118" name="Update:Cumulative Update for SQLite"  invariantName="sqlite">
  *	<summary>Update:Migrate person ctable columns</summary>
  *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE tbl_name = 'PSN_TBL' AND sql LIKE '%DCSD_UTC%')</isInstalled>
  * </feature>

@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20220927-01" name="Update:20220927-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
+ * <feature scope="SanteDB.Persistence.Data" id="20220927-01" name="Update:20220927-01"   invariantName="FirebirdSQL">
  *	<summary>Update: Adds claims to applications and devices</summary>
  *	<isInstalled>select ck_patch('20220927-01') from RDB$DATABASE</isInstalled>
  * </feature>

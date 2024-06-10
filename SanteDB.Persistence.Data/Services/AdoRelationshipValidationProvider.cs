@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,16 +16,13 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
-using DocumentFormat.OpenXml.EMMA;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
-using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.DataTypes;
-using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
@@ -43,12 +40,11 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 
 namespace SanteDB.Persistence.Data.Services
 {
 
-    
+
     /// <summary>
     /// ADO.NET Based Relationship Provider
     /// </summary>
@@ -78,10 +74,10 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         private RelationshipTargetType GetRelationshipTargetType<TRelationship>() where TRelationship : ITargetedAssociation => this.GetRelationshipTargetType(typeof(TRelationship));
-            
+
         private RelationshipTargetType GetRelationshipTargetType(Type tRelationship)
         {
-            if(!Enum.TryParse<RelationshipTargetType>(tRelationship.Name, out var retVal))
+            if (!Enum.TryParse<RelationshipTargetType>(tRelationship.Name, out var retVal))
             {
                 throw new ArgumentOutOfRangeException(nameof(tRelationship));
             }
@@ -213,7 +209,7 @@ namespace SanteDB.Persistence.Data.Services
                     context.Open();
                     using (var tx = context.BeginTransaction())
                     {
-                      
+
                         context.EstablishProvenance(AuthenticationContext.Current.Principal);
                         var retVal = this.Delete(context, key, DeleteMode.PermanentDelete);
                         tx.Commit();
@@ -243,12 +239,12 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
-                    using(var tx = context.BeginTransaction())
+                    using (var tx = context.BeginTransaction())
                     {
                         var tclass = GetRelationshipTargetType<TRelationship>();
                         context.EstablishProvenance(AuthenticationContext.Current.Principal);
                         var toDelete = context.FirstOrDefault<DbRelationshipValidationRule>(o => o.SourceClassKey == sourceClassKey && o.TargetClassKey == targetClassKey && o.RelationshipTypeKey == relationshipTypeKey && o.RelationshipClassType == tclass);
-                        if(toDelete != null)
+                        if (toDelete != null)
                         {
                             this.Delete(context, toDelete.Key, DeleteMode.PermanentDelete);
                         }
@@ -286,7 +282,7 @@ namespace SanteDB.Persistence.Data.Services
         public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<RelationshipValidationRule, bool>> query)
         {
             var dbQuery = this.m_mapper.MapModelExpression<RelationshipValidationRule, DbRelationshipValidationRule, bool>(query);
-            
+
             return context.Query<DbRelationshipValidationRule>(dbQuery);
         }
 
@@ -312,7 +308,7 @@ namespace SanteDB.Persistence.Data.Services
                 var retVal = this.m_mapper.MapDomainInstance<DbRelationshipValidationRule, RelationshipValidationRule>(rule);
                 retVal.AppliesToXml = rule.RelationshipClassType.ToString();
 
-                switch(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
                 {
                     case LoadMode.FullLoad:
                         retVal.CreatedBy = retVal.CreatedBy.GetRelatedPersistenceService().Get(context, rule.CreatedByKey);
@@ -369,7 +365,7 @@ namespace SanteDB.Persistence.Data.Services
         public RelationshipValidationRule Update(DataContext context, RelationshipValidationRule data)
         {
             var existing = context.FirstOrDefault<DbRelationshipValidationRule>(o => o.Key == data.Key);
-            if(existing == null)
+            if (existing == null)
             {
                 throw new KeyNotFoundException(data.Key?.ToString());
             }
@@ -422,7 +418,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public IdentifiedData Insert(DataContext context, IdentifiedData data)
         {
-            if(data is RelationshipValidationRule rel)
+            if (data is RelationshipValidationRule rel)
             {
                 return this.Insert(context, rel);
             }
@@ -452,10 +448,9 @@ namespace SanteDB.Persistence.Data.Services
         public bool Exists(DataContext context, Guid key) => context.Any<DbRelationshipValidationRule>(o => o.Key == key);
 
         /// <inheritdoc/>
-        public IEnumerable<KeyValuePair<Type, Guid>> Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        public void Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
         {
             context.DeleteAll<DbRelationshipValidationRule>(o => o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff);
-            yield break;
         }
     }
 }

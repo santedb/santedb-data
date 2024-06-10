@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Jobs;
 using SanteDB.Core.Services;
@@ -86,13 +86,7 @@ namespace SanteDB.Persistence.Data.Jobs
                     optimizedConnections.Add(configuration.ReadWriteConnectionString);
 
                     this.m_jobState.SetProgress(this, $"Optimizing {configuration.ReadWriteConnectionString}", (float)i / (float)dataConnections.Length);
-                    using (var context = configuration.Provider.GetWriteConnection())
-                    {
-                        context.Open();
-                        context.ExecuteNonQuery(configuration.Provider.StatementFactory.CreateSqlKeyword(OrmLite.Providers.SqlKeyword.Vacuum));
-                        context.ExecuteNonQuery(configuration.Provider.StatementFactory.CreateSqlKeyword(OrmLite.Providers.SqlKeyword.Reindex));
-                        context.ExecuteNonQuery(configuration.Provider.StatementFactory.CreateSqlKeyword(OrmLite.Providers.SqlKeyword.Analyze));
-                    }
+                    configuration.Provider.Optimize();
                 }
 
 
@@ -100,7 +94,7 @@ namespace SanteDB.Persistence.Data.Jobs
             }
             catch (Exception ex)
             {
-                this.m_jobState.SetState(this, JobStateType.Aborted);
+                this.m_jobState.SetState(this, JobStateType.Aborted, ex.ToHumanReadableString());
                 this.m_jobState.SetProgress(this, ex.Message, 1.0f);
             }
         }

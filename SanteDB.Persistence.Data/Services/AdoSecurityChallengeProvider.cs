@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
@@ -116,10 +116,6 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new ArgumentNullException(nameof(userName), ErrorMessages.ARGUMENT_NULL);
             }
-            else if (challengeKey == default(Guid))
-            {
-                throw new ArgumentOutOfRangeException(nameof(challengeKey), ErrorMessages.ARGUMENT_NULL);
-            }
             else if (String.IsNullOrEmpty(response))
             {
                 throw new ArgumentNullException(nameof(response), ErrorMessages.ARGUMENT_NULL);
@@ -184,8 +180,20 @@ namespace SanteDB.Persistence.Data.Services
                             throw new InvalidIdentityAuthenticationException();
                         }
 
+                        // HACK: User is using an expiration reset
+                        bool isChallengeResponseValid = false;
+                        if(challengeKey == Guid.Empty && dbUser.PasswordExpiration.HasValue)
+                        {
+                            isChallengeResponseValid = context.Any<DbSecurityUser>(a => a.UserName.ToLowerInvariant() == userName.ToLower() && pepperResponses.Contains(a.Password));
+                        }
+                        else
+                        {
+                            isChallengeResponseValid = context.Any<DbSecurityUserChallengeAssoc>(c => pepperResponses.Contains(c.ChallengeResponse) && c.ChallengeKey == challengeKey && c.ExpiryTime > DateTimeOffset.Now);
+                        }
+
+
                         if (challengeIsMfa && this.m_tfaRelay?.ValidateSecret(challengeKey, identity, response) == true ||
-                            !challengeIsMfa && !context.Any<DbSecurityUserChallengeAssoc>(c => pepperResponses.Contains(c.ChallengeResponse) && c.ChallengeKey == challengeKey && c.ExpiryTime > DateTimeOffset.Now)) // Increment invalid
+                            !challengeIsMfa && !isChallengeResponseValid) // Increment invalid
                         {
                             dbUser.InvalidLoginAttempts++;
                             if (dbUser.InvalidLoginAttempts > this.m_securityConfiguration.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxInvalidLogins, 5))

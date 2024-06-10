@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20230802-01" name="Update:20230802-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="sqlite">
+ * <feature scope="SanteDB.Persistence.Data" id="20230802-01" name="Update:20230802-01"   invariantName="sqlite">
  *	<summary>Update: Adds application encryption master key configuration functions and adds free-text searching view</summary>
  *	<isInstalled>select count(*) > 0 from patch_db_systbl WHERE PATCH_ID = '20230802-01'</isInstalled>
  * </feature>

@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20211110-01" name="Update:20211110-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20211110-01" name="Update:20211110-01"   invariantName="npgsql">
  *	<summary>Update: Migrate the old phon value tables out of SanteDB - NOTE: This update may take upwards of 1 hour to apply on larger datasets</summary>
  *	<isInstalled>select ck_patch('20211110-01')</isInstalled>
  * </feature>

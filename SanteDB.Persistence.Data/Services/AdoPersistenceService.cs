@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,10 +16,11 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.BI.Model;
 using SanteDB.BI.Services;
+using SanteDB.Core.Data.Backup;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Jobs;
@@ -41,9 +42,10 @@ namespace SanteDB.Persistence.Data.Services
     /// A daemon service which registers the other persistence services
     /// </summary>
     [ServiceProvider("ADO.NET Persistence Service", Configuration = typeof(AdoPersistenceConfigurationSection))]
-    public class AdoPersistenceService : ISqlDataPersistenceService, IServiceFactory, IReportProgressChanged
+    public class AdoPersistenceService : ISqlDataPersistenceService, IServiceFactory, IReportProgressChanged, IProvideBackupAssets, IDisposable
     {
-
+        
+        // Service factory types
         private readonly Type[] m_serviceFactoryTypes = new Type[]
         {
             typeof(AdoForeignDataManager),
@@ -58,7 +60,8 @@ namespace SanteDB.Persistence.Data.Services
             typeof(AdoRelationshipValidationProvider),
             typeof(AdoDataSigningCertificateManagerService),
             typeof(AdoCertificateIdentityProvider),
-            typeof(AdoCdssLibraryRepository)
+            typeof(AdoCdssLibraryRepository),
+            typeof(AdoDataQualityConfigurationProvider)
         };
 
         // Gets the configuration
@@ -237,6 +240,26 @@ namespace SanteDB.Persistence.Data.Services
             }
             serviceInstance = this.m_services.FirstOrDefault(o => serviceType.IsAssignableFrom(o.GetType()));
             return serviceInstance != null;
+        }
+
+
+        /// <inheritdoc/>
+        public IEnumerable<IBackupAsset> GetBackupAssets()
+        {
+            var retVal = this.m_configuration.Provider.CreateBackupAsset(DataConstants.PRIMARY_DATABASE_ASSET_ID);
+            if (retVal != null)
+            {
+                yield return retVal;
+            }
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            if(this.m_configuration.Provider is IDisposable dispose)
+            {
+                dispose.Dispose();
+            }
         }
     }
 }

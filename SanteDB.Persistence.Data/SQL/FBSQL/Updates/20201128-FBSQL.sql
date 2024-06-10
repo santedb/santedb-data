@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="20201128-01" name="Update:20201128-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
+ * <feature scope="SanteDB.Persistence.Data" id="20201128-01" name="Update:20201128-01"   invariantName="FirebirdSQL">
  *	<summary>Update: Register </summary>
  *	<remarks>Adds policies which control impersination</remarks>
  *	<isInstalled>select ck_patch('20201128-01') from rdb$database;</isInstalled>

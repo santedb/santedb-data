@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,12 +16,14 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Extensibility;
+using SanteDB.Persistence.Data.Model.Security;
 using System;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
@@ -44,6 +46,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override EntityNote BeforePersisting(DataContext context, EntityNote data)
         {
             data.AuthorKey = this.EnsureExists(context, data.Author)?.Key ?? data.AuthorKey;
+
+            if(!data.AuthorKey.HasValue && context.Data.TryGetValue("provenance", out var prov) && prov is DbSecurityProvenance dbProv)
+            {
+                var userEntityStmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbUserEntity), typeof(DbEntityVersion))
+                        .InnerJoin<DbUserEntity, DbEntityVersion>(o => o.ParentKey, o => o.VersionKey)
+                        .Where<DbUserEntity>(o => o.SecurityUserKey == dbProv.UserKey);
+                var userEntityKey = context.Query<DbEntityVersion>(userEntityStmt.Statement).Select(o => o.Key).FirstOrDefault();
+                data.AuthorKey = userEntityKey;
+            }
             return base.BeforePersisting(context, data);
         }
 

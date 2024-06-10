@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20230330-01" name="Update:20230330-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="sqlite">
+ * <feature scope="SanteDB.Persistence.Data" id="20230330-01" name="Update:20230330-01"   invariantName="sqlite">
  *	<summary>Update: Adds concept set references to the database</summary>
  *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE tbl_name = 'CD_SET_COMP_ASSOC_TBL' AND sql LIKE '%SET_ID%')</isInstalled>
  * </feature>

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -52,7 +52,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             if (data.GetAnnotations<String>().Contains(SystemTagNames.UpstreamDataTag))
             {
                 data.AssigningAuthority
-                    .Where(a=>!context.Any<DbSecurityApplication>(o => o.Key == a.AssigningApplicationKey))
+                    .Where(a => !context.Any<DbSecurityApplication>(o => o.Key == a.AssigningApplicationKey))
                     .ToList()
                     .ForEach(o => o.AssigningApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid));
             }
@@ -77,8 +77,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 
             switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                case LoadMode.SyncLoad:
                 case LoadMode.FullLoad:
+                    retVal.IdentifierClassification = retVal.IdentifierClassification.GetRelatedPersistenceService().Get(context, dbModel.IdentifierClassificationKey.GetValueOrDefault());
+                    retVal.SetLoaded(o => o.IdentifierClassification);
+                    goto case LoadMode.SyncLoad;
+                case LoadMode.SyncLoad:
                     retVal.AssigningAuthority = retVal.AssigningAuthority.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
                     retVal.SetLoaded(o => o.AssigningAuthority);
                     break;

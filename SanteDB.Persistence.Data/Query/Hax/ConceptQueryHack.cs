@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2024-2-2
  */
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Map;
@@ -27,7 +27,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace SanteDB.Persistence.Data.Hax
+namespace SanteDB.Persistence.Data.Query.Hax
 {
     /// <summary>
     /// This particular hack will override queries where concepts are filtered by mnemonic to be more efficient
@@ -43,13 +43,13 @@ namespace SanteDB.Persistence.Data.Hax
         /// </summary>
         public ConceptQueryHack(ModelMapper mapper)
         {
-            this.m_mapper = mapper;
+            m_mapper = mapper;
         }
 
         /// <summary>
         /// Hack the particular query
         /// </summary>
-        public bool HackQuery(QueryBuilder builder, SqlStatementBuilder sqlStatement, SqlStatementBuilder whereClause, Type tmodel, PropertyInfo property, String queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<String, string[]> queryFilter)
+        public bool HackQuery(QueryBuilder builder, SqlStatementBuilder sqlStatement, SqlStatementBuilder whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, string[] values, IEnumerable<TableMapping> scopedTables, IDictionary<string, string[]> queryFilter)
         {
             // Hack mnemonic queries
             if (typeof(Concept).IsAssignableFrom(property.PropertyType) && predicate.SubPath == "mnemonic")
@@ -61,15 +61,15 @@ namespace SanteDB.Persistence.Data.Hax
                     mapType = tmodel;
                 }
 
-                var declType = TableMapping.Get(this.m_mapper.MapModelType(mapType));
+                var declType = TableMapping.Get(m_mapper.MapModelType(mapType));
                 var keyProperty = property.PropertyType == typeof(Guid) ? property : mapType.GetRuntimeProperty(property.Name + "Key");
-                var declProp = declType.GetColumn(this.m_mapper.MapModelProperty(mapType, declType.OrmType, keyProperty));
+                var declProp = declType.GetColumn(m_mapper.MapModelProperty(mapType, declType.OrmType, keyProperty));
                 if (declProp.ForeignKey == null)
                 {
                     return false; // No FK link
                 }
 
-                var tblMap = TableMapping.Get(this.m_mapper.MapModelType(property.PropertyType));
+                var tblMap = TableMapping.Get(m_mapper.MapModelType(property.PropertyType));
                 var fkTbl = TableMapping.Get(declProp.ForeignKey.Table);
                 string directFkName = $"{queryPrefix}{fkTbl.TableName}";
 
