@@ -242,7 +242,11 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(configuration));
             }
 
-            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterSystemConfiguration);
+            bool isSystemContext = AuthenticationContext.Current.Principal == AuthenticationContext.SystemPrincipal;
+            if (!isSystemContext)
+            {
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterSystemConfiguration);
+            }
 
             try
             {
