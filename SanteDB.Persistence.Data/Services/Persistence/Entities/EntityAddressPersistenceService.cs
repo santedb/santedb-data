@@ -62,7 +62,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                    .Where<DbEntityAddress>(o => o.SourceKey == placeUuid && o.ObsoleteVersionSequenceId == null && s_placeRefAddressTypes.Contains(o.UseConceptKey));
                 var components = context.Query<DbEntityAddressComponent>(dbPlaceQuery.Statement).Select(o=>o.ComponentTypeKey).ToArray();
                 data.Component.RemoveAll(o => components.Contains(o.ComponentTypeKey.Value));
-
             }
             return base.BeforePersisting(context, data);
         }
