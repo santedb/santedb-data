@@ -66,6 +66,26 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             return base.BeforePersisting(context, data);
         }
 
+        /// <inheritdoc/>
+        protected override EntityAddress AfterPersisted(DataContext context, EntityAddress data)
+        {
+            // If the address has a place reference we want to strip out the place reference data
+            if (Guid.TryParse(data.Component?.Find(p => p.ComponentTypeKey == AddressComponentKeys.PlaceReference)?.Value, out var placeUuid))
+            {
+                var dbPlaceQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityAddress), typeof(DbEntityAddressComponent))
+                   .InnerJoin<DbEntityAddress, DbEntityAddressComponent>(o => o.Key, o => o.SourceKey)
+                   .Where<DbEntityAddress>(o => o.SourceKey == placeUuid && o.ObsoleteVersionSequenceId == null && s_placeRefAddressTypes.Contains(o.UseConceptKey));
+                var components = context.Query<DbEntityAddressComponent>(dbPlaceQuery.Statement).ToArray();
+                data.Component.AddRange(components.Select(o=>new EntityAddressComponent()
+                {
+                    ComponentTypeKey = o.ComponentTypeKey, 
+                    OrderSequence = o.OrderSequence,
+                    Value = o.Value
+                }));
+            }
+            return base.AfterPersisted(context, data);
+        }
+
         /// <summary>
         /// Perform an insert with the nested components
         /// </summary>

@@ -32,6 +32,7 @@ using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Jobs;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.Services
@@ -48,6 +49,8 @@ namespace SanteDB.Persistence.Data.Services
     [ServiceProvider("ADO.NET Freetext Service", Configuration = typeof(AdoPersistenceConfigurationSection))]
     public class AdoFreetextSearchService : IFreetextSearchService
     {
+        private readonly string[] m_keywords = { "and", "or", "not", "!", "&", "|" };
+
         private readonly AdoPersistenceConfigurationSection m_configuration;
         private readonly IThreadPoolService m_threadPool;
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoFreetextSearchService));
@@ -111,7 +114,7 @@ namespace SanteDB.Persistence.Data.Services
                 throw new InvalidOperationException("Cannot find a UNION query repository service");
             }
 
-            var searchTerm = String.Join(" and ", term.SelectMany(t => t.Split(' ')));
+            var searchTerm = String.Join(" ", term);
             return idps.Query(o => o.FreetextSearch(searchTerm), AuthenticationContext.Current.Principal);
         }
 
