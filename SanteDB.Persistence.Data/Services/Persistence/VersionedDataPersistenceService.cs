@@ -222,9 +222,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 yield break;
             }
-
+            
             foreach (var id in objectToVerify.Identifiers)
             {
+                if (String.IsNullOrEmpty(id.Value)) continue; // skip empty
+
                 // Get ID
                 DbIdentityDomain dbAuth = null;
                 var domainKey = id.IdentityDomain?.Key ?? id.IdentityDomainKey;
