@@ -93,8 +93,6 @@ namespace SanteDB.Persistence.Data.Services
         public AdoPersistenceService(IConfigurationManager configManager, 
             IServiceManager serviceManager, 
             IJobManagerService jobManager, 
-            IAppletManagerService appletManagerService,
-            IAppletSolutionManagerService appletSolutionManagerService = null,
             IBiMetadataRepository biMetadataRepository = null)
         {
             try
