@@ -210,6 +210,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ARGUMENT_NULL);
             }
+            else if(data.Item.All(o=>o.BatchOperation == BatchOperationType.Ignore))
+            {
+                this.m_tracer.TraceWarning("Ignoring bundle - all items are set to IGNORE");
+                return data;
+            }
 
             var preEventArgs = new DataPersistingEventArgs<Bundle>(data, transactionMode, principal);
             this.Inserting?.Invoke(this, preEventArgs);
