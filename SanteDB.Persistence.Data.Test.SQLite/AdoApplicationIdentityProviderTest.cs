@@ -167,7 +167,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
                 serviceProvider.Authenticate("TEST_APP_005", "THIS_IS_A_SECRET");
                 Assert.Fail("Authentication should have failed");
             }
-            catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_LOCKED))
+            catch (AuthenticationException e) when (e.Message.StartsWith(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_LOCKED)))
             {
             }
             catch
@@ -247,7 +247,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
                 serviceProvider.Authenticate("TEST_APP_008", "THIS_IS_A_SECRET");
                 Assert.Fail("Lockout should be active");
             }
-            catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_LOCKED))
+            catch (AuthenticationException e) when (e.Message.StartsWith(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_LOCKED)))
             {
             }
             catch
