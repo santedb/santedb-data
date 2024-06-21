@@ -202,10 +202,10 @@ namespace SanteDB.Persistence.Data.Services
 
                     return retVal;
                 }
-                catch (LockedIdentityAuthenticationException)
+                catch (LockedIdentityAuthenticationException e)
                 {
                     this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(applicationId, null, false));
-                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_LOCKED));
+                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_LOCKED, new { time = e.TimeLockExpires }));
                 }
                 catch (InvalidIdentityAuthenticationException)
                 {

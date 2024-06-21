@@ -617,8 +617,8 @@ namespace SanteDB.Persistence.Data.Services
 
             var sessionguid = new Guid(sessionId);
 
-            var sessionInfo = this.m_adhocCacheService?.Get<AdoSecuritySession>(this.CreateCacheKey(sessionguid));
-            if (sessionInfo != null)
+            AdoSecuritySession sessionInfo = null;
+            if (this.m_adhocCacheService.TryGet<AdoSecuritySession>(this.CreateCacheKey(sessionguid), out sessionInfo))
             {
                 if (!allowExpired && sessionInfo.NotAfter < DateTimeOffset.Now)
                 {

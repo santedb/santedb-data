@@ -20,6 +20,8 @@
  */
 using SanteDB.BI.Model;
 using SanteDB.BI.Services;
+using SanteDB.Core.Applets;
+using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Data.Backup;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
@@ -32,6 +34,7 @@ using SanteDB.OrmLite.Migration;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Jobs;
 using SanteDB.Persistence.Data.Services.Persistence;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -87,13 +90,17 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// ADO Persistence service
         /// </summary>
-        public AdoPersistenceService(IConfigurationManager configManager, IServiceManager serviceManager, IJobManagerService jobManager, IBiMetadataRepository biMetadataRepository = null)
+        public AdoPersistenceService(IConfigurationManager configManager, 
+            IServiceManager serviceManager, 
+            IJobManagerService jobManager, 
+            IBiMetadataRepository biMetadataRepository = null)
         {
             try
             {
                 this.m_configuration = configManager.GetSection<AdoPersistenceConfigurationSection>();
                 this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
                 this.m_serviceManager = serviceManager;
+
                 QueryBuilder.AddQueryHacks(serviceManager.CreateAll<IQueryBuilderHack>(this.m_mapper));
 
                 // Upgrade the schema
@@ -120,6 +127,8 @@ namespace SanteDB.Persistence.Data.Services
                     jobManager.AddJob(job, JobStartType.DelayStart);
                     jobManager.SetJobSchedule(job, new DayOfWeek[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday }, DateTime.Now.Date.AddHours(3));
                 }
+
+
                 // Add this to the BI layer
                 using (AuthenticationContext.EnterSystemContext())
                 {

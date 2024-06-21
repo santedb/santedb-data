@@ -99,6 +99,7 @@
     <None Remove="SQL\PSQL\Updates\20240320-PSQL.sql" />
     <None Remove="SQL\PSQL\Updates\20240521-PSQL.sql" />
     <None Remove="SQL\PSQL\Updates\20240605-PSQL.sql" />
+    <None Remove="SQL\PSQL\Updates\20240617.sql" />
     <None Remove="SQL\SQLITE\20221003.SQL" />
     <None Remove="SQL\SQLITE\20221027.sql" />
     <None Remove="SQL\SQLITE\20221130.sql" />
@@ -235,6 +236,7 @@
     <EmbeddedResource Include="SQL\PSQL\Updates\20230227-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20230118-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20221214-PSQL.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20240617.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20240605-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20240521-PSQL.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20240320-PSQL.sql" />

@@ -54,15 +54,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             data.AddressUseKey = this.EnsureExists(context, data.AddressUse)?.Key ?? data.AddressUseKey;
             
-            // If the address has a place reference we want to strip out the place reference data
+            // If the address is a place reference we want to supplement the data going into the database with the appropriate information
             if(Guid.TryParse(data.Component?.Find(p=>p.ComponentTypeKey == AddressComponentKeys.PlaceReference)?.Value, out var placeUuid))
             {
                 var dbPlaceQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityAddress), typeof(DbEntityAddressComponent))
                    .InnerJoin<DbEntityAddress, DbEntityAddressComponent>(o => o.Key, o => o.SourceKey)
                    .Where<DbEntityAddress>(o => o.SourceKey == placeUuid && o.ObsoleteVersionSequenceId == null && s_placeRefAddressTypes.Contains(o.UseConceptKey));
-                var components = context.Query<DbEntityAddressComponent>(dbPlaceQuery.Statement).Select(o=>o.ComponentTypeKey).ToArray();
-                data.Component.RemoveAll(o => components.Contains(o.ComponentTypeKey.Value));
-
+                var components = context.Query<DbEntityAddressComponent>(dbPlaceQuery.Statement).ToArray();
+                data.Component.AddRange(components.Where(c => !data.Component.Any(d => d.ComponentTypeKey == c.ComponentTypeKey)).Select(c => new EntityAddressComponent(c.ComponentTypeKey.Value, c.Value)));
             }
             return base.BeforePersisting(context, data);
         }

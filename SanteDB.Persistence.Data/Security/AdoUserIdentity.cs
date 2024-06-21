@@ -127,17 +127,22 @@ namespace SanteDB.Persistence.Data.Security
             var cdrEntityId = contextForReadingAdditionalData.Query<DbEntityVersion>(cdrEntitySql).Select(o => o.Key).First();
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.CdrEntityId, cdrEntityId.ToString()));
 
-            var organizationId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.AssignedEntity && o.ObsoleteVersionSequenceId == null).Select(o => o.SourceKey).FirstOrDefault();
-            if (organizationId != Guid.Empty)
+            if (this.FindFirst(SanteDBClaimTypes.XspaOrganizationIdClaim) == null)
             {
-                this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaOrganizationIdClaim, organizationId.ToString()));
+                var organizationId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.TargetKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.Employee && o.ObsoleteVersionSequenceId == null).Select(o => o.SourceKey);
+                if (organizationId.Any())
+                {
+                    organizationId.ForEach(o => this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaOrganizationIdClaim, o.ToString())));
+                }
             }
 
-            // HACK: Copy the XSPA facility claim from the user assignment of the dedicated service delivery location on their profile
-            var facilityId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation && o.ObsoleteVersionSequenceId == null).Select(o => o.SourceKey).FirstOrDefault();
-            if (facilityId != Guid.Empty && this.FindFirst(SanteDBClaimTypes.XspaFacilityClaim) == null)
+            if (this.FindFirst(SanteDBClaimTypes.XspaFacilityClaim) == null)
             {
-                this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaFacilityClaim, facilityId.ToString()));
+                var facilityId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.TargetKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.AssignedEntity && o.ObsoleteVersionSequenceId == null).Select(o => o.SourceKey);
+                if (facilityId.Any())
+                {
+                    facilityId.ForEach(o => this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaFacilityClaim, o.ToString())));
+                }
             }
 
             var subjectNameSql = contextForReadingAdditionalData.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityNameComponent))
@@ -152,21 +157,24 @@ namespace SanteDB.Persistence.Data.Security
                 this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaSubjectNameClaim, nameValue));
             }
 
-            var subjectRoleSql = contextForReadingAdditionalData.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityRelationship), typeof(DbReferenceTerm), typeof(DbCodeSystem))
-                .InnerJoin<DbEntityRelationship, DbEntityVersion>(o => o.TargetKey, o => o.Key)
-                .InnerJoin<DbEntityVersion, DbProvider>(o => o.VersionKey, o => o.ParentKey)
-                .InnerJoin<DbProvider, DbConceptVersion>(o => o.SpecialtyKey, o => o.Key)
-                .Join<DbConceptVersion, DbConceptReferenceTerm>("LEFT", o => o.Key, o => o.SourceKey)
-                .InnerJoin<DbConceptReferenceTerm, DbReferenceTerm>(o => o.TargetKey, o => o.Key)
-                .InnerJoin<DbReferenceTerm, DbCodeSystem>(o => o.CodeSystemKey, o => o.Key)
-                .Where<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.EquivalentEntity && o.ClassificationKey == RelationshipClassKeys.PlayedRoleLink && o.ObsoleteVersionSequenceId == null)
-                .And<DbEntityVersion>(o => o.ObsoletionTime == null)
-                .And<DbConceptReferenceTerm>(o => o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs && o.ObsoleteVersionSequenceId == null)
-                .Statement;
-
-            foreach (var cd in contextForReadingAdditionalData.Query<CompositeResult<DbReferenceTerm, DbCodeSystem>>(subjectRoleSql))
+            if (!this.FindAll(SanteDBClaimTypes.XspaUserRoleClaim).Any())
             {
-                this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaUserRoleClaim, $"{cd.Object1.Mnemonic}^{cd.Object2.Oid}"));
+                var subjectRoleSql = contextForReadingAdditionalData.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityRelationship), typeof(DbReferenceTerm), typeof(DbCodeSystem))
+                    .InnerJoin<DbEntityRelationship, DbEntityVersion>(o => o.TargetKey, o => o.Key)
+                    .InnerJoin<DbEntityVersion, DbProvider>(o => o.VersionKey, o => o.ParentKey)
+                    .InnerJoin<DbProvider, DbConceptVersion>(o => o.SpecialtyKey, o => o.Key)
+                    .Join<DbConceptVersion, DbConceptReferenceTerm>("LEFT", o => o.Key, o => o.SourceKey)
+                    .InnerJoin<DbConceptReferenceTerm, DbReferenceTerm>(o => o.TargetKey, o => o.Key)
+                    .InnerJoin<DbReferenceTerm, DbCodeSystem>(o => o.CodeSystemKey, o => o.Key)
+                    .Where<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.EquivalentEntity && o.ClassificationKey == RelationshipClassKeys.PlayedRoleLink && o.ObsoleteVersionSequenceId == null)
+                    .And<DbEntityVersion>(o => o.ObsoletionTime == null)
+                    .And<DbConceptReferenceTerm>(o => o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs && o.ObsoleteVersionSequenceId == null)
+                    .Statement;
+
+                foreach (var cd in contextForReadingAdditionalData.Query<CompositeResult<DbReferenceTerm, DbCodeSystem>>(subjectRoleSql))
+                {
+                    this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaUserRoleClaim, $"{cd.Object1.Mnemonic}^{cd.Object2.Oid}"));
+                }
             }
 
             // TODO: Retrieve NPI claim value
