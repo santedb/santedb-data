@@ -253,7 +253,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
             }
             catch (Exception e)
             {
-                Assert.Fail($"Wrong exception thrown - expected {typeof(AuthenticationException)} but got {e.GetType()}");
+                Assert.Fail($"Wrong exception thrown - expected {this.m_localizationService.GetString(ErrorMessageStrings.AUTH_DEV_LOCKED)} but got {e.Message}");
             }
 
             // Clear lockout

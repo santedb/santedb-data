@@ -173,7 +173,7 @@ namespace SanteDB.Persistence.Data.Test
             }
             catch (Exception e)
             {
-                Assert.Fail($"Improper authentication error - Expected {typeof(AuthenticationException)} but got {e.GetType()}");
+                Assert.Fail($"Improper authentication error - Expected {this.m_localizationService.GetString(ErrorMessageStrings.AUTH_DEV_LOCKED)} but got {e.Message}");
             }
         }
 
