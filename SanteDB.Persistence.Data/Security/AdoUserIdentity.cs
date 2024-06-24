@@ -138,7 +138,7 @@ namespace SanteDB.Persistence.Data.Security
 
             if (this.FindFirst(SanteDBClaimTypes.XspaFacilityClaim) == null)
             {
-                var facilityId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.TargetKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.AssignedEntity && o.ObsoleteVersionSequenceId == null).Select(o => o.SourceKey);
+                var facilityId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation && o.ObsoleteVersionSequenceId == null).Select(o => o.SourceKey);
                 if (facilityId.Any())
                 {
                     facilityId.ForEach(o => this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaFacilityClaim, o.ToString())));
