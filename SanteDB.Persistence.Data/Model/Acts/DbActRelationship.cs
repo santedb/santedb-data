@@ -72,7 +72,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// Negation indicator
         /// </summary>
-        [Column("neg_ind")]
+        [Column("neg_ind"), NotNull]
         public bool NegationIndicator { get; set; }
     }
 }

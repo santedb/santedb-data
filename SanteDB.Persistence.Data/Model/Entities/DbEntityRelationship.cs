@@ -88,7 +88,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// <summary>
         /// Gets or sets the negation indicator
         /// </summary>
-        [Column("neg_ind")]
+        [Column("neg_ind"), NotNull]
         public bool NegationIndicator { get; set; }
     }
 }
