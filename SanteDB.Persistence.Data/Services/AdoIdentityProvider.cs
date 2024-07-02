@@ -41,6 +41,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Security.Authentication;
+using System.Security.Claims;
 using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.Services
@@ -59,6 +60,14 @@ namespace SanteDB.Persistence.Data.Services
         private readonly String[] m_nonIdentityClaims =
         {
             SanteDBClaimTypes.SanteDBOTAuthCode
+        };
+
+        private readonly String[] m_allowedCallerClaims =
+        {
+            SanteDBClaimTypes.XspaFacilityClaim,
+            SanteDBClaimTypes.PurposeOfUse,
+            SanteDBClaimTypes.XspaOrganizationIdClaim,
+            SanteDBClaimTypes.Language
         };
 
         // Tracer
@@ -207,13 +216,8 @@ namespace SanteDB.Persistence.Data.Services
             }
         }
 
-        /// <summary>
-        /// Authenticate the specified user with the specified password
-        /// </summary>
-        /// <param name="userName">The name of the user which is to eb authenticated</param>
-        /// <param name="password">The password for the user</param>
-        /// <returns>The authenticated principal</returns>
-        public IPrincipal Authenticate(string userName, string password)
+        /// <inheritdoc/>
+        public IPrincipal Authenticate(string userName, string password, IEnumerable<IClaim> clientClaimAssertions = null, IEnumerable<String> demandedScopes = null)
         {
             if (String.IsNullOrEmpty(userName))
             {
@@ -224,17 +228,11 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(password), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            return this.AuthenticateInternal(userName, password, null);
+            return this.AuthenticateInternal(userName, password, null, clientClaimAssertions);
         }
 
-        /// <summary>
-        /// Authenticate the user with the user name password and TFA secret
-        /// </summary>
-        /// <param name="userName">The user name of the user to be authenticated</param>
-        /// <param name="password">The password of the user</param>
-        /// <param name="tfaSecret">The TFA secret provided by the user</param>
-        /// <returns>The authentcated principal</returns>
-        public IPrincipal Authenticate(string userName, string password, string tfaSecret)
+        /// <inheritdoc/>
+        public IPrincipal Authenticate(string userName, string password, string tfaSecret, IEnumerable<IClaim> clientClaimAssertions = null, IEnumerable<String> demandedScopes = null)
         {
             if (String.IsNullOrEmpty(userName))
             {
@@ -245,7 +243,7 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(tfaSecret), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            return this.AuthenticateInternal(userName, password, tfaSecret);
+            return this.AuthenticateInternal(userName, password, tfaSecret, clientClaimAssertions);
         }
 
         /// <summary>
@@ -255,7 +253,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <param name="password">If provided, the password to authenticated</param>
         /// <param name="tfaSecret">If provided the TFA challenge response</param>
         /// <returns>The authenticated principal</returns>
-        protected virtual IPrincipal AuthenticateInternal(String userName, String password, String tfaSecret)
+        protected virtual IPrincipal AuthenticateInternal(String userName, String password, String tfaSecret, IEnumerable<IClaim> clientClaimAssertions = null)
         {
             // Allow cancellation
             var preEvtArgs = new AuthenticatingEventArgs(userName);
@@ -347,12 +345,25 @@ namespace SanteDB.Persistence.Data.Services
                             // Establish ID
                             var identity = new AdoUserIdentity(dbUser, "LOCAL");
 
+
+                            // Add any client claims
+                            if (clientClaimAssertions != null)
+                            {
+                                claims.AddRange(clientClaimAssertions.Where(o => this.m_allowedCallerClaims.Contains(o.Type)).Select(o => new DbUserClaim()
+                                {
+                                    ClaimType = o.Type,
+                                    ClaimValue = o.Value
+                                }));
+                            }
+
                             // Establish role
                             var roleSql = context.CreateSqlStatementBuilder()
                                 .SelectFrom(typeof(DbSecurityRole))
                                 .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                                 .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key)
                                 .Statement;
+
+
                             identity.AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
 
                             // Establish additional claims
