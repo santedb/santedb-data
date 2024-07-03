@@ -19,6 +19,7 @@
  * Date: 2023-6-21
  */
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
@@ -58,7 +59,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Security
         /// </summary>
         protected override SecurityApplication BeforePersisting(DataContext context, SecurityApplication data)
         {
-            if (!String.IsNullOrEmpty(data.ApplicationSecret))
+            if (!String.IsNullOrEmpty(data.ApplicationSecret) && context.ContextId.ToString() != AuthenticationContext.SystemUserSid)
             {
                 this.m_tracer.TraceWarning("Caller has set ApplicationSecret on the SecurityApplication instance - this will be ignored");
                 data.ApplicationSecret = null;
