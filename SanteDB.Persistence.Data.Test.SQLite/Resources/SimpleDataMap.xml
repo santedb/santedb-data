@@ -57,7 +57,7 @@
             <transform transformer="NoCase"/>
             <transform transformer="Expression">
               <args>
-                <string>Middle.Substring(0,1)</string>
+                <string>source["Middle"]?.ToString().Substring(0,1)</string>
               </args>
             </transform>
           </map>
