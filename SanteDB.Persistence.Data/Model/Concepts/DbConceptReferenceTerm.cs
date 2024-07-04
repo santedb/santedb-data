@@ -45,7 +45,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
         /// <summary>
         /// Gets or sets the relationship type id
         /// </summary>
-        [Column("rel_typ_id")]
+        [Column("rel_typ_id"), ForeignKey(typeof(DbConceptRelationshipType), nameof(DbConceptRelationshipType.Key))]
         public Guid RelationshipTypeKey { get; set; }
     }
 }
