@@ -39,6 +39,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override PlaceService BeforePersisting(DataContext context, PlaceService data)
         {
             data.ServiceConceptKey = this.EnsureExists(context, data.ServiceConcept)?.Key ?? data.ServiceConceptKey;
+            data.ServiceSchedule = data.ServiceSchedule ?? "{\"schedule\":[]}";
             return base.BeforePersisting(context, data);
         }
 

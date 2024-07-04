@@ -259,7 +259,7 @@ namespace SanteDB.Persistence.Data.Services
                                                             SourceKey = foreignDataId,
                                                             LogicalId = itm.Id,
                                                             Priority = itm.Priority,
-                                                            Text = itm.Text
+                                                            Text = itm.Text.Substring(0, itm.Text.Length > 512 ? 512 : itm.Text.Length)
                                                         });
                                                     }
 

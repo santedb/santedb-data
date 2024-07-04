@@ -161,9 +161,10 @@ namespace SanteDB.Persistence.Data.Security
             {
                 // Validate the claim
                 var claimedFacIds = this.FindAll(SanteDBClaimTypes.XspaFacilityClaim).Select(o => Guid.Parse(o.Value)).ToArray();
-                if (!contextForReadingAdditionalData.Any<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation && o.ObsoleteVersionSequenceId == null && claimedFacIds.Contains(o.TargetKey)))
+                var actualFacIds = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation && o.ObsoleteVersionSequenceId == null).Select(o => o.Key).ToArray();
+                if (actualFacIds.Any() && !claimedFacIds.All(f=>actualFacIds.Contains(f)))
                 {
-                    throw new ClaimAssertionException(SanteDBClaimTypes.XspaFacilityClaim, claimedFacIds.First().ToString(), "*****");
+                    throw new ClaimAssertionException(SanteDBClaimTypes.XspaFacilityClaim, claimedFacIds.First().ToString(), String.Join(",", actualFacIds));
                 }
             }
 
