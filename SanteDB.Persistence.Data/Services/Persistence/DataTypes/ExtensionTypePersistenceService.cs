@@ -32,7 +32,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
     /// <summary>
     /// Extension type persistence
     /// </summary>
-    public class ExtensionTypePersistenceService : NonVersionedDataPersistenceService<ExtensionType, DbExtensionType>
+    public class ExtensionTypePersistenceService : NonVersionedDataPersistenceService<ExtensionType, DbExtensionType>, IAdoKeyResolver<ExtensionType>, IAdoKeyResolver<DbExtensionType>
     {
         /// <summary>
         /// Creates a DI injected extension type
@@ -55,9 +55,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 
             if (data.ScopeXml?.Any() == true)
             {
-                retVal.ScopeXml= base.UpdateInternalAssociations(context, retVal.Key.Value, data.ScopeXml.Select(o => new DbExtensionTypeScope()
+                retVal.ScopeXml = base.UpdateInternalAssociations(context, retVal.Key.Value, data.ScopeXml.Select(o => new DbExtensionTypeScope()
                 {
-                    ClassCodeKey= o
+                    ClassCodeKey = o
                 })).Select(o => o.ClassCodeKey).ToList();
             }
             return retVal;
@@ -67,7 +67,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override ExtensionType DoUpdateModel(DataContext context, ExtensionType data)
         {
             var retVal = base.DoUpdateModel(context, data); // updates the core properties
-            if (data.ScopeXml!= null)
+            if (data.ScopeXml != null)
             {
                 retVal.ScopeXml = base.UpdateInternalAssociations(context, retVal.Key.Value,
                     data.ScopeXml?.Select(o => new DbExtensionTypeScope()
@@ -86,5 +86,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             retVal.ScopeXml = context.Query<DbExtensionTypeScope>(s => s.SourceKey == retVal.Key).Select(o => o.ClassCodeKey).ToList();
             return retVal;
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<ExtensionType, bool>> GetKeyExpression(ExtensionType model) => o => o.Uri == model.Uri && o.ObsoletionTime == null;
+
+        /// <inheritdoc/>
+        public Expression<Func<DbExtensionType, bool>> GetKeyExpression(DbExtensionType model) => o => o.Uri == model.Uri && o.ObsoletionTime == null;
     }
 }

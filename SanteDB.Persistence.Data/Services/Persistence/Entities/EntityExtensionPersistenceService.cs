@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Extensibility;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
@@ -34,6 +35,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         public EntityExtensionPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
+        }
+
+        /// <remarks>
+        /// Will lookup the extension type if none is set
+        /// </remarks>
+        /// <inheritdoc/>
+        protected override EntityExtension BeforePersisting(DataContext context, EntityExtension data)
+        {
+            if(!data.ExtensionTypeKey.HasValue && data.ExtensionType != null && this.TryGetKeyResolver<ExtensionType>(out var resolver) )
+            {
+                data.ExtensionType = data.ExtensionType.GetRelatedPersistenceService().Query(context, resolver.GetKeyExpression(data.ExtensionType)).First();
+                data.ExtensionTypeKey = data.ExtensionType.Key;
+            }
+            return base.BeforePersisting(context, data);
         }
     }
 }
