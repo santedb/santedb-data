@@ -22,6 +22,7 @@
 <modelMap xmlns="http://santedb.org/model/map">
 
 
+  
   <class modelClass="SanteDB.Core.Model.DataTypes.RelationshipValidationRule, SanteDB.Core.Model"
          domainClass="SanteDB.Persistence.Data.Model.Sys.DbRelationshipValidationRule, SanteDB.Persistence.Data">
     <property modelName="ModifiedOn" domainName="CreationTime" />
