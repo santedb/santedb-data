@@ -130,7 +130,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_pepService = pepService;
             this.m_localizationService = localizationService;
             this.m_queryPersistence = queryPersistenceService;
-            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
+            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.CdssMapResourceName), "AdoModelMap");
 
         }
 

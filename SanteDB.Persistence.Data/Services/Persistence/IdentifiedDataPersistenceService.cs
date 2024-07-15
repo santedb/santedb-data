@@ -88,6 +88,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         var existing = persistenceService.Query(context, keyResolver.GetKeyExpression(data)).SingleOrDefault();
                         if (existing != null)
                         {
+                            if(data.BatchOperation == Core.Model.DataTypes.BatchOperationType.Update || data.BatchOperation == Core.Model.DataTypes.BatchOperationType.InsertOrUpdate && this.m_configuration.AutoUpdateExisting)
+                            {
+                                return persistenceService.Update(context, data);
+                            }
                             return existing;
                         }
                         else if (DataPersistenceControlContext.Current?.AutoInsertChildren ?? this.m_configuration.AutoInsertChildren)
