@@ -303,7 +303,8 @@ namespace SanteDB.Persistence.Data.Services
                         else if (existingLibrary.IsSystem &&
                             !isSystemContext)
                         {
-                            this.m_pepService.Demand(PermissionPolicyIdentifiers.UnrestrictedAll);
+                            this.m_pepService.Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration);
+                            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterClinicalProtocolConfigurationDefinition);
                         }
                         else if (!isSystemContext)
                         {
