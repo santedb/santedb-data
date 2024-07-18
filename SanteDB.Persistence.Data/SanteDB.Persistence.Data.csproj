@@ -54,6 +54,7 @@
   </Choose>
   
   <ItemGroup>
+    <None Remove="Map\CdssModelMap.xml" />
     <None Remove="Map\ModelMap.xml" />
     <None Remove="SQL\20210414-FBSQL.sql" />
     <None Remove="SQL\20210414-PSQL.sql" />
@@ -205,6 +206,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <EmbeddedResource Include="Map\CdssModelMap.xml" />
     <EmbeddedResource Include="Map\ModelMap.xml" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20240628-FBSQL.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20240605-FBSQL.sql" />

@@ -38,6 +38,11 @@ namespace SanteDB.Persistence.Data
         internal const string MapResourceName = "SanteDB.Persistence.Data.Map.ModelMap.xml";
 
         /// <summary>
+        /// CDSS Mapper resource name
+        /// </summary>
+        internal const string CdssMapResourceName = "SanteDB.Persistence.Data.Map.CdssModelMap.xml";
+
+        /// <summary>
         /// Ad-hoc cache key for AA information
         /// </summary>
         internal const string AdhocAuthorityKey = "ado.aa.";
