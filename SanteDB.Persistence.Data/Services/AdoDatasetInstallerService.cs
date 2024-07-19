@@ -23,6 +23,11 @@ using SanteDB.Core.Data.Initialization;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
+using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Collection;
+using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
@@ -66,6 +71,67 @@ namespace SanteDB.Persistence.Data.Services
         /// Progress has changed
         /// </summary>
         public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
+
+
+        /// <summary>
+        /// Re-organize a bundle's contents for insert
+        /// </summary>
+        public Dataset ReorganizeForInsert(Dataset input)
+        {
+            var resolved = input.Action.ToArray();
+
+            // Process each object in our queue of to be processed
+            bool swapped = true;
+            for (var outer = 0; outer < resolved.Length && swapped; outer++)
+            {
+                swapped = false;
+                for (var inner = 0; inner < resolved.Length; inner++)
+                {
+                    var itm = resolved[inner];
+                    IEnumerable<int> dependencies = new int[0];
+                    switch (itm.Element)
+                    {
+                        case Entity entity:
+                            dependencies = dependencies.Concat(entity.Relationships?.Select(r => Array.FindIndex(resolved, k => k.Element.Key == r.TargetEntityKey)) ?? new int[0]);
+                            dependencies = dependencies.Concat(entity.Participations?.Select(p => Array.FindIndex(resolved, i => i.Element.Key == p.ActKey)) ?? new int[0]);
+                            break;
+                        case Act act:
+                            dependencies = dependencies.Concat(act.Relationships?.Select(r => Array.FindIndex(resolved, i => i.Element.Key == r.TargetActKey)) ?? new int[0]);
+                            dependencies = dependencies.Concat(act.Participations?.Select(p => Array.FindIndex(resolved, i => i.Element.Key == p.PlayerEntityKey)) ?? new int[0]);
+                            break;
+                        case Concept concept:
+                            dependencies = dependencies.Concat(concept.Relationships?.Select(r => Array.FindIndex(resolved, i => i.Element.Key == r.TargetConceptKey)) ?? new int[0]);
+                            break;
+                        case ITargetedAssociation ta:
+                            dependencies = new int[] { Array.FindIndex(resolved, i => i.Element.Key == ta.TargetEntityKey), Array.FindIndex(resolved, i => i.Element.Key == ta.SourceEntityKey) };
+                            break;
+
+                    }
+
+                    // Scan dependencies and swap
+                    var index = inner;
+                    var scanSwap = dependencies.ToArray();
+                    foreach (var dep in scanSwap)
+                    {
+                        if (dep > index)
+                        {
+                            swapped = true;
+                            resolved[index] = resolved[dep];
+                            resolved[dep] = itm;
+                            index = dep;
+                        }
+                    }
+                }
+            }
+
+            // Could not order dependencies
+            //if (swapped)
+            //{
+            //    throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_CIRCULAR_DEPENDENCY));
+            //}
+
+            return new Dataset(input.Id) { Action = resolved.ToList(), ServiceExec = input.ServiceExec, SqlExec = input.SqlExec };
+        }
 
         /// <summary>
         /// Get the installation date
@@ -118,6 +184,8 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new ArgumentNullException(nameof(dataset), ErrorMessages.ARGUMENT_NULL);
             }
+
+            dataset = this.ReorganizeForInsert(dataset);
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
