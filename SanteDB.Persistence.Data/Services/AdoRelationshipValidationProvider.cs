@@ -405,6 +405,9 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
+        object IAdoPersistenceProvider.Touch(DataContext context, Guid id) => this.Touch(context, id);
+
+        /// <inheritdoc/>
         public RelationshipValidationRule Touch(DataContext context, Guid id)
         {
             var existing = context.FirstOrDefault<DbRelationshipValidationRule>(o => o.Key == id);

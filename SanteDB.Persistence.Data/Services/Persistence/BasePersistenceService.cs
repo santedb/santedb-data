@@ -1130,10 +1130,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
         }
 
-        private TModel DoDeleteModel(DataContext context, Guid key, object p)
-        {
-            throw new NotImplementedException();
-        }
 
         /// <summary>
         /// Delete all objects according to the current <see cref="DataPersistenceControlContext"/>
@@ -1237,6 +1233,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
         /// <inheritdoc/>
         public IdentifiedData Update(DataContext context, IdentifiedData data) => this.DoUpdateModel(context, data.Convert<TModel>());
+
+        /// <summary>
+        /// Touches the specified model so that the object is synchronized
+        /// </summary>
+        object IAdoPersistenceProvider.Touch(DataContext context, Guid id) => this.DoTouchModel(context, id);
 
         /// <summary>
         /// Touch the specified object

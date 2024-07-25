@@ -502,6 +502,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(IdentifiedData.Key), ErrorMessages.ARGUMENT_NULL);
             }
 
+            context.PushData(DataConstants.NoTouchSourceContextKey, true);
+
             // We now want to fetch the perssitence serivce of this
             var persistenceService = typeof(TModelAssociation).GetRelatedPersistenceService() as IAdoPersistenceProvider<TModelAssociation>;
             if (persistenceService == null)
@@ -545,7 +547,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return a;
             });
 
-            return updatedRelationships.Except(removedRelationships).Union(addedRelationships).ToArray();
+            var retVal = updatedRelationships.Except(removedRelationships).Union(addedRelationships).ToArray();
+            context.PopData(DataConstants.NoTouchSourceContextKey, out _);
+            return retVal;
+
         }
 
         /// <summary>

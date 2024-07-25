@@ -108,5 +108,9 @@ namespace SanteDB.Persistence.Data
         /// </summary>
         public const string IdentifierCheckDigitMissing = "id.checkDigit.missing";
 
+        /// <summary>
+        /// The key for source context key
+        /// </summary>
+        public const string NoTouchSourceContextKey = "no.touch.source";
     }
 }

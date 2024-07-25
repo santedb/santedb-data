@@ -156,6 +156,11 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
                 // But we have one Bob
                 fetched = base.TestQuery<Entity>(k => k.Names.Any(n => n.Component.Any(c => c.Value.Contains("Bobz"))), 1).AsResultSet();
 
+
+                // Fetch based on name or mothers name
+                var fetchExpr = QueryExpressionParser.BuildLinqExpression<Entity>("name.component.value||relationship[Mother].target.name.component.value=Robert".ParseQueryString());
+                fetched = base.TestQuery<Entity>(fetchExpr, 1).AsResultSet();
+
                 afterFetch = fetched.First();
                 Assert.AreEqual(afterInsert.Key, afterFetch.Key);
             }

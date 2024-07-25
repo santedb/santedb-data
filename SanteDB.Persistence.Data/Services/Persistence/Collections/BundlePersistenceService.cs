@@ -32,6 +32,7 @@ using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using System;
@@ -379,6 +380,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         {
             throw new NotSupportedException();
         }
+
+        /// <inheritdoc/>
+        object IAdoPersistenceProvider.Touch(DataContext context, Guid id) => this.Touch(context, id);
 
         /// <inheritdoc/>
         /// <exception cref="NotSupportedException">This method is not supported on <see cref="Bundle"/></exception>

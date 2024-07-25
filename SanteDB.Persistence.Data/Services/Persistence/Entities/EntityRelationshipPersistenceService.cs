@@ -59,7 +59,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
             return base.BeforePersisting(context, data);
         }
-
+        
         /// <summary>
         /// Convert to information model
         /// </summary>
