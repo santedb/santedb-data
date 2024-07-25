@@ -158,7 +158,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
 
 
                 // Fetch based on name or mothers name
-                var fetchExpr = QueryExpressionParser.BuildLinqExpression<Entity>("name.component.value||relationship[Mother].target.name.component.value=Robert".ParseQueryString());
+                var fetchExpr = QueryExpressionParser.BuildLinqExpression<Entity>("name.component.value||relationship[Mother].target.name.component.value=Bobz".ParseQueryString());
                 fetched = base.TestQuery<Entity>(fetchExpr, 1).AsResultSet();
 
                 afterFetch = fetched.First();
