@@ -18,6 +18,8 @@
  * User: fyfej
  * Date: 2024-1-5
  */
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Wordprocessing;
 using SanteDB.Core.Data.Quality;
 using SanteDB.Core.Data.Quality.Configuration;
 using SanteDB.Core.Diagnostics;
@@ -35,6 +37,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -174,14 +177,20 @@ namespace SanteDB.Persistence.Data.Services
         };
 
         /// <inheritdoc/>
-        public IEnumerable<DataQualityRulesetConfiguration> GetRuleSets()
+        public IEnumerable<DataQualityRulesetConfiguration> GetRuleSets(bool includeObsolete = false)
         {
             try
             {
                 using (var ctx = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     ctx.Open();
-                    return ctx.Query<DbDataQualityConfiguration>(o => o.ObsoletionTime == null).ToArray().Select(o => this.ConvertToRuleSet(ctx, o)).ToArray();
+                    Expression<Func<DbDataQualityConfiguration, Boolean>> qry = o => o.ObsoletionTime == null;
+                    if(includeObsolete)
+                    {
+                        qry = o => true;
+                    }
+
+                    return ctx.Query<DbDataQualityConfiguration>(qry).ToArray().Select(o => this.ConvertToRuleSet(ctx, o)).ToArray();
                 }
             }
             catch (DbException e)

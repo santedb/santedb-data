@@ -203,15 +203,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             {
                 throw new ArgumentNullException(nameof(data), ErrorMessages.ARGUMENT_NULL);
             }
-            else if (data.Item == null || !data.Item.Any())
-            {
-                throw new InvalidOperationException(ErrorMessages.SEQUENCE_NO_ELEMENTS);
-            }
             else if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ARGUMENT_NULL);
             }
-            else if(data.Item.All(o=>o.BatchOperation == BatchOperationType.Ignore))
+            else if(data.Item.All(o=>o.BatchOperation == BatchOperationType.Ignore) || !data.Item.Any())
             {
                 this.m_tracer.TraceWarning("Ignoring bundle - all items are set to IGNORE");
                 return data;
