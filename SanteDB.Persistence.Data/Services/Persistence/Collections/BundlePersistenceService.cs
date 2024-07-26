@@ -30,6 +30,7 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -299,7 +300,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 {
                     this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(BundlePersistenceService), (float)i / (float)data.Item.Count, UserMessages.PROCESSING));
                 }
+
+                var objectType = data.Item[i].GetType();
+                if (data.Item[i] is IdentifiedDataReference idr)
+                {
+                    if(idr.BatchOperation != BatchOperationType.Delete)
+                    {
+                        throw new InvalidOperationException(String.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, "Insert on IdentifiedDataReference"));
+                    }
+                    objectType = idr.ReferencedType;
+                }
                 var persistenceService = data.Item[i].GetType().GetRelatedPersistenceService();
+                // Is the object a reference?
 
                 try
                 {
