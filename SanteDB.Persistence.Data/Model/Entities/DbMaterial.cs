@@ -88,7 +88,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// </summary>
         /// <value>The expiry date.</value>
         [Column("exp_utc")]
-        public DateTime ExpiryDate
+        public DateTime? ExpiryDate
         {
             get;
             set;
