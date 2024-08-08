@@ -95,6 +95,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
             {
                 Key = Guid.NewGuid(),
                 VersionKey = Guid.NewGuid(),
+                VersionSequence = 10,
                 GenderConceptKey = Guid.NewGuid(),
                 CreatedByKey = Guid.NewGuid(),
                 DateOfBirth = DateTime.Now,
@@ -105,13 +106,13 @@ namespace SanteDB.Persistence.Data.Test.SQLite
 
             var dbPatient = mapper.MapModelInstance<Patient, DbPatient>(patient);
             Assert.AreEqual(patient.EducationLevelKey, dbPatient.EducationLevelKey);
-
             var dbPerson = mapper.MapModelInstance<Person, DbPerson>(patient);
             Assert.AreEqual(patient.DeceasedDate, dbPerson.DeceasedDate);
             Assert.AreEqual(patient.GenderConceptKey, dbPerson.GenderConceptKey);
             Assert.AreEqual(patient.DateOfBirth, dbPerson.DateOfBirth);
 
             var dbEntity = mapper.MapModelInstance<Entity, DbEntityVersion>(patient);
+            Assert.AreEqual(patient.VersionSequence, dbEntity.VersionSequenceId);
             Assert.AreEqual(patient.Key, dbEntity.Key);
             Assert.AreEqual(patient.VersionKey, dbEntity.VersionKey);
 
@@ -119,14 +120,17 @@ namespace SanteDB.Persistence.Data.Test.SQLite
             var revPatient = mapper.MapDomainInstance<DbPatient, Patient>(dbPatient);
             Assert.AreEqual(dbPatient.EducationLevelKey, revPatient.EducationLevelKey);
 
-            var revPerson = mapper.MapDomainInstance<DbPerson, Person>(dbPerson);
+            var revPerson = mapper.MapDomainInstance<DbPerson, Patient>(dbPerson);
             Assert.AreEqual(dbPerson.DeceasedDate, revPerson.DeceasedDate);
             Assert.AreEqual(dbPerson.DateOfBirth, revPerson.DateOfBirth);
             Assert.AreEqual(patient.DateOfBirthPrecision, revPerson.DateOfBirthPrecision);
 
-            var revEntity = mapper.MapDomainInstance<DbEntityVersion, Entity>(dbEntity);
+            var revEntity = mapper.MapDomainInstance<DbEntityVersion, Patient>(dbEntity);
+            Assert.AreEqual(patient.VersionSequence, revEntity.VersionSequence);
             Assert.AreEqual(patient.Key, revEntity.Key);
             Assert.AreEqual(patient.VersionKey, revEntity.VersionKey);
+
+            // Test persistence layer mapping
         }
     }
 }
