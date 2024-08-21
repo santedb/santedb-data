@@ -81,7 +81,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             try
             {
-                return base.DoInsertInternal(context, dbModel);
+                return base.DoUpdateInternal(context, dbModel);
             }
             catch (DbException e) when (e.Message.Contains("ENTITY RELATIONSHIP FAILED VALIDATION") || e.Message.Contains("Validation error: Relationship"))
             {

@@ -32,6 +32,7 @@ using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model;
+using SanteDB.Persistence.Data.Model.Entities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
