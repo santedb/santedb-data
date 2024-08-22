@@ -99,7 +99,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         {
             try
             {
-                return base.DoInsertInternal(context, dbModel);
+                return base.DoUpdateInternal(context, dbModel);
             }
             catch (DbException e) when (e.Message.Contains("ACT PARTICIPATION FAILED VALIDATION") || e.Message.Contains("Validation error: Relationship"))
             {
