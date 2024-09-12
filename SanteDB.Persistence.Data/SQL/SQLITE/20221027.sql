@@ -2,7 +2,7 @@
  * <feature scope="SanteDB.Persistence.Data" id="20221027" name="Update:Session User Index"  invariantName="sqlite">
  *	<summary>Update:Adds index for user key in session table</summary>
  *	<remarks>Adds an index for the </remarks>
- *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE type='index' AND name='SEC_SES_USR_ID_IDX')</isInstalled>
+ *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE name='SEC_SES_USR_ID_IDX')</isInstalled>
  * </feature>
  */
  -- OPTIONAL
