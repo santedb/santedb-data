@@ -45,6 +45,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
         [Test]
         public void TestSetSecurityChallenge()
         {
+            
             using (AuthenticationContext.EnterSystemContext())
             {
                 var chlProvider = ApplicationServiceContext.Current.GetService<ISecurityChallengeService>();
