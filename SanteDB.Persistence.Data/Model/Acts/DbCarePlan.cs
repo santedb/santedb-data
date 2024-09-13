@@ -55,7 +55,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// Gets or sets the program identifier for the care plan
         /// </summary>
-        [Column("prog")]
-        public string CarePathwayIdentifier { get; set; }
+        [Column("pth_id")]
+        public Guid? CarePathwayKey { get; set; }
     }
 }

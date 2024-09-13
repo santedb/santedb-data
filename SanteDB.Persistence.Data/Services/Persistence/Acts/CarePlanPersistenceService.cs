@@ -41,8 +41,26 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         }
 
         /// <inheritdoc/>
-        protected override void DoCopyVersionSubTableInternal(DataContext context, DbActVersion newVersion)
+        protected override CarePlan BeforePersisting(DataContext context, CarePlan data)
         {
+            data.CarePathwayKey = this.EnsureExists(context, data.CarePathway)?.Key ?? data.CarePathwayKey;
+            return base.BeforePersisting(context, data);
+        }
+
+        /// <inheritdoc/>
+        protected override CarePlan DoConvertToInformationModel(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
+        {
+            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+
+            switch(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            {
+                case LoadMode.FullLoad:
+                    retVal.CarePathway = retVal.CarePathway.GetRelatedPersistenceService().Get(context, retVal.CarePathwayKey.GetValueOrDefault());
+                    retVal.SetLoaded(o => o.CarePathway);
+                    break;
+            }
+
+            return retVal;
         }
 
     }

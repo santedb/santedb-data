@@ -413,6 +413,9 @@
   <class modelClass="SanteDB.Core.Model.Acts.CarePlan, SanteDB.Core.Model"
          domainClass="SanteDB.Persistence.Data.Model.Acts.DbCarePlan, SanteDB.Persistence.Data">
   </class>
+  <class modelClass="SanteDB.Core.Model.Acts.CarePathwayDefinition, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Acts.DbCarePathwayDefinition, SanteDB.Persistence.Data">
+  </class>
 
   <!-- Represents Act Model -->
   <!--
