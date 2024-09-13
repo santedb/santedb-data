@@ -76,6 +76,7 @@
     <None Remove="SQL\FBSQL\Updates\20240521-FBSQL.sql" />
     <None Remove="SQL\FBSQL\Updates\20240605-FBSQL.sql" />
     <None Remove="SQL\FBSQL\Updates\20240628-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20240913.sql" />
     <None Remove="SQL\PSQL\santedb-codes.sql" />
     <None Remove="SQL\PSQL\santedb-ddl.sql" />
     <None Remove="SQL\PSQL\santedb-fn.sql" />
@@ -211,6 +212,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Map\CdssModelMap.xml" />
     <EmbeddedResource Include="Map\ModelMap.xml" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20240913.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20240628-FBSQL.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20240605-FBSQL.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20240521-FBSQL.sql" />
