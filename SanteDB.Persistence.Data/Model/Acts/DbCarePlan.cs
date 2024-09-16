@@ -53,7 +53,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// Gets or sets the program identifier for the care plan
         /// </summary>
-        [Column("pth_id")]
+        [Column("pth_id"), ForeignKey(typeof(DbCarePathwayDefinition), nameof(DbCarePathwayDefinition.Key))]
         public Guid? CarePathwayKey { get; set; }
     }
 }
