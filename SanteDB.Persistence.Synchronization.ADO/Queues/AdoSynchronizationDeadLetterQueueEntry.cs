@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2024-1-23
  */
 using SanteDB.Client.Disconnected.Data.Synchronization;
 using SanteDB.Persistence.Synchronization.ADO.Model;

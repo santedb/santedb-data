@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SanteDB.Core.TestFramework.FirebirdSQL.targets" Pack="true" PackagePath="build" />
+    <None Include="..\..\SanteDB.licenseheader" Link="SanteDB.licenseheader" />
     <None Include="firebird\fbclient.dll" Pack="true" PackagePath="build\firebird" />
     <None Include="firebird\firebird.conf" Pack="true" PackagePath="build\firebird" />
     <None Include="firebird\firebird.msg" Pack="true" PackagePath="build\firebird" />
