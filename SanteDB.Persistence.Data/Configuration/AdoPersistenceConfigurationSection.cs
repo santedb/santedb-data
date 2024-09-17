@@ -96,7 +96,7 @@ namespace SanteDB.Persistence.Data.Configuration
         public AdoPersistenceConfigurationSection()
         {
             this.Validation = new List<AdoValidationPolicy>();
-
+            this.AutoInsertChildren = true;
             this.VersioningPolicy = AdoVersioningPolicyFlags.Default;
             this.CachingPolicy = new AdoPersistenceCachingPolicy()
             {
