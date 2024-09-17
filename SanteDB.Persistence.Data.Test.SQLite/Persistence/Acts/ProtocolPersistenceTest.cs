@@ -125,6 +125,12 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
             {
                 throw new NotImplementedException();
             }
+
+            public IEnumerable<Protocol> GetProtocolDefinitions()
+            {
+                yield break;
+
+            }
         }
 
         /// <summary>

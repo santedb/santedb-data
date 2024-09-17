@@ -127,6 +127,11 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             {
                 throw new NotImplementedException();
             }
+
+            public IEnumerable<Protocol> GetProtocolDefinitions()
+            {
+                yield break;
+            }
         }
 
         /// <summary>

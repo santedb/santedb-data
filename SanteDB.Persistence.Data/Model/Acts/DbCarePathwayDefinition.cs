@@ -54,7 +54,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// Enrolment 
         /// </summary>
         [Column("enrol")]
-        public CarePathwayEnrolmentMode EnrolmentMode { get; set; }
+        public CarePathwayEnrollmentMode EnrollmentMode { get; set; }
 
         /// <summary>
         /// Get or set the eligibility criteria
