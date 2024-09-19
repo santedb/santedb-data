@@ -61,7 +61,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
             /// <summary>
             /// Gets the protocols
             /// </summary>
-            public IEnumerable<ICdssProtocol> GetProtocols(Patient forPatient, params String[] forType)
+            public IEnumerable<ICdssProtocol> GetProtocols(Patient forPatient, IDictionary<String, Object> parameters,  params String[] forType)
             {
                 yield return this.m_protocol;
             }

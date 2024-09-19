@@ -430,6 +430,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override TAct DoConvertToInformationModel(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
+
             if (this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var persistenceProvider) && persistenceProvider is IAdoClassMapper edps)
             {
 
