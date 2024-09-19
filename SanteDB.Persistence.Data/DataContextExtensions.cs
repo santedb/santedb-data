@@ -15,9 +15,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
@@ -40,6 +39,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 using System.Security;
 using System.Security.Principal;
 
@@ -230,6 +230,57 @@ namespace SanteDB.Persistence.Data
             }
         }
 
+
+        /// <summary>
+        /// Set data on the context in a safe manner
+        /// </summary>
+        public static void PushData(this DataContext me, String dataKey, Object data)
+        {
+            if(me.Data.TryGetValue(dataKey, out var existing) && existing is Stack<Object> stk)
+            {
+                stk.Push(data);
+            }
+            else
+            {
+                stk = new Stack<object>();
+                stk.Push(data);
+                me.Data.Add(dataKey, stk);
+            }
+        }
+
+        /// <summary>
+        /// Set data on the context in a safe manner
+        /// </summary>
+        public static void PopData(this DataContext me, String dataKey, out Object data)
+        {
+            if (me.Data.TryGetValue(dataKey, out var existing) && existing is Stack<Object> stk)
+            {
+                data = stk.Pop();
+            }
+            else
+            {
+                stk = new Stack<object>();
+                me.Data.Add(dataKey, stk);
+                data = null;
+            }
+        }
+
+        /// <summary>
+        /// Set data on the context in a safe manner
+        /// </summary>
+        public static bool PeekData(this DataContext me, String dataKey, out Object data)
+        {
+            if (me.Data.TryGetValue(dataKey, out var existing) && existing is Stack<Object> stk && stk.Any())
+            {
+                data = stk.Peek();
+                return true;
+            }
+            else
+            {
+                data = null;
+                return false;
+            }
+        }
 
         /// <summary>
         /// Get provenance from the context

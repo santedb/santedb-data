@@ -15,11 +15,10 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -54,6 +53,28 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
         /// <inheritdoc/>
         protected override bool ValidateCacheItem(TModel cacheEntry, TDbModel dataModel) => cacheEntry.EffectiveVersionSequenceId >= dataModel.EffectiveVersionSequenceId;
+
+        /// <inheritdoc/>
+        protected override TModel BeforePersisting(DataContext context, TModel data)
+        {
+            if (data.SourceEntityKey.HasValue && (!context.PeekData(DataConstants.NoTouchSourceContextKey, out var noTouch) || !(bool)noTouch)) // Touch the entity version
+            {
+                data.SourceType.GetRelatedPersistenceService().Touch(context, data.SourceEntityKey.Value);
+            }
+            data.EffectiveVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, data.SourceEntityKey.Value);
+            return base.BeforePersisting(context, data);
+        }
+
+        /// <inheritdoc/>
+        protected override TModel DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode)
+        {
+            var sourceKey = context.Query<TDbModel>(o => o.Key == key).Select(o => o.SourceKey).FirstOrDefault();
+            if(sourceKey != Guid.Empty && (!context.PeekData(DataConstants.NoTouchSourceContextKey, out var noTouch) || !(bool)noTouch))
+            {
+                new TModel().SourceType.GetRelatedPersistenceService().Touch(context, sourceKey);
+            }
+            return base.DoDeleteModel(context, key, deleteMode);
+        }
 
         /// <summary>
         /// Obsolete all objects

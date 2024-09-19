@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-11-27
  */
 using SanteDB.Core.Model.Constants;
 using SanteDB.OrmLite.Attributes;
@@ -55,7 +53,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// Gets or sets the program identifier for the care plan
         /// </summary>
-        [Column("prog")]
-        public string CarePathwayIdentifier { get; set; }
+        [Column("pth_id"), ForeignKey(typeof(DbCarePathwayDefinition), nameof(DbCarePathwayDefinition.Key))]
+        public Guid? CarePathwayKey { get; set; }
     }
 }

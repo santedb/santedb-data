@@ -15,13 +15,11 @@
  - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
  - License for the specific language governing permissions and limitations under 
  - the License.
- - 
- - User: fyfej
- - Date: 2023-6-21
  -->
 <modelMap xmlns="http://santedb.org/model/map">
 
 
+  
   <class modelClass="SanteDB.Core.Model.DataTypes.RelationshipValidationRule, SanteDB.Core.Model"
          domainClass="SanteDB.Persistence.Data.Model.Sys.DbRelationshipValidationRule, SanteDB.Persistence.Data">
     <property modelName="ModifiedOn" domainName="CreationTime" />
@@ -411,6 +409,9 @@
   <!-- Represents Act Model -->
   <class modelClass="SanteDB.Core.Model.Acts.CarePlan, SanteDB.Core.Model"
          domainClass="SanteDB.Persistence.Data.Model.Acts.DbCarePlan, SanteDB.Persistence.Data">
+  </class>
+  <class modelClass="SanteDB.Core.Model.Acts.CarePathwayDefinition, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Acts.DbCarePathwayDefinition, SanteDB.Persistence.Data">
   </class>
 
   <!-- Represents Act Model -->

@@ -15,9 +15,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
+using DocumentFormat.OpenXml.EMMA;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
@@ -62,6 +61,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns></returns>
         bool Exists(DataContext context, Guid key);
 
+        /// <summary>
+        /// Touch the specified object (creates a new version or updates the modified time)
+        /// </summary>
+        object Touch(DataContext context, Guid id);
     }
 
     /// <summary>

@@ -15,11 +15,10 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -44,12 +43,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
         }
 
-        /// <inheritdoc/>
-        protected override TModel BeforePersisting(DataContext context, TModel data)
-        {
-            data.EffectiveVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, data.SourceEntityKey.Value);
-            return base.BeforePersisting(context, data);
-        }
         /// <summary>
         /// Get current version sequence
         /// </summary>

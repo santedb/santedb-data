@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using NUnit.Framework;
 using SanteDB.Core;
@@ -45,6 +43,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
         [Test]
         public void TestSetSecurityChallenge()
         {
+            
             using (AuthenticationContext.EnterSystemContext())
             {
                 var chlProvider = ApplicationServiceContext.Current.GetService<ISecurityChallengeService>();

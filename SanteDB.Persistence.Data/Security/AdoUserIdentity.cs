@@ -15,9 +15,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
+using SanteDB.Core.Data.Quality;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security.Claims;
 using SanteDB.OrmLite;
@@ -125,23 +124,45 @@ namespace SanteDB.Persistence.Data.Security
                     .Statement;
 
             var cdrEntityId = contextForReadingAdditionalData.Query<DbEntityVersion>(cdrEntitySql).Select(o => o.Key).First();
+            // NO CDR Entity
+            if (cdrEntityId == Guid.Empty) return;
+
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.CdrEntityId, cdrEntityId.ToString()));
 
             if (this.FindFirst(SanteDBClaimTypes.XspaOrganizationIdClaim) == null)
             {
-                var organizationId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.TargetKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.Employee && o.ObsoleteVersionSequenceId == null).Select(o => o.SourceKey);
+                var organizationId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.Employee && o.ObsoleteVersionSequenceId == null).Select(o => o.TargetKey);
                 if (organizationId.Any())
                 {
                     organizationId.ForEach(o => this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaOrganizationIdClaim, o.ToString())));
                 }
             }
+            else
+            {
+                // Validate the claim
+                var claimedOrgIds = this.FindAll(SanteDBClaimTypes.XspaOrganizationIdClaim).Select(o => Guid.Parse(o.Value)).ToArray();
+                if (!contextForReadingAdditionalData.Any<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.Employee && o.ObsoleteVersionSequenceId == null && claimedOrgIds.Contains(o.TargetKey)))
+                {
+                    throw new ClaimAssertionException(SanteDBClaimTypes.XspaOrganizationIdClaim, claimedOrgIds.First().ToString(), "*****");
+                }
+            }
 
             if (this.FindFirst(SanteDBClaimTypes.XspaFacilityClaim) == null)
             {
-                var facilityId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.TargetKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.AssignedEntity && o.ObsoleteVersionSequenceId == null).Select(o => o.SourceKey);
+                var facilityId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation && o.ObsoleteVersionSequenceId == null).Select(o => o.TargetKey);
                 if (facilityId.Any())
                 {
                     facilityId.ForEach(o => this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaFacilityClaim, o.ToString())));
+                }
+            }
+            else
+            {
+                // Validate the claim
+                var claimedFacIds = this.FindAll(SanteDBClaimTypes.XspaFacilityClaim).Select(o => Guid.Parse(o.Value)).ToArray();
+                var actualFacIds = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation && o.ObsoleteVersionSequenceId == null).Select(o => o.TargetKey).ToArray();
+                if (actualFacIds.Any() && !claimedFacIds.All(f=>actualFacIds.Contains(f)))
+                {
+                    throw new ClaimAssertionException(SanteDBClaimTypes.XspaFacilityClaim, claimedFacIds.First().ToString(), String.Join(",", actualFacIds));
                 }
             }
 

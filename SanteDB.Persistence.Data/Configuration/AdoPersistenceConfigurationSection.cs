@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Services;
@@ -98,7 +96,7 @@ namespace SanteDB.Persistence.Data.Configuration
         public AdoPersistenceConfigurationSection()
         {
             this.Validation = new List<AdoValidationPolicy>();
-
+            this.AutoInsertChildren = true;
             this.VersioningPolicy = AdoVersioningPolicyFlags.Default;
             this.CachingPolicy = new AdoPersistenceCachingPolicy()
             {

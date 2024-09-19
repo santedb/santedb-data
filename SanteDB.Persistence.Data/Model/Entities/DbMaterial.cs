@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.Model.Constants;
 using SanteDB.OrmLite.Attributes;
@@ -88,7 +86,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// </summary>
         /// <value>The expiry date.</value>
         [Column("exp_utc")]
-        public DateTime ExpiryDate
+        public DateTime? ExpiryDate
         {
             get;
             set;

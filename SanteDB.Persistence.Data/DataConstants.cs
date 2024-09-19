@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using System;
 
@@ -36,6 +34,11 @@ namespace SanteDB.Persistence.Data
         /// Mapper resource name
         /// </summary>
         internal const string MapResourceName = "SanteDB.Persistence.Data.Map.ModelMap.xml";
+
+        /// <summary>
+        /// CDSS Mapper resource name
+        /// </summary>
+        internal const string CdssMapResourceName = "SanteDB.Persistence.Data.Map.CdssModelMap.xml";
 
         /// <summary>
         /// Ad-hoc cache key for AA information
@@ -103,5 +106,9 @@ namespace SanteDB.Persistence.Data
         /// </summary>
         public const string IdentifierCheckDigitMissing = "id.checkDigit.missing";
 
+        /// <summary>
+        /// The key for source context key
+        /// </summary>
+        public const string NoTouchSourceContextKey = "no.touch.source";
     }
 }

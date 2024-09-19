@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-11-27
  */
 using SanteDB.Core;
 using SanteDB.Core.Cdss;
@@ -24,6 +22,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Http.Compression;
 using SanteDB.Core.i18n;
+using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Audit;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
@@ -60,6 +59,7 @@ namespace SanteDB.Persistence.Data.Services
         private readonly ILocalizationService m_localizationService;
         private readonly ModelMapper m_modelMapper;
         private readonly IQueryPersistenceService m_queryPersistence;
+        private readonly IAdoPersistenceProvider<Protocol> m_protocolPersistence;
         private readonly ConcurrentDictionary<String, ICdssLibrary> m_cdssLibraryLoaded = new ConcurrentDictionary<string, ICdssLibrary>();
 
         /// <summary>
@@ -124,14 +124,18 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// DI constructor
         /// </summary>
-        public AdoCdssLibraryRepository(IConfigurationManager configurationManager, IPolicyEnforcementService pepService, ILocalizationService localizationService, IQueryPersistenceService queryPersistenceService = null)
+        public AdoCdssLibraryRepository(IConfigurationManager configurationManager, 
+            IPolicyEnforcementService pepService, 
+            ILocalizationService localizationService, 
+            IAdoPersistenceProvider<Protocol> protocolProvider,
+            IQueryPersistenceService queryPersistenceService = null)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_pepService = pepService;
             this.m_localizationService = localizationService;
             this.m_queryPersistence = queryPersistenceService;
-            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
-
+            this.m_protocolPersistence = protocolProvider;
+            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.CdssMapResourceName), "AdoModelMap");
         }
 
 
@@ -303,7 +307,8 @@ namespace SanteDB.Persistence.Data.Services
                         else if (existingLibrary.IsSystem &&
                             !isSystemContext)
                         {
-                            this.m_pepService.Demand(PermissionPolicyIdentifiers.UnrestrictedAll);
+                            this.m_pepService.Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration);
+                            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterClinicalProtocolConfigurationDefinition);
                         }
                         else if (!isSystemContext)
                         {
@@ -352,6 +357,19 @@ namespace SanteDB.Persistence.Data.Services
                         }
                         context.Insert(newVersion);
 
+                        // Insert protocol definitions
+                        foreach(var protocolDefinition in libraryToInsert.GetProtocolDefinitions())
+                        {
+                            var existing = this.m_protocolPersistence.Get(context, protocolDefinition.Key.Value);
+                            if(existing == null)
+                            {
+                                this.m_protocolPersistence.Insert(context, protocolDefinition);
+                            }
+                            else
+                            {
+                                this.m_protocolPersistence.Update(context, protocolDefinition);
+                            }
+                        }
                         tx.Commit();
 
                         var retVal = this.ToModelInstance(context, new CompositeResult<DbCdssLibrary, DbCdssLibraryVersion>(existingLibrary, newVersion));

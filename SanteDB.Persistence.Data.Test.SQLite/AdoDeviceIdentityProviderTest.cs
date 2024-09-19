@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using NUnit.Framework;
 using SanteDB.Core;
@@ -253,7 +251,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite
             }
             catch (Exception e)
             {
-                Assert.Fail($"Wrong exception thrown - expected {typeof(AuthenticationException)} but got {e.GetType()}");
+                Assert.Fail($"Wrong exception thrown - expected {this.m_localizationService.GetString(ErrorMessageStrings.AUTH_DEV_LOCKED)} but got {e.Message}");
             }
 
             // Clear lockout

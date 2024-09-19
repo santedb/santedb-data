@@ -15,10 +15,10 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
+using DocumentFormat.OpenXml.Wordprocessing;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Data.Quality;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
@@ -33,8 +33,10 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Exceptions;
 using SanteDB.Persistence.Data.Model.Concepts;
+using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,6 +51,7 @@ namespace SanteDB.Persistence.Data.Services
     /// </summary>
     public class AdoSessionProvider : ISessionIdentityProviderService, ISessionProviderService, ILocalServiceProvider<ISessionIdentityProviderService>, ILocalServiceProvider<ISessionProviderService>
     {
+        
         // Tracer
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoSessionProvider));
 
@@ -80,6 +83,16 @@ namespace SanteDB.Persistence.Data.Services
         private readonly IPolicyEnforcementService m_pepService;
 
         // TODO: Session caching in a memory cache
+
+        private readonly String[] m_principalClaimsToSession =
+        {
+            SanteDBClaimTypes.XspaFacilityClaim,
+            SanteDBClaimTypes.XspaOrganizationIdClaim,
+            SanteDBClaimTypes.XspaOrganizationNameClaim,
+            SanteDBClaimTypes.XspaPurposeOfUseClaim,
+            SanteDBClaimTypes.XspaUserNpi,
+            SanteDBClaimTypes.XspaUserRoleClaim
+        };
 
         /// <summary>
         /// Claims which are not to be stored or set in the session
@@ -232,15 +245,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new SecurityException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_NOT_AUTH_PRINCIPAL));
             }
-            else if (isOverride && (String.IsNullOrEmpty(purpose) || scope == null || scope.Length == 0))
-            {
-                throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_OVERRIDE_WITH_INSUFFICIENT_DATA));
-            }
-            else if (scope == null || scope.Length == 0)
-            {
-                scope = new string[] { "*" };
-            }
-
+            
             // Must be claims principal
             if (!(principal is IClaimsPrincipal claimsPrincipal))
             {
@@ -257,10 +262,18 @@ namespace SanteDB.Persistence.Data.Services
                 purpose = claimsPrincipal.FindFirst(SanteDBClaimTypes.PurposeOfUse).Value;
             }
 
-            // Validate override permission for the user
-            if (isOverride)
+            if (isOverride && (String.IsNullOrEmpty(purpose) || scope == null || scope.Length == 0))
             {
-                this.m_pepService.Demand(PermissionPolicyIdentifiers.OverridePolicyPermission, principal);
+                var exception = new SecuritySessionException(SessionExceptionType.MissingRequiredClaim, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_OVERRIDE_WITH_INSUFFICIENT_DATA), null);
+                exception.Data.Add(SecuritySessionException.DATA_CLAIM_TYPE_KEY, SanteDBClaimTypes.XspaPurposeOfUseClaim);
+                exception.Data.Add(SecuritySessionException.DATA_CLAIM_VALUE_KEY, String.Join(",", PurposeOfUseKeys.AllKeys));
+                throw exception;
+            }
+
+            // Ensure the prinicpal has permission to access scopes they have requested
+            if (scope == null || scope.Length == 0)
+            {
+                scope = new string[] { "*" };
             }
 
             // Validate scopes are valid or can be overridden
@@ -288,6 +301,53 @@ namespace SanteDB.Persistence.Data.Services
                 try
                 {
                     context.Open();
+
+                    // When the system is configured only for one facility login then we want an XSPA facility ID to be set
+                    // TODO: Determine whether this is the best place to perform this type of check
+                    if (!isOverride &&
+                        !this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AllowNonAssignedUsersToLogin, true) &&
+                        !(principal.Identity is IDeviceIdentity || principal.Identity is IApplicationIdentity) &&
+                        !this.m_pepService.SoftDemand(PermissionPolicyIdentifiers.AccessClientAdministrativeFunction, principal))
+                    {
+                        // What is the restricted facility identifier?
+                        var assignedFacility = this.m_securityConfiguration.GetSecurityPolicy<Guid?>(SecurityPolicyIdentification.AssignedFacilityUuid, null);
+                        var facilityClaims = claimsPrincipal.FindAll(SanteDBClaimTypes.XspaFacilityClaim);
+                        if (!facilityClaims.Any() || !assignedFacility.HasValue && facilityClaims.Count() != 1) // The user has no facility claim nor do they have a "default" we can select
+                        {
+                            var exception = new SecuritySessionException(SessionExceptionType.MissingRequiredClaim, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_REQUIRE_FACILITY), null);
+                            exception.Data.Add(SecuritySessionException.DATA_CLAIM_TYPE_KEY, SanteDBClaimTypes.XspaFacilityClaim);
+
+                            // Fetch the allowed values for the facility selection
+                            var sqlStatement = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityName), typeof(DbEntityNameComponent))
+                                .InnerJoin<DbEntityName, DbEntityNameComponent>(o => o.Key, o => o.SourceKey)
+                                .Where<DbEntityName>(o => o.ObsoleteVersionSequenceId == null && o.UseConceptKey == NameUseKeys.OfficialRecord);
+
+                            if(assignedFacility.HasValue)
+                            {
+                                sqlStatement = sqlStatement.And<DbEntityName>(o => o.SourceKey == assignedFacility.Value);
+                            }
+                            else if(facilityClaims.Any())
+                            {
+                                var userAssignedFacs = facilityClaims.Select(o => Guid.Parse(o.Value)).ToArray();
+                                sqlStatement = sqlStatement.And<DbEntityName>(o => userAssignedFacs.Contains(o.SourceKey));
+                            }
+                            else
+                            {
+                                throw new SecuritySessionException(SessionExceptionType.NotEstablished, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_ASSIGNED_FACILITY_MISSING), null);
+                            }
+
+                            var dbn = context.Query<CompositeResult<DbEntityName, DbEntityNameComponent>>(sqlStatement.Statement);
+                            exception.Data.Add(SecuritySessionException.DATA_CLAIM_VALUE_KEY, String.Join(",", dbn.ToArray().Select(o=>$"{o.Object1.SourceKey}={o.Object2.Value}")));
+                            throw exception;
+                        }
+                        if (assignedFacility.HasValue &&
+                            !facilityClaims.Any(c => c.Value == assignedFacility.ToString()))
+                        {
+                            throw new SecuritySessionException(SessionExceptionType.NotEstablished, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_ASSIGNED_FACILITY_MISMATCH, new { allowed = assignedFacility, assigned = String.Join(" or ", facilityClaims.Select(o => o.Value)) }), null);
+                        }
+                    }
+
+
                     using (var tx = context.BeginTransaction())
                     {
                         // Generate refresh token
@@ -370,10 +430,12 @@ namespace SanteDB.Persistence.Data.Services
                             System.Security.Cryptography.RandomNumberGenerator.Create().GetBytes(refreshToken);
                             dbSession.RefreshToken = this.m_passwordHashingService.ComputeHash(refreshToken).HexEncode().ToLower();
                         }
-                        if (isOverride) // Overrides cannot be extended
+
+                        if (isOverride) // Overrides cannot be extended and can only be applied when the scopes allow it
                         {
                             dbSession.RefreshToken = null;
                             dbSession.RefreshExpiration = DateTimeOffset.Now;
+
                         }
 
                         // Is the original principal already a session principal from another service? If so we should use its expiration
@@ -404,6 +466,10 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             sessionScopes.AddRange(this.m_pdpService.GetEffectivePolicySet(principal).Where(o => o.Rule == Core.Model.Security.PolicyGrantType.Grant).Select(c => c.Policy.Oid));
                         }
+                        if (scope?.Any(s => !s.Equals("*")) == true) // Demand additional scopes
+                        {
+                            sessionScopes.AddRange(scope.Where(s => !s.Equals("*")).Select(o => { this.m_pepService.Demand(o, principal); return o; }));
+                        }
 
                         // Explicitly set scopes
                         sessionScopes.AddRange(scope.Where(s => !"*".Equals(s)));
@@ -433,6 +499,9 @@ namespace SanteDB.Persistence.Data.Services
                             claims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, lang));
                         }
 
+                        // Promote claims over
+                        claims.AddRange(claimsPrincipal.Claims.Where(o => m_principalClaimsToSession.Contains(o.Type)));
+
                         // Local session/authentication
                         if(claimsPrincipal.HasClaim(o=>o.Type == SanteDBClaimTypes.LocalOnly && Boolean.TryParse(o.Value, out var b) && b))
                         {
@@ -460,6 +529,10 @@ namespace SanteDB.Persistence.Data.Services
 
                         return session;
                     }
+                }
+                catch(SecuritySessionException)
+                {
+                    throw;
                 }
                 catch (NullReferenceException e)
                 {
@@ -719,6 +792,7 @@ namespace SanteDB.Persistence.Data.Services
                             if (authenticated)
                             {
                                 var uid = new AdoUserIdentity(dbSession.Object3, "SESSION");
+                                uid.AddClaims(adoSession.Claims.Where(o => m_principalClaimsToSession.Contains(o.Type)));
                                 uid.AddXspaClaims(context);
                                 identities[0] = uid;
                             }

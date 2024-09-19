@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using NUnit.Framework;
 using SanteDB.Core;
@@ -155,6 +153,11 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
                 fetched = base.TestQuery<Entity>(k => k.Names.Any(n => n.NameUseKey == NameUseKeys.Assigned && n.Component.Any(c => c.Value == "Justin")), 0).AsResultSet();
                 // But we have one Bob
                 fetched = base.TestQuery<Entity>(k => k.Names.Any(n => n.Component.Any(c => c.Value.Contains("Bobz"))), 1).AsResultSet();
+
+
+                // Fetch based on name or mothers name
+                var fetchExpr = QueryExpressionParser.BuildLinqExpression<Entity>("name.component.value||relationship[Mother].target.name.component.value=Bobz".ParseQueryString());
+                fetched = base.TestQuery<Entity>(fetchExpr, 1).AsResultSet();
 
                 afterFetch = fetched.First();
                 Assert.AreEqual(afterInsert.Key, afterFetch.Key);

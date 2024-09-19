@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core;
 using SanteDB.Core.Exceptions;
@@ -88,6 +86,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         var existing = persistenceService.Query(context, keyResolver.GetKeyExpression(data)).SingleOrDefault();
                         if (existing != null)
                         {
+                            if(data.BatchOperation == Core.Model.DataTypes.BatchOperationType.Update || data.BatchOperation == Core.Model.DataTypes.BatchOperationType.InsertOrUpdate && this.m_configuration.AutoUpdateExisting)
+                            {
+                                return persistenceService.Update(context, data);
+                            }
                             return existing;
                         }
                         else if (DataPersistenceControlContext.Current?.AutoInsertChildren ?? this.m_configuration.AutoInsertChildren)
@@ -498,6 +500,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(IdentifiedData.Key), ErrorMessages.ARGUMENT_NULL);
             }
 
+            context.PushData(DataConstants.NoTouchSourceContextKey, true);
+
             // We now want to fetch the perssitence serivce of this
             var persistenceService = typeof(TModelAssociation).GetRelatedPersistenceService() as IAdoPersistenceProvider<TModelAssociation>;
             if (persistenceService == null)
@@ -541,7 +545,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return a;
             });
 
-            return updatedRelationships.Except(removedRelationships).Union(addedRelationships).ToArray();
+            var retVal = updatedRelationships.Except(removedRelationships).Union(addedRelationships).ToArray();
+            context.PopData(DataConstants.NoTouchSourceContextKey, out _);
+            return retVal;
+
         }
 
         /// <summary>

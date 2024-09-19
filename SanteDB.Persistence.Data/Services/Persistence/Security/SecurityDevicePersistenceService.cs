@@ -15,10 +15,9 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
@@ -59,7 +58,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Security
         /// </summary>
         protected override SecurityDevice BeforePersisting(DataContext context, SecurityDevice data)
         {
-            if (!String.IsNullOrEmpty(data.DeviceSecret))
+            if (!String.IsNullOrEmpty(data.DeviceSecret) && context.ContextId.ToString() != AuthenticationContext.SystemUserSid)
             {
                 this.m_tracer.TraceWarning("Caller has set the DeviceSecret property on SecurityDevice - use the IDeviceIdentityProvider.ChangeSecret() for this - the property will be ignored");
                 data.DeviceSecret = null;

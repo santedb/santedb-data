@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using NUnit.Framework;
 using SanteDB.Core;
@@ -26,6 +24,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Services;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Authentication;
@@ -250,9 +249,9 @@ namespace SanteDB.Persistence.Data.Test
             catch (AuthenticationException e) when (e.Message.StartsWith(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_LOCKED)))
             {
             }
-            catch
+            catch(Exception e)
             {
-                Assert.Fail("Wrong exception thrown");
+                Assert.Fail($"Wrong exception thrown - expected {this.m_localizationService.GetString(ErrorMessageStrings.AUTH_APP_LOCKED)} but got {e.Message}");
             }
 
             // Clear lockout

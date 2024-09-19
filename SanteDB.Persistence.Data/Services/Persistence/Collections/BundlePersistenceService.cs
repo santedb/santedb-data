@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
@@ -30,8 +28,10 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using System;
@@ -202,15 +202,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             {
                 throw new ArgumentNullException(nameof(data), ErrorMessages.ARGUMENT_NULL);
             }
-            else if (data.Item == null || !data.Item.Any())
-            {
-                throw new InvalidOperationException(ErrorMessages.SEQUENCE_NO_ELEMENTS);
-            }
             else if (principal == null)
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ARGUMENT_NULL);
             }
-            else if(data.Item.All(o=>o.BatchOperation == BatchOperationType.Ignore))
+            else if(data.Item.All(o=>o.BatchOperation == BatchOperationType.Ignore) || !data.Item.Any())
             {
                 this.m_tracer.TraceWarning("Ignoring bundle - all items are set to IGNORE");
                 return data;
@@ -302,7 +298,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 {
                     this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(BundlePersistenceService), (float)i / (float)data.Item.Count, UserMessages.PROCESSING));
                 }
+
+                var objectType = data.Item[i].GetType();
+                if (data.Item[i] is IdentifiedDataReference idr)
+                {
+                    if(idr.BatchOperation != BatchOperationType.Delete)
+                    {
+                        throw new InvalidOperationException(String.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, "Insert on IdentifiedDataReference"));
+                    }
+                    objectType = idr.ReferencedType;
+                }
                 var persistenceService = data.Item[i].GetType().GetRelatedPersistenceService();
+                // Is the object a reference?
 
                 try
                 {
@@ -379,6 +386,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         {
             throw new NotSupportedException();
         }
+
+        /// <inheritdoc/>
+        object IAdoPersistenceProvider.Touch(DataContext context, Guid id) => this.Touch(context, id);
 
         /// <inheritdoc/>
         /// <exception cref="NotSupportedException">This method is not supported on <see cref="Bundle"/></exception>

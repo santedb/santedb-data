@@ -15,12 +15,13 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-7-12
  */
+using SanteDB.Core.Data.Quality;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
+using SanteDB.Core.Model.Query;
+using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Principal;
@@ -29,9 +30,12 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Security;
+using SanteDB.Persistence.Data.Security;
 using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Data.Common;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
@@ -41,7 +45,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// ADO data signing certificate 
     /// </summary>
-    public class AdoDataSigningCertificateManagerService : IDataSigningCertificateManagerService, IAdoTrimProvider
+    public class AdoDataSigningCertificateManagerService : IDataSigningCertificateManagerService, IAdoTrimProvider, ILocalServiceProvider<IDataSigningCertificateManagerService>
     {
         // Tracer
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoDataSigningCertificateManagerService));
@@ -56,9 +60,8 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public AdoDataSigningCertificateManagerService(IConfigurationManager configuration,
             ILocalizationService localizationService,
-            IPasswordHashingService passwordHashingService,
-            IPolicyEnforcementService policyEnforcementService,
-            ITfaService twoFactorSecretGenerator = null)
+            IPolicyEnforcementService policyEnforcementService
+            )
         {
             this.m_configuration = configuration.GetSection<AdoPersistenceConfigurationSection>();
             this.m_pepService = policyEnforcementService;
@@ -67,6 +70,9 @@ namespace SanteDB.Persistence.Data.Services
 
         /// <inheritdoc/>
         public string ServiceName => "ADO.NET Data Signing Service";
+
+        /// <inheritdoc/>
+        public IDataSigningCertificateManagerService LocalProvider => this;
 
         /// <inheritdoc/>
         public void AddSigningCertificate(IIdentity identity, X509Certificate2 x509Certificate, IPrincipal principal)
@@ -124,7 +130,10 @@ namespace SanteDB.Persistence.Data.Services
                     var existingMap = context.FirstOrDefault<DbCertificateMapping>(o =>
                         o.X509Thumbprint == x509Certificate.Thumbprint &&
                         o.Use == CertificateMappingUse.Signature &&
-                        o.ObsoletionTime == null);
+                        o.ObsoletionTime == null &&
+                        o.SecurityDeviceKey == certificateRegistration.SecurityDeviceKey &&
+                        o.SecurityUserKey == certificateRegistration.SecurityUserKey &&
+                        o.SecurityApplicationKey == certificateRegistration.SecurityApplicationKey);
 
                     if (existingMap != null &&
                         (existingMap.SecurityApplicationKey.GetValueOrDefault() == certificateRegistration.SecurityApplicationKey || existingMap.SecurityDeviceKey.GetValueOrDefault() == certificateRegistration.SecurityDeviceKey || existingMap.SecurityUserKey.GetValueOrDefault() == certificateRegistration.SecurityUserKey))
@@ -145,6 +154,10 @@ namespace SanteDB.Persistence.Data.Services
                     }
                 }
             }
+            catch (DbException e)
+            {
+                throw e.TranslateDbException();
+            }
             catch (Exception e)
             {
                 this.m_tracer.TraceError("Error registering signing certificate to identity {0} with {1} - {2}", identity.Name, x509Certificate.Subject, e.Message);
@@ -153,6 +166,47 @@ namespace SanteDB.Persistence.Data.Services
                     identity = identity.Name,
                     subject = x509Certificate.Subject
                 }), e);
+            }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<IIdentity> GetCertificateIdentities(X509Certificate2 signingCertificate)
+        {
+            if (signingCertificate == null)
+            {
+                throw new ArgumentNullException(nameof(signingCertificate), ErrorMessages.ARGUMENT_NULL);
+            }
+
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                context.Open();
+
+                var dsigSql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping), typeof(DbSecurityUser), typeof(DbSecurityApplication), typeof(DbSecurityDevice))
+                    .Join<DbCertificateMapping, DbSecurityUser>("LEFT", o => o.SecurityUserKey, o => o.Key)
+                    .Join<DbCertificateMapping, DbSecurityApplication>("LEFT", o => o.SecurityApplicationKey, o => o.Key)
+                    .Join<DbCertificateMapping, DbSecurityDevice>("LEFT", o => o.SecurityDeviceKey, o => o.Key)
+                    .Where<DbCertificateMapping>(o => o.X509Thumbprint == signingCertificate.Thumbprint && o.Use == CertificateMappingUse.Signature && o.ObsoletionTime == null && o.Expiration > DateTime.Now)
+                    .And<DbSecurityDevice>(o => o.ObsoletionTime == null)
+                    .And<DbSecurityApplication>(o => o.ObsoletionTime == null)
+                    .And<DbSecurityUser>(o => o.ObsoletionTime == null)
+                    .Statement;
+
+                // Return the appropriate type of data 
+                foreach (var map in context.Query<CompositeResult<DbCertificateMapping, DbSecurityUser, DbSecurityApplication, DbSecurityDevice>>(dsigSql))
+                {
+                    if (map.Object1.SecurityUserKey.HasValue)
+                    {
+                        yield return new AdoUserIdentity(map.Object2);
+                    }
+                    else if (map.Object1.SecurityApplicationKey.HasValue)
+                    {
+                        yield return new AdoApplicationIdentity(map.Object3);
+                    }
+                    else if (map.Object1.SecurityDeviceKey.HasValue)
+                    {
+                        yield return new AdoDeviceIdentity(map.Object4);
+                    }
+                }
             }
         }
 
@@ -199,10 +253,73 @@ namespace SanteDB.Persistence.Data.Services
                     return retVal.ToList().Select(o => new X509Certificate2(o.X509PublicKeyData));
                 }
             }
+            catch (DbException e)
+            {
+                throw e.TranslateDbException();
+            }
             catch (Exception e)
             {
                 this.m_tracer.TraceError("Could not find mapped identity using identity {0}- {1}", identity.Name, e);
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SIG_CERT_GENERAL), e);
+            }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<X509Certificate2> GetSigningCertificates(Type classOfIdentity, NameValueCollection filter)
+        {
+            if (classOfIdentity == null)
+            {
+                throw new ArgumentNullException(nameof(classOfIdentity), ErrorMessages.ARGUMENT_NULL);
+            }
+            filter = filter ?? new NameValueCollection();
+
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                context.Open();
+
+                SqlStatementBuilder sqlStatementBuilder = null;
+                if (classOfIdentity == typeof(IDeviceIdentity) || classOfIdentity == typeof(SecurityDevice))
+                {
+                    sqlStatementBuilder = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping))
+                        .InnerJoin<DbCertificateMapping, DbSecurityDevice>(o => o.SecurityDeviceKey, o => o.Key)
+                        .Where<DbSecurityDevice>(o => o.ObsoletionTime == null);
+                }
+                else if (classOfIdentity == typeof(IApplicationIdentity) || classOfIdentity == typeof(SecurityApplication))
+                {
+                    sqlStatementBuilder = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping))
+                        .InnerJoin<DbCertificateMapping, DbSecurityApplication>(o => o.SecurityApplicationKey, o => o.Key)
+                        .Where<DbSecurityApplication>(o => o.ObsoletionTime == null);
+                }
+                else
+                {
+                    sqlStatementBuilder = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping))
+                        .InnerJoin<DbCertificateMapping, DbSecurityUser>(o => o.SecurityUserKey, o => o.Key)
+                        .Where<DbSecurityUser>(o => o.ObsoletionTime == null);
+                }
+
+                sqlStatementBuilder.And<DbCertificateMapping>(o => o.Use == CertificateMappingUse.Signature);
+                if (!String.IsNullOrEmpty(filter["thumbprint"]))
+                {
+                    var thb = filter["thumbprint"];
+                    sqlStatementBuilder.And<DbCertificateMapping>(o => o.X509Thumbprint == thb);
+                }
+                if (DateTime.TryParse(filter["modifiedSince"], out var modifiedSince))
+                {
+                    sqlStatementBuilder.And<DbCertificateMapping>(o => (o.UpdatedTime ?? o.CreationTime) > modifiedSince);
+                }
+                if (DateTime.TryParse(filter["obsoleteSince"], out var obsSince))
+                {
+                    sqlStatementBuilder.And<DbCertificateMapping>(o => o.ObsoletionTime != null && o.ObsoletionTime > obsSince);
+                }
+                else
+                {
+                    sqlStatementBuilder.And<DbCertificateMapping>(o => o.ObsoletionTime == null);
+                }
+
+                foreach (var itm in context.Query<DbCertificateMapping>(sqlStatementBuilder.Statement).OfType<DbCertificateMapping>())
+                {
+                    yield return new X509Certificate2(itm.X509PublicKeyData);
+                }
             }
         }
 
@@ -274,6 +391,10 @@ namespace SanteDB.Persistence.Data.Services
                     context.Update(dbCertMapping);
                 }
             }
+            catch (DbException e)
+            {
+                throw e.TranslateDbException();
+            }
             catch (Exception e)
             {
                 this.m_tracer.TraceError("Error registering signing certificate to identity {0} with {1} - {2}", identity.Name, x509Certificate.Subject, e.Message);
@@ -321,6 +442,10 @@ namespace SanteDB.Persistence.Data.Services
                         return true;
                     }
                 }
+            }
+            catch (DbException e)
+            {
+                throw e.TranslateDbException();
             }
             catch (Exception e)
             {

@@ -15,14 +15,15 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
+using SanteDB.Core.BusinessRules;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
 using System;
+using System.Data.Common;
 using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
@@ -75,6 +76,33 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             }
 
             return retVal;
+        }
+
+
+        /// <inheritdoc/>
+        protected override DbActParticipation DoInsertInternal(DataContext context, DbActParticipation dbModel)
+        {
+            try
+            {
+                return base.DoInsertInternal(context, dbModel);
+            }
+            catch (DbException e) when (e.Message.Contains("ACT PARTICIPATION FAILED VALIDATION") || e.Message.Contains("Validation error: Relationship"))
+            {
+                throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "data.relationship.validation", $"Participation of type {dbModel.ParticipationRoleKey} between {dbModel.SourceKey} and {dbModel.TargetKey} is invalid", DetectedIssueKeys.CodificationIssue, e);
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override DbActParticipation DoUpdateInternal(DataContext context, DbActParticipation dbModel)
+        {
+            try
+            {
+                return base.DoUpdateInternal(context, dbModel);
+            }
+            catch (DbException e) when (e.Message.Contains("ACT PARTICIPATION FAILED VALIDATION") || e.Message.Contains("Validation error: Relationship"))
+            {
+                throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "data.relationship.validation", $"Participation of type {dbModel.ParticipationRoleKey} between {dbModel.SourceKey} and {dbModel.TargetKey} is invalid", DetectedIssueKeys.CodificationIssue, e);
+            }
         }
     }
 }

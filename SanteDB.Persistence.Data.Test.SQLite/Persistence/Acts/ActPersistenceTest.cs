@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using NUnit.Framework;
 using SanteDB.Core;
@@ -371,6 +369,10 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                 Assert.AreEqual("Allergy Testing Protocol", afterQuery.LoadProperty(o => o.Protocols).First().LoadProperty(o => o.Protocol).Name);
                 Assert.IsFalse(afterQuery.IsNegated);
 
+                var place = afterInsert.LoadProperty(o=>o.Participations)[0].LoadProperty(o=>o.PlayerEntity);
+                // Attempt delay load
+                var participations = place.LoadProperty(o => o.Participations);
+                Assert.AreEqual(1, participations.Count());
             }
         }
 

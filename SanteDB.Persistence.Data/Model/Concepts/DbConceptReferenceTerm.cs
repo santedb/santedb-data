@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.OrmLite.Attributes;
 using System;
@@ -45,7 +43,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
         /// <summary>
         /// Gets or sets the relationship type id
         /// </summary>
-        [Column("rel_typ_id")]
+        [Column("rel_typ_id"), ForeignKey(typeof(DbConceptRelationshipType), nameof(DbConceptRelationshipType.Key))]
         public Guid RelationshipTypeKey { get; set; }
     }
 }

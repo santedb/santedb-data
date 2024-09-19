@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
@@ -39,6 +37,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override PlaceService BeforePersisting(DataContext context, PlaceService data)
         {
             data.ServiceConceptKey = this.EnsureExists(context, data.ServiceConcept)?.Key ?? data.ServiceConceptKey;
+            data.ServiceSchedule = data.ServiceSchedule ?? "{\"schedule\":[]}";
             return base.BeforePersisting(context, data);
         }
 

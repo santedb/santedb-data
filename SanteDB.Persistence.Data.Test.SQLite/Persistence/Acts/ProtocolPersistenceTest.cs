@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using NUnit.Framework;
 using SanteDB.Core;
@@ -63,7 +61,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
             /// <summary>
             /// Gets the protocols
             /// </summary>
-            public IEnumerable<ICdssProtocol> GetProtocols(Patient forPatient, String forType)
+            public IEnumerable<ICdssProtocol> GetProtocols(Patient forPatient, IDictionary<String, Object> parameters,  params String[] forType)
             {
                 yield return this.m_protocol;
             }
@@ -126,6 +124,12 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
             public IAnnotatedResource CopyAnnotations(IAnnotatedResource other)
             {
                 throw new NotImplementedException();
+            }
+
+            public IEnumerable<Protocol> GetProtocolDefinitions()
+            {
+                yield break;
+
             }
         }
 

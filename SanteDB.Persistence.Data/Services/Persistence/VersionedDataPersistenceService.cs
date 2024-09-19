@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
@@ -102,14 +100,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     if (existing.Count() > 1) // We only keep recent and last
                     {
                         var lastVersionSequence = existing[0].VersionSequenceId;
-
                         this.DoDeleteAllModel(context, o => o.Key == key && o.VersionSequence < lastVersionSequence, DeleteMode.PermanentDelete);
                     }
                 }
                 else
                 {
                     // We want to obsolete the non current version(s)
-                    foreach (var itm in context.Query<TDbModel>(o => o.Key == key && o.ObsoletionTime == null))
+                    foreach (var itm in context.Query<TDbModel>(o => o.Key == key && o.ObsoletionTime == null).ToArray())
                     {
                         itm.ObsoletionTime = DateTimeOffset.Now;
                         itm.ObsoletedByKey = context.ContextId;
@@ -869,10 +866,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<TModelAssociation> UpdateModelVersionedAssociations<TModelAssociation>(DataContext context, TModel data, IEnumerable<TModelAssociation> associations)
             where TModelAssociation : IdentifiedData, IVersionedAssociation, new()
         {
+
             if (data == null || data.Key.GetValueOrDefault() == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(IdentifiedData.Key), ErrorMessages.ARGUMENT_NULL);
             }
+
+            context.PushData(DataConstants.NoTouchSourceContextKey, true);
 
             // We now want to fetch the perssitence serivce of this
             var persistenceService = typeof(TModelAssociation).GetRelatedPersistenceService() as IAdoPersistenceProvider<TModelAssociation>;
@@ -938,8 +938,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return a;
             });
 
-
-            return updatedRelationships.Union(addedRelationships).ToArray();
+            var retVal = updatedRelationships.Union(addedRelationships).ToArray();
+            context.PopData(DataConstants.NoTouchSourceContextKey, out _);
+            return retVal;
         }
 
         /// <summary>

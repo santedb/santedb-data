@@ -15,14 +15,15 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
+using SanteDB.Core.BusinessRules;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
 using System;
+using System.Data.Common;
 using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
@@ -58,6 +59,32 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             data.HolderKey = this.EnsureExists(context, data.Holder)?.Key ?? data.HolderKey;
 
             return base.BeforePersisting(context, data);
+        }
+
+        /// <inheritdoc/>
+        protected override DbEntityRelationship DoInsertInternal(DataContext context, DbEntityRelationship dbModel)
+        {
+            try
+            {
+                return base.DoInsertInternal(context, dbModel);
+            }
+            catch(DbException e) when (e.Message.Contains("ENTITY RELATIONSHIP FAILED VALIDATION") || e.Message.Contains("Validation error: Relationship"))
+            {
+                throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "data.relationship.validation", $"Relationship of type {dbModel.RelationshipTypeKey} between {dbModel.SourceKey} and {dbModel.TargetKey} is invalid", DetectedIssueKeys.CodificationIssue, e);
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override DbEntityRelationship DoUpdateInternal(DataContext context, DbEntityRelationship dbModel)
+        {
+            try
+            {
+                return base.DoUpdateInternal(context, dbModel);
+            }
+            catch (DbException e) when (e.Message.Contains("ENTITY RELATIONSHIP FAILED VALIDATION") || e.Message.Contains("Validation error: Relationship"))
+            {
+                throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "data.relationship.validation", $"Relationship of type {dbModel.RelationshipTypeKey} between {dbModel.SourceKey} and {dbModel.TargetKey} is invalid", DetectedIssueKeys.CodificationIssue, e);
+            }
         }
 
         /// <summary>

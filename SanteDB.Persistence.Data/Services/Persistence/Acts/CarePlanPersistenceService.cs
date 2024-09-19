@@ -15,13 +15,12 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
@@ -41,8 +40,32 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         }
 
         /// <inheritdoc/>
-        protected override void DoCopyVersionSubTableInternal(DataContext context, DbActVersion newVersion)
+        protected override CarePlan BeforePersisting(DataContext context, CarePlan data)
         {
+            data.CarePathwayKey = this.EnsureExists(context, data.CarePathway)?.Key ?? data.CarePathwayKey;
+            return base.BeforePersisting(context, data);
+        }
+
+        /// <inheritdoc/>
+        protected override CarePlan DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
+        {
+            var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+            var dbCarePlan = referenceObjects?.OfType<DbCarePlan>().FirstOrDefault();
+            if (dbCarePlan == null)
+            {
+                this.m_tracer.TraceWarning("Using slow loading of careplan data (hint: use the appropriate persistence API)");
+                dbCarePlan = context.FirstOrDefault<DbCarePlan>(o => o.ParentKey == dbModel.VersionKey);
+            }
+
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            {
+                case LoadMode.FullLoad:
+                    retVal.CarePathway = retVal.CarePathway.GetRelatedPersistenceService().Get(context, dbCarePlan.CarePathwayKey.GetValueOrDefault());
+                    retVal.SetLoaded(o => o.CarePathway);
+                    break;
+            }
+            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbCarePlan, CarePlan>(dbCarePlan), declaredOnly: true);
+            return retVal;
         }
 
     }

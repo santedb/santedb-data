@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
@@ -32,6 +30,7 @@ using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model;
+using SanteDB.Persistence.Data.Model.Entities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -1130,10 +1129,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
         }
 
-        private TModel DoDeleteModel(DataContext context, Guid key, object p)
-        {
-            throw new NotImplementedException();
-        }
 
         /// <summary>
         /// Delete all objects according to the current <see cref="DataPersistenceControlContext"/>
@@ -1237,6 +1232,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
         /// <inheritdoc/>
         public IdentifiedData Update(DataContext context, IdentifiedData data) => this.DoUpdateModel(context, data.Convert<TModel>());
+
+        /// <summary>
+        /// Touches the specified model so that the object is synchronized
+        /// </summary>
+        object IAdoPersistenceProvider.Touch(DataContext context, Guid id) => this.DoTouchModel(context, id);
 
         /// <summary>
         /// Touch the specified object

@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Data.Import;
@@ -259,7 +257,7 @@ namespace SanteDB.Persistence.Data.Services
                                                             SourceKey = foreignDataId,
                                                             LogicalId = itm.Id,
                                                             Priority = itm.Priority,
-                                                            Text = itm.Text
+                                                            Text = itm.Text.Substring(0, itm.Text.Length > 512 ? 512 : itm.Text.Length)
                                                         });
                                                     }
 

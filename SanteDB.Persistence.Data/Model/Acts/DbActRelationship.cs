@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Concepts;
@@ -72,7 +70,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// Negation indicator
         /// </summary>
-        [Column("neg_ind")]
+        [Column("neg_ind"), NotNull]
         public bool NegationIndicator { get; set; }
     }
 }

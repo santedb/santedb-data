@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using NUnit.Framework;
 using SanteDB.Core;
@@ -173,7 +171,7 @@ namespace SanteDB.Persistence.Data.Test
             }
             catch (Exception e)
             {
-                Assert.Fail($"Improper authentication error - Expected {typeof(AuthenticationException)} but got {e.GetType()}");
+                Assert.Fail($"Improper authentication error - Expected {this.m_localizationService.GetString(ErrorMessageStrings.AUTH_DEV_LOCKED)} but got {e.Message}");
             }
         }
 

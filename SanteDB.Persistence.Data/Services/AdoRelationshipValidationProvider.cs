@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
@@ -403,6 +401,9 @@ namespace SanteDB.Persistence.Data.Services
 
 
         }
+
+        /// <inheritdoc/>
+        object IAdoPersistenceProvider.Touch(DataContext context, Guid id) => this.Touch(context, id);
 
         /// <inheritdoc/>
         public RelationshipValidationRule Touch(DataContext context, Guid id)

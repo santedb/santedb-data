@@ -38,7 +38,7 @@ BEGIN
 		(SELECT 1
 			FROM  
 				cd_set_mem_assoc_tbl csmt
-				LEFT JOIN cd_set_comp_assoc_tbl csct ON (csct.trg_set_id = csmt.set_id)
+				LEFT JOIN cd_set_comp_assoc_tbl csct ON (csct.set_id = csmt.set_id)
 				INNER JOIN cd_set_tbl cst ON (cst.set_id = csct.set_id OR cst.set_id = csmt.set_id)
 			WHERE 
 				(cst.mnemonic = set_mnemonic_in AND COALESCE(csct.rol_cs, 1) = 1
