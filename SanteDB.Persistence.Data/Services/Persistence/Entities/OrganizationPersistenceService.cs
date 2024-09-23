@@ -39,7 +39,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc/>
         protected override Organization BeforePersisting(DataContext context, Organization data)
         {
-            data.IndustryConceptKey = this.EnsureExists(context, data.IndustryConcept)?.Key ?? data.IndustryConceptKey;
+            data.IndustryConceptKey = data.IndustryConceptKey ?? this.EnsureExists(context, data.IndustryConcept)?.Key;
             return base.BeforePersisting(context, data);
         }
 

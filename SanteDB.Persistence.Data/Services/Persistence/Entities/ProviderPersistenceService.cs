@@ -40,7 +40,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc/>
         protected override Provider BeforePersisting(DataContext context, Provider data)
         {
-            data.SpecialtyKey = this.EnsureExists(context, data.Specialty)?.Key ?? data.SpecialtyKey;
+            data.SpecialtyKey = data.SpecialtyKey ?? this.EnsureExists(context, data.Specialty)?.Key;
             return base.BeforePersisting(context, data);
         }
 

@@ -329,15 +329,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 data.StatusConceptKey = StatusKeys.New;
             }
 
-            data.ClassConceptKey = this.EnsureExists(context, data.ClassConcept)?.Key ?? data.ClassConceptKey;
-            data.CreationActKey = this.EnsureExists(context, data.CreationAct)?.Key ?? data.CreationActKey;
-            data.DeterminerConceptKey = this.EnsureExists(context, data.DeterminerConcept)?.Key ?? data.DeterminerConceptKey;
-            data.StatusConceptKey = this.EnsureExists(context, data.StatusConcept)?.Key ?? data.StatusConceptKey;
-            data.TemplateKey = this.EnsureExists(context, data.Template)?.Key ?? data.TemplateKey;
-            data.TypeConceptKey = this.EnsureExists(context, data.TypeConcept)?.Key ?? data.TypeConceptKey;
+            data.ClassConceptKey = data.ClassConceptKey ?? this.EnsureExists(context, data.ClassConcept)?.Key;
+            data.CreationActKey = data.CreationActKey ?? this.EnsureExists(context, data.CreationAct)?.Key;
+            data.DeterminerConceptKey = data.DeterminerConceptKey ?? this.EnsureExists(context, data.DeterminerConcept)?.Key;
+            data.StatusConceptKey = data.StatusConceptKey ?? this.EnsureExists(context, data.StatusConcept)?.Key;
+            data.TemplateKey = data.TemplateKey ?? this.EnsureExists(context, data.Template)?.Key;
+            data.TypeConceptKey = data.TypeConceptKey ?? this.EnsureExists(context, data.TypeConcept)?.Key;
 
             // Geo-tagging
-            data.GeoTagKey = this.EnsureExists(context, data.GeoTag)?.Key ?? data.GeoTagKey;
+            data.GeoTagKey = data.GeoTagKey ?? this.EnsureExists(context, data.GeoTag)?.Key;
 
             // Prepare any detected issues
             var issues = this.VerifyEntity(context, data).ToArray();

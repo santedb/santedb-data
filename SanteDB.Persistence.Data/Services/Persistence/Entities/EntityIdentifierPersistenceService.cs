@@ -43,8 +43,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override EntityIdentifier BeforePersisting(DataContext context, EntityIdentifier data)
         {
-            data.IdentityDomainKey = this.EnsureExists(context, data.IdentityDomain)?.Key ?? data.IdentityDomainKey;
-            data.IdentifierTypeKey = this.EnsureExists(context, data.IdentifierType)?.Key ?? data.IdentifierTypeKey;
+            data.IdentityDomainKey = data.IdentityDomainKey ?? this.EnsureExists(context, data.IdentityDomain)?.Key;
+            data.IdentifierTypeKey = data.IdentifierTypeKey ?? this.EnsureExists(context, data.IdentifierType)?.Key;
             return base.BeforePersisting(context, data);
         }
 

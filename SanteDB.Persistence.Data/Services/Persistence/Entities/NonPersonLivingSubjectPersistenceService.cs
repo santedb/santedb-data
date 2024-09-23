@@ -37,7 +37,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc />
         protected override NonPersonLivingSubject BeforePersisting(DataContext context, NonPersonLivingSubject data)
         {
-            data.StrainKey = this.EnsureExists(context, data.Strain)?.Key ?? data.StrainKey;
+            data.StrainKey = data.StrainKey ?? this.EnsureExists(context, data.Strain)?.Key;
             return base.BeforePersisting(context, data);
         }
 

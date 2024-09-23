@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override EntityName BeforePersisting(DataContext context, EntityName data)
         {
-            data.NameUseKey = this.EnsureExists(context, data.NameUse)?.Key ?? data.NameUseKey;
+            data.NameUseKey = data.NameUseKey ?? this.EnsureExists(context, data.NameUse)?.Key;
             return base.BeforePersisting(context, data);
         }
 

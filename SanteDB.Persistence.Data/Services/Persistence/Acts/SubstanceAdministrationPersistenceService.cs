@@ -39,9 +39,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override SubstanceAdministration BeforePersisting(DataContext context, SubstanceAdministration data)
         {
-            data.DoseUnitKey = this.EnsureExists(context, data.DoseUnit)?.Key ?? data.DoseUnitKey;
-            data.RouteKey = this.EnsureExists(context, data.Route)?.Key ?? data.RouteKey;
-            data.SiteKey = this.EnsureExists(context, data.Site)?.Key ?? data.SiteKey;
+            data.DoseUnitKey = data.DoseUnitKey ?? this.EnsureExists(context, data.DoseUnit)?.Key;
+            data.RouteKey = data.RouteKey ?? this.EnsureExists(context, data.Route)?.Key;
+            data.SiteKey = data.SiteKey ?? this.EnsureExists(context, data.Site)?.Key;
             return base.BeforePersisting(context, data);
         }
 

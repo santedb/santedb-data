@@ -51,10 +51,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override ActParticipation BeforePersisting(DataContext context, ActParticipation data)
         {
-            data.ClassificationKey = this.EnsureExists(context, data.Classification)?.Key ?? data.ClassificationKey;
-            data.ParticipationRoleKey = this.EnsureExists(context, data.ParticipationRole)?.Key ?? data.ParticipationRoleKey;
-            data.PlayerEntityKey = this.EnsureExists(context, data.PlayerEntity)?.Key ?? data.PlayerEntityKey;
-            data.ActKey = this.EnsureExists(context, data.Act)?.Key ?? data.ActKey;
+            data.ClassificationKey = data.ClassificationKey ?? this.EnsureExists(context, data.Classification)?.Key;
+            data.ParticipationRoleKey = data.ParticipationRoleKey ?? this.EnsureExists(context, data.ParticipationRole)?.Key;
+            data.PlayerEntityKey = data.PlayerEntityKey ?? this.EnsureExists(context, data.PlayerEntity)?.Key;
+            data.ActKey = data.ActKey ?? this.EnsureExists(context, data.Act)?.Key;
             return base.BeforePersisting(context, data);
         }
 

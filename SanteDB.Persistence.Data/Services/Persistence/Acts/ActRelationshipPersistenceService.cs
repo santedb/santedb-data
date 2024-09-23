@@ -52,10 +52,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// </summary>
         protected override ActRelationship BeforePersisting(DataContext context, ActRelationship data)
         {
-            data.ClassificationKey = this.EnsureExists(context, data.Classification)?.Key ?? data.ClassificationKey;
-            data.RelationshipTypeKey = this.EnsureExists(context, data.RelationshipType)?.Key ?? data.RelationshipTypeKey;
-            data.TargetActKey = this.EnsureExists(context, data.TargetAct)?.Key ?? data.TargetActKey;
-            data.SourceEntityKey = this.EnsureExists(context, data.SourceEntity)?.Key ?? data.SourceEntityKey;
+            data.ClassificationKey = data.ClassificationKey ?? this.EnsureExists(context, data.Classification)?.Key;
+            data.RelationshipTypeKey = data.RelationshipTypeKey ?? this.EnsureExists(context, data.RelationshipType)?.Key;
+            data.TargetActKey = data.TargetActKey ?? this.EnsureExists(context, data.TargetAct)?.Key;
+            data.SourceEntityKey = data.SourceEntityKey ?? this.EnsureExists(context, data.SourceEntity)?.Key;
             return base.BeforePersisting(context, data);
         }
 

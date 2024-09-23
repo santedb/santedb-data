@@ -50,7 +50,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override EntityAddress BeforePersisting(DataContext context, EntityAddress data)
         {
-            data.AddressUseKey = this.EnsureExists(context, data.AddressUse)?.Key ?? data.AddressUseKey;
+            data.AddressUseKey = data.AddressUseKey ?? this.EnsureExists(context, data.AddressUse)?.Key;
             
             // If the address is a place reference we want to supplement the data going into the database with the appropriate information
             if(Guid.TryParse(data.Component?.Find(p=>p.ComponentTypeKey == AddressComponentKeys.PlaceReference)?.Value, out var placeUuid))

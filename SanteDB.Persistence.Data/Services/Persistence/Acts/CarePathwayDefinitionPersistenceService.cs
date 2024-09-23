@@ -39,7 +39,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override CarePathwayDefinition BeforePersisting(DataContext context, CarePathwayDefinition data)
         {
-            data.TemplateKey = this.EnsureExists(context, data.Template)?.Key ?? data.TemplateKey;
+            data.TemplateKey = data.TemplateKey ?? this.EnsureExists(context, data.Template)?.Key;
             return base.BeforePersisting(context, data);
         }
 

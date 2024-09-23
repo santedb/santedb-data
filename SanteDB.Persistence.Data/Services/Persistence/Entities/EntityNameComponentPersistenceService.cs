@@ -41,7 +41,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override EntityNameComponent BeforePersisting(DataContext context, EntityNameComponent data)
         {
-            data.ComponentTypeKey = this.EnsureExists(context, data.ComponentType)?.Key ?? data.ComponentTypeKey;
+            data.ComponentTypeKey = data.ComponentTypeKey ?? this.EnsureExists(context, data.ComponentType)?.Key;
             
             return base.BeforePersisting(context, data);
         }

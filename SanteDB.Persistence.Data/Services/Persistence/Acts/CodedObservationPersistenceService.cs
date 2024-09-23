@@ -40,7 +40,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override CodedObservation BeforePersisting(DataContext context, CodedObservation data)
         {
-            data.ValueKey = this.EnsureExists(context, data.Value)?.Key ?? data.ValueKey;
+            data.ValueKey = data.ValueKey ?? this.EnsureExists(context, data.Value)?.Key;
             return base.BeforePersisting(context, data);
         }
 

@@ -38,7 +38,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override ActProtocol BeforePersisting(DataContext context, ActProtocol data)
         {
-            data.ProtocolKey = this.EnsureExists(context, data.Protocol)?.Key ?? data.ProtocolKey;
+            data.ProtocolKey = data.ProtocolKey ?? this.EnsureExists(context, data.Protocol)?.Key;
             return base.BeforePersisting(context, data);
         }
 

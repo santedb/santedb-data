@@ -39,9 +39,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override Procedure BeforePersisting(DataContext context, Procedure data)
         {
-            data.ApproachSiteKey = this.EnsureExists(context, data.ApproachSite)?.Key ?? data.ApproachSiteKey;
-            data.MethodKey = this.EnsureExists(context, data.Method)?.Key ?? data.MethodKey;
-            data.TargetSiteKey = this.EnsureExists(context, data.TargetSite)?.Key ?? data.TargetSiteKey;
+            data.ApproachSiteKey = data.ApproachSiteKey ?? this.EnsureExists(context, data.ApproachSite)?.Key;
+            data.MethodKey = data.MethodKey ?? this.EnsureExists(context, data.Method)?.Key;
+            data.TargetSiteKey = data.TargetSiteKey ?? this.EnsureExists(context, data.TargetSite)?.Key;
             return base.BeforePersisting(context, data);
         }
 

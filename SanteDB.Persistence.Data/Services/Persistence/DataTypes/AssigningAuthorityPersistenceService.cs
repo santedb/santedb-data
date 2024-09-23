@@ -45,7 +45,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <inheritdoc/>
         protected override AssigningAuthority BeforePersisting(DataContext context, AssigningAuthority data)
         {
-            data.SourceEntityKey = this.EnsureExists(context, data.SourceEntity)?.Key ?? data.SourceEntityKey;
+            data.SourceEntityKey = data.SourceEntityKey ?? this.EnsureExists(context, data.SourceEntity)?.Key;
             return base.BeforePersisting(context, data);
         }
 

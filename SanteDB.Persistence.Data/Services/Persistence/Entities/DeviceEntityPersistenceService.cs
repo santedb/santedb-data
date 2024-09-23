@@ -41,8 +41,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc/>
         protected override DeviceEntity BeforePersisting(DataContext context, DeviceEntity data)
         {
-            data.SecurityDeviceKey = this.EnsureExists(context, data.SecurityDevice)?.Key ?? data.SecurityDeviceKey;
-            data.GeoTagKey = this.EnsureExists(context, data.GeoTag)?.Key ?? data.GeoTagKey;
+            data.SecurityDeviceKey = data.SecurityDeviceKey ?? this.EnsureExists(context, data.SecurityDevice)?.Key;
+            data.GeoTagKey = data.GeoTagKey ?? this.EnsureExists(context, data.GeoTag)?.Key;
 
             // The data may be synchronized from an upstream - if so we want to ensure our security user actually exists
             if (data.SecurityDeviceKey.HasValue &&

@@ -71,8 +71,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc/>
         protected override Material BeforePersisting(DataContext context, Material data)
         {
-            data.FormConceptKey = this.EnsureExists(context, data.FormConcept)?.Key ?? data.FormConceptKey;
-            data.QuantityConceptKey = this.EnsureExists(context, data.QuantityConcept)?.Key ?? data.QuantityConceptKey;
+            data.FormConceptKey = data.FormConceptKey ?? this.EnsureExists(context, data.FormConcept)?.Key;
+            data.QuantityConceptKey = data.QuantityConceptKey ?? this.EnsureExists(context, data.QuantityConcept)?.Key;
             return base.BeforePersisting(context, data);
         }
 
