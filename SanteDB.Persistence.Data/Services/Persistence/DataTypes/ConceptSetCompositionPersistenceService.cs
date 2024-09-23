@@ -40,7 +40,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override ConceptSetComposition BeforePersisting(DataContext context, ConceptSetComposition data)
         {
             if (data.Operation == 0) { data.Operation = ConceptSetCompositionOperation.Include; }
-            data.TargetKey = data.TargetKey ?? this.EnsureExists(context, data.Target)?.Key;
+            data.TargetKey = this.EnsureExists(context, data.Target)?.Key ?? data.TargetKey;
             return base.BeforePersisting(context, data);
         }
 

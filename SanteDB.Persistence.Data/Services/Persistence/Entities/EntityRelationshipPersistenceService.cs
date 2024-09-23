@@ -52,11 +52,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override EntityRelationship BeforePersisting(DataContext context, EntityRelationship data)
         {
-            data.ClassificationKey = data.ClassificationKey ?? this.EnsureExists(context, data.Classification)?.Key;
-            data.RelationshipRoleKey = data.RelationshipRoleKey ?? this.EnsureExists(context, data.RelationshipRole)?.Key;
-            data.RelationshipTypeKey = data.RelationshipTypeKey ?? this.EnsureExists(context, data.RelationshipType)?.Key;
-            data.TargetEntityKey = data.TargetEntityKey ?? this.EnsureExists(context, data.TargetEntity)?.Key;
-            data.HolderKey = data.HolderKey ?? this.EnsureExists(context, data.Holder)?.Key;
+            data.ClassificationKey = this.EnsureExists(context, data.Classification)?.Key ?? data.ClassificationKey;
+            data.RelationshipRoleKey = this.EnsureExists(context, data.RelationshipRole)?.Key ?? data.RelationshipRoleKey;
+            data.RelationshipTypeKey = this.EnsureExists(context, data.RelationshipType)?.Key ?? data.RelationshipTypeKey;
+            data.TargetEntityKey = this.EnsureExists(context, data.TargetEntity)?.Key ?? data.TargetEntityKey;
+            data.HolderKey = this.EnsureExists(context, data.Holder)?.Key ?? data.HolderKey;
 
             return base.BeforePersisting(context, data);
         }

@@ -75,8 +75,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override PatientEncounter BeforePersisting(DataContext context, PatientEncounter data)
         {
-            data.DischargeDispositionKey = data.DischargeDispositionKey ?? this.EnsureExists(context, data.DischargeDisposition)?.Key;
-            data.AdmissionSourceTypeKey = data.AdmissionSourceTypeKey ?? this.EnsureExists(context, data.AdmissionSourceType)?.Key;
+            data.DischargeDispositionKey = this.EnsureExists(context, data.DischargeDisposition)?.Key ?? data.DischargeDispositionKey;
+            data.AdmissionSourceTypeKey = this.EnsureExists(context, data.AdmissionSourceType)?.Key ?? data.AdmissionSourceTypeKey;
             if (data.SpecialArrangements != null)
             {
                 foreach (var itm in data.SpecialArrangements)

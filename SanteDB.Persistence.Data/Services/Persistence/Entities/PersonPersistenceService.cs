@@ -39,10 +39,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc />
         protected override Person BeforePersisting(DataContext context, Person data)
         {
-            data.OccupationKey = data.OccupationKey ?? this.EnsureExists(context, data.Occupation)?.Key;
-            data.GenderConceptKey = data.GenderConceptKey ?? this.EnsureExists(context, data.GenderConcept)?.Key;
-            data.NationalityKey = data.NationalityKey ?? this.EnsureExists(context, data.Nationality)?.Key;
-            data.VipStatusKey = data.VipStatusKey ?? this.EnsureExists(context, data.VipStatus)?.Key;
+            data.OccupationKey = this.EnsureExists(context, data.Occupation)?.Key ?? data.OccupationKey;
+            data.GenderConceptKey = this.EnsureExists(context, data.GenderConcept)?.Key ?? data.GenderConceptKey;
+            data.NationalityKey = this.EnsureExists(context, data.Nationality)?.Key ?? data.NationalityKey;
+            data.VipStatusKey = this.EnsureExists(context, data.VipStatus)?.Key ?? data.VipStatusKey;
             return base.BeforePersisting(context, data);
         }
 

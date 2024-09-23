@@ -43,7 +43,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override EntityNote BeforePersisting(DataContext context, EntityNote data)
         {
-            data.AuthorKey = data.AuthorKey ?? this.EnsureExists(context, data.Author)?.Key;
+            data.AuthorKey = this.EnsureExists(context, data.Author)?.Key ?? data.AuthorKey;
 
             if(!data.AuthorKey.HasValue && context.Data.TryGetValue("provenance", out var prov) && prov is DbSecurityProvenance dbProv)
             {

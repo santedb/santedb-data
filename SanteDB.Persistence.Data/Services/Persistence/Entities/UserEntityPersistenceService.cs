@@ -43,7 +43,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override UserEntity BeforePersisting(DataContext context, UserEntity data)
         {
-            data.SecurityUserKey = data.SecurityUserKey ?? this.EnsureExists(context, data.SecurityUser)?.Key;
+            data.SecurityUserKey = this.EnsureExists(context, data.SecurityUser)?.Key ?? data.SecurityUserKey;
 
             // The data may be synchronized from an upstream - if so we want to ensure our security user actually exists
             // TODO: This data will need to be downloaded when the user logs in

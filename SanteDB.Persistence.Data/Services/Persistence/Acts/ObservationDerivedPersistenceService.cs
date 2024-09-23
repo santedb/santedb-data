@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override TModel BeforePersisting(DataContext context, TModel data)
         {
-            data.InterpretationConceptKey = data.InterpretationConceptKey ?? this.EnsureExists(context, data.InterpretationConcept)?.Key;
+            data.InterpretationConceptKey = this.EnsureExists(context, data.InterpretationConcept)?.Key ?? data.InterpretationConceptKey;
             return base.BeforePersisting(context, data);
         }
 

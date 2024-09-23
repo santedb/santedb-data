@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override CarePlan BeforePersisting(DataContext context, CarePlan data)
         {
-            data.CarePathwayKey = data.CarePathwayKey ?? this.EnsureExists(context, data.CarePathway)?.Key;
+            data.CarePathwayKey = this.EnsureExists(context, data.CarePathway)?.Key ?? data.CarePathwayKey;
             return base.BeforePersisting(context, data);
         }
 

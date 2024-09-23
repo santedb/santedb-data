@@ -41,8 +41,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override EntityTelecomAddress BeforePersisting(DataContext context, EntityTelecomAddress data)
         {
-            data.AddressUseKey = data.AddressUseKey ?? this.EnsureExists(context, data.AddressUse)?.Key;
-            data.TypeConceptKey = data.TypeConceptKey ?? this.EnsureExists(context, data.TypeConcept)?.Key;
+            data.AddressUseKey = this.EnsureExists(context, data.AddressUse)?.Key ?? data.AddressUseKey;
+            data.TypeConceptKey = this.EnsureExists(context, data.TypeConcept)?.Key ?? data.TypeConceptKey;
 
             return base.BeforePersisting(context, data);
         }

@@ -49,8 +49,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// </summary>
         protected override ConceptRelationship BeforePersisting(DataContext context, ConceptRelationship data)
         {
-            data.RelationshipTypeKey = data.RelationshipTypeKey ?? this.EnsureExists(context, data.RelationshipType)?.Key;
-            data.TargetConceptKey = data.TargetConceptKey ?? this.EnsureExists(context, data.TargetConcept)?.Key;
+            data.RelationshipTypeKey = this.EnsureExists(context, data.RelationshipType)?.Key ?? data.RelationshipTypeKey;
+            data.TargetConceptKey = this.EnsureExists(context, data.TargetConcept)?.Key ?? data.TargetConceptKey;
             return data;
         }
 

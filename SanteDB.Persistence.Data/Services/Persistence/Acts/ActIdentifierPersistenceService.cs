@@ -42,8 +42,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// </summary>
         protected override ActIdentifier BeforePersisting(DataContext context, ActIdentifier data)
         {
-            data.IdentityDomainKey = data.IdentityDomainKey ?? this.EnsureExists(context, data.IdentityDomain)?.Key;
-            data.IdentifierTypeKey = data.IdentifierTypeKey ?? this.EnsureExists(context, data.IdentifierType)?.Key;
+            data.IdentityDomainKey = this.EnsureExists(context, data.IdentityDomain)?.Key ?? data.IdentityDomainKey;
+            data.IdentifierTypeKey = this.EnsureExists(context, data.IdentifierType)?.Key ?? data.IdentifierTypeKey;
             return base.BeforePersisting(context, data);
         }
 

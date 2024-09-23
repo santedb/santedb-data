@@ -38,7 +38,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override PatientEncounterArrangement BeforePersisting(DataContext context, PatientEncounterArrangement data)
         {
-            data.ArrangementTypeKey = data.ArrangementTypeKey ?? this.EnsureExists(context, data.ArrangementType)?.Key;
+            data.ArrangementTypeKey = this.EnsureExists(context, data.ArrangementType)?.Key ?? data.ArrangementTypeKey;
             return base.BeforePersisting(context, data);
         }
 

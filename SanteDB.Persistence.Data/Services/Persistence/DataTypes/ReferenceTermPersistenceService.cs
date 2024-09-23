@@ -53,7 +53,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// </summary>
         protected override ReferenceTerm BeforePersisting(DataContext context, ReferenceTerm data)
         {
-            data.CodeSystemKey = data.CodeSystemKey ?? this.EnsureExists(context, data.CodeSystem)?.Key;
+            data.CodeSystemKey = this.EnsureExists(context, data.CodeSystem)?.Key ?? data.CodeSystemKey;
             return base.BeforePersisting(context, data);
         }
 

@@ -43,7 +43,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override ApplicationEntity BeforePersisting(DataContext context, ApplicationEntity data)
         {
-            data.SecurityApplicationKey = data.SecurityApplicationKey ?? this.EnsureExists(context, data.SecurityApplication)?.Key;
+            data.SecurityApplicationKey = this.EnsureExists(context, data.SecurityApplication)?.Key ?? data.SecurityApplicationKey;
             // The data may be synchronized from an upstream - if so we want to ensure our security user actually exists
             if (data.SecurityApplicationKey.HasValue &&
                 data.GetAnnotations<string>().Contains(SystemTagNames.UpstreamDataTag) &&

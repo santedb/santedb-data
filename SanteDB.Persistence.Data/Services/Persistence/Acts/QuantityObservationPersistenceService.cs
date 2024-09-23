@@ -40,7 +40,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override QuantityObservation BeforePersisting(DataContext context, QuantityObservation data)
         {
-            data.UnitOfMeasureKey = data.UnitOfMeasureKey ?? this.EnsureExists(context, data.UnitOfMeasure)?.Key;
+            data.UnitOfMeasureKey = this.EnsureExists(context, data.UnitOfMeasure)?.Key ?? data.UnitOfMeasureKey;
             return base.BeforePersisting(context, data);
         }
 

@@ -79,31 +79,31 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc />
         protected override Patient BeforePersisting(DataContext context, Patient data)
         {
-            data.EducationLevelKey = data.EducationLevelKey ?? this.EnsureExists(context, data.EducationLevel)?.Key;
+            data.EducationLevelKey = this.EnsureExists(context, data.EducationLevel)?.Key ?? data.EducationLevelKey;
             if (data.EducationLevelKey.HasValue && !m_allowEducationLevel)
             {
                 throw new FieldRestrictionException(nameof(Patient.EducationLevel));
             }
 
-            data.EthnicGroupKey = data.EthnicGroupKey ?? this.EnsureExists(context, data.EthnicGroup)?.Key;
+            data.EthnicGroupKey = this.EnsureExists(context, data.EthnicGroup)?.Key ?? data.EthnicGroupKey;
             if (data.EthnicGroupKey.HasValue && !m_allowEthnicity)
             {
                 throw new FieldRestrictionException(nameof(Patient.EthnicGroup));
             }
 
-            data.MaritalStatusKey = data.MaritalStatusKey ?? this.EnsureExists(context, data.MaritalStatus)?.Key;
+            data.MaritalStatusKey = this.EnsureExists(context, data.MaritalStatus)?.Key ?? data.MaritalStatusKey;
             if (data.MaritalStatusKey.HasValue && !m_allowMaritalStatus)
             {
                 throw new FieldRestrictionException(nameof(Patient.MaritalStatus));
             }
 
-            data.LivingArrangementKey = data.LivingArrangementKey ?? this.EnsureExists(context, data.LivingArrangement)?.Key;
+            data.LivingArrangementKey = this.EnsureExists(context, data.LivingArrangement)?.Key ?? data.LivingArrangementKey;
             if (data.LivingArrangementKey.HasValue && !m_allowLivingArrangement)
             {
                 throw new FieldRestrictionException(nameof(Patient.LivingArrangement));
             }
 
-            data.ReligiousAffiliationKey = data.ReligiousAffiliationKey ?? this.EnsureExists(context, data.ReligiousAffiliation)?.Key;
+            data.ReligiousAffiliationKey = this.EnsureExists(context, data.ReligiousAffiliation)?.Key ?? data.ReligiousAffiliationKey;
             if (data.ReligiousAffiliationKey.HasValue && !m_allowReligion)
             {
                 throw new FieldRestrictionException(nameof(Patient.ReligiousAffiliation));
