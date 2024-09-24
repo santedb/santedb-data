@@ -493,14 +493,17 @@ namespace SanteDB.Persistence.PubSub.ADO
                         conn.DeleteAll<DbChannelSetting>(o => o.ChannelKey == key);
 
                         // Insert settings
-                        foreach (var itm in settings)
+                        if (settings != null)
                         {
-                            conn.Insert(new DbChannelSetting()
+                            foreach (var itm in settings)
                             {
-                                ChannelKey = dbExisting.Key.Value,
-                                Name = itm.Key,
-                                Value = itm.Value
-                            });
+                                conn.Insert(new DbChannelSetting()
+                                {
+                                    ChannelKey = dbExisting.Key.Value,
+                                    Name = itm.Key,
+                                    Value = itm.Value
+                                });
+                            }
                         }
 
                         var retVal = this.MapInstance(conn, dbExisting);
