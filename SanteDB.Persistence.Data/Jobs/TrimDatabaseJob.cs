@@ -20,6 +20,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Jobs;
 using SanteDB.Core.Model.Audit;
+using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
@@ -92,6 +93,7 @@ namespace SanteDB.Persistence.Data.Jobs
         public void Cancel()
         {
             this.m_cancelRequest = true;
+            this.m_jobStateManager.SetState(this, JobStateType.Cancelled);
         }
 
         /// <inheritdoc/>
@@ -114,6 +116,7 @@ namespace SanteDB.Persistence.Data.Jobs
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open();
+                    context.EstablishProvenance(AuthenticationContext.SystemPrincipal);
                     // First we want to trim old sessions
                     var cutoff = DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxSessionRetention.Value);
                     this.m_tracer.TraceInfo("Pruning sessions before {0}", cutoff);
@@ -146,6 +149,9 @@ namespace SanteDB.Persistence.Data.Jobs
                         var trimHelpers = this.m_serviceManager.GetServices().OfType<IAdoTrimProvider>().ToArray();
 
                         c = 0;
+                        var deletedCutoff = DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxDeletedDataRetention.Value);
+                        var oldVersionCutoff = DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxOldVersionRetention.Value);
+
                         foreach (var th in trimHelpers)
                         {
                             if (this.m_cancelRequest)
@@ -155,7 +161,7 @@ namespace SanteDB.Persistence.Data.Jobs
                             }
                             this.m_tracer.TraceInfo("Trimming {0}...", th.GetType().Name);
                             this.m_jobStateManager.SetProgress(this, this.m_localizationService.GetString(UserMessageStrings.DB_TRIM_OBJECTS, new { objectType = th.GetType().Name }), c++ / (float)trimHelpers.Length * 0.7f + 0.3f);
-                            th.Trim(context, DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxOldVersionRetention.Value), DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxDeletedDataRetention.Value), audit);
+                            th.Trim(context, oldVersionCutoff, deletedCutoff, audit);
                         }
 
                         tx.Commit();

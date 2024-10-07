@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20240104-04" name="Update:20240104-04"   invariantName="sqlite">
+ * <feature scope="SanteDB.Persistence.Data" id="20240104-05" name="Update:20240104-04"   invariantName="sqlite">
  *	<summary>Update: Adds persistence of data quality rules in the primary database</summary>
  *	<isInstalled>select count(*) > 0 from patch_db_systbl WHERE PATCH_ID = '20240104-04'</isInstalled>
  * </feature>

@@ -81,7 +81,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             {
                 foreach (var itm in data.SpecialArrangements)
                 {
-                    itm.ArrangementTypeKey = this.EnsureExists(context, itm.ArrangementType)?.Key ?? itm.ArrangementTypeKey;
+                    itm.ArrangementTypeKey = itm.ArrangementTypeKey ?? this.EnsureExists(context, itm.ArrangementType)?.Key;
                 }
             }
             return base.BeforePersisting(context, data);

@@ -19,13 +19,15 @@
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Model.Extensibility;
+using System;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 {
     /// <summary>
     /// Template definition persistence services
     /// </summary>
-    public class TemplateDefinitionPersistenceService : NonVersionedDataPersistenceService<TemplateDefinition, DbTemplateDefinition>
+    public class TemplateDefinitionPersistenceService : NonVersionedDataPersistenceService<TemplateDefinition, DbTemplateDefinition>, IAdoKeyResolver<DbTemplateDefinition>, IAdoKeyResolver<TemplateDefinition>
     {
         /// <summary>
         /// Persist the template definition to the database
@@ -33,5 +35,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         public TemplateDefinitionPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<DbTemplateDefinition, bool>> GetKeyExpression(DbTemplateDefinition model) => o => o.Oid == model.Oid || o.Mnemonic == model.Mnemonic || o.Key == model.Key;
+
+        /// <inheritdoc/>
+        public Expression<Func<TemplateDefinition, bool>> GetKeyExpression(TemplateDefinition model) => o => o.Oid == model.Oid || o.Mnemonic == model.Mnemonic || o.Key == model.Key;
     }
 }

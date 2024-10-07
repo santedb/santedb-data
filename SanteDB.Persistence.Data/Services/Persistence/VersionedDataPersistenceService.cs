@@ -884,11 +884,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Ensure either the relationship points to (key) (either source or target)
             associations = associations.Select(a =>
             {
-                if (a is ITargetedAssociation target && target.TargetEntityKey != data.Key && a.SourceEntityKey != data.Key ||
-                    a.SourceEntityKey.GetValueOrDefault() == Guid.Empty) // The target is a target association
+                if (a is ITargetedAssociation target)
+                {
+                    if (target.TargetEntityKey != data.Key && !a.SourceEntityKey.HasValue) // The target is a target association
+                    {
+                        a.SourceEntityKey = data.Key;
+                    }
+                    else if (target.SourceEntityKey.HasValue && !target.TargetEntityKey.HasValue) // Reverse relationship
+                    {
+                        target.TargetEntityKey = data.Key;
+                    }
+                }
+                else if (a.SourceEntityKey.GetValueOrDefault() == Guid.Empty)
                 {
                     a.SourceEntityKey = data.Key;
                 }
+
                 if (!a.Key.HasValue && a.BatchOperation != BatchOperationType.Insert
                     && this.TryGetKeyResolver<TModelAssociation>(out var keyResolver))
                 {
