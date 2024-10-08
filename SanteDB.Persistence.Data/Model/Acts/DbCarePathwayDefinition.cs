@@ -45,6 +45,12 @@ namespace SanteDB.Persistence.Data.Model.Acts
         public string Mnemonic { get; set; }
 
         /// <summary>
+        /// Gets the name of the care pathway
+        /// </summary>
+        [Column("name"), NotNull]
+        public string Name { get; set; }
+
+        /// <summary>
         /// Get or sets the description
         /// </summary>
         [Column("descr")]

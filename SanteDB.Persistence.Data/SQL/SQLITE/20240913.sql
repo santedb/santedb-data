@@ -1,16 +1,20 @@
 /** 
  * <feature scope="SanteDB.Persistence.Data" id="20240913" name="Update:20240913"  invariantName="sqlite">
  *	<summary>Update: Registers the care pathway table</summary>
- *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE name='CP_DEF_TBL')</isInstalled>
+ *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE name='CP_DEF_TBL' AND sql LIKE '%name %')</isInstalled>
  * </feature>
  */
  -- OPTIONAL
  ALTER TABLE CP_TBL DROP COLUMN PROG; 
  --#!
+ -- OPTIONAL
+ DROP TABLE IF EXISTS CP_DEF_TBL;
+ --#!
 
  CREATE TABLE CP_DEF_TBL (
 	PTH_ID BLOB(16) DEFAULT (RANDOMBLOB()) NOT NULL, 
 	MNEMONIC VARCHAR(128) NOT NULL UNIQUE, 
+	NAME VARCHAR(256) NOT NULL,
 	DESCR TEXT,
 	ENROL INT,
 	ELIG TEXT,
