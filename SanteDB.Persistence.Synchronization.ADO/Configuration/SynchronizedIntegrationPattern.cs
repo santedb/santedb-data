@@ -17,6 +17,7 @@
  * 
  */
 using SanteDB.BI.Services.Impl;
+using SanteDB.Cdss.Xml;
 using SanteDB.Client.Configuration;
 using SanteDB.Client.Disconnected.Data.Synchronization;
 using SanteDB.Client.Disconnected.Services;
@@ -63,6 +64,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                         typeof(AdoRoleProvider),
                         typeof(AdoDeviceIdentityProvider),
                         typeof(AdoApplicationIdentityProvider),
+                        typeof(AppletClinicalProtocolInstaller),
                         typeof(AdoSecurityChallengeProvider),
                         typeof(AdoCertificateIdentityProvider),
                         typeof(AdoFreetextSearchService),
