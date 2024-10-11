@@ -88,12 +88,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         {
                             if(data.BatchOperation == Core.Model.DataTypes.BatchOperationType.Update || data.BatchOperation == Core.Model.DataTypes.BatchOperationType.InsertOrUpdate && this.m_configuration.AutoUpdateExisting)
                             {
+                                data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
                                 return persistenceService.Update(context, data);
                             }
+                            existing.BatchOperation = Core.Model.DataTypes.BatchOperationType.Ignore;
                             return existing;
                         }
                         else if (DataPersistenceControlContext.Current?.AutoInsertChildren ?? this.m_configuration.AutoInsertChildren)
                         {
+                            data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
                             return persistenceService.Insert(context, data);
                         }
                         else
@@ -103,6 +106,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     }
                     else if (DataPersistenceControlContext.Current?.AutoInsertChildren ?? this.m_configuration.AutoInsertChildren)
                     {
+                        data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
                         return persistenceService.Insert(context, data);
                     }
                     else
@@ -112,6 +116,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
                 else
                 {
+                    data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Ignore;
                     return data;
                 }
             }
