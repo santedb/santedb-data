@@ -1,7 +1,7 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20240913-02" name="Update:20240913-02" invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20240913-03" name="Update:20240913-03" invariantName="npgsql">
  *	<summary>Update: Registers the care pathway table</summary>
- *	<isInstalled>select ck_patch('20240913-02')</isInstalled>
+ *	<isInstalled>select ck_patch('20240913-03')</isInstalled>
  * </feature>
  */
 
@@ -38,4 +38,8 @@
  -- OPTIONAL
  ALTER TABLE cp_tbl ADD CONSTRAINT fk_cp_pth_def_tbl FOREIGN KEY (pth_id) REFERENCES cp_def_tbl(pth_id);
  --#!
- SELECT REG_PATCH('20240913-02'); 
+ DROP INDEX IF EXISTS sec_oid_idx;
+ --#!
+ CREATE UNIQUE INDEX sec_oid_idx ON sec_pol_tbl (oid) WHERE obslt_utc IS NULL;
+ --#!
+ SELECT REG_PATCH('20240913-03'); 
