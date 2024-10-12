@@ -316,8 +316,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                     switch (data.Item[i].BatchOperation)
                     {
                         case BatchOperationType.Delete:
-                            data.Item[i] = persistenceService.Delete(context, data.Item[i].Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
-                            data.Item[i].BatchOperation = BatchOperationType.Delete;
+                            if (persistenceService.Exists(context, data.Item[i].Key.Value))
+                            {
+                                data.Item[i] = persistenceService.Delete(context, data.Item[i].Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
+                                data.Item[i].BatchOperation = BatchOperationType.Delete;
+                            }
+                            else
+                            {
+                                data.Item[i].BatchOperation = BatchOperationType.Ignore;
+                            }
                             break;
                         case BatchOperationType.Insert:
                             data.Item[i] = persistenceService.Insert(context, data.Item[i]);
