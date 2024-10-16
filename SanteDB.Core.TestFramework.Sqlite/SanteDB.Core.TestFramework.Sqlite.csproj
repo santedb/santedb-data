@@ -51,9 +51,6 @@
   <ItemGroup>
     <EmbeddedResource Include="SanteDB.Core.TestFramework.Sqlite.targets" Pack="true" PackagePath="build" />
     <None Include="..\..\SanteDB.licenseheader" Link="SanteDB.licenseheader" />
-    <None Include="santedb_test.sqlite" Pack="true" PackagePath="build" />
-    <None Include="santedb_test.sqlite-wal" Pack="true" PackagePath="build" />
-    <None Include="santedb_test.sqlite-shm" Pack="true" PackagePath="build" />
   </ItemGroup>
 
  

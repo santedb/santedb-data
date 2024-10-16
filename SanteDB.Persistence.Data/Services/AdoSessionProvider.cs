@@ -307,11 +307,12 @@ namespace SanteDB.Persistence.Data.Services
                     if (!isOverride &&
                         !this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AllowNonAssignedUsersToLogin, true) &&
                         !(principal.Identity is IDeviceIdentity || principal.Identity is IApplicationIdentity) &&
-                        !this.m_pepService.SoftDemand(PermissionPolicyIdentifiers.AccessClientAdministrativeFunction, principal))
+                        !this.m_pepService.SoftDemand(PermissionPolicyIdentifiers.LoginAnywhere, principal))
                     {
                         // What is the restricted facility identifier?
                         var assignedFacility = this.m_securityConfiguration.GetSecurityPolicy<Guid?>(SecurityPolicyIdentification.AssignedFacilityUuid, null);
                         var facilityClaims = claimsPrincipal.FindAll(SanteDBClaimTypes.XspaFacilityClaim);
+                        // TODO: Allow login up hierarchy
                         if (!facilityClaims.Any() || !assignedFacility.HasValue && facilityClaims.Count() != 1) // The user has no facility claim nor do they have a "default" we can select
                         {
                             var exception = new SecuritySessionException(SessionExceptionType.MissingRequiredClaim, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_REQUIRE_FACILITY), null);

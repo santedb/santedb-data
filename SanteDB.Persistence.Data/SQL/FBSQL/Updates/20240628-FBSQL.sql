@@ -1,7 +1,7 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20240628-01" name="Update:20240628-01"   invariantName="FirebirdSQL">
+ * <feature scope="SanteDB.Persistence.Data" id="20240628-03" name="Update:20240628-03"   invariantName="FirebirdSQL">
  *	<summary>Update: Updates the certificate mapping index to allow for a certificate to be assigned to multiple uses</summary>
- *	<isInstalled>select ck_patch('20240628-01') from rdb$database</isInstalled>
+ *	<isInstalled>select ck_patch('20240628-03') from rdb$database</isInstalled>
  * </feature>
  */
 -- OPTIONAL
