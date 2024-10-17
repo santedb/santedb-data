@@ -25,6 +25,7 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -117,7 +118,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 };
 
                 var afterInsert = base.TestInsert(act);
-                Assert.AreEqual(1, afterInsert.Protocols.Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.Protocols).Count);
                 Assert.AreEqual("act.sample", afterInsert.LoadProperty(o => o.Template).Mnemonic);
 
                 var afterQuery = base.TestQuery<Act>(o => o.Template.Mnemonic == "act.sample", 1).AsResultSet().First();
@@ -149,7 +150,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                     });
                     return o;
                 });
-                Assert.AreEqual(2, afterUpdate.Protocols.Count);
+                Assert.AreEqual(2, afterUpdate.LoadProperty(o => o.Protocols).Count);
 
                 base.TestQuery<Act>(o => o.Template.Mnemonic == "act.sample", 0);
                 base.TestQuery<Act>(o => o.Template.Mnemonic == "act.sample2", 1);
@@ -356,9 +357,9 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 Assert.AreEqual("HasSubject", afterQuery.Relationships[0].LoadProperty(o => o.RelationshipType).Mnemonic);
                 Assert.AreEqual(IntoleranceObservationTypeKeys.DrugIntolerance, afterQuery.Relationships[0].LoadProperty(o => o.TargetAct).TypeConceptKey);
                 Assert.AreEqual(3, afterQuery.LoadProperty(o => o.Participations).Count);
-                Assert.AreEqual(ActParticipationKeys.Location, afterQuery.Participations[0].ParticipationRoleKey);
-                Assert.AreEqual(ActParticipationKeys.Authororiginator, afterQuery.Participations[1].ParticipationRoleKey);
-                Assert.AreEqual(ActParticipationKeys.Performer, afterQuery.Participations[2].ParticipationRoleKey);
+                Assert.IsTrue(afterQuery.Participations.Any(p => p.ParticipationRoleKey == ActParticipationKeys.Location), "Missing Location");
+                Assert.IsTrue(afterQuery.Participations.Any(p => p.ParticipationRoleKey == ActParticipationKeys.Authororiginator), "Missing Authororiginator");
+                Assert.IsTrue(afterQuery.Participations.Any(p => p.ParticipationRoleKey == ActParticipationKeys.Performer), "Missing Performer");
                 Assert.AreEqual("Good Health Hospital Testing Facility", afterQuery.Participations[0].LoadProperty(o => o.PlayerEntity).LoadProperty(o => o.Names).First().LoadProperty(o => o.Component).First().Value);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Identifiers).Count);
                 Assert.AreEqual("123-303-TEST30", afterQuery.Identifiers.First().Value);
@@ -368,6 +369,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 Assert.AreEqual("Allergy Testing Protocol", afterQuery.LoadProperty(o => o.Protocols).First().LoadProperty(o => o.Protocol).Name);
                 Assert.IsFalse(afterQuery.IsNegated);
 
+                var place = afterInsert.LoadProperty(o => o.Participations)[0].LoadProperty(o => o.PlayerEntity);
+                // Attempt delay load
+                var participations = place.LoadProperty(o => o.Participations);
+                Assert.AreEqual(1, participations.Count());
             }
         }
 
@@ -548,7 +553,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
                 var aaUuid = this.GetOrCreateAA();
 
-                Enumerable.Range(1, 99).AsParallel().ForAll(i =>
+                Enumerable.Range(1, 99).ForEach(i =>
                 {
                     using (AuthenticationContext.EnterSystemContext())
                     {

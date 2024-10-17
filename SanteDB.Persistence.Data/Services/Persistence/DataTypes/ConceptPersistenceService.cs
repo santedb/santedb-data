@@ -77,8 +77,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             // Insert names
             if (data.ConceptNames != null)
             {
-                retVal.ConceptNames = base.UpdateModelVersionedAssociations<ConceptName>(context, retVal, data.ConceptNames).ToList();
-                retVal.SetLoaded(o => o.ConceptNames);
+                base.UpdateModelVersionedAssociations<ConceptName>(context, retVal, data.ConceptNames).ToList();
 
             }
 
@@ -96,16 +95,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             // Reference terms
             if (data.ReferenceTerms != null)
             {
-                retVal.ReferenceTerms = base.UpdateModelVersionedAssociations<ConceptReferenceTerm>(context, retVal, data.ReferenceTerms).ToList();
-                retVal.SetLoaded(o => o.ReferenceTerms);
-
+                base.UpdateModelVersionedAssociations<ConceptReferenceTerm>(context, retVal, data.ReferenceTerms).ToList();
             }
 
             // Relationships
             if (data.Relationships != null)
             {
-                retVal.Relationships = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationships).ToList();
-                retVal.SetLoaded(o => o.Relationships);
+                base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationships).ToList();
 
             }
             return retVal;
@@ -121,8 +117,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             // Update names
             if (data.ConceptNames != null)
             {
-                retVal.ConceptNames = base.UpdateModelVersionedAssociations<ConceptName>(context, retVal, data.ConceptNames).ToList();
-                retVal.SetLoaded(o => o.ConceptNames);
+                base.UpdateModelVersionedAssociations<ConceptName>(context, retVal, data.ConceptNames).ToList();
 
             }
 
@@ -140,17 +135,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             // Update reference terms
             if (data.ReferenceTerms != null)
             {
-                retVal.ReferenceTerms = base.UpdateModelVersionedAssociations<ConceptReferenceTerm>(context, retVal, data.ReferenceTerms).ToList();
-                retVal.SetLoaded(o => o.ReferenceTerms);
-
+                base.UpdateModelVersionedAssociations<ConceptReferenceTerm>(context, retVal, data.ReferenceTerms).ToList();
             }
 
             // Relationships
             if (data.Relationships != null)
             {
-                retVal.Relationships = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationships).ToList();
-                retVal.SetLoaded(o => o.Relationships);
-
+                base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationships).ToList();
             }
 
             return retVal;

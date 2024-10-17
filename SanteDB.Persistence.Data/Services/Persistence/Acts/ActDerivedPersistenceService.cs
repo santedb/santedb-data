@@ -466,26 +466,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
             if (data.Extensions != null)
             {
-                retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
-                retVal.SetLoaded(o => o.Extensions);
-
+                this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
             }
 
             if (data.Identifiers != null)
             {
-                retVal.Identifiers = this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
-                retVal.SetLoaded(o => o.Identifiers);
+                this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
             }
 
             if (data.Notes != null)
             {
-                retVal.Notes = this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
-                retVal.SetLoaded(o => o.Notes);
+                this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
             }
 
             if (data.Policies != null)
             {
-                retVal.Policies = this.UpdateInternalVersoinedAssociations(context, retVal.Key.Value, retVal.VersionSequence.Value, data.Policies.Select(o => new DbActSecurityPolicy()
+                this.UpdateInternalVersoinedAssociations(context, retVal.Key.Value, retVal.VersionSequence.Value, data.Policies.Select(o => new DbActSecurityPolicy()
                 {
                     PolicyKey = o.PolicyKey.Value
                 })).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
@@ -493,31 +489,27 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
             if (data.Relationships != null)
             {
-                retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
-                retVal.SetLoaded(o => o.Relationships);
+                this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
             }
 
             if (data.Tags != null)
             {
-                retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
-                retVal.SetLoaded(o => o.Tags);
+                this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
             }
 
             if (data.Participations != null)
             {
-                retVal.Participations = this.UpdateModelVersionedAssociations(context, retVal, data.Participations).ToList();
-                retVal.SetLoaded(o => o.Participations);
+                this.UpdateModelVersionedAssociations(context, retVal, data.Participations).ToList();
             }
 
             if (data.Protocols != null)
             {
                 // This is a special case since the dbactprotocol <> acts are not specifically identified (they are combination)
-                retVal.Protocols = data.Protocols.Select(p =>
+                data.Protocols.Select(p =>
                 {
                     p.SourceEntityKey = retVal.Key;
                     return typeof(ActProtocol).GetRelatedPersistenceService().Insert(context, p) as ActProtocol;
                 }).ToList();
-                retVal.SetLoaded(o => o.Protocols);
             }
 
             return retVal;
@@ -535,26 +527,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
             if (data.Extensions != null)
             {
-                retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
-                retVal.SetLoaded(o => o.Extensions);
-
+                this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
             }
 
             if (data.Identifiers != null)
             {
-                retVal.Identifiers = this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
-                retVal.SetLoaded(o => o.Identifiers);
+                this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
             }
 
             if (data.Notes != null)
             {
-                retVal.Notes = this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
-                retVal.SetLoaded(o => o.Notes);
+                this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
             }
 
             if (data.Policies != null)
             {
-                retVal.Policies = this.UpdateInternalVersoinedAssociations(context, retVal.Key.Value, retVal.VersionSequence.Value, data.Policies.Select(o => new DbActSecurityPolicy()
+                this.UpdateInternalVersoinedAssociations(context, retVal.Key.Value, retVal.VersionSequence.Value, data.Policies.Select(o => new DbActSecurityPolicy()
                 {
                     PolicyKey = o.PolicyKey.Value
                 })).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
@@ -562,32 +550,28 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
             if (data.Relationships != null)
             {
-                retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
-                retVal.SetLoaded(o => o.Relationships);
+                this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
             }
 
             if (data.Tags != null)
             {
-                retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
-                retVal.SetLoaded(o => o.Tags);
+                this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
             }
 
             if (data.Participations != null)
             {
-                retVal.Participations = this.UpdateModelVersionedAssociations(context, retVal, data.Participations).ToList();
-                retVal.SetLoaded(o => o.Participations);
+                this.UpdateModelVersionedAssociations(context, retVal, data.Participations).ToList();
             }
 
             if (data.Protocols != null)
             {
                 // This is a special case since the dbactprotocol <> acts are not specifically identified (they are combination)
                 context.DeleteAll<DbActProtocol>(o => o.SourceKey == retVal.Key);
-                retVal.Protocols = data.Protocols.Select(p =>
+                data.Protocols.Select(p =>
                 {
                     p.SourceEntityKey = retVal.Key;
                     return typeof(ActProtocol).GetRelatedPersistenceService().Insert(context, p) as ActProtocol;
                 }).ToList();
-                retVal.SetLoaded(o => o.Protocols);
             }
 
             return retVal;

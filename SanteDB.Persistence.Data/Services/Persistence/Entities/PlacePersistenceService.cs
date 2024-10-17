@@ -41,8 +41,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
             if (data.Services != null)
             {
-                retVal.Services = this.UpdateModelVersionedAssociations(context, retVal, data.Services).ToList();
-                retVal.SetLoaded(o => o.Services);
+                this.UpdateModelVersionedAssociations(context, retVal, data.Services).ToList();
             }
 
             return retVal;
@@ -55,8 +54,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
             if (data.Services != null)
             {
-                retVal.Services = this.UpdateModelVersionedAssociations(context, retVal, data.Services).ToList();
-                retVal.SetLoaded(o => o.Services);
+                this.UpdateModelVersionedAssociations(context, retVal, data.Services).ToList();
             }
 
             return retVal;

@@ -118,7 +118,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                 };
 
                 var afterInsert = base.TestInsert(act);
-                Assert.AreEqual(1, afterInsert.Protocols.Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.Protocols).Count);
                 Assert.AreEqual("act.sample", afterInsert.LoadProperty(o => o.Template).Mnemonic);
 
                 var afterQuery = base.TestQuery<Act>(o => o.Template.Mnemonic == "act.sample", 1).AsResultSet().First();
@@ -150,7 +150,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                     });
                     return o;
                 });
-                Assert.AreEqual(2, afterUpdate.Protocols.Count);
+                Assert.AreEqual(2, afterUpdate.LoadProperty(o => o.Protocols).Count);
 
                 base.TestQuery<Act>(o => o.Template.Mnemonic == "act.sample", 0);
                 base.TestQuery<Act>(o => o.Template.Mnemonic == "act.sample2", 1);

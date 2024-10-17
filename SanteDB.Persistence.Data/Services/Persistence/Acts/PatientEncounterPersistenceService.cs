@@ -45,7 +45,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             // Update the special arrangements
             if (data.SpecialArrangements != null)
             {
-                retVal.SpecialArrangements = base.UpdateModelVersionedAssociations(context, retVal, data.SpecialArrangements).ToList();
+                base.UpdateModelVersionedAssociations(context, retVal, data.SpecialArrangements).ToList();
             }
 
             return retVal;
@@ -59,7 +59,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             // Update special arrangements
             if (data.SpecialArrangements != null)
             {
-                retVal.SpecialArrangements = base.UpdateModelVersionedAssociations(context, retVal, data.SpecialArrangements).ToList();
+                base.UpdateModelVersionedAssociations(context, retVal, data.SpecialArrangements).ToList();
             }
 
             return retVal;
