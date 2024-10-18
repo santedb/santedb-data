@@ -19,6 +19,7 @@
 using SanteDB.Core;
 using SanteDB.Core.Data.Initialization;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model.Acts;
@@ -70,6 +71,9 @@ namespace SanteDB.Persistence.Data.Services
         /// Progress has changed
         /// </summary>
         public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
+
+        /// <inheritdoc/>
+        public event EventHandler<DataPersistedEventArgs<Dataset>> Installed;
 
 
         /// <summary>
@@ -299,6 +303,8 @@ namespace SanteDB.Persistence.Data.Services
 
                         context.Insert(new DbPatch() { ApplyDate = DateTimeOffset.Now, PatchId = patchId, Description = dataset.Id });
                         tx.Commit();
+
+                        this.Installed?.Invoke(this, new DataPersistedEventArgs<Dataset>(dataset, TransactionMode.Commit, AuthenticationContext.Current.Principal));
                         return true;
                     }
                 }
