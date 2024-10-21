@@ -204,6 +204,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 dbModel.EffectiveVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, dbModel.SourceKey);
             }
 
+            
             return base.DoInsertInternal(context, dbModel);
         }
 

@@ -308,7 +308,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                     }
                     objectType = idr.ReferencedType;
                 }
-                var persistenceService = data.Item[i].GetType().GetRelatedPersistenceService();
+
+                var persistenceService = objectType.GetRelatedPersistenceService();
                 // Is the object a reference?
 
                 try
