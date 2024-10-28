@@ -117,7 +117,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         /// </summary>
         public Bundle ReorganizeForInsert(Bundle input)
         {
-            var resolved = input.Item.ToArray();
+            var retVal = new Bundle(input.Item.Where(o => o.BatchOperation == BatchOperationType.Delete));
+            var resolved = input.Item.Where(e=>!retVal.Item.Contains(e)).ToArray();
 
             // Process each object in our queue of to be processed
             bool swapped = true;
@@ -169,7 +170,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             //    throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_CIRCULAR_DEPENDENCY));
             //}
 
-            return new Bundle(resolved);
+            retVal.AddRange(resolved);
+            return retVal; 
         }
 
 
