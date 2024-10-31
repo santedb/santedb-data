@@ -1,9 +1,13 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20241022-01" name="Update:20241022-01" invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20241022-02" name="Update:20241022-02" invariantName="npgsql">
  *	<summary>Update: Recreates the obsoletion reason</summary>
- *	<isInstalled>select ck_patch('20241022-01')</isInstalled>
+ *	<isInstalled>select ck_patch('20241022-02')</isInstalled>
  * </feature>
  */
- ALTER TABLE ACT_VRSN_TBL DROP OBSLT_RSN;
- ALTER TABLE ACT_VRSN_TBL ADD OBSLT_RSN UUID;
- SELECT REG_PATCH('20241022-01'); 
+ -- OPTIONAL
+ ALTER TABLE ACT_VRSN_TBL DROP OBSLT_RSN;--#!
+ -- OPTIONAL
+ ALTER TABLE ACT_VRSN_TBL ADD OBSLT_RSN UUID;--#!
+ -- OPTIONAL
+ CREATE INDEX ent_tel_use_idx ON ent_tel_tbl(use_cd_id); --#!
+ SELECT REG_PATCH('20241022-02'); 
