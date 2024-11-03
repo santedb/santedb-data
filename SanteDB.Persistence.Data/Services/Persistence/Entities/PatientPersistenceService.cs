@@ -136,7 +136,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             var dbPatient = referenceObjects?.OfType<DbPatient>()?.FirstOrDefault();
             if (dbPatient == null)
             {
-                this.m_tracer.TraceWarning("Using slow fetch of DbPatient for DbEntityVersion (consider using the appropriate persister class)");
+                this.m_tracer.TraceVerbose("Using slow fetch of DbPatient for DbEntityVersion (consider using the appropriate persister class)");
                 dbPatient = context.FirstOrDefault<DbPatient>(o => o.ParentKey == dbModel.VersionKey);
             }
 

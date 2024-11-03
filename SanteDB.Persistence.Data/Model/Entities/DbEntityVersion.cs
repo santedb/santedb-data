@@ -17,6 +17,7 @@
  * 
  */
 using SanteDB.OrmLite.Attributes;
+using SanteDB.Persistence.Data.Model.Acts;
 using SanteDB.Persistence.Data.Model.Concepts;
 using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Extensibility;
@@ -96,7 +97,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// <summary>
         /// Creation act key
         /// </summary>
-        [Column("crt_act_id")]
+        [Column("crt_act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.Key))]
         public Guid? CreationActKey { get; set; }
 
         /// <summary>

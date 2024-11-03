@@ -43,7 +43,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             var narrativeData = referenceObjects?.OfType<DbNarrative>().FirstOrDefault();
             if (narrativeData == null)
             {
-                this.m_tracer.TraceWarning("Using slow method of loading DbNarrative data from DbActVersion - Consider using the Narrative persistence service instead");
+                this.m_tracer.TraceVerbose("Using slow method of loading DbNarrative data from DbActVersion - Consider using the Narrative persistence service instead");
                 narrativeData = context.FirstOrDefault<DbNarrative>(o => o.ParentKey == dbModel.VersionKey);
             }
 

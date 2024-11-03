@@ -134,6 +134,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                         case Entity entity:
                             dependencies = dependencies.Concat(entity.Relationships?.Select(r => Array.FindIndex(resolved, k => k.Key == r.TargetEntityKey)) ?? new int[0]);
                             dependencies = dependencies.Concat(entity.Participations?.Select(p => Array.FindIndex(resolved, i => i.Key == p.ActKey)) ?? new int[0]);
+                            if(entity.CreationActKey.HasValue && resolved.Any(r=>r.Key == entity.CreationActKey))
+                            {
+                                dependencies = dependencies.Concat(new int[] { Array.FindIndex(resolved, i => i.Key == entity.CreationActKey) });
+                            }
                             break;
                         case Act act:
                             dependencies = dependencies.Concat(act.Relationships?.Select(r => Array.FindIndex(resolved, i => i.Key == r.TargetActKey)) ?? new int[0]);

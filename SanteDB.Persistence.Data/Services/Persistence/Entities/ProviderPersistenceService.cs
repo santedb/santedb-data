@@ -52,7 +52,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             var dbProvider = referenceObjects?.OfType<DbProvider>().FirstOrDefault();
             if (dbProvider == null)
             {
-                this.m_tracer.TraceWarning("Using slow loading for DbProvider data on DbEntityVersion. Consider using the IDataPersistenceService<Provider> instead");
+                this.m_tracer.TraceVerbose("Using slow loading for DbProvider data on DbEntityVersion. Consider using the IDataPersistenceService<Provider> instead");
                 dbProvider = context.FirstOrDefault<DbProvider>(o => o.ParentKey == dbModel.VersionKey);
             }
 
