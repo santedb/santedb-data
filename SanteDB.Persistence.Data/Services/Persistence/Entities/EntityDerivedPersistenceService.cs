@@ -461,7 +461,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 if (referenceObjects.Length == 0)
                 {
-                    this.m_tracer.TraceWarning($"Fetching referenced objects - consider calling IDataPersistences<{typeof(TEntity).Name}> in the future");
+                    this.m_tracer.TraceVerbose($"Fetching referenced objects - consider calling IDataPersistences<{typeof(TEntity).Name}> in the future");
                     referenceObjects = edps.GetReferencedObjects(context, dbModel) ?? new object[0];
                 }
                 return (TEntity)edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
