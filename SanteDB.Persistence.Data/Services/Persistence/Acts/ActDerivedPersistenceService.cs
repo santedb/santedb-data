@@ -35,6 +35,7 @@ using SanteDB.Persistence.Data.Model.Extensibility;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -90,6 +91,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             existingVersion.ParentKey = newVersion.VersionKey;
             context.Insert(existingVersion);
         }
+
 
         /// <inheritdoc/>
         public override IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<TAct, bool>> query)
@@ -305,6 +307,40 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             base.DoDeleteReferencesInternal(context, key);
         }
 
+
+        /// <inheritdoc/>
+        public override IEnumerable<DetectedIssue> Validate(object objectToValidate)
+        {
+            if (objectToValidate == null)
+            {
+                throw new ArgumentNullException(nameof(objectToValidate));
+            }
+            else if (objectToValidate is TAct strong)
+            {
+                try
+                {
+                    using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+                    {
+                        context.Open();
+                        return this.VerifyEntity(context, strong).ToArray(); // force execute
+                    }
+                }
+                catch (DbException e)
+                {
+                    throw e.TranslateDbException();
+                }
+                catch (Exception e)
+                {
+                    throw new DataPersistenceException(ErrorMessages.DATA_STRUCTURE_NOT_APPROPRIATE, e);
+                }
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(TAct), objectToValidate.GetType()));
+            }
+        }
+
+
         /// <inheritdoc/>
         protected override TAct BeforePersisting(DataContext context, TAct data)
         {
@@ -329,32 +365,32 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             {
                 throw new DetectedIssueException(issues);
             }
-            else if (issues.Any()) // there are non-serious issues
-            {
-                if (data.Extensions == null)
-                {
-                    if (data.Key.HasValue)
-                    { // load from DB because there may be some existing stuff we don't want to erase
-                        data.Extensions = data.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == data.Key).ToList();
-                    }
-                    else
-                    {
-                        data.Extensions = new List<ActExtension>();
-                    }
-                }
+            //else if (issues.Any()) // there are non-serious issues
+            //{
+            //    if (data.Extensions == null)
+            //    {
+            //        if (data.Key.HasValue)
+            //        { // load from DB because there may be some existing stuff we don't want to erase
+            //            data.Extensions = data.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == data.Key).ToList();
+            //        }
+            //        else
+            //        {
+            //            data.Extensions = new List<ActExtension>();
+            //        }
+            //    }
 
-                var extension = data.Extensions.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension);
-                if (extension == null)
-                {
-                    data.Extensions.Add(new ActExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issues));
-                }
-                else
-                {
-                    var existingValues = extension.GetValue<List<DetectedIssue>>();
-                    existingValues.AddRange(issues);
-                    extension.ExtensionValue = existingValues;
-                }
-            }
+            //    var extension = data.Extensions.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension);
+            //    if (extension == null)
+            //    {
+            //        data.Extensions.Add(new ActExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issues));
+            //    }
+            //    else
+            //    {
+            //        var existingValues = extension.GetValue<List<DetectedIssue>>();
+            //        existingValues.AddRange(issues);
+            //        extension.ExtensionValue = existingValues;
+            //    }
+            //}
 
             return base.BeforePersisting(context, data);
         }

@@ -17,6 +17,7 @@
  * 
  */
 using SanteDB.Core.BusinessRules;
+using SanteDB.Core.Data.Quality;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
@@ -35,6 +36,7 @@ using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.DataType;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -46,7 +48,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// <summary>
     /// Persistence service which handles versioned objects
     /// </summary>
-    public abstract class VersionedDataPersistenceService<TModel, TDbModel, TDbKeyModel> : BaseEntityDataPersistenceService<TModel, TDbModel>
+    public abstract class VersionedDataPersistenceService<TModel, TDbModel, TDbKeyModel> : BaseEntityDataPersistenceService<TModel, TDbModel>, IExtendedDataQualityValidationProvider
         where TModel : BaseEntityData, IVersionedData, IHasState, new()
         where TDbModel : DbVersionedData, IDbHasStatus, new()
         where TDbKeyModel : DbIdentified, new()
@@ -57,6 +59,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
         // Class key map
         private Guid[] m_classKeyMap;
+
+        /// <inheritdoc/>
+        Type[] IExtendedDataQualityValidationProvider.SupportedTypes => new Type[] { typeof(TModel) };
 
         /// <summary>
         /// Perform a copy of the existing version inforamtion to a new version
@@ -1016,5 +1021,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             return existing.Except(removeRelationships).Union(addRelationships).ToArray();
         }
+
+        /// <inheritdoc/>
+        public abstract IEnumerable<DetectedIssue> Validate(object objectToValidate);
+        
     }
 }

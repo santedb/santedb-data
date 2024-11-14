@@ -16,6 +16,7 @@
  * the License.
  * 
  */
+using DocumentFormat.OpenXml.EMMA;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Extensions;
@@ -37,6 +38,7 @@ using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -319,6 +321,38 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             base.DoDeleteFreeTextIndexInternal(context, key);
         }
 
+        /// <inheritdoc/>
+        public override IEnumerable<DetectedIssue> Validate(object objectToValidate)
+        {
+            if (objectToValidate == null)
+            {
+                throw new ArgumentNullException(nameof(objectToValidate));
+            }
+            else if (objectToValidate is TEntity strong)
+            {
+                try
+                {
+                    using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+                    {
+                        context.Open();
+                        return this.VerifyEntity(context, strong).ToArray(); // force execute
+                    }
+                }
+                catch (DbException e)
+                {
+                    throw e.TranslateDbException();
+                }
+                catch (Exception e)
+                {
+                    throw new DataPersistenceException(ErrorMessages.DATA_STRUCTURE_NOT_APPROPRIATE, e);
+                }
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(TEntity), objectToValidate.GetType()));
+            }
+        }
+
         /// <summary>
         /// Prepare references
         /// </summary>
@@ -345,36 +379,36 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 throw new DetectedIssueException(issues);
             }
-            else if (issues.Any()) // There are issues
-            {
-                if (data.Extensions == null)
-                {
-                    if (data.Key.HasValue)
-                    {
-                        data.Extensions = data.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == data.Key).ToList();
-                    }
-                    else
-                    {
-                        data.Extensions = new List<EntityExtension>();
-                    }
-                }
+            //else if (issues.Any()) // There are issues
+            //{
+            //    if (data.Extensions == null)
+            //    {
+            //        if (data.Key.HasValue)
+            //        {
+            //            data.Extensions = data.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == data.Key).ToList();
+            //        }
+            //        else
+            //        {
+            //            data.Extensions = new List<EntityExtension>();
+            //        }
+            //    }
 
-                var extension = data.Extensions.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension);
-                if (extension == null)
-                {
-                    data.Extensions.Add(new EntityExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issues));
-                }
-                else
-                {
-                    var existingValues = extension.GetValue<List<DetectedIssue>>();
-                    if (existingValues == null)
-                    {
-                        throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.EXTENSION_INVALID_TYPE, new { extension = ExtensionTypeKeys.DataQualityExtensionName }));
-                    }
-                    existingValues.AddRange(issues);
-                    extension.ExtensionValue = existingValues;
-                }
-            }
+            //    var extension = data.Extensions.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension);
+            //    if (extension == null)
+            //    {
+            //        data.Extensions.Add(new EntityExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issues));
+            //    }
+            //    else
+            //    {
+            //        var existingValues = extension.GetValue<List<DetectedIssue>>();
+            //        if (existingValues == null)
+            //        {
+            //            throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.EXTENSION_INVALID_TYPE, new { extension = ExtensionTypeKeys.DataQualityExtensionName }));
+            //        }
+            //        existingValues.AddRange(issues);
+            //        extension.ExtensionValue = existingValues;
+            //    }
+            //}
 
             return base.BeforePersisting(context, data);
         }

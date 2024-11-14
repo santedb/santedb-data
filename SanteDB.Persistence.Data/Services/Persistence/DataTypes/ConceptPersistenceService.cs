@@ -16,12 +16,14 @@
  * the License.
  * 
  */
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -64,6 +66,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             data.ClassKey = this.EnsureExists(context, data.Class)?.Key ?? data.ClassKey;
             data.StatusConceptKey = this.EnsureExists(context, data.StatusConcept)?.Key ?? data.StatusConceptKey;
             return data;
+        }
+
+        /// <inheritdoc/>
+        /// <remarks>Not implemented</remarks>
+        public override IEnumerable<DetectedIssue> Validate(object objectToValidate)
+        {
+            // TODO: Validate the mnemonic is unique 
+            yield break;
         }
 
         /// <summary>
