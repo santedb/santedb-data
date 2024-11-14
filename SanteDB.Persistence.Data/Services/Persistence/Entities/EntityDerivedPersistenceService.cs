@@ -27,6 +27,7 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
@@ -335,6 +336,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                     {
                         context.Open();
+                        context.EstablishProvenance(AuthenticationContext.Current.Principal);
                         return this.VerifyEntity(context, strong).ToArray(); // force execute
                     }
                 }
@@ -379,36 +381,36 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 throw new DetectedIssueException(issues);
             }
-            //else if (issues.Any()) // There are issues
-            //{
-            //    if (data.Extensions == null)
-            //    {
-            //        if (data.Key.HasValue)
-            //        {
-            //            data.Extensions = data.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == data.Key).ToList();
-            //        }
-            //        else
-            //        {
-            //            data.Extensions = new List<EntityExtension>();
-            //        }
-            //    }
+            else if (issues.Any()) // There are issues
+            {
+                if (data.Extensions == null)
+                {
+                    if (data.Key.HasValue)
+                    {
+                        data.Extensions = data.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == data.Key).ToList();
+                    }
+                    else
+                    {
+                        data.Extensions = new List<EntityExtension>();
+                    }
+                }
 
-            //    var extension = data.Extensions.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension);
-            //    if (extension == null)
-            //    {
-            //        data.Extensions.Add(new EntityExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issues));
-            //    }
-            //    else
-            //    {
-            //        var existingValues = extension.GetValue<List<DetectedIssue>>();
-            //        if (existingValues == null)
-            //        {
-            //            throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.EXTENSION_INVALID_TYPE, new { extension = ExtensionTypeKeys.DataQualityExtensionName }));
-            //        }
-            //        existingValues.AddRange(issues);
-            //        extension.ExtensionValue = existingValues;
-            //    }
-            //}
+                var extension = data.Extensions.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension);
+                if (extension == null)
+                {
+                    data.Extensions.Add(new EntityExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issues));
+                }
+                else
+                {
+                    var existingValues = extension.GetValue<List<DetectedIssue>>();
+                    if (existingValues == null)
+                    {
+                        throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.EXTENSION_INVALID_TYPE, new { extension = ExtensionTypeKeys.DataQualityExtensionName }));
+                    }
+                    existingValues.AddRange(issues);
+                    extension.ExtensionValue = existingValues;
+                }
+            }
 
             return base.BeforePersisting(context, data);
         }
