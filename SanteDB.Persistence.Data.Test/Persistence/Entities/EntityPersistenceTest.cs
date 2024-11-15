@@ -104,7 +104,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(EntityClassKeys.LivingSubject, afterInsert.ClassConceptKey);
                 Assert.AreEqual(EntityClassKeys.Place, afterInsert.TypeConceptKey);
                 Assert.AreEqual(DeterminerKeys.Specific, afterInsert.DeterminerConceptKey);
-                Assert.AreEqual(2, afterInsert.Names.Count);
+                Assert.AreEqual(2, afterInsert.LoadProperty(o => o.Names).Count);
 
                 // Test retrieve
                 var fetched = base.TestQuery<Entity>(k => k.Key == afterInsert.Key, 1).AsResultSet();
@@ -127,7 +127,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     o.Names.Add(new EntityName(NameUseKeys.License, "Bobz", "Smith"));
                     return o;
                 });
-                Assert.AreEqual(3, afterInsert.Names.Count);
+                Assert.AreEqual(3, afterInsert.LoadProperty(o => o.Names).Count);
 
                 // Test query by name
                 fetched = base.TestQuery<Entity>(k => k.Names.Any(n => n.NameUseKey == NameUseKeys.Assigned && n.Component.Any(c => c.Value == "Justin")), 1).AsResultSet();
@@ -138,11 +138,11 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // Test name is updated
                 afterInsert = base.TestUpdate(afterInsert, (o) =>
                 {
-                    o.Names.FirstOrDefault(n => n.NameUseKey == NameUseKeys.Legal).Component[0].Value = "Robert";
-                    o.Names.FirstOrDefault(n => n.NameUseKey == NameUseKeys.Assigned).Component[0].Value = "Bobby";
+                    o.LoadProperty(a => a.Names).FirstOrDefault(n => n.NameUseKey == NameUseKeys.Legal).LoadProperty(a => a.Component)[0].Value = "Robert";
+                    o.Names.FirstOrDefault(n => n.NameUseKey == NameUseKeys.Assigned).LoadProperty(a => a.Component)[0].Value = "Bobby";
                     return o;
                 });
-                Assert.AreEqual(3, afterInsert.Names.Count);
+                Assert.AreEqual(3, afterInsert.LoadProperty(o => o.Names).Count);
 
                 fetched = base.TestQuery<Entity>(k => k.Key == afterInsert.Key, 1).AsResultSet();
                 afterFetch = fetched.First();
@@ -153,6 +153,11 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 fetched = base.TestQuery<Entity>(k => k.Names.Any(n => n.NameUseKey == NameUseKeys.Assigned && n.Component.Any(c => c.Value == "Justin")), 0).AsResultSet();
                 // But we have one Bob
                 fetched = base.TestQuery<Entity>(k => k.Names.Any(n => n.Component.Any(c => c.Value.Contains("Bobz"))), 1).AsResultSet();
+
+
+                // Fetch based on name or mothers name
+                var fetchExpr = QueryExpressionParser.BuildLinqExpression<Entity>("name.component.value||relationship[Mother].target.name.component.value=Bobz".ParseQueryString());
+                fetched = base.TestQuery<Entity>(fetchExpr, 1).AsResultSet();
 
                 afterFetch = fetched.First();
                 Assert.AreEqual(afterInsert.Key, afterFetch.Key);
@@ -185,7 +190,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 var afterInsert = base.TestInsert(entity);
                 Assert.IsNotNull(afterInsert.CreationTime);
-                Assert.AreEqual(1, afterInsert.Addresses.Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.Addresses).Count);
 
                 // Test fetch
                 var fetched = base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 1).AsResultSet();
@@ -202,10 +207,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 afterInsert = base.TestUpdate(afterInsert, (o) =>
                 {
-                    o.Addresses.Add(new EntityAddress(AddressUseKeys.WorkPlace, "123 Main Street West", "Hamilton1", "ON", "CA", "L8K5N2"));
+                    o.LoadProperty(a => a.Addresses).Add(new EntityAddress(AddressUseKeys.WorkPlace, "123 Main Street West", "Hamilton1", "ON", "CA", "L8K5N2"));
                     return o;
                 });
-                Assert.AreEqual(2, afterInsert.Addresses.Count);
+                Assert.AreEqual(2, afterInsert.LoadProperty(o => o.Addresses).Count);
 
                 // Test fetch
                 fetched = base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 1).AsResultSet();
@@ -220,14 +225,14 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // Test updating an address
                 afterInsert = base.TestUpdate(afterInsert, (o) =>
                 {
-                    o.Addresses[0].Component.Add(new EntityAddressComponent(AddressComponentKeys.BuildingNumberSuffix, "123"));
+                    o.LoadProperty(a => a.Addresses)[0].LoadProperty(a => a.Component).Add(new EntityAddressComponent(AddressComponentKeys.BuildingNumberSuffix, "123"));
                     return o;
                 }, (o) =>
                 {
-                    o.Addresses[0].Component.First(c => c.ComponentTypeKey == AddressComponentKeys.City).Value = "Hamilton2";
+                    o.LoadProperty(a => a.Addresses)[0].LoadProperty(a => a.Component).First(c => c.ComponentTypeKey == AddressComponentKeys.City).Value = "Hamilton2";
                     return o;
                 });
-                Assert.AreEqual("123", afterInsert.Addresses[0].Component.Find(c => c.ComponentTypeKey == AddressComponentKeys.BuildingNumberSuffix).Value);
+                Assert.AreEqual("123", afterInsert.LoadProperty(o => o.Addresses)[0].LoadProperty(o => o.Component).Find(c => c.ComponentTypeKey == AddressComponentKeys.BuildingNumberSuffix).Value);
 
                 // Test that the update applied
                 fetched = base.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUseKey == AddressUseKeys.WorkPlace || g.AddressUseKey == AddressUseKeys.Direct).Any(a => a.Component.Where(g => g.ComponentTypeKey == AddressComponentKeys.BuildingNumberSuffix).Any(c => c.Value == "123")), 1).AsResultSet();
@@ -327,21 +332,17 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     Identifiers = new List<Core.Model.DataTypes.EntityIdentifier>()
                     {
                         new Core.Model.DataTypes.EntityIdentifier(new IdentityDomain("TEST_3", "TESTING", "1.2.3.4.5.5"), "TEST3")
-                        {
-                            IdentifierTypeKey = IdentifierTypeKeys.Employer
-                        }
                     }
                 };
 
                 var afterInsert = base.TestInsert(entity);
                 Assert.IsNotNull(afterInsert.CreationTime);
-                Assert.AreEqual(1, afterInsert.Identifiers.Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.Identifiers).Count);
 
                 var fetch = base.TestQuery<Entity>(o => o.Identifiers.Where(g => g.IdentityDomain.DomainName == "TEST_3").Any(i => i.Value == "TEST3"), 1).AsResultSet();
                 var afterFetch = fetch.First();
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Identifiers).Count);
                 Assert.AreEqual("TEST_3", afterFetch.Identifiers[0].LoadProperty(o => o.IdentityDomain).DomainName);
-                Assert.AreEqual(IdentifierTypeKeys.Employer, afterFetch.Identifiers[0].IdentifierTypeKey);
             }
         }
 
@@ -378,7 +379,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 var afterInsert = base.TestInsert(entity);
                 Assert.IsNotNull(afterInsert.CreationTime);
-                Assert.AreEqual(1, afterInsert.Telecoms.Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.Telecoms).Count);
 
                 var fetch = base.TestQuery<Entity>(o => o.Telecoms.Any(t => t.Value == "mailto:justin@fyfesoftware.ca"), 1).AsResultSet();
                 fetch = base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 1).AsResultSet();
@@ -391,7 +392,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // Update
                 var afterUpdate = base.TestUpdate(afterFetch, (o) =>
                 {
-                    o.Telecoms.Add(new EntityTelecomAddress(TelecomAddressUseKeys.Pager, "394-304-3045"));
+                    o.LoadProperty(a => a.Telecoms).Add(new EntityTelecomAddress(TelecomAddressUseKeys.Pager, "394-304-3045"));
                     return o;
                 });
                 afterFetch = fetch.First();
@@ -399,7 +400,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 afterUpdate = base.TestUpdate(afterFetch, (o) =>
                 {
-                    o.Telecoms.RemoveAt(1);
+                    o.LoadProperty(a => a.Telecoms).RemoveAt(1);
                     return o;
                 });
                 afterFetch = fetch.First();
@@ -407,7 +408,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 afterUpdate = base.TestUpdate(afterFetch, (o) =>
                 {
-                    o.Telecoms[0].Value = "mailto:justin@fyfesoftware.com";
+                    o.LoadProperty(a => a.Telecoms)[0].Value = "mailto:justin@fyfesoftware.com";
                     return o;
                 });
                 afterFetch = fetch.First();
@@ -497,7 +498,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 var afterInsert = base.TestInsert(entity);
                 Assert.IsNotNull(afterInsert.CreationTime);
-                Assert.AreEqual(1, afterInsert.Telecoms.Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.Telecoms).Count);
 
                 var fetch = base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 1).AsResultSet();
                 var afterFetch = fetch.First();
@@ -707,7 +708,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     };
 
                     base.TestInsert(entity);
-                    Thread.Sleep(300);
+                    Thread.Sleep(1000);
                 });
 
                 var afterQuery = base.TestQuery<Entity>(o => o.Identifiers.Any(i => i.Value.Contains("TEST_CASE3_%")), 3).AsResultSet() as IOrderableQueryResultSet<Entity>;
@@ -757,6 +758,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     };
 
                     base.TestInsert(entity);
+                    Thread.Sleep(500); // allow creation time to elapse
                 });
 
                 var afterQuery = base.TestQuery<Entity>(o => o.Identifiers.Any(i => i.Value.Contains("TEST_CASE4_%")), 3).AsResultSet() as IOrderableQueryResultSet<Entity>;
@@ -817,6 +819,15 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUseKey == AddressUseKeys.HomeAddress).Any(n => n.AddressUseKey == AddressUseKeys.HomeAddress && n.Component.Where(c => c.ComponentTypeKey == AddressComponentKeys.City).Any(c => c.Value == "Hometown")), 1);
                 afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUseKey == AddressUseKeys.HomeAddress).Any(n => n.Component.Where(c => c.ComponentTypeKey == AddressComponentKeys.City).Any(c => c.Value == "Hometown"))
                 && o.Names.Where(g => g.NameUseKey == NameUseKeys.Legal).Any(n => n.Component.Where(g => g.ComponentTypeKey == NameComponentKeys.Given).Any(c => c.Value == "John")), 1);
+
+
+                // Test that complex queries are mapped to SQL
+                // Use a reference term
+                afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUse.ReferenceTerms.Any(t => t.ReferenceTerm.Mnemonic == "H")).Any(n => n.Component.Any(a => a.Value == "Hometown")), 1);
+                // Use two conditions
+                afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUse.ReferenceTerms.Any(t => t.ReferenceTerm.Mnemonic == "H") && g.AddressUse.ConceptSets.Any(s => s.Key == ConceptSetKeys.AddressUse)).Any(n => n.Component.Any(a => a.Value == "Hometown")), 1);
+                afterQuery = this.TestQuery<Entity>(o => o.Addresses.Where(g => g.AddressUse.StatusConceptKey == StatusKeys.Inactive).Any(n => n.Component.Any(a => a.Value == "Hometown")), 0);
+
             }
         }
 

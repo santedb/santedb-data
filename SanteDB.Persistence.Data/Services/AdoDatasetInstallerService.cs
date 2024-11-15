@@ -19,6 +19,7 @@
 using SanteDB.Core;
 using SanteDB.Core.Data.Initialization;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model.Acts;
@@ -32,6 +33,7 @@ using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -69,6 +71,9 @@ namespace SanteDB.Persistence.Data.Services
         /// Progress has changed
         /// </summary>
         public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
+
+        /// <inheritdoc/>
+        public event EventHandler<DataPersistedEventArgs<Dataset>> Installed;
 
 
         /// <summary>
@@ -234,9 +239,17 @@ namespace SanteDB.Persistence.Data.Services
 
                                         break;
                                     case DataDelete dd:
-                                        persistenceService.Delete(context, dd.Element.Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
+                                        if (persistenceService.Exists(context, dd.Element.Key.Value))
+                                        {
+                                            persistenceService.Delete(context, dd.Element.Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
+                                        }
                                         break;
                                 }
+                            }
+                            catch(DbException e)
+                            {
+                                this.m_tracer.TraceError("Installing {0} (#{1} in dataset) failed", itm, i);
+                                throw e.TranslateDbException();
                             }
                             catch (Exception e)
                             {
@@ -247,6 +260,7 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                                 else
                                 {
+                                    this.m_tracer.TraceError("Error applying dataset item {0} - {1}", i, e.ToHumanReadableString());
                                     throw;
                                 }
                             }
@@ -289,12 +303,14 @@ namespace SanteDB.Persistence.Data.Services
 
                         context.Insert(new DbPatch() { ApplyDate = DateTimeOffset.Now, PatchId = patchId, Description = dataset.Id });
                         tx.Commit();
+
+                        this.Installed?.Invoke(this, new DataPersistedEventArgs<Dataset>(dataset, TransactionMode.Commit, AuthenticationContext.Current.Principal));
                         return true;
                     }
                 }
                 catch (Exception e)
                 {
-                    throw new DataPersistenceException(String.Format(ErrorMessages.BUNDLE_PERSISTENCE_ERROR, dataset.Id, "X"), e);
+                    throw new DataPersistenceException(String.Format(ErrorMessages.BUNDLE_PERSISTENCE_ERROR, "X", dataset.Id), e);
                 }
             }
         }

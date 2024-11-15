@@ -22,6 +22,7 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Security;
+using System;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
@@ -52,6 +53,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 !context.Any<DbSecurityUser>(o => o.Key == data.SecurityUserKey))
             {
                 data.SecurityUserKey = null;
+            }
+            else if(!data.SecurityUserKey.HasValue && data.Key.HasValue)
+            {
+                var myVersionNumber = context.Query<DbEntityVersion>(e => e.Key == data.Key.Value && e.IsHeadVersion).Select(o => o.VersionKey).FirstOrDefault();
+                if (myVersionNumber != null && myVersionNumber != Guid.Empty)
+                {
+                    data.SecurityUserKey = context.Query<DbUserEntity>(e => e.ParentKey == myVersionNumber).Select(o => o.SecurityUserKey).FirstOrDefault();
+                }
             }
 
             return base.BeforePersisting(context, data);

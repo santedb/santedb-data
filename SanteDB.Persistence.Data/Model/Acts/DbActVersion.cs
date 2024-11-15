@@ -81,6 +81,12 @@ namespace SanteDB.Persistence.Data.Model.Acts
         public Guid? ReasonConceptKey { get; set; }
 
         /// <summary>
+        /// Gets or sets the reason for the obsoletion
+        /// </summary>
+        [Column("obslt_rsn"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid? ObsoletionReasonKey { get; set; }
+
+        /// <summary>
         /// Gets or sets the status concept
         /// </summary>
         [Column("sts_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]

@@ -412,8 +412,11 @@ namespace SanteDB.Persistence.Data
                 }
                 else
                 {
-                    retVal = me.Insert(retVal);
-                    me.ContextId = retVal.Key;
+                    if (!me.IsReadonly)
+                    {
+                        retVal = me.Insert(retVal);
+                        me.ContextId = retVal.Key;
+                    }
                 }
 
                 me.Data.Add("provenance", retVal);

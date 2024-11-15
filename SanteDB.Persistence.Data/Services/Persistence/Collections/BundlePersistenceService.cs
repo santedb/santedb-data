@@ -117,7 +117,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         /// </summary>
         public Bundle ReorganizeForInsert(Bundle input)
         {
-            var resolved = input.Item.ToArray();
+            var retVal = new Bundle(input.Item.Where(o => o.BatchOperation == BatchOperationType.Delete));
+            var resolved = input.Item.Where(e=>!retVal.Item.Contains(e)).ToArray();
 
             // Process each object in our queue of to be processed
             bool swapped = true;
@@ -133,6 +134,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                         case Entity entity:
                             dependencies = dependencies.Concat(entity.Relationships?.Select(r => Array.FindIndex(resolved, k => k.Key == r.TargetEntityKey)) ?? new int[0]);
                             dependencies = dependencies.Concat(entity.Participations?.Select(p => Array.FindIndex(resolved, i => i.Key == p.ActKey)) ?? new int[0]);
+                            if(entity.CreationActKey.HasValue && resolved.Any(r=>r.Key == entity.CreationActKey))
+                            {
+                                dependencies = dependencies.Concat(new int[] { Array.FindIndex(resolved, i => i.Key == entity.CreationActKey) });
+                            }
                             break;
                         case Act act:
                             dependencies = dependencies.Concat(act.Relationships?.Select(r => Array.FindIndex(resolved, i => i.Key == r.TargetActKey)) ?? new int[0]);
@@ -169,7 +174,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             //    throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_CIRCULAR_DEPENDENCY));
             //}
 
-            return new Bundle(resolved);
+            retVal.AddRange(resolved);
+            return retVal; 
         }
 
 
@@ -308,7 +314,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                     }
                     objectType = idr.ReferencedType;
                 }
-                var persistenceService = data.Item[i].GetType().GetRelatedPersistenceService();
+
+                var persistenceService = objectType.GetRelatedPersistenceService();
                 // Is the object a reference?
 
                 try
@@ -316,8 +323,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                     switch (data.Item[i].BatchOperation)
                     {
                         case BatchOperationType.Delete:
-                            data.Item[i] = persistenceService.Delete(context, data.Item[i].Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
-                            data.Item[i].BatchOperation = BatchOperationType.Delete;
+                            if (persistenceService.Exists(context, data.Item[i].Key.Value))
+                            {
+                                data.Item[i] = persistenceService.Delete(context, data.Item[i].Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
+                                data.Item[i].BatchOperation = BatchOperationType.Delete;
+                            }
+                            else
+                            {
+                                data.Item[i].BatchOperation = BatchOperationType.Ignore;
+                            }
                             break;
                         case BatchOperationType.Insert:
                             data.Item[i] = persistenceService.Insert(context, data.Item[i]);

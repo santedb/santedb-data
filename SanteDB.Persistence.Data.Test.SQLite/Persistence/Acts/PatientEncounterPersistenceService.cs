@@ -173,7 +173,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                 };
 
                 var afterInsert = base.TestInsert(encounter);
-                Assert.AreEqual(1, afterInsert.SpecialArrangements.Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.SpecialArrangements).Count);
 
                 // Test querying by special arrangements
                 base.TestQuery<PatientEncounter>(o => o.SpecialArrangements.Any(s => s.ArrangementTypeKey == NullReasonKeys.AskedUnknown), 1);
@@ -206,7 +206,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                     o.SpecialArrangements.Add(new PatientEncounterArrangement(NullReasonKeys.Other));
                     return o;
                 });
-                Assert.AreEqual(2, afterUpdate.SpecialArrangements.Count);
+                Assert.AreEqual(2, afterUpdate.LoadProperty(o => o.SpecialArrangements).Count);
 
                 // Test query on new
                 base.TestQuery<PatientEncounter>(o => o.SpecialArrangements.Any(s => s.ArrangementTypeKey == NullReasonKeys.AskedUnknown), 1);
@@ -217,10 +217,10 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
                 // Test update to remove
                 afterUpdate = base.TestUpdate(afterQuery, o =>
                 {
-                    o.SpecialArrangements.RemoveAll(x => x.ArrangementTypeKey == NullReasonKeys.AskedUnknown);
+                    o.LoadProperty(a => a.SpecialArrangements).RemoveAll(x => x.ArrangementTypeKey == NullReasonKeys.AskedUnknown);
                     return o;
                 });
-                Assert.AreEqual(1, afterUpdate.SpecialArrangements.Count);
+                Assert.AreEqual(1, afterUpdate.LoadProperty(o => o.SpecialArrangements).Count);
                 // Test query on new
                 base.TestQuery<PatientEncounter>(o => o.SpecialArrangements.Any(s => s.ArrangementTypeKey == NullReasonKeys.AskedUnknown), 0);
                 base.TestQuery<PatientEncounter>(o => o.SpecialArrangements.Any(s => s.ArrangementTypeKey == NullReasonKeys.AskedUnknown) && o.StatusConceptKey == StatusKeys.Active, 0);

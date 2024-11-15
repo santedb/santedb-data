@@ -16,12 +16,14 @@
  * the License.
  * 
  */
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -66,6 +68,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             return data;
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Not implemented</remarks>
+        public override IEnumerable<DetectedIssue> Validate(object objectToValidate)
+        {
+            // TODO: Validate the mnemonic is unique 
+            yield break;
+        }
+
         /// <summary>
         /// Perform an insert of the model properties
         /// </summary>
@@ -78,7 +88,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             if (data.ConceptNames != null)
             {
                 retVal.ConceptNames = base.UpdateModelVersionedAssociations<ConceptName>(context, retVal, data.ConceptNames).ToList();
-                retVal.SetLoaded(o => o.ConceptNames);
 
             }
 
@@ -97,15 +106,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             if (data.ReferenceTerms != null)
             {
                 retVal.ReferenceTerms = base.UpdateModelVersionedAssociations<ConceptReferenceTerm>(context, retVal, data.ReferenceTerms).ToList();
-                retVal.SetLoaded(o => o.ReferenceTerms);
-
             }
 
             // Relationships
             if (data.Relationships != null)
             {
                 retVal.Relationships = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationships).ToList();
-                retVal.SetLoaded(o => o.Relationships);
 
             }
             return retVal;
@@ -122,7 +128,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             if (data.ConceptNames != null)
             {
                 retVal.ConceptNames = base.UpdateModelVersionedAssociations<ConceptName>(context, retVal, data.ConceptNames).ToList();
-                retVal.SetLoaded(o => o.ConceptNames);
 
             }
 
@@ -141,16 +146,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             if (data.ReferenceTerms != null)
             {
                 retVal.ReferenceTerms = base.UpdateModelVersionedAssociations<ConceptReferenceTerm>(context, retVal, data.ReferenceTerms).ToList();
-                retVal.SetLoaded(o => o.ReferenceTerms);
-
             }
 
             // Relationships
             if (data.Relationships != null)
             {
                 retVal.Relationships = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationships).ToList();
-                retVal.SetLoaded(o => o.Relationships);
-
             }
 
             return retVal;

@@ -26,6 +26,7 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
@@ -35,6 +36,7 @@ using SanteDB.Persistence.Data.Model.Extensibility;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -90,6 +92,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             existingVersion.ParentKey = newVersion.VersionKey;
             context.Insert(existingVersion);
         }
+
 
         /// <inheritdoc/>
         public override IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<TAct, bool>> query)
@@ -305,6 +308,41 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             base.DoDeleteReferencesInternal(context, key);
         }
 
+
+        /// <inheritdoc/>
+        public override IEnumerable<DetectedIssue> Validate(object objectToValidate)
+        {
+            if (objectToValidate == null)
+            {
+                throw new ArgumentNullException(nameof(objectToValidate));
+            }
+            else if (objectToValidate is TAct strong)
+            {
+                try
+                {
+                    using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+                    {
+                        context.Open();
+                        context.EstablishProvenance(AuthenticationContext.Current.Principal);
+                        return this.VerifyEntity(context, strong).ToArray(); // force execute
+                    }
+                }
+                catch (DbException e)
+                {
+                    throw e.TranslateDbException();
+                }
+                catch (Exception e)
+                {
+                    throw new DataPersistenceException(ErrorMessages.DATA_STRUCTURE_NOT_APPROPRIATE, e);
+                }
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(TAct), objectToValidate.GetType()));
+            }
+        }
+
+
         /// <inheritdoc/>
         protected override TAct BeforePersisting(DataContext context, TAct data)
         {
@@ -467,20 +505,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             if (data.Extensions != null)
             {
                 retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
-                retVal.SetLoaded(o => o.Extensions);
-
             }
 
             if (data.Identifiers != null)
             {
                 retVal.Identifiers = this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
-                retVal.SetLoaded(o => o.Identifiers);
             }
 
             if (data.Notes != null)
             {
                 retVal.Notes = this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
-                retVal.SetLoaded(o => o.Notes);
             }
 
             if (data.Policies != null)
@@ -494,19 +528,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             if (data.Relationships != null)
             {
                 retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
-                retVal.SetLoaded(o => o.Relationships);
             }
 
             if (data.Tags != null)
             {
                 retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
-                retVal.SetLoaded(o => o.Tags);
             }
 
             if (data.Participations != null)
             {
                 retVal.Participations = this.UpdateModelVersionedAssociations(context, retVal, data.Participations).ToList();
-                retVal.SetLoaded(o => o.Participations);
             }
 
             if (data.Protocols != null)
@@ -517,7 +548,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     p.SourceEntityKey = retVal.Key;
                     return typeof(ActProtocol).GetRelatedPersistenceService().Insert(context, p) as ActProtocol;
                 }).ToList();
-                retVal.SetLoaded(o => o.Protocols);
             }
 
             return retVal;
@@ -536,20 +566,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             if (data.Extensions != null)
             {
                 retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
-                retVal.SetLoaded(o => o.Extensions);
-
             }
 
             if (data.Identifiers != null)
             {
                 retVal.Identifiers = this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
-                retVal.SetLoaded(o => o.Identifiers);
             }
 
             if (data.Notes != null)
             {
                 retVal.Notes = this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
-                retVal.SetLoaded(o => o.Notes);
             }
 
             if (data.Policies != null)
@@ -563,19 +589,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             if (data.Relationships != null)
             {
                 retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
-                retVal.SetLoaded(o => o.Relationships);
             }
 
             if (data.Tags != null)
             {
                 retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
-                retVal.SetLoaded(o => o.Tags);
             }
 
             if (data.Participations != null)
             {
                 retVal.Participations = this.UpdateModelVersionedAssociations(context, retVal, data.Participations).ToList();
-                retVal.SetLoaded(o => o.Participations);
             }
 
             if (data.Protocols != null)
@@ -587,7 +610,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     p.SourceEntityKey = retVal.Key;
                     return typeof(ActProtocol).GetRelatedPersistenceService().Insert(context, p) as ActProtocol;
                 }).ToList();
-                retVal.SetLoaded(o => o.Protocols);
             }
 
             return retVal;

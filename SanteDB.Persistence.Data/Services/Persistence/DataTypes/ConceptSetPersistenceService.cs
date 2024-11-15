@@ -50,7 +50,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         {
             var retVal = base.DoInsertModel(context, data);
 
-            if (data.ConceptsXml?.Any() == true)
+            if (data.ConceptsXml != null)
             {
                 retVal.ConceptsXml = base.UpdateInternalAssociations(context, retVal.Key.Value, data.ConceptsXml.Select(o => new DbConceptSetConceptAssociation()
                 {
@@ -59,7 +59,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                 })).Select(o => o.ConceptKey).ToList();
             }
 
-            if (data.Composition?.Any() == true)
+            if (data.Composition != null)
             {
                 retVal.Composition = base.UpdateModelAssociations(context, retVal, data.Composition).ToList();
             }
@@ -70,7 +70,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override ConceptSet DoUpdateModel(DataContext context, ConceptSet data)
         {
             var retVal = base.DoUpdateModel(context, data);
-            if (data.ConceptsXml?.Any() == true)
+            if (data.ConceptsXml != null)
             {
                 retVal.ConceptsXml = base.UpdateInternalAssociations(context, retVal.Key.Value, data.ConceptsXml.Select(o => new DbConceptSetConceptAssociation()
                 {
@@ -78,7 +78,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                     SourceKey = retVal.Key.Value
                 }), o => o.SourceKey == data.Key).Select(o => o.ConceptKey).ToList();
             }
-            if (data.Composition?.Any() == true)
+            if (data.Composition != null)
             {
                 retVal.Composition = base.UpdateModelAssociations(context, retVal, data.Composition).ToList();
             }
@@ -98,6 +98,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                 case LoadMode.FullLoad:
                 case LoadMode.SyncLoad:
                     retVal.Composition = retVal.Composition.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.SetLoaded(o=>o.Composition);
                     break;
             }
             return retVal;

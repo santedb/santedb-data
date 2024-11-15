@@ -45,6 +45,7 @@
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="9.1.1" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.4.2" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SanteDB.Core.TestFramework.FirebirdSQL.targets" Pack="true" PackagePath="build" />
@@ -62,10 +63,4 @@
     <None Include="firebird\santedb_test.fdb" Pack="true" PackagePath="build\firebird" />
     <None Include="firebird\plugins\engine12.dll" Pack="true" PackagePath="build\firebird\plugins" />
   </ItemGroup>
-
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(NoFirebird)' == '' and Exists('C:\Program Files\7-Zip\7z.exe')">
-    <Exec Command="&quot;C:\Program Files\7-Zip\7z.exe&quot; x -o&quot;$(ProjectDir)\firebird&quot; -y &quot;$(MSBuildThisFileDirectory)..\Solution Items\FirebirdSQL-3.0.3-Embedded.zip&quot; " />
-    <Copy SourceFiles="$(ProjectDir)..\Solution Items\santedb_test.fdb" DestinationFolder="$(ProjectDir)\firebird" />
-  </Target>
-
 </Project>

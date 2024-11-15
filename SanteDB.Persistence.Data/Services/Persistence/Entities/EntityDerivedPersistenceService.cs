@@ -16,6 +16,7 @@
  * the License.
  * 
  */
+using DocumentFormat.OpenXml.EMMA;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Extensions;
@@ -26,6 +27,7 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
@@ -37,6 +39,7 @@ using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -319,6 +322,39 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             base.DoDeleteFreeTextIndexInternal(context, key);
         }
 
+        /// <inheritdoc/>
+        public override IEnumerable<DetectedIssue> Validate(object objectToValidate)
+        {
+            if (objectToValidate == null)
+            {
+                throw new ArgumentNullException(nameof(objectToValidate));
+            }
+            else if (objectToValidate is TEntity strong)
+            {
+                try
+                {
+                    using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+                    {
+                        context.Open();
+                        context.EstablishProvenance(AuthenticationContext.Current.Principal);
+                        return this.VerifyEntity(context, strong).ToArray(); // force execute
+                    }
+                }
+                catch (DbException e)
+                {
+                    throw e.TranslateDbException();
+                }
+                catch (Exception e)
+                {
+                    throw new DataPersistenceException(ErrorMessages.DATA_STRUCTURE_NOT_APPROPRIATE, e);
+                }
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(TEntity), objectToValidate.GetType()));
+            }
+        }
+
         /// <summary>
         /// Prepare references
         /// </summary>
@@ -461,7 +497,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 if (referenceObjects.Length == 0)
                 {
-                    this.m_tracer.TraceWarning($"Fetching referenced objects - consider calling IDataPersistences<{typeof(TEntity).Name}> in the future");
+                    this.m_tracer.TraceVerbose($"Fetching referenced objects - consider calling IDataPersistences<{typeof(TEntity).Name}> in the future");
                     referenceObjects = edps.GetReferencedObjects(context, dbModel) ?? new object[0];
                 }
                 return (TEntity)edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
@@ -486,33 +522,26 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             if (data.Addresses != null)
             {
                 retVal.Addresses = this.UpdateModelVersionedAssociations(context, retVal, data.Addresses).ToList();
-                retVal.SetLoaded(o => o.Addresses);
-
             }
 
             if (data.Extensions != null)
             {
                 retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
-                retVal.SetLoaded(o => o.Extensions);
-
             }
 
             if (data.Identifiers != null)
             {
                 retVal.Identifiers = this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
-                retVal.SetLoaded(o => o.Identifiers);
             }
 
             if (data.Names != null)
             {
                 retVal.Names = this.UpdateModelVersionedAssociations(context, retVal, data.Names).ToList();
-                retVal.SetLoaded(o => o.Names);
             }
 
             if (data.Notes != null)
             {
                 retVal.Notes = this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
-                retVal.SetLoaded(o => o.Notes);
             }
 
             if (data.Policies != null)
@@ -526,19 +555,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             if (data.Relationships != null)
             {
                 retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
-                retVal.SetLoaded(o => o.Relationships);
             }
 
             if (data.Tags != null)
             {
                 retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
-                retVal.SetLoaded(o => o.Tags);
             }
 
             if (data.Telecoms != null)
             {
                 retVal.Telecoms = this.UpdateModelVersionedAssociations(context, retVal, data.Telecoms).ToList();
-                retVal.SetLoaded(o => o.Telecoms);
             }
             if (data.GeoTag != null && data.GeoTag.Key.HasValue)
             {
@@ -559,31 +585,26 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             if (data.Addresses != null)
             {
                 retVal.Addresses = this.UpdateModelVersionedAssociations(context, retVal, data.Addresses).ToList();
-                retVal.SetLoaded(o => o.Addresses);
             }
 
             if (data.Extensions != null)
             {
                 retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
-                retVal.SetLoaded(o => o.Extensions);
             }
 
             if (data.Identifiers != null)
             {
                 retVal.Identifiers = this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
-                retVal.SetLoaded(o => o.Identifiers);
             }
 
             if (data.Names != null)
             {
                 retVal.Names = this.UpdateModelVersionedAssociations(context, retVal, data.Names).ToList();
-                retVal.SetLoaded(o => o.Names);
             }
 
             if (data.Notes != null)
             {
                 retVal.Notes = this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
-                retVal.SetLoaded(o => o.Notes);
             }
 
             if (data.Policies != null)
@@ -597,19 +618,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             if (data.Relationships != null)
             {
                 retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
-                retVal.SetLoaded(o => o.Relationships);
             }
 
             if (data.Tags != null)
             {
                 retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
-                retVal.SetLoaded(o => o.Tags);
             }
 
             if (data.Telecoms != null)
             {
                 retVal.Telecoms = this.UpdateModelVersionedAssociations(context, retVal, data.Telecoms).ToList();
-                retVal.SetLoaded(o => o.Telecoms);
             }
 
             if (data.GeoTag != null && data.GeoTag.Key.HasValue)

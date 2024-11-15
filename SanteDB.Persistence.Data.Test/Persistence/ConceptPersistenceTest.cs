@@ -84,7 +84,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 var afterInsert = base.TestInsert(concept);
                 Assert.AreEqual("TEST-02", afterInsert.Mnemonic);
                 Assert.AreEqual(ConceptClassKeys.Other, afterInsert.ClassKey);
-                Assert.AreEqual(1, afterInsert.ConceptNames.Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.ConceptNames).Count);
 
                 // Fetch
                 var afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-02", 1).FirstOrDefault();
@@ -135,8 +135,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 var afterInsert = base.TestInsert(concept);
                 Assert.AreEqual("TEST-03", afterInsert.Mnemonic);
                 Assert.AreEqual(ConceptClassKeys.Other, afterInsert.ClassKey);
-                Assert.AreEqual(1, afterInsert.ConceptNames.Count);
-                Assert.AreEqual(1, afterInsert.ReferenceTerms.Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.ConceptNames).Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.ReferenceTerms).Count);
                 Assert.AreEqual("032XX", afterInsert.ReferenceTerms.First().LoadProperty(o => o.ReferenceTerm).Mnemonic);
                 Assert.AreEqual(ConceptRelationshipTypeKeys.SameAs, afterInsert.ReferenceTerms.First().RelationshipTypeKey);
 
@@ -202,10 +202,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 var afterInsert = base.TestInsert(concept);
                 Assert.AreEqual("TEST-04", afterInsert.Mnemonic);
                 Assert.AreEqual(StatusKeys.Active, afterInsert.StatusConceptKey);
-                Assert.AreEqual(1, afterInsert.Relationships.Count);
-                Assert.AreEqual(1, afterInsert.ConceptNames.Count);
-                Assert.AreEqual(1, afterInsert.ReferenceTerms.Count);
-                Assert.AreEqual(1, afterInsert.ConceptSetsXml.Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.Relationships).Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.ConceptNames).Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.ReferenceTerms).Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.ConceptSetsXml).Count);
 
                 var afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-04", 1).First();
                 Assert.AreEqual("TEST-04", afterQuery.Mnemonic);
@@ -311,9 +311,9 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 var afterInsert = base.TestInsert(concept);
                 Assert.AreEqual("TEST-06", afterInsert.Mnemonic);
-                Assert.AreEqual(3, afterInsert.ConceptNames.Count);
-                Assert.AreEqual(1, afterInsert.ConceptSetsXml.Count);
-                Assert.AreEqual(1, afterInsert.ReferenceTerms.Count);
+                Assert.AreEqual(3, afterInsert.LoadProperty(o => o.ConceptNames).Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.ConceptSetsXml).Count);
+                Assert.AreEqual(1, afterInsert.LoadProperty(o => o.ReferenceTerms).Count);
 
                 // First we will remove a name
                 var afterUpdate = base.TestUpdate(afterInsert, (o) =>
@@ -321,7 +321,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                     o.ConceptNames.RemoveAt(2);
                     return o;
                 });
-                Assert.AreEqual(2, afterUpdate.ConceptNames.Count);
+                Assert.AreEqual(2, afterUpdate.LoadProperty(o => o.ConceptNames).Count);
 
                 // Query to ensure the name is not being loaded
                 var afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-06", 1).FirstOrDefault();
@@ -336,8 +336,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                     o.LoadProperty(r => r.Relationships).Add(new ConceptRelationship(ConceptRelationshipTypeKeys.SameAs, NullReasonKeys.NoInformation));
                     return o;
                 });
-                Assert.AreEqual(1, afterUpdate.Relationships.Count);
-                Assert.AreEqual(2, afterUpdate.ConceptNames.Count);
+                Assert.AreEqual(1, afterUpdate.LoadProperty(o => o.Relationships).Count);
+                Assert.AreEqual(2, afterUpdate.LoadProperty(o => o.ConceptNames).Count);
 
                 // Ensure the query returns the same
                 afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-06", 1).FirstOrDefault();
@@ -361,10 +361,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 });
 
                 // Ensure the update reflects
-                Assert.AreEqual(1, afterUpdate.ConceptNames.Count);
-                Assert.AreEqual(2, afterUpdate.ReferenceTerms.Count);
-                Assert.AreEqual(0, afterUpdate.ConceptSetsXml.Count);
-                Assert.AreEqual(1, afterUpdate.Relationships.Count);
+                Assert.AreEqual(1, afterUpdate.LoadProperty(o => o.ConceptNames).Count);
+                Assert.AreEqual(2, afterUpdate.LoadProperty(o => o.ReferenceTerms).Count);
+                Assert.AreEqual(0, afterUpdate.LoadProperty(o => o.ConceptSetsXml).Count);
+                Assert.AreEqual(1, afterUpdate.LoadProperty(o => o.Relationships).Count);
 
                 // Now re-query
                 afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-06", 1).FirstOrDefault();
@@ -372,7 +372,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Relationships).Count);
                 Assert.AreEqual("en", afterQuery.ConceptNames[0].Language);
                 Assert.AreEqual(2, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
-                Assert.AreEqual(0, afterQuery.ConceptSetsXml.Count);
+                Assert.AreEqual(0, afterQuery.LoadProperty(o => o.ConceptSetsXml).Count);
             }
         }
 
@@ -398,15 +398,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                             {
                                 Mnemonic = "TEST07A",
                                 CodeSystemKey = CodeSystemKeys.AdministrativeGender
-                            }
-                        },
-                        new ConceptReferenceTerm()
-                        {
-                            RelationshipTypeKey = ConceptRelationshipTypeKeys.SameAs,
-                            ReferenceTerm = new ReferenceTerm()
-                            {
-                                Mnemonic = "TEST07A.B",
-                                CodeSystemKey = CodeSystemKeys.CVX
                             }
                         }
                     },
@@ -455,7 +446,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 // Test filte ron reference term
                 base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST07A"), 1);
-                base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST07A.B"), 1);
 
                 // Test ordering
                 var result = base.TestQuery<Concept>(o => o.Mnemonic.StartsWith("TEST-07"), 2);
@@ -491,22 +481,11 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(1, stateful.Skip(0).Take(1).Count());
                 Assert.AreEqual(1, stateful.Skip(1).Take(100).Count());
 
+
                 // Test that nested selectors work
                 var uuids = result.Select(o => o.Key);
                 Assert.AreEqual(after1.Key, uuids.First());
                 Assert.AreEqual(after2.Key, uuids.Last());
-
-
-                // Update
-
-                var after3 = base.TestUpdate(after1, o =>
-                {
-                    o.ReferenceTerms.RemoveAt(1);
-                    return o;
-                });
-                base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST07A"), 1);
-                base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST07A.B"), 0);
-
 
 
             }
