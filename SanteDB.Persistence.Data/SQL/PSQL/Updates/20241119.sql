@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20241119-01" name="Update:20241119-01"   invariantName="npgsql"  environment="Server">
+ * <feature scope="SanteDB.Persistence.Data" id="20241119-01" name="Update:20241119-01"   invariantName="npgsql" >
  *	<summary>Update: Updates the concept relationship tables to support flow relationships</summary>
  *	<isInstalled>select ck_patch('20241119-01')</isInstalled>
  * </feature>

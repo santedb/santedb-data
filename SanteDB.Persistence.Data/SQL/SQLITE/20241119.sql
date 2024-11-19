@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20241119" name="Update:20241119"  invariantName="sqlite" environment="Server">
+ * <feature scope="SanteDB.Persistence.Data" id="20241119" name="Update:20241119"  invariantName="sqlite">
  *	<summary>Update: Updates the concept relationship tables to support flow relationships</summary>
  *  <isInstalled>SELECT EXISTS (SELECT 1 FROM patch_db_systbl WHERE patch_id='20241119')</isInstalled>
  * </feature>
