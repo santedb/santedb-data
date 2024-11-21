@@ -508,7 +508,7 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             claims.Add(new SanteDBClaim(SanteDBClaimTypes.LocalOnly, "true"));
                         }
-
+                        
                         // Insert claims to database
                         var dbClaims = claims.Where(c => !this.m_nonSessionClaims.Contains(c.Type)).Select(o => new DbSessionClaim()
                         {

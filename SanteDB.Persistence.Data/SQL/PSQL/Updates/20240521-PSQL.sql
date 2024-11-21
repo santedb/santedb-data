@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20240521-01" name="Update:20240521-01" environment="Server"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20240521-01" name="Update:20240521-01" environment="Server Gateway"  invariantName="npgsql">
  *	<summary>Update: Adds entity extension scope column and URI/Name separation</summary>
  *	<isInstalled>select ck_patch('20240521-01')</isInstalled>
  * </feature>

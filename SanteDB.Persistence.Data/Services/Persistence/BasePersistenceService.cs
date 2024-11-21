@@ -262,6 +262,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             else if (data.IsEmpty()) // No sense in persisting an empty data object
             {
+                data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Ignore;
                 return data;
             }
 
@@ -655,6 +656,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return preEvent.Data;
             }
 
+            var deferConstraints = data.ShouldDisablePersistenceConstraints();
 
             try
             {
@@ -664,36 +666,52 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                     using (var tx = context.BeginTransaction())
                     {
-                        // Establish provenance object
-                        if (data is BaseEntityData be)
+                        try
                         {
-                            context.EstablishProvenance(principal, be.CreatedByKey);
-                        }
-                        else
-                        {
-                            context.EstablishProvenance(principal, null);
-                        }
+                            if (deferConstraints)
+                            {
+                                context.DisableConstraints();
+                            }
 
-                        data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty, this.m_configuration.StrictKeyAgreement);
-                        // Is this an update or insert?
-                        if ((DataPersistenceControlContext.Current?.AutoUpdate ?? this.m_configuration.AutoUpdateExisting) && data.Key.HasValue && this.Exists(context, data.Key.Value))
-                        {
-                            this.m_tracer.TraceWarning("Object {0} already exists - updating instead", data);
-                            data = this.DoUpdateModel(context, data);
-                            data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
-                        }
-                        else
-                        {
-                            data = this.DoInsertModel(context, data);
-                            data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
+                            // Establish provenance object
+                            if (data is BaseEntityData be)
+                            {
+                                context.EstablishProvenance(principal, be.CreatedByKey);
+                                be.CreatedByKey = context.ContextId;
+                            }
+                            else
+                            {
+                                context.EstablishProvenance(principal, null);
+                            }
 
-                        }
-                        data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
+                            data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty, this.m_configuration.StrictKeyAgreement);
+                            // Is this an update or insert?
+                            if ((DataPersistenceControlContext.Current?.AutoUpdate ?? this.m_configuration.AutoUpdateExisting) && data.Key.HasValue && this.Exists(context, data.Key.Value))
+                            {
+                                this.m_tracer.TraceWarning("Object {0} already exists - updating instead", data);
+                                data = this.DoUpdateModel(context, data);
+                                data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
+                            }
+                            else
+                            {
+                                data = this.DoInsertModel(context, data);
+                                data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
 
-                        if (mode == TransactionMode.Commit)
+                            }
+                            data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
+
+                            if (mode == TransactionMode.Commit)
+                            {
+                                tx.Commit();
+                                this.m_dataCacheService?.Add(data);
+                            }
+                        }
+                        finally
                         {
-                            tx.Commit();
-                            this.m_dataCacheService?.Add(data);
+                            if(deferConstraints)
+                            {
+                                context.RestoreConstraints();
+                            }
                         }
                     }
                 }
@@ -879,6 +897,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return preEvt.Data;
             }
 
+            var deferConstraints = data.ShouldDisablePersistenceConstraints();
+
             using (var context = this.Provider.GetWriteConnection())
             {
                 try
@@ -887,25 +907,41 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                     using (var tx = context.BeginTransaction())
                     {
-                        // Establish provenance object
-                        if (data is BaseEntityData be)
+                        try
                         {
-                            context.EstablishProvenance(principal, be.CreatedByKey);
-                        }
-                        else
-                        {
-                            context.EstablishProvenance(principal, null);
-                        }
+                            if (deferConstraints)
+                            {
+                                context.DisableConstraints();
+                            }
 
-                        data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty, this.m_configuration.StrictKeyAgreement);
-                        data = this.DoUpdateModel(context, data);
-                        data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
-                        data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
-                        if (mode == TransactionMode.Commit)
-                        {
-                            tx.Commit();
-                            this.m_dataCacheService?.Add(data);
+                            // Establish provenance object
+                            if (data is BaseEntityData be)
+                            {
+                                context.EstablishProvenance(principal, be.CreatedByKey);
+                                be.CreatedByKey = context.ContextId;
+                            }
+                            else
+                            {
+                                context.EstablishProvenance(principal, null);
+                            }
 
+                            data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty, this.m_configuration.StrictKeyAgreement);
+                            data = this.DoUpdateModel(context, data);
+                            data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
+                            data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
+                            if (mode == TransactionMode.Commit)
+                            {
+                                tx.Commit();
+                                this.m_dataCacheService?.Add(data);
+
+                            }
+                        }
+                        finally
+                        {
+                            if (deferConstraints)
+                            {
+                                context.RestoreConstraints();
+                            }
                         }
                     }
 
