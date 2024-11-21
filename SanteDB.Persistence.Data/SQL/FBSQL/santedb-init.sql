@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="0-004" name="Data Initialization" invariantName="FirebirdSQL">
+ * <feature scope="SanteDB.Persistence.Data" id="0-004" name="Data Initialization" invariantName="FirebirdSQL" environment="Server">
  *	<summary>Install Core Data</summary>
  *	<remarks>Initializes the SanteDB database with default usernames, passwords, and applications</remarks>
  *	<isInstalled>SELECT COUNT(1) = 1 FROM SEC_USR_TBL WHERE USR_NAME = 'Administrator'</isInstalled>
