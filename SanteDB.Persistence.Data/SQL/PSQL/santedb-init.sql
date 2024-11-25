@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data" id="00010000-04" name="Data Initialization" invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="00010000-04" name="Data Initialization" invariantName="npgsql" environment="Server">
  *	<summary>Initialize Data</summary>
  *	<remarks>Initializes the SanteDB database with default usernames, passwords, and applications</remarks>
  *	<isInstalled>SELECT COUNT(1) = 1 FROM SEC_USR_TBL WHERE USR_NAME = 'Administrator'</isInstalled>

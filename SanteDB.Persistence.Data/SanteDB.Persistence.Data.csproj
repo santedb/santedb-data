@@ -79,6 +79,7 @@
     <None Remove="SQL\FBSQL\Updates\20240913.sql" />
     <None Remove="SQL\FBSQL\Updates\20241022.sql" />
     <None Remove="SQL\FBSQL\Updates\20241103.sql" />
+    <None Remove="SQL\FBSQL\Updates\20241119.sql" />
     <None Remove="SQL\PSQL\santedb-codes.sql" />
     <None Remove="SQL\PSQL\santedb-ddl.sql" />
     <None Remove="SQL\PSQL\santedb-fn.sql" />
@@ -109,6 +110,8 @@
     <None Remove="SQL\PSQL\Updates\20240718.sql" />
     <None Remove="SQL\PSQL\Updates\20240913.sql" />
     <None Remove="SQL\PSQL\Updates\20241022.sql" />
+    <None Remove="SQL\PSQL\Updates\20241118.sql" />
+    <None Remove="SQL\PSQL\Updates\20241119.sql" />
     <None Remove="SQL\SQLITE\20221003.SQL" />
     <None Remove="SQL\SQLITE\20221027.sql" />
     <None Remove="SQL\SQLITE\20221130.sql" />
@@ -135,6 +138,8 @@
     <None Remove="SQL\SQLITE\20240913.sql" />
     <None Remove="SQL\SQLITE\20241022.sql" />
     <None Remove="SQL\SQLITE\20241103.sql" />
+    <None Remove="SQL\SQLITE\20241119.sql" />
+    <None Remove="SQL\SQLITE\20241118.sql" />
     <None Remove="SQL\SQLITE\santedb-codes.sql" />
     <None Remove="SQL\SQLITE\santedb-ddl.sql" />
     <None Remove="SQL\SQLITE\santedb-init.sql" />
@@ -217,6 +222,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Map\CdssModelMap.xml" />
     <EmbeddedResource Include="Map\ModelMap.xml" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20241119.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20241119.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20241118.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20241103.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20241022.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20240913.sql" />
@@ -304,6 +312,8 @@
     <EmbeddedResource Include="SQL\SQLITE\20230514.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20230509.sql">
     </EmbeddedResource>
+    <EmbeddedResource Include="SQL\SQLITE\20241118.sql" />
+    <EmbeddedResource Include="SQL\SQLITE\20241119.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20241103.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20241022.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20240913.sql" />

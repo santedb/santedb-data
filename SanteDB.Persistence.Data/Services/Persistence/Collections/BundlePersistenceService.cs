@@ -226,6 +226,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 return preEventArgs.Data;
             }
 
+            var deferConstraints = data.ShouldDisablePersistenceConstraints();
             try
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
@@ -233,20 +234,34 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                     context.Open();
                     using (var tx = context.BeginTransaction())
                     {
-                        context.EstablishProvenance(principal, null);
-
-                        data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty, this.m_configuration.StrictKeyAgreement);
-
-                        data = this.Insert(context, data);
-
-                        data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
-
-                        if (transactionMode == TransactionMode.Commit)
+                        try
                         {
-                            tx.Commit();
-                        }
+                            if (deferConstraints)
+                            {
+                                context.DisableConstraints();
+                            }
+                            context.EstablishProvenance(principal, null);
 
-                        data.Item.ForEach(i => this.m_dataCachingService.Add(i));
+                            data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty, this.m_configuration.StrictKeyAgreement);
+
+                            data = this.Insert(context, data);
+
+                            data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
+
+                            if (transactionMode == TransactionMode.Commit)
+                            {
+                                tx.Commit();
+                            }
+
+                            data.Item.ForEach(i => this.m_dataCachingService.Add(i));
+                        }
+                        finally
+                        {
+                            if (deferConstraints)
+                            {
+                                context.RestoreConstraints();
+                            }
+                        }
                     }
                 }
 
@@ -296,6 +311,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         /// <inheritdoc/>
         public Bundle Insert(OrmLite.DataContext context, Bundle data)
         {
+            
             // Process the bundle components
             data = this.ReorganizeForInsert(data);
             for (var i = 0; i < data.Item.Count; i++)
