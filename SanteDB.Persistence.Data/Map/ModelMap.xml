@@ -527,7 +527,8 @@
 
   <class modelClass="SanteDB.Core.Model.Acts.Protocol, SanteDB.Core.Model"
          domainClass="SanteDB.Persistence.Data.Model.Acts.DbProtocol, SanteDB.Persistence.Data">
-     <property modelName="Tag" queryOnly="true" domainName="Key" /> 
+	  <property modelName="ModifiedOn" domainName="CreationTime" />
+	  <property modelName="Tag" queryOnly="true" domainName="Key" /> 
   </class>
 
   <class modelClass="SanteDB.Core.Model.Acts.ControlAct, SanteDB.Core.Model"
