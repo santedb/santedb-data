@@ -216,14 +216,18 @@ namespace SanteDB.Persistence.Data.Services
                             // Clear the provenance times
                             if(itm.Element is BaseEntityData be)
                             {
-                                be.CreationTime = default(DateTime);
+                                be.CreationTime = default(DateTimeOffset);
                                 be.CreatedByKey = null;
                                 be.ObsoletionTime = null;
                                 be.ObsoletedByKey = null;
                             }
                             if(itm.Element is NonVersionedEntityData nve)
                             {
-                                nve.UpdatedBy = null;
+                                nve.CreationTime = default(DateTimeOffset);
+                                nve.CreatedByKey = null;
+                                nve.ObsoletionTime = null;
+                                nve.ObsoletedByKey = null;
+                                nve.UpdatedTime = null;
                                 nve.UpdatedByKey = null;
                             }
                             this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(AdoDatasetInstallerService), (float)i / (float)dataset.Action.Count, String.Format(UserMessages.PROCESSING, dataset.Id)));
@@ -262,6 +266,7 @@ namespace SanteDB.Persistence.Data.Services
                             }
                             catch(DbException e)
                             {
+                                
                                 this.m_tracer.TraceError("Installing {0} (#{1} in dataset) failed", itm, i);
                                 throw e.TranslateDbException();
                             }
