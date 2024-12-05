@@ -22,6 +22,7 @@ using SanteDB.OrmLite.Providers.Postgres;
 using SanteDB.OrmLite.Providers.Sqlite;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SanteDB.Persistence.Data.Query.Filters
@@ -52,6 +53,7 @@ namespace SanteDB.Persistence.Data.Query.Filters
             match = Constants.ExtractColumnBindingRegex.Match(filterColumn);
             String tableName = match.Groups[1].Value, columnName = match.Groups[2].Value;
 
+            var tableMapping = TableMapping.Get(tableName.Replace(".",""));
             switch (columnName)
             {
                 case "ent_id":
@@ -67,7 +69,15 @@ namespace SanteDB.Persistence.Data.Query.Filters
                     currentBuilder.Append($"cd_vrsn_tbl.crt_utc {op} ?", QueryBuilder.CreateParameterValue(value, typeof(DateTimeOffset)));
                     break;
                 default:
-                    currentBuilder.Append($"COALESCE({tableName}upd_utc, {tableName}crt_utc) {op} ?", QueryBuilder.CreateParameterValue(value, typeof(DateTimeOffset)));
+                    if(tableMapping == null || tableMapping.Columns.Any(c=>c.Name == "upd_utc"))
+                    {
+                        currentBuilder.Append($"COALESCE({tableName}upd_utc, {tableName}crt_utc) {op} ?", QueryBuilder.CreateParameterValue(value, typeof(DateTimeOffset)));
+                    }
+                    else
+                    {
+                        currentBuilder.Append($"{tableName}crt_utc {op} ?", QueryBuilder.CreateParameterValue(value, typeof(DateTimeOffset)));
+
+                    }
                     break;
             }
             return currentBuilder;   

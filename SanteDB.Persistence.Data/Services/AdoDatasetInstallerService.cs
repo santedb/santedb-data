@@ -22,6 +22,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
+using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.DataTypes;
@@ -212,6 +213,23 @@ namespace SanteDB.Persistence.Data.Services
                         for (var i = 0; i < dataset.Action.Count; i++)
                         {
                             var itm = dataset.Action[i];
+                            // Clear the provenance times
+                            if(itm.Element is BaseEntityData be)
+                            {
+                                be.CreationTime = default(DateTimeOffset);
+                                be.CreatedByKey = null;
+                                be.ObsoletionTime = null;
+                                be.ObsoletedByKey = null;
+                            }
+                            if(itm.Element is NonVersionedEntityData nve)
+                            {
+                                nve.CreationTime = default(DateTimeOffset);
+                                nve.CreatedByKey = null;
+                                nve.ObsoletionTime = null;
+                                nve.ObsoletedByKey = null;
+                                nve.UpdatedTime = null;
+                                nve.UpdatedByKey = null;
+                            }
                             this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(AdoDatasetInstallerService), (float)i / (float)dataset.Action.Count, String.Format(UserMessages.PROCESSING, dataset.Id)));
                             var persistenceService = itm.Element.GetType().GetRelatedPersistenceService();
                             this.m_tracer.TraceVerbose("{0} {1}", itm.ActionName, itm.Element);
@@ -248,6 +266,7 @@ namespace SanteDB.Persistence.Data.Services
                             }
                             catch(DbException e)
                             {
+                                
                                 this.m_tracer.TraceError("Installing {0} (#{1} in dataset) failed", itm, i);
                                 throw e.TranslateDbException();
                             }
