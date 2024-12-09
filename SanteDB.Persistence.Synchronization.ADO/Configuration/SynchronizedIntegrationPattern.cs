@@ -21,6 +21,7 @@ using SanteDB.Cdss.Xml;
 using SanteDB.Client.Configuration;
 using SanteDB.Client.Disconnected.Data.Synchronization;
 using SanteDB.Client.Disconnected.Services;
+using SanteDB.Client.Upstream.Management;
 using SanteDB.Client.Upstream.Repositories;
 using SanteDB.Client.Upstream.Security;
 using SanteDB.Core;
@@ -79,6 +80,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                         typeof(AdoPubSubManager),
                         typeof(BridgedSecurityRepositoryService),
                         typeof(UpstreamSecurityRepository),
+                        typeof(UpstreamDataTemplateManagementService),
                         typeof(BridgedIdentityProvider),
                         typeof(UpstreamIdentityProvider),
                         typeof(UpstreamApplicationIdentityProvider),
