@@ -1,0 +1,396 @@
+﻿/*
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you 
+ * may not use this file except in compliance with the License. You may 
+ * obtain a copy of the License at 
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0 
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ * License for the specific language governing permissions and limitations under 
+ * the License.
+ * 
+ */
+using SanteDB.Core.Data.Import;
+using SanteDB.Core.Data.Query;
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.i18n;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Map;
+using SanteDB.Core.Model.Query;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
+using SanteDB.Core.Services;
+
+
+/*
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you 
+ * may not use this file except in compliance with the License. You may 
+ * obtain a copy of the License at 
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0 
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ * License for the specific language governing permissions and limitations under 
+ * the License.
+ * 
+ */
+using SanteDB.Core.Templates;
+using SanteDB.Core.Templates.Definition;
+using SanteDB.OrmLite;
+using SanteDB.OrmLite.MappedResultSets;
+using SanteDB.OrmLite.Providers;
+using SanteDB.Persistence.Data.Configuration;
+using SanteDB.Persistence.Data.ForeignData;
+using SanteDB.Persistence.Data.Model;
+using SanteDB.Persistence.Data.Model.Extensibility;
+using SanteDB.Persistence.Data.Model.Security;
+using SanteDB.Persistence.Data.Model.Sys;
+using System;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Net.Mime;
+using System.Runtime.CompilerServices;
+
+namespace SanteDB.Persistence.Data.Services
+{
+    /// <summary>
+    /// ADO data template manager
+    /// </summary>
+    public class AdoDataTemplateManager : IDataTemplateManagementService, IMappedQueryProvider<DataTemplateDefinition>
+    {
+
+        // Configuration
+        private readonly AdoPersistenceConfigurationSection m_configuration;
+        private readonly IQueryPersistenceService m_queryPersistenceService;
+        private readonly IPolicyEnforcementService m_pepService;
+        private readonly ModelMapper m_modelMapper;
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoDataTemplateManager));
+
+        /// <summary>
+        /// DI constructor
+        /// </summary>
+        public AdoDataTemplateManager(IConfigurationManager configurationManager, IQueryPersistenceService queryPersistenceService, IPolicyEnforcementService pepService, IPasswordHashingService hashingService)
+        {
+            this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
+            this.m_queryPersistenceService = queryPersistenceService;
+            this.m_pepService = pepService;
+            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.CdssMapResourceName), "CdssModelMap");
+        }
+
+        /// <inheritdoc/>
+        public string ServiceName => "ADO.NET Data Template Manager";
+
+        /// <inheritdoc/>
+        public IDbProvider Provider => this.m_configuration.Provider;
+
+        /// <inheritdoc/>
+        public IQueryPersistenceService QueryPersistence => this.m_queryPersistenceService;
+
+        /// <inheritdoc/>
+        public DataTemplateDefinition AddOrUpdate(DataTemplateDefinition definition)
+        {
+            if (definition == null)
+            {
+                throw new ArgumentNullException(nameof(definition));
+            }
+
+            if (AuthenticationContext.Current.Principal != AuthenticationContext.SystemPrincipal)
+            {
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterDataTemplates);
+            }
+
+            try
+            {
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
+                {
+                    context.Open();
+                    using (var tx = context.BeginTransaction())
+                    {
+                        context.EstablishProvenance(AuthenticationContext.Current.Principal);
+
+                        if (definition.Key == Guid.Empty)
+                        {
+                            definition.Key = Guid.NewGuid();
+                        }
+
+                        // Now update the view 
+                        using (var ms = new MemoryStream())
+                        {
+                            definition.Save(ms);
+
+                            // Create the template definition
+                            var existingTpl = context.Query<DbTemplateDefinition>(o => o.Key == definition.Key).FirstOrDefault();
+                            var existingView = context.Query<DbDataTemplateDefinition>(o => o.Key == definition.Key).FirstOrDefault();
+                            // Ensure change has occurred
+                            if (existingView?.Definition.ComputeMd5Hash() == ms.ToArray().ComputeMd5Hash())
+                            {
+                                this.m_tracer.TraceInfo("Skipping the insert or update of {0} since the definition has not changed", definition.Mnemonic);
+                            }
+
+                            if (existingTpl == null)
+                            {
+                                existingTpl = context.Insert(new DbTemplateDefinition()
+                                {
+                                    CreatedByKey = context.ContextId,
+                                    CreationTime = DateTimeOffset.Now,
+                                    Description = definition.Description,
+                                    Mnemonic = definition.Mnemonic,
+                                    Name = definition.Name,
+                                    Oid = definition.Oid,
+                                    Key = definition.Key.Value
+                                });
+                            }
+                            else
+                            {
+                                existingTpl.Oid = definition.Oid;
+                                existingTpl.Name = definition.Name;
+                                existingTpl.Mnemonic = definition.Mnemonic;
+                                existingTpl.UpdatedByKey = context.ContextId;
+                                existingTpl.UpdatedTime = DateTimeOffset.Now;
+                                existingTpl.Description = definition.Description;
+                                existingTpl = context.Update(existingTpl);
+                            }
+
+
+                            if (existingView == null)
+                            {
+                                existingView = context.Insert(new DbDataTemplateDefinition()
+                                {
+                                    Key = definition.Key.Value,
+                                    CreatedByKey = context.ContextId,
+                                    CreationTime = DateTimeOffset.Now,
+                                    UpdatedByKey = context.ContextId,
+                                    UpdatedTime = DateTimeOffset.Now,
+                                    Definition = ms.ToArray(),
+                                    Description = definition.Description,
+                                    Mnemonic = definition.Mnemonic,
+                                    Name = definition.Name,
+                                    Oid = definition.Oid,
+                                    Public = definition.Public,
+                                    IsActive = definition.IsActive,
+                                    Readonly = definition.Readonly
+                                });
+                            }
+                            else if (!existingView.Readonly || AuthenticationContext.Current.Principal == AuthenticationContext.SystemPrincipal)
+                            {
+                                existingView.IsActive = definition.IsActive;
+                                existingView.UpdatedByKey = context.ContextId;
+                                existingView.UpdatedTime = DateTimeOffset.Now;
+                                existingView.Definition = ms.ToArray();
+                                existingView.Mnemonic = definition.Mnemonic;
+                                existingView.ObsoletionTime = null;
+                                existingView.ObsoletedByKey = null;
+                                existingView.ObsoletedByKeySpecified = existingView.ObsoletionTimeSpecified = true;
+                                existingView.Name = definition.Name;
+                                existingView.Oid = definition.Oid;
+                                existingView.Public = definition.Public;
+                                existingView.Readonly = definition.Readonly;
+                                existingView = context.Update(existingView);
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException(ErrorMessages.OBJECT_READONLY);
+                            }
+
+                            var retVal = this.ToModelInstance(context, existingView);
+                            tx.Commit();
+                            return retVal;
+                        }
+                    }
+                }
+            }
+            catch (DbException e)
+            {
+                throw e.TranslateDbException();
+            }
+            catch (Exception e)
+            {
+                throw new DataPersistenceException("Error persisting data template", e);
+            }
+        }
+
+        /// <inheritdoc/>
+        public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<DataTemplateDefinition, bool>> query)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+            else if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+
+            var expression = this.m_modelMapper.MapModelExpression<DataTemplateDefinition, DbDataTemplateDefinition, bool>(query, true);
+            if (!query.ToString().Contains(nameof(BaseEntityData.ObsoletionTime)))
+            {
+                var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(expression.Parameters[0], typeof(DbNonVersionedBaseData).GetProperty(nameof(DbNonVersionedBaseData.ObsoletionTime))), Expression.Constant(null));
+                expression = Expression.Lambda<Func<DbDataTemplateDefinition, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, expression.Body), expression.Parameters);
+            }
+
+            return context.Query<DbDataTemplateDefinition>(expression);
+        }
+
+        /// <inheritdoc/>
+        public IQueryResultSet<DataTemplateDefinition> Find(Expression<Func<DataTemplateDefinition, bool>> query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+            return new MappedQueryResultSet<DataTemplateDefinition>(this).Where(query);
+        }
+
+        /// <inheritdoc/>
+        public DataTemplateDefinition Get(Guid key)
+        {
+            if (key == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+
+            try
+            {
+                using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+                {
+                    context.Open();
+                    return this.Get(context, key);
+                }
+            }
+            catch (DbException e)
+            {
+                throw e.TranslateDbException();
+            }
+            catch (Exception e)
+            {
+                throw new DataPersistenceException("Error reading data template", e);
+            }
+        }
+
+        /// <inheritdoc/>
+        public DataTemplateDefinition Get(DataContext context, Guid key)
+        {
+            var existing = context.Query<DbDataTemplateDefinition>(o => o.Key == key && o.ObsoletionTime == null).FirstOrDefault();
+            if (existing == null)
+            {
+                throw new KeyNotFoundException(key.ToString());
+            }
+            return this.ToModelInstance(context, existing);
+        }
+
+        /// <inheritdoc/>
+        public SqlStatement GetCurrentVersionFilter(string tableAlias)
+        {
+            var tableMap = TableMapping.Get(typeof(DbDataTemplateDefinition));
+            var obsltCol = tableMap.GetColumn(nameof(DbDataTemplateDefinition.ObsoletionTime));
+            return new SqlStatement($"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
+        }
+
+        /// <inheritdoc/>
+        public LambdaExpression MapExpression<TReturn>(Expression<Func<DataTemplateDefinition, TReturn>> sortExpression)
+        {
+            return this.m_modelMapper.MapModelExpression<DataTemplateDefinition, DbDataTemplateDefinition, TReturn>(sortExpression, true);
+        }
+
+        /// <inheritdoc/>
+        public DataTemplateDefinition Remove(Guid key)
+        {
+            if (key == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterDataTemplates);
+            try
+            {
+                using (var context = this.m_configuration.Provider.GetWriteConnection())
+                {
+                    context.Open();
+                    context.EstablishProvenance(AuthenticationContext.Current.Principal);
+                    var existing = context.Query<DbDataTemplateDefinition>(o => o.Key == key).FirstOrDefault();
+                    if (existing == null)
+                    {
+                        throw new KeyNotFoundException(key.ToString());
+                    }
+                    existing.ObsoletedByKey = context.ContextId;
+                    existing.ObsoletionTime = DateTimeOffset.Now;
+                    return this.ToModelInstance(context, context.Update(existing));
+                }
+            }
+            catch (DbException e)
+            {
+                throw e.TranslateDbException();
+            }
+            catch (Exception e)
+            {
+                throw new DataPersistenceException("Error deleting template definition", e);
+            }
+        }
+
+        /// <inheritdoc/>
+        public DataTemplateDefinition ToModelInstance(DataContext context, object result)
+        {
+            if (result is DbDataTemplateDefinition dte)
+            {
+                using (var ms = new MemoryStream(dte.Definition))
+                {
+                    var retVal = DataTemplateDefinition.Load(ms);
+                    retVal.Metadata = retVal.Metadata ?? new DataTemplateDefinitionMetadata();
+                    retVal.Metadata.LastUpdated = dte.UpdatedTime ?? dte.CreationTime;
+                    retVal.IsActive = dte.ObsoletionTime.HasValue ? true : dte.IsActive;
+                    retVal.Oid = dte.Oid;
+                    retVal.Name = dte.Name;
+                    retVal.Description = dte.Description;
+                    retVal.Public = dte.Public;
+                    retVal.Readonly = dte.Readonly;
+                    dte.Mnemonic = dte.Mnemonic;
+
+                    // Authorship
+                    if (retVal.Metadata.Author?.Any() != true)
+                    {
+                        var provKey = dte.UpdatedByKey ?? dte.CreatedByKey;
+                        var provShip = context.Query<DbSecurityProvenance>(o => o.Key == provKey).FirstOrDefault();
+                        retVal.Metadata.Author = new List<string>();
+
+                        // Get the appropriate prov
+                        if (provShip.UserKey.HasValue)
+                        {
+                            retVal.Metadata.Author.Add(context.Query<DbSecurityUser>(o => o.Key == provShip.UserKey).Select(o => o.UserName).First());
+                        }
+                        else if (provShip.DeviceKey.HasValue)
+                        {
+                            retVal.Metadata.Author.Add(context.Query<DbSecurityDevice>(o => o.Key == provShip.DeviceKey).Select(o => o.PublicId).First());
+                        }
+                        else
+                        {
+                            retVal.Metadata.Author.Add(context.Query<DbSecurityApplication>(o => o.Key == provShip.ApplicationKey).Select(o => o.PublicId).First());
+
+                        }
+                    }
+
+                    return retVal;
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(DbDataTemplateDefinition), result.GetType()));
+            }
+        }
+    }
+}

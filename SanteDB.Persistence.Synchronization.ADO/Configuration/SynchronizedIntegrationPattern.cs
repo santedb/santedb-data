@@ -73,6 +73,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                         typeof(AdoPolicyInformationService),
                         typeof(FileSystemDataQualityConfigurationProvider),
                         typeof(FileSystemCdssLibraryRepository),
+                        typeof(FileSystemDataTemplateManager),
                         typeof(AdoRelationshipValidationProvider),
                         typeof(AdoAuditRepositoryService),
                         typeof(AdoPubSubManager),

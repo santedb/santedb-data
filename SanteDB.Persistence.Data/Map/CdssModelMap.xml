@@ -22,5 +22,8 @@
   <class modelClass="SanteDB.Core.Cdss.ICdssLibrary, SanteDB.Core.Api" domainClass="SanteDB.Persistence.Data.Model.Sys.DbCdssLibraryVersion, SanteDB.Persistence.Data">
     <property modelName="Uuid" domainName="Key" />
   </class>
-  
+
+  <class modelClass="SanteDB.Core.Templates.Definition.DataTemplateDefinition, SanteDB.Core.Api" domainClass="SanteDB.Persistence.Data.Model.Sys.DbDataTemplateDefinition, SanteDB.Persistence.Data">
+    <property modelName="ModifiedOn" domainName="UpdatedTime" />
+  </class>
 </modelMap>
