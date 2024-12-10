@@ -124,7 +124,7 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         context.EstablishProvenance(AuthenticationContext.Current.Principal);
 
-                        if (definition.Key == Guid.Empty)
+                        if (!definition.Key.HasValue)
                         {
                             definition.Key = Guid.NewGuid();
                         }
@@ -141,6 +141,13 @@ namespace SanteDB.Persistence.Data.Services
                             if (existingView?.Definition.ComputeMd5Hash() == ms.ToArray().ComputeMd5Hash())
                             {
                                 this.m_tracer.TraceInfo("Skipping the insert or update of {0} since the definition has not changed", definition.Mnemonic);
+                                return definition;
+                            }
+                            // Ensure version is newer
+                            if(existingView?.Version > definition.Metadata?.Version)
+                            {
+                                this.m_tracer.TraceInfo("Skipping the insert or update of {0} since version in the database is newer than the provided version", definition.Mnemonic);
+                                return definition;
                             }
 
                             if (existingTpl == null)
@@ -184,6 +191,7 @@ namespace SanteDB.Persistence.Data.Services
                                     Oid = definition.Oid,
                                     Public = definition.Public,
                                     IsActive = definition.IsActive,
+                                    Version = definition.Metadata?.Version ?? 1,
                                     Readonly = definition.Readonly
                                 });
                             }
@@ -194,6 +202,16 @@ namespace SanteDB.Persistence.Data.Services
                                 existingView.UpdatedTime = DateTimeOffset.Now;
                                 existingView.Definition = ms.ToArray();
                                 existingView.Mnemonic = definition.Mnemonic;
+
+                                if(existingView.ObsoletionTime.HasValue)
+                                {
+                                    existingView.Version = definition.Metadata?.Version ?? 1;
+                                }
+                                else
+                                {
+                                    existingView.Version++;
+                                }
+
                                 existingView.ObsoletionTime = null;
                                 existingView.ObsoletedByKey = null;
                                 existingView.ObsoletedByKeySpecified = existingView.ObsoletionTimeSpecified = true;
@@ -328,6 +346,10 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         throw new KeyNotFoundException(key.ToString());
                     }
+                    else if(existing.Readonly && AuthenticationContext.Current.Principal != AuthenticationContext.SystemPrincipal)
+                    {
+                        throw new InvalidOperationException(ErrorMessages.OBJECT_READONLY);
+                    }
                     existing.ObsoletedByKey = context.ContextId;
                     existing.ObsoletionTime = DateTimeOffset.Now;
                     return this.ToModelInstance(context, context.Update(existing));
@@ -352,7 +374,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     var retVal = DataTemplateDefinition.Load(ms);
                     retVal.Metadata = retVal.Metadata ?? new DataTemplateDefinitionMetadata();
-                    retVal.Metadata.LastUpdated = dte.UpdatedTime ?? dte.CreationTime;
+                    retVal.Metadata.LastUpdated = (dte.UpdatedTime ?? dte.CreationTime).DateTime;
                     retVal.IsActive = dte.ObsoletionTime.HasValue ? true : dte.IsActive;
                     retVal.Oid = dte.Oid;
                     retVal.Name = dte.Name;

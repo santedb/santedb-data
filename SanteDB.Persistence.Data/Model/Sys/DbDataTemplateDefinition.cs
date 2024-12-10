@@ -55,15 +55,22 @@ namespace SanteDB.Persistence.Data.Model.Sys
         public bool Public { get; set; }
 
         /// <summary>
+        /// True if the definition is active
+        /// </summary>
+        [Column("ac"), NotNull, DefaultValue(true)]
+        public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Gets the version of the template
+        /// </summary>
+        [Column("ver"), NotNull, DefaultValue(1)]
+        public int Version { get; set; }
+
+        /// <summary>
         /// Definition of the template
         /// </summary>
         [Column("def"), NotNull]
         public byte[] Definition { get; set; }
 
-        /// <summary>
-        /// True if the definition is active
-        /// </summary>
-        [Column("ac"), NotNull, DefaultValue(true)]
-        public bool IsActive { get; internal set; }
     }
 }

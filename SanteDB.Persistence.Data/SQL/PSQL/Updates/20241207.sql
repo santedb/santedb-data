@@ -1,7 +1,7 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20241207-02" name="Update:20241207-02"   invariantName="npgsql" >
+ * <feature scope="SanteDB.Persistence.Data" id="20241207-03" name="Update:20241207-03"   invariantName="npgsql" >
  *	<summary>Update: Adds stored user defined clinical data templates into the database</summary>
- *	<isInstalled>select ck_patch('20241207-02')</isInstalled>
+ *	<isInstalled>select ck_patch('20241207-03')</isInstalled>
  * </feature>
  */
 
@@ -20,6 +20,7 @@ CREATE TABLE TPL_VW_DEF_TBL (
 	AC BOOL NOT NULL DEFAULT TRUE,
 	RO BOOL NOT NULL DEFAULT FALSE,
 	PUB BOOL NOT NULL DEFAULT TRUE,
+	VER INT NOT NULL DEFAULT 1,
 	DEF BYTEA NOT NULL,
 	CONSTRAINT PK_TPL_VW_DEF_TBL PRIMARY KEY (TPL_ID),
 	CONSTRAINT FK_TPL_VW_DEF_DEF FOREIGN KEY (TPL_ID) REFERENCES TPL_DEF_TBL(TPL_ID),
@@ -33,4 +34,4 @@ CREATE TABLE TPL_VW_DEF_TBL (
 CREATE UNIQUE INDEX TPL_VW_DEF_OID_UQ ON TPL_VW_DEF_TBL(OID) WHERE (OBSLT_UTC IS NULL);
 CREATE UNIQUE INDEX TPL_VW_DEF_MNEMONIC_UQ ON TPL_VW_DEF_TBL(MNEMONIC) WHERE (OBSLT_UTC IS NULL);
 
-SELECT REG_PATCH('20241207-02');
+SELECT REG_PATCH('20241207-03');
