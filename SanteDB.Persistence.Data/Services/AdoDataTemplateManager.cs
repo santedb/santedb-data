@@ -16,6 +16,7 @@
  * the License.
  * 
  */
+using ClosedXML;
 using SanteDB.Core.Data.Import;
 using SanteDB.Core.Data.Query;
 using SanteDB.Core.Diagnostics;
@@ -137,14 +138,9 @@ namespace SanteDB.Persistence.Data.Services
                             // Create the template definition
                             var existingTpl = context.Query<DbTemplateDefinition>(o => o.Key == definition.Key).FirstOrDefault();
                             var existingView = context.Query<DbDataTemplateDefinition>(o => o.Key == definition.Key).FirstOrDefault();
-                            // Ensure change has occurred
-                            if (existingView?.Definition.ComputeMd5Hash() == ms.ToArray().ComputeMd5Hash())
-                            {
-                                this.m_tracer.TraceInfo("Skipping the insert or update of {0} since the definition has not changed", definition.Mnemonic);
-                                return definition;
-                            }
+                            
                             // Ensure version is newer
-                            if(existingView?.Version > definition.Metadata?.Version)
+                            if(definition.Version != 0 && existingView?.Version > definition.Version)
                             {
                                 this.m_tracer.TraceInfo("Skipping the insert or update of {0} since version in the database is newer than the provided version", definition.Mnemonic);
                                 return definition;
@@ -191,41 +187,44 @@ namespace SanteDB.Persistence.Data.Services
                                     Oid = definition.Oid,
                                     Public = definition.Public,
                                     IsActive = definition.IsActive,
-                                    Version = definition.Metadata?.Version ?? 1,
+                                    Version = definition.Version,
                                     Readonly = definition.Readonly
                                 });
                             }
-                            else if (!existingView.Readonly || AuthenticationContext.Current.Principal == AuthenticationContext.SystemPrincipal)
+                            else
                             {
                                 existingView.IsActive = definition.IsActive;
                                 existingView.UpdatedByKey = context.ContextId;
                                 existingView.UpdatedTime = DateTimeOffset.Now;
-                                existingView.Definition = ms.ToArray();
-                                existingView.Mnemonic = definition.Mnemonic;
-
-                                if(existingView.ObsoletionTime.HasValue)
+                                existingView.ObsoletionTime = null;
+                                existingView.ObsoletedByKey = null;
+                                existingView.ObsoletedByKeySpecified = existingView.ObsoletionTimeSpecified = true;
+                                if (existingView.ObsoletionTime.HasValue)
                                 {
-                                    existingView.Version = definition.Metadata?.Version ?? 1;
+                                    existingView.Version = definition.Version;
                                 }
                                 else
                                 {
                                     existingView.Version++;
                                 }
 
-                                existingView.ObsoletionTime = null;
-                                existingView.ObsoletedByKey = null;
-                                existingView.ObsoletedByKeySpecified = existingView.ObsoletionTimeSpecified = true;
-                                existingView.Name = definition.Name;
-                                existingView.Oid = definition.Oid;
-                                existingView.Public = definition.Public;
-                                existingView.Readonly = definition.Readonly;
+                                if (!existingView.Readonly || AuthenticationContext.Current.Principal == AuthenticationContext.SystemPrincipal)
+                                {
+                                    existingView.Definition = ms.ToArray();
+                                    existingView.Mnemonic = definition.Mnemonic;
+                                    existingView.Name = definition.Name;
+                                    existingView.Oid = definition.Oid;
+                                    existingView.Public = definition.Public;
+                                    existingView.Readonly = definition.Readonly;
+                                }
+                                else if( existingView.Definition.ComputeMd5Hash() != ms.ToArray().ComputeMd5Hash())
+                                {
+                                    throw new InvalidOperationException(ErrorMessages.OBJECT_READONLY);
+                                }
+
                                 existingView = context.Update(existingView);
                             }
-                            else
-                            {
-                                throw new InvalidOperationException(ErrorMessages.OBJECT_READONLY);
-                            }
-
+                           
                             var retVal = this.ToModelInstance(context, existingView);
                             tx.Commit();
                             return retVal;
@@ -346,10 +345,7 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         throw new KeyNotFoundException(key.ToString());
                     }
-                    else if(existing.Readonly && AuthenticationContext.Current.Principal != AuthenticationContext.SystemPrincipal)
-                    {
-                        throw new InvalidOperationException(ErrorMessages.OBJECT_READONLY);
-                    }
+                  
                     existing.ObsoletedByKey = context.ContextId;
                     existing.ObsoletionTime = DateTimeOffset.Now;
                     return this.ToModelInstance(context, context.Update(existing));
@@ -373,35 +369,35 @@ namespace SanteDB.Persistence.Data.Services
                 using (var ms = new MemoryStream(dte.Definition))
                 {
                     var retVal = DataTemplateDefinition.Load(ms);
-                    retVal.Metadata = retVal.Metadata ?? new DataTemplateDefinitionMetadata();
-                    retVal.Metadata.LastUpdated = (dte.UpdatedTime ?? dte.CreationTime).DateTime;
+                    retVal.LastUpdated = (dte.UpdatedTime ?? dte.CreationTime).DateTime;
                     retVal.IsActive = dte.ObsoletionTime.HasValue ? true : dte.IsActive;
                     retVal.Oid = dte.Oid;
                     retVal.Name = dte.Name;
                     retVal.Description = dte.Description;
                     retVal.Public = dte.Public;
                     retVal.Readonly = dte.Readonly;
+                    retVal.Version = dte.Version;
                     dte.Mnemonic = dte.Mnemonic;
 
                     // Authorship
-                    if (retVal.Metadata.Author?.Any() != true)
+                    if (retVal.Author?.Any() != true)
                     {
                         var provKey = dte.UpdatedByKey ?? dte.CreatedByKey;
                         var provShip = context.Query<DbSecurityProvenance>(o => o.Key == provKey).FirstOrDefault();
-                        retVal.Metadata.Author = new List<string>();
+                        retVal.Author = new List<string>();
 
                         // Get the appropriate prov
                         if (provShip.UserKey.HasValue)
                         {
-                            retVal.Metadata.Author.Add(context.Query<DbSecurityUser>(o => o.Key == provShip.UserKey).Select(o => o.UserName).First());
+                            retVal.Author.Add(context.Query<DbSecurityUser>(o => o.Key == provShip.UserKey).Select(o => o.UserName).First());
                         }
                         else if (provShip.DeviceKey.HasValue)
                         {
-                            retVal.Metadata.Author.Add(context.Query<DbSecurityDevice>(o => o.Key == provShip.DeviceKey).Select(o => o.PublicId).First());
+                            retVal.Author.Add(context.Query<DbSecurityDevice>(o => o.Key == provShip.DeviceKey).Select(o => o.PublicId).First());
                         }
                         else
                         {
-                            retVal.Metadata.Author.Add(context.Query<DbSecurityApplication>(o => o.Key == provShip.ApplicationKey).Select(o => o.PublicId).First());
+                            retVal.Author.Add(context.Query<DbSecurityApplication>(o => o.Key == provShip.ApplicationKey).Select(o => o.PublicId).First());
 
                         }
                     }
