@@ -170,8 +170,8 @@ namespace SanteDB.Persistence.Data.Services
                             dbUser.TwoFactorMechnaismKey.HasValue &&
                             this.m_tfaRelay != null)
                         {
-                            this.m_tfaRelay.SendSecret(dbUser.TwoFactorMechnaismKey.Value, new AdoUserIdentity(dbUser));
-                            throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ));
+                            var secretString = this.m_tfaRelay.SendSecret(dbUser.TwoFactorMechnaismKey.Value, new AdoUserIdentity(dbUser));
+                            throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ, new { message = this.m_localizationService.GetString(secretString) }));
                         }
                         else if (dbUser.TwoFactorEnabled && !this.m_tfaRelay.ValidateSecret(dbUser.TwoFactorMechnaismKey.Value, identity, tfaSecret))
                         {
@@ -180,7 +180,7 @@ namespace SanteDB.Persistence.Data.Services
 
                         // HACK: User is using an expiration reset
                         bool isChallengeResponseValid = false;
-                        if(challengeKey == Guid.Empty && dbUser.PasswordExpiration.HasValue)
+                        if (challengeKey == Guid.Empty && dbUser.PasswordExpiration.HasValue)
                         {
                             isChallengeResponseValid = context.Any<DbSecurityUser>(a => a.UserName.ToLowerInvariant() == userName.ToLower() && pepperResponses.Contains(a.Password));
                         }
