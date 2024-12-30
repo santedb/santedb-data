@@ -26,6 +26,7 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 
@@ -59,6 +60,7 @@ using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Extensibility;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Model.Sys;
+using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -73,7 +75,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// ADO data template manager
     /// </summary>
-    public class AdoDataTemplateManager : IDataTemplateManagementService, IMappedQueryProvider<DataTemplateDefinition>
+    public class AdoDataTemplateManager : IDataTemplateManagementService, IMappedQueryProvider<DataTemplateDefinition>, IAdoTrimProvider
     {
 
         // Configuration
@@ -125,7 +127,7 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         context.EstablishProvenance(AuthenticationContext.Current.Principal);
 
-                        if (!definition.Key.HasValue)
+                        if (definition.Key.GetValueOrDefault() == Guid.Empty)
                         {
                             definition.Key = Guid.NewGuid();
                         }
@@ -215,6 +217,7 @@ namespace SanteDB.Persistence.Data.Services
                                     existingView.Name = definition.Name;
                                     existingView.Oid = definition.Oid;
                                     existingView.Public = definition.Public;
+                                    existingView.Description = definition.Description;
                                     existingView.Readonly = definition.Readonly;
                                 }
                                 else if( existingView.Definition.ComputeMd5Hash() != ms.ToArray().ComputeMd5Hash())
@@ -339,16 +342,30 @@ namespace SanteDB.Persistence.Data.Services
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open();
-                    context.EstablishProvenance(AuthenticationContext.Current.Principal);
-                    var existing = context.Query<DbDataTemplateDefinition>(o => o.Key == key).FirstOrDefault();
-                    if (existing == null)
+                    using (var tx = context.BeginTransaction())
                     {
-                        throw new KeyNotFoundException(key.ToString());
+                        context.EstablishProvenance(AuthenticationContext.Current.Principal);
+                        var existing = context.Query<DbDataTemplateDefinition>(o => o.Key == key).FirstOrDefault();
+                        if (existing == null)
+                        {
+                            throw new KeyNotFoundException(key.ToString());
+                        }
+
+                        var existingTplDef = context.Query<DbTemplateDefinition>(o => o.Key == key).FirstOrDefault();
+                        if(existingTplDef != null)
+                        {
+                            existingTplDef.ObsoletedByKey = context.ContextId;
+                            existingTplDef.ObsoletionTime = DateTimeOffset.Now;
+                            context.Update(existingTplDef);
+                        }
+
+                        existing.ObsoletedByKey = context.ContextId;
+                        existing.ObsoletionTime = DateTimeOffset.Now;
+                        tx.Commit();
+
+                        var retVal = context.Update(existing);
+                        return this.ToModelInstance(context, retVal);
                     }
-                  
-                    existing.ObsoletedByKey = context.ContextId;
-                    existing.ObsoletionTime = DateTimeOffset.Now;
-                    return this.ToModelInstance(context, context.Update(existing));
                 }
             }
             catch (DbException e)
@@ -409,6 +426,13 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new InvalidOperationException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(DbDataTemplateDefinition), result.GetType()));
             }
+        }
+
+        /// <inheritdoc/>
+        public void Trim(DataContext context, DateTimeOffset oldVersionCutoff, DateTimeOffset deletedCutoff, IAuditBuilder auditBuilder)
+        {
+            context.DeleteAll<DbTemplateDefinition>(o => o.ObsoletionTime != null && o.ObsoletionTime > deletedCutoff);
+            context.DeleteAll<DbDataTemplateDefinition>(o => o.ObsoletionTime != null && o.ObsoletionTime > deletedCutoff);
         }
     }
 }
