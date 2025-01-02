@@ -1,7 +1,7 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20241207-04" name="Update:20241207-03"   invariantName="npgsql" >
+ * <feature scope="SanteDB.Persistence.Data" id="20241207-05" name="Update:20241207-05"   invariantName="npgsql" >
  *	<summary>Update: Adds stored user defined clinical data templates into the database</summary>
- *	<isInstalled>select ck_patch('20241207-04')</isInstalled>
+ *	<isInstalled>select ck_patch('20241207-05')</isInstalled>
  * </feature>
  */
 
@@ -33,16 +33,23 @@ CREATE TABLE IF NOT EXISTS TPL_VW_DEF_TBL (
 
 CREATE UNIQUE INDEX IF NOT EXISTS TPL_VW_DEF_OID_UQ ON TPL_VW_DEF_TBL(OID) WHERE (OBSLT_UTC IS NULL);
 CREATE UNIQUE INDEX IF NOT EXISTS TPL_VW_DEF_MNEMONIC_UQ ON TPL_VW_DEF_TBL(MNEMONIC) WHERE (OBSLT_UTC IS NULL);
+DROP INDEX IF EXISTS TPL_DEF_MNEMONIC_IDX;
+DROP INDEX IF EXISTS TPL_DEF_OID_IDX;
+CREATE UNIQUE INDEX TPL_DEF_OID_IDX ON TPL_DEF_TBL(OID) WHERE (OBSLT_UTC IS NULL);
+CREATE UNIQUE INDEX TPL_DEF_MNEMONIC_IDX ON TPL_DEF_TBL(MNEMONIC) WHERE (OBSLT_UTC IS NULL);
 
 
 
 INSERT INTO SEC_APP_TBL (APP_ID, APP_PUB_ID, APP_SCRT, CRT_PROV_ID)
-	VALUES ('48D9D2BB-7F11-4E1E-981E-623CC7F567F8','org.santedb.disconnected_client.www', ('015fe16693e1117c6c235d91dd535302d65e9259720416d606ab1a2b27a37ba3'), 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+	VALUES ('48D9D2BB-7F11-4E1E-981E-623CC7F567F8','org.santedb.disconnected_client.www', ('015fe16693e1117c6c235d91dd535302d65e9259720416d606ab1a2b27a37ba3'), 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8')
+	ON CONFLICT DO NOTHING;
 
 INSERT INTO SEC_APP_POL_ASSOC_TBL(APP_ID, POL_ID, POL_ACT)
 	SELECT APP_ID, POL_ID, 2 FROM
 		SEC_APP_TBL, SEC_POL_TBL
 	WHERE
-		SEC_APP_TBL.APP_PUB_ID = 'org.santedb.disconnected_client.www';
+		SEC_APP_TBL.APP_PUB_ID = 'org.santedb.disconnected_client.www'
+	ON CONFLICT DO NOTHING;
 
-SELECT REG_PATCH('20241207-04');
+
+SELECT REG_PATCH('20241207-05');
