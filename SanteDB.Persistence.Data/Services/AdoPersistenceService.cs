@@ -142,7 +142,7 @@ namespace SanteDB.Persistence.Data.Services
                             Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
                             Demands = new List<string>()
                                 {
-                                PermissionPolicyIdentifiers.ReadClinicalData
+                                PermissionPolicyIdentifiers.Login
                                 }
                         },
                         Id = "org.santedb.bi.dataSource.main",
@@ -150,23 +150,6 @@ namespace SanteDB.Persistence.Data.Services
                         ProviderType = typeof(OrmBiDataProvider)
                     });
 
-                    biMetadataRepository?.Insert(new BiDataSourceDefinition()
-                    {
-                        IsSystemObject = true,
-                        ConnectionString = this.m_configuration.ReadonlyConnectionString,
-                        Status = BiDefinitionStatus.Active,
-                        MetaData = new BiMetadata()
-                        {
-                            Version = typeof(AdoPersistenceService).Assembly.GetName().Version.ToString(),
-                            Demands = new List<string>()
-                                {
-                                PermissionPolicyIdentifiers.UnrestrictedAdministration
-                                }
-                        },
-                        Id = "org.santedb.bi.dataSource.admin",
-                        Name = "admin",
-                        ProviderType = typeof(OrmBiDataProvider)
-                    });
                 };
             }
             catch (ModelMapValidationException e)
