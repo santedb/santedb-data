@@ -198,9 +198,6 @@ namespace SanteDB.Persistence.Data.Services
                                 existingView.IsActive = definition.IsActive;
                                 existingView.UpdatedByKey = context.ContextId;
                                 existingView.UpdatedTime = DateTimeOffset.Now;
-                                existingView.ObsoletionTime = null;
-                                existingView.ObsoletedByKey = null;
-                                existingView.ObsoletedByKeySpecified = existingView.ObsoletionTimeSpecified = true;
                                 if (existingView.ObsoletionTime.HasValue)
                                 {
                                     existingView.Version = definition.Version;
@@ -210,8 +207,16 @@ namespace SanteDB.Persistence.Data.Services
                                     existingView.Version++;
                                 }
 
-                                if (!existingView.Readonly || AuthenticationContext.Current.Principal == AuthenticationContext.SystemPrincipal)
+                                if (existingView.ObsoletionTime.HasValue && definition.ObsoletionTime == null) // undelete
                                 {
+                                    existingView.ObsoletionTime = null;
+                                    existingView.ObsoletedByKey = null;
+                                    existingView.ObsoletedByKeySpecified = existingView.ObsoletionTimeSpecified = true;
+                                }
+                                else if(!existingView.Readonly || AuthenticationContext.Current.Principal == AuthenticationContext.SystemPrincipal)
+                                {
+                                    existingView.ObsoletionTime = null;
+                                    existingView.ObsoletedByKey = null;
                                     existingView.Definition = ms.ToArray();
                                     existingView.Mnemonic = definition.Mnemonic;
                                     existingView.Name = definition.Name;
@@ -306,7 +311,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public DataTemplateDefinition Get(DataContext context, Guid key)
         {
-            var existing = context.Query<DbDataTemplateDefinition>(o => o.Key == key && o.ObsoletionTime == null).FirstOrDefault();
+            var existing = context.Query<DbDataTemplateDefinition>(o => o.Key == key).FirstOrDefault();
             if (existing == null)
             {
                 throw new KeyNotFoundException(key.ToString());
@@ -394,7 +399,13 @@ namespace SanteDB.Persistence.Data.Services
                     retVal.Public = dte.Public;
                     retVal.Readonly = dte.Readonly;
                     retVal.Version = dte.Version;
-                    dte.Mnemonic = dte.Mnemonic;
+                    retVal.Mnemonic = dte.Mnemonic;
+                    retVal.CreatedByKey = dte.CreatedByKey;
+                    retVal.CreationTime = dte.CreationTime;
+                    retVal.UpdatedByKey = dte.UpdatedByKey;
+                    retVal.UpdatedTime = dte.UpdatedTime;
+                    retVal.ObsoletionTime = dte.ObsoletionTime;
+                    retVal.ObsoletedByKey = dte.ObsoletedByKey;
 
                     // Authorship
                     if (retVal.Author?.Any() != true)

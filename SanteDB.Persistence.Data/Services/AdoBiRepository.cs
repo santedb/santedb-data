@@ -237,7 +237,7 @@ namespace SanteDB.Persistence.Data.Services
         public string ServiceName => "ADO.NET BI Metadata Repository";
 
         /// <inheritdoc/>
-        public TBisDefinition Get<TBisDefinition>(string id) where TBisDefinition : BiDefinition
+        public TBisDefinition Get<TBisDefinition>(string id) where TBisDefinition : BiDefinition, new()
         {
             if (String.IsNullOrEmpty(id))
             {
@@ -292,7 +292,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public TBisDefinition Insert<TBisDefinition>(TBisDefinition metadata) where TBisDefinition : BiDefinition
+        public TBisDefinition Insert<TBisDefinition>(TBisDefinition metadata) where TBisDefinition : BiDefinition, new()
         {
             if (metadata == null)
             {
@@ -498,10 +498,10 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public IEnumerable<TBisDefinition> Query<TBisDefinition>(Expression<Func<TBisDefinition, bool>> filter, int offset, int? count) where TBisDefinition : BiDefinition => this.Query(filter).Skip(offset).Take(count ?? 100);
+        public IEnumerable<TBisDefinition> Query<TBisDefinition>(Expression<Func<TBisDefinition, bool>> filter, int offset, int? count) where TBisDefinition : BiDefinition, new() => this.Query(filter).Skip(offset).Take(count ?? 100);
 
         /// <inheritdoc/>
-        public IQueryResultSet<TBisDefinition> Query<TBisDefinition>(Expression<Func<TBisDefinition, bool>> filter) where TBisDefinition : BiDefinition
+        public IQueryResultSet<TBisDefinition> Query<TBisDefinition>(Expression<Func<TBisDefinition, bool>> filter) where TBisDefinition : BiDefinition, new()
         {
             if (filter == null)
             {
@@ -560,7 +560,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public void Remove<TBisDefinition>(string id) where TBisDefinition : BiDefinition
+        public void Remove<TBisDefinition>(string id) where TBisDefinition : BiDefinition, new()
         {
             if (String.IsNullOrEmpty(id))
             {
