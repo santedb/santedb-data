@@ -105,6 +105,8 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public IQueryPersistenceService QueryPersistence => this.m_queryPersistenceService;
 
+        string IServiceImplementation.ServiceName => throw new NotImplementedException();
+
         /// <inheritdoc/>
         public DataTemplateDefinition AddOrUpdate(DataTemplateDefinition definition)
         {
@@ -198,9 +200,6 @@ namespace SanteDB.Persistence.Data.Services
                                 existingView.IsActive = definition.IsActive;
                                 existingView.UpdatedByKey = context.ContextId;
                                 existingView.UpdatedTime = DateTimeOffset.Now;
-                                existingView.ObsoletionTime = null;
-                                existingView.ObsoletedByKey = null;
-                                existingView.ObsoletedByKeySpecified = existingView.ObsoletionTimeSpecified = true;
                                 if (existingView.ObsoletionTime.HasValue)
                                 {
                                     existingView.Version = definition.Version;
@@ -210,8 +209,16 @@ namespace SanteDB.Persistence.Data.Services
                                     existingView.Version++;
                                 }
 
-                                if (!existingView.Readonly || AuthenticationContext.Current.Principal == AuthenticationContext.SystemPrincipal)
+                                if (existingView.ObsoletionTime.HasValue && definition.ObsoletionTime == null) // undelete
                                 {
+                                    existingView.ObsoletionTime = null;
+                                    existingView.ObsoletedByKey = null;
+                                    existingView.ObsoletedByKeySpecified = existingView.ObsoletionTimeSpecified = true;
+                                }
+                                else if(!existingView.Readonly || AuthenticationContext.Current.Principal == AuthenticationContext.SystemPrincipal)
+                                {
+                                    existingView.ObsoletionTime = null;
+                                    existingView.ObsoletedByKey = null;
                                     existingView.Definition = ms.ToArray();
                                     existingView.Mnemonic = definition.Mnemonic;
                                     existingView.Name = definition.Name;
@@ -306,7 +313,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public DataTemplateDefinition Get(DataContext context, Guid key)
         {
-            var existing = context.Query<DbDataTemplateDefinition>(o => o.Key == key && o.ObsoletionTime == null).FirstOrDefault();
+            var existing = context.Query<DbDataTemplateDefinition>(o => o.Key == key).FirstOrDefault();
             if (existing == null)
             {
                 throw new KeyNotFoundException(key.ToString());
@@ -394,7 +401,13 @@ namespace SanteDB.Persistence.Data.Services
                     retVal.Public = dte.Public;
                     retVal.Readonly = dte.Readonly;
                     retVal.Version = dte.Version;
-                    dte.Mnemonic = dte.Mnemonic;
+                    retVal.Mnemonic = dte.Mnemonic;
+                    retVal.CreatedByKey = dte.CreatedByKey;
+                    retVal.CreationTime = dte.CreationTime;
+                    retVal.UpdatedByKey = dte.UpdatedByKey;
+                    retVal.UpdatedTime = dte.UpdatedTime;
+                    retVal.ObsoletionTime = dte.ObsoletionTime;
+                    retVal.ObsoletedByKey = dte.ObsoletedByKey;
 
                     // Authorship
                     if (retVal.Author?.Any() != true)
@@ -433,6 +446,75 @@ namespace SanteDB.Persistence.Data.Services
         {
             context.DeleteAll<DbTemplateDefinition>(o => o.ObsoletionTime != null && o.ObsoletionTime > deletedCutoff);
             context.DeleteAll<DbDataTemplateDefinition>(o => o.ObsoletionTime != null && o.ObsoletionTime > deletedCutoff);
+        }
+
+        /// <inheritdoc/>
+        DataTemplateDefinition IRepositoryService<DataTemplateDefinition>.Delete(Guid key) => this.Remove(key);
+
+        /// <inheritdoc/>
+        IdentifiedData IRepositoryService.Delete(Guid key) => this.Remove(key);
+
+        /// <inheritdoc/>
+        IQueryResultSet<DataTemplateDefinition> IRepositoryService<DataTemplateDefinition>.Find(Expression<Func<DataTemplateDefinition, bool>> query) => this.Find(query);
+
+        /// <inheritdoc/>
+        IQueryResultSet IRepositoryService.Find(Expression query)
+        {
+            if (query is Expression<Func<DataTemplateDefinition, bool>> qr)
+            {
+                return this.Find(qr);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(Expression<Func<DataTemplateDefinition, bool>>), query.GetType()));
+            }
+        }
+
+        /// <inheritdoc/>
+        IEnumerable<IdentifiedData> IRepositoryService.Find(Expression query, int offset, int? count, out int totalResults)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <inheritdoc/>
+        DataTemplateDefinition IRepositoryService<DataTemplateDefinition>.Get(Guid key) => this.Get(key);
+
+        /// <inheritdoc/>
+        DataTemplateDefinition IRepositoryService<DataTemplateDefinition>.Get(Guid key, Guid versionKey) => this.Get(key);
+
+        /// <inheritdoc/>
+        IdentifiedData IRepositoryService.Get(Guid key) => this.Get(key);
+
+        /// <inheritdoc/>
+        DataTemplateDefinition IRepositoryService<DataTemplateDefinition>.Insert(DataTemplateDefinition data) => this.AddOrUpdate(data);
+
+        /// <inheritdoc/>
+        IdentifiedData IRepositoryService.Insert(object data)
+        {
+            if (data is DataTemplateDefinition dd)
+            {
+                return this.AddOrUpdate(dd);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(DataTemplateDefinition), data.GetType()));
+            }
+        }
+
+        /// <inheritdoc/>
+        DataTemplateDefinition IRepositoryService<DataTemplateDefinition>.Save(DataTemplateDefinition data) => this.AddOrUpdate(data);
+
+        /// <inheritdoc/>
+        IdentifiedData IRepositoryService.Save(object data)
+        {
+            if (data is DataTemplateDefinition dd)
+            {
+                return this.AddOrUpdate(dd);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(DataTemplateDefinition), data.GetType()));
+            }
         }
     }
 }
