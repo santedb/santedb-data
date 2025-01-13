@@ -272,6 +272,8 @@ namespace SanteDB.Persistence.Data.Services
                         using (var ms = new MemoryStream(itm.Object2.DefinitionContents))
                         {
                             retVal = (TBisDefinition)BiDefinition.Load(ms);
+                            retVal.MetaData.LastModified = itm.Object2.CreationTime.DateTime;
+                            retVal.MetaData.LastModifiedBy = itm.Object2.CreatedByKey;
                             this.m_adhocCacheService.Add(cacheKey, retVal);
                         }
 
