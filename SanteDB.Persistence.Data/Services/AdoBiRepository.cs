@@ -411,6 +411,10 @@ namespace SanteDB.Persistence.Data.Services
                     Key = biEntry.Key,
                     Status = metadata.Status
                 });
+
+                metadata.MetaData = metadata.MetaData ?? new BiMetadata();
+                metadata.MetaData.LastModified = biVersion.CreationTime.DateTime;
+                metadata.MetaData.LastModifiedBy = biVersion.CreatedByKey;
             }
 
             return metadata;
