@@ -16,6 +16,7 @@
  * the License.
  * 
  */
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
@@ -33,6 +34,7 @@ using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Entities;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
@@ -56,6 +58,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         where TModel : IdentifiedData, new()
         where TDbModel : class, IDbIdentified, new()
     {
+
+        // Exists providers
+        private readonly ConcurrentDictionary<Type, IAdoKeyResolver> m_keyResolvers = new ConcurrentDictionary<Type, IAdoKeyResolver>();
+
         /// <summary>
         /// Get tracer for the specified persistence class
         /// </summary>
@@ -246,6 +252,24 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected abstract TModel AfterPersisted(DataContext context, TModel data);
 
+
+        /// <summary>
+        /// Get the key resolver for <typeparamref name="TTarget"/>
+        /// </summary>
+        /// <typeparam name="TTarget">Target of the key resolver</typeparam>
+        /// <returns>The key resolver if one exists</returns>
+        protected bool TryGetKeyResolver<TTarget>(out IAdoKeyResolver<TTarget> resolver)
+        {
+            if (this.m_keyResolvers.TryGetValue(typeof(TTarget), out var tresolver))
+            {
+                resolver = tresolver as IAdoKeyResolver<TTarget>;
+                return resolver != null;
+            }
+            var candidate = ApplicationServiceContext.Current.GetService<IAdoKeyResolver<TTarget>>();
+            this.m_keyResolvers.TryAdd(typeof(TTarget), candidate);
+            resolver = candidate as IAdoKeyResolver<TTarget>;
+            return resolver != null;
+        }
 
         /// <summary>
         /// Perform the actual insert of a model object

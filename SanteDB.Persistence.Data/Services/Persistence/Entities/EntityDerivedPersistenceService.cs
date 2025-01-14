@@ -383,18 +383,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             }
             else if (issues.Any()) // There are issues
             {
-                if (data.Extensions == null)
+                // Remove all detected issue extensions
+                var suvivalExtension = context.FirstOrDefault<DbEntityExtension>(o => o.SourceKey == data.Key && o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension && o.ObsoleteVersionSequenceId == null);
+                if(suvivalExtension != null)
                 {
-                    if (data.Key.HasValue)
-                    {
-                        data.Extensions = data.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == data.Key).ToList();
-                    }
-                    else
-                    {
-                        data.Extensions = new List<EntityExtension>();
-                    }
+                    context.UpdateAll<DbEntityExtension>(o => o.SourceKey == data.Key && o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension && o.ObsoleteVersionSequenceId == null && o.Key != suvivalExtension.Key, o => o.ObsoleteVersionSequenceId == data.VersionSequence);
                 }
-
+                
                 var extension = data.Extensions.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension);
                 if (extension == null)
                 {

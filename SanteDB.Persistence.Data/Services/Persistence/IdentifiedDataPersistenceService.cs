@@ -45,9 +45,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         where TDbModel : class, IDbIdentified, new()
     {
 
-        // Exists providers
-        private readonly ConcurrentDictionary<Type, IAdoKeyResolver> m_keyResolvers = new ConcurrentDictionary<Type, IAdoKeyResolver>();
-
         /// <summary>
         /// Creates a new injected version of the IdentifiedDataPersistenceService
         /// </summary>
@@ -126,23 +123,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
         }
 
-        /// <summary>
-        /// Get the key resolver for <typeparamref name="TTarget"/>
-        /// </summary>
-        /// <typeparam name="TTarget">Target of the key resolver</typeparam>
-        /// <returns>The key resolver if one exists</returns>
-        protected bool TryGetKeyResolver<TTarget>(out IAdoKeyResolver<TTarget> resolver)
-        {
-            if (this.m_keyResolvers.TryGetValue(typeof(TTarget), out var tresolver))
-            {
-                resolver = tresolver as IAdoKeyResolver<TTarget>;
-                return resolver != null;
-            }
-            var candidate = ApplicationServiceContext.Current.GetService<IAdoKeyResolver<TTarget>>();
-            this.m_keyResolvers.TryAdd(typeof(TTarget), candidate);
-            resolver = candidate as IAdoKeyResolver<TTarget>;
-            return resolver != null;
-        }
 
         /// <summary>
         /// Prepare references
