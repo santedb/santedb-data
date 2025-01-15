@@ -384,13 +384,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             else if (issues.Any()) // There are issues
             {
                 // Remove all detected issue extensions
-                var suvivalExtension = context.FirstOrDefault<DbEntityExtension>(o => o.SourceKey == data.Key && o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension && o.ObsoleteVersionSequenceId == null);
-                if(suvivalExtension != null)
-                {
-                    context.UpdateAll<DbEntityExtension>(o => o.SourceKey == data.Key && o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension && o.ObsoleteVersionSequenceId == null && o.Key != suvivalExtension.Key, o => o.ObsoleteVersionSequenceId == data.VersionSequence);
-                }
-                
-                var extension = data.Extensions.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension);
+                context.UpdateAll<DbEntityExtension>(o => o.SourceKey == data.Key && o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension && o.ObsoleteVersionSequenceId == null, o=>o.ObsoleteVersionSequenceId == data.VersionSequence);
+                data.Extensions = data.Extensions ?? new List<EntityExtension>();
+                var extension = data.Extensions?.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension);
                 if (extension == null)
                 {
                     data.Extensions.Add(new EntityExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issues));

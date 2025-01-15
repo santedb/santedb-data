@@ -369,19 +369,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             }
             else if (issues.Any()) // there are non-serious issues
             {
-                if (data.Extensions == null)
-                {
-                    if (data.Key.HasValue)
-                    { // load from DB because there may be some existing stuff we don't want to erase
-                        data.Extensions = data.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == data.Key).ToList();
-                    }
-                    else
-                    {
-                        data.Extensions = new List<ActExtension>();
-                    }
-                }
-
-                var extension = data.Extensions.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension);
+                // Remove all detected issue extensions
+                context.UpdateAll<DbActExtension>(o => o.SourceKey == data.Key && o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension && o.ObsoleteVersionSequenceId == null, o => o.ObsoleteVersionSequenceId == data.VersionSequence);
+                data.Extensions = data.Extensions ?? new List<ActExtension>();
+                var extension = data.Extensions?.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension);
                 if (extension == null)
                 {
                     data.Extensions.Add(new ActExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issues));
@@ -389,6 +380,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 else
                 {
                     var existingValues = extension.GetValue<List<DetectedIssue>>();
+                    if (existingValues == null)
+                    {
+                        throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.EXTENSION_INVALID_TYPE, new { extension = ExtensionTypeKeys.DataQualityExtensionName }));
+                    }
                     existingValues.AddRange(issues);
                     extension.ExtensionValue = existingValues;
                 }
