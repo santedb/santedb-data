@@ -203,22 +203,29 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         private void ProcessAppletCollection(ReadonlyAppletCollection appletCollection)
         {
-            foreach (var itm in appletCollection.SelectMany(c => c.Assets).Where(o => o.Name.StartsWith("bi/") && o.Name.EndsWith(".xml")))
+            try
             {
-                try
+                foreach (var itm in appletCollection.SelectMany(c => c.Assets).Where(o => o.Name.StartsWith("bi/") && o.Name.EndsWith(".xml")))
                 {
-                    this.m_tracer.TraceInfo("Attempting to install {0}...", itm.Name);
-                    var content = appletCollection.RenderAssetContent(itm);
-                    using (var ms = new MemoryStream(content))
+                    try
                     {
-                        var ast = BiDefinition.Load(ms);
-                        this.Insert(ast);
+                        this.m_tracer.TraceInfo("Attempting to install {0}...", itm.Name);
+                        var content = appletCollection.RenderAssetContent(itm);
+                        using (var ms = new MemoryStream(content))
+                        {
+                            var ast = BiDefinition.Load(ms);
+                            this.Insert(ast);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        this.m_tracer.TraceWarning("Error installing {0}...", itm.Name, e);
                     }
                 }
-                catch (Exception e)
-                {
-                    this.m_tracer.TraceWarning("Error installing {0}...", itm.Name, e);
-                }
+            }
+            catch(Exception e)
+            {
+                this.m_tracer.TraceWarning("Could not refresh BI - {0}", e.ToHumanReadableString());
             }
         }
 
