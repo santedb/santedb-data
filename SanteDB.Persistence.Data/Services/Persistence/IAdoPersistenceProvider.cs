@@ -65,6 +65,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Touch the specified object (creates a new version or updates the modified time)
         /// </summary>
         object Touch(DataContext context, Guid id);
+
+
     }
 
     /// <summary>

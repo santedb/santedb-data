@@ -16,6 +16,7 @@
  * the License.
  * 
  */
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
@@ -36,6 +37,7 @@ using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
@@ -111,6 +113,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         /// <inheritdoc/>
         public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
 #pragma warning restore CS0067
+
 
         /// <summary>
         /// Re-organize a bundle's contents for insert
@@ -336,6 +339,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
                 try
                 {
+
                     switch (data.Item[i].BatchOperation)
                     {
                         case BatchOperationType.Delete:
@@ -359,7 +363,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                             break;
                         case BatchOperationType.InsertOrUpdate:
                         case BatchOperationType.Auto:
-
+                            
                             // Ensure that the object exists
                             if (data.Item[i].Key.HasValue && persistenceService.Exists(context, data.Item[i].Key.Value))
                             {

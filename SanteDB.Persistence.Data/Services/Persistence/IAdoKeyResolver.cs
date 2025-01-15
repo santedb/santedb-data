@@ -27,7 +27,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// <summary>
     /// Marker interface
     /// </summary>
-    public interface IAdoKeyResolver { }
+    public interface IAdoKeyResolver { 
+        
+    }
 
     /// <summary>
     /// Key resolver service

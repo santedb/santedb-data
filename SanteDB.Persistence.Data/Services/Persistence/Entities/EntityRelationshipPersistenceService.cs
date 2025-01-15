@@ -66,6 +66,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             try
             {
+                if(this.m_configuration.AutoUpdateExisting)
+                {
+                    var existingKey = context.Query<DbEntityRelationship>(o => o.SourceKey == dbModel.SourceKey && o.RelationshipTypeKey == dbModel.RelationshipTypeKey && o.TargetKey == dbModel.TargetKey && o.ObsoleteVersionSequenceId == null).Select(o => o.Key).FirstOrDefault();
+                    if (existingKey != Guid.Empty)
+                    {
+                        context.UpdateAll<DbEntityRelationship>(o => o.Key == existingKey, o => o.ObsoleteVersionSequenceId == dbModel.EffectiveVersionSequenceId);
+                    }
+                }
                 return base.DoInsertInternal(context, dbModel);
             }
             catch(DbException e) when (e.Message.Contains("ENTITY RELATIONSHIP FAILED VALIDATION") || e.Message.Contains("Validation error: Relationship"))
