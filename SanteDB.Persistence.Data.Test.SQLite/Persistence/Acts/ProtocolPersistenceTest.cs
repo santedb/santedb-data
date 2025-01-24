@@ -26,6 +26,7 @@ using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -80,12 +81,12 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
 
             public ICdssLibraryRepositoryMetadata StorageMetadata { get; set; }
 
-            public IEnumerable<DetectedIssue> Analyze(IdentifiedData analysisTarget, IDictionary<string, object> parameters)
+            public IEnumerable<ICdssResult> Analyze(IdentifiedData analysisTarget, IDictionary<string, object> parameters)
             {
                 yield break;
             }
 
-            public IEnumerable<object> Execute(IdentifiedData target, IDictionary<string, object> parameters)
+            public IEnumerable<ICdssResult> Execute(IdentifiedData target, IDictionary<string, object> parameters)
             {
                 yield break;
             }
