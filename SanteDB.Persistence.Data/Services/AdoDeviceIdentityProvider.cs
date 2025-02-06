@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// An implementation of the device identity provider
     /// </summary>
-    public class AdoDeviceIdentityProvider : IDeviceIdentityProviderService, ILocalServiceProvider<IDeviceIdentityProviderService>
+    public class AdoDeviceIdentityProvider : IDeviceIdentityProviderService, INotifyDeviceIdentityProviderService, ILocalServiceProvider<IDeviceIdentityProviderService>
     {
 
         /// <inheritdoc/>
@@ -69,6 +69,20 @@ namespace SanteDB.Persistence.Data.Services
         /// Fired prior to authenticating a device principal
         /// </summary>
         public event EventHandler<AuthenticatingEventArgs> Authenticating;
+        /// <inheritdoc/>
+        public event EventHandler<IdentityEventArgs> Locked;
+        /// <inheritdoc/>
+        public event EventHandler<IdentityEventArgs> Unlocked;
+        /// <inheritdoc/>
+        public event EventHandler<IdentityEventArgs> Changed;
+        /// <inheritdoc/>
+        public event EventHandler<IdentityEventArgs> Created;
+        /// <inheritdoc/>
+        public event EventHandler<IdentityEventArgs> Deleted;
+        /// <inheritdoc/>
+        public event EventHandler<IdentityClaimEventArgs> ClaimAdded;
+        /// <inheritdoc/>
+        public event EventHandler<IdentityClaimEventArgs> ClaimRemoved;
 
         // Tracer
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoDeviceIdentityProvider));
@@ -254,6 +268,8 @@ namespace SanteDB.Persistence.Data.Services
                     dev.UpdatedByKey = context.EstablishProvenance(principal, null);
                     dev.UpdatedTime = DateTimeOffset.Now;
                     context.Update(dev);
+
+                    this.Changed?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dev), principal));
                 }
                 catch (Exception e)
                 {
@@ -366,6 +382,15 @@ namespace SanteDB.Persistence.Data.Services
                     }
 
                     dev = context.Update(dev);
+                    if (lockoutState)
+                    {
+                        this.Locked?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dev), principal));
+                    }
+                    else
+                    {
+                        this.Unlocked?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dev), principal));
+                    }
+
                 }
                 catch (Exception e)
                 {
@@ -439,6 +464,7 @@ namespace SanteDB.Persistence.Data.Services
 
                         tx.Commit();
 
+                        this.Created?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dbsa), principal));
                         return new AdoDeviceIdentity(dbsa);
                     }
                 }
@@ -481,6 +507,7 @@ namespace SanteDB.Persistence.Data.Services
                     dbDev.ObsoletedByKey = context.EstablishProvenance(principal, null);
                     dbDev.ObsoletionTime = DateTimeOffset.Now;
                     context.Update(dbDev);
+                    this.Deleted?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dbDev), principal));
                 }
                 catch (Exception e)
                 {
@@ -568,6 +595,8 @@ namespace SanteDB.Persistence.Data.Services
                         tx.Commit();
                     }
 
+                    this.Changed?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dbDevice), principal));
+
                 }
                 catch (Exception e)
                 {
@@ -614,6 +643,8 @@ namespace SanteDB.Persistence.Data.Services
                         context.Update(dbDevice);
                         tx.Commit();
                     }
+                    this.Changed?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dbDevice), principal));
+
                 }
                 catch (Exception e)
                 {

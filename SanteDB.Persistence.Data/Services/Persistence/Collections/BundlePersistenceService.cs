@@ -17,6 +17,7 @@
  * 
  */
 using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
@@ -35,6 +36,7 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
+using SanteDB.Persistence.Data.Model.Sys;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -43,6 +45,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
+using ZstdSharp.Unsafe;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 {
@@ -112,15 +115,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         public event EventHandler<DataRetrievedEventArgs<Bundle>> Retrieved;
         /// <inheritdoc/>
         public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
-#pragma warning restore CS0067
 
+#pragma warning restore CS0067
 
         /// <summary>
         /// Re-organize a bundle's contents for insert
         /// </summary>
         public Bundle ReorganizeForInsert(Bundle input)
         {
-            var retVal = new Bundle(input.Item.Where(o => o.BatchOperation == BatchOperationType.Delete));
+            var retVal = new Bundle(input.Item.Where(o => o.BatchOperation == BatchOperationType.Delete))
+            {
+                CorrelationKey = input.CorrelationKey,
+                CorrelationSequence = input.CorrelationSequence
+            };
             var resolved = input.Item.Where(e=>!retVal.Item.Contains(e)).ToArray();
 
             // Process each object in our queue of to be processed
@@ -245,18 +252,25 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                             }
                             context.EstablishProvenance(principal, null);
 
-                            data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty, this.m_configuration.StrictKeyAgreement);
-
-                            data = this.Insert(context, data);
-
-                            data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
-
-                            if (transactionMode == TransactionMode.Commit)
+                            // Correlation and message control
+                            // JF - 20250127 - This set of code will register the bundle's correlation key and sequence into the database and will perform necessary actions
+                            // to prevent changes where none is desired. 
+                            if (this.ValidateBundleCorrelation(context, data))
                             {
-                                tx.Commit();
-                            }
 
-                            data.Item.ForEach(i => this.m_dataCachingService.Add(i));
+                                data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty, this.m_configuration.StrictKeyAgreement);
+
+                                data = this.Insert(context, data);
+
+                                data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
+
+                                if (transactionMode == TransactionMode.Commit)
+                                {
+                                    tx.Commit();
+                                }
+
+                                data.Item.ForEach(i => this.m_dataCachingService.Add(i));
+                            }
                         }
                         finally
                         {
@@ -281,6 +295,72 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             {
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
             }
+        }
+
+        /// <summary>
+        /// Validate the bundle sequence and insert the correlation key if needed 
+        /// </summary>
+        private bool ValidateBundleCorrelation(DataContext context, Bundle data)
+        {
+            if(context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+            else if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            // The bundle is un-correlated so don't check
+            if(!data.CorrelationKey.HasValue)
+            {
+                return true;
+            }
+
+            // We will determine if we've processed this bundle before
+            var lastSequence = context.Query<DbBundleCorrelationSubmission>(o => o.SourceKey == data.CorrelationKey.Value).OrderByDescending(o => o.CorrelationSequence).Select(o => o.CorrelationSequence).FirstOrDefault();
+            if (!lastSequence.HasValue) // Never submitted before
+            {
+                context.Insert(new DbBundleCorrelation() { Key = data.CorrelationKey.Value });
+            }
+            else if (lastSequence > data.CorrelationSequence) // We already received a future sequence so ignore this one
+            {
+                switch (this.m_configuration.BundleCorrelationBehavior) {
+                    case BundleCorrelationBehaviorType.NotModified:
+                        throw new PreconditionFailedException(String.Format(ErrorMessages.BUNDLE_CORRELATION_SEQUENCE_ERROR, data.CorrelationSequence, lastSequence));
+                    case BundleCorrelationBehaviorType.Ignore:
+                        return false;
+                    case BundleCorrelationBehaviorType.ThrowError:
+                        throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "error.persistence.sequence", String.Format(ErrorMessages.BUNDLE_CORRELATION_SEQUENCE_ERROR, data.CorrelationSequence, lastSequence), DetectedIssueKeys.InvalidDataIssue, null);
+                }
+            }
+
+            // Assign a bundle id to uniquely track the message
+            data.Key = data.Key ?? Guid.NewGuid();
+            
+            // Already processed? 
+            if(context.Any<DbBundleCorrelationSubmission>(o=>o.Key == data.Key))
+            {
+                switch(this.m_configuration.BundleCorrelationBehavior)
+                {
+                    case BundleCorrelationBehaviorType.NotModified:
+                        throw new PreconditionFailedException(String.Format(ErrorMessages.BUNDLE_ALREADY_PROCESSED, data.Key));
+                    case BundleCorrelationBehaviorType.Ignore:
+                        return false;
+                    case BundleCorrelationBehaviorType.ThrowError:
+                        throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "error.persistence.alreadyDone", String.Format(ErrorMessages.BUNDLE_ALREADY_PROCESSED, data.Key), DetectedIssueKeys.AlreadyDoneIssue, null);
+                }
+            }
+
+            context.Insert(new DbBundleCorrelationSubmission()
+            {
+                Key = data.Key.Value,
+                SourceKey = data.CorrelationKey.Value,
+                CreatedByKey = context.ContextId,
+                CreationTime = DateTimeOffset.Now,
+                CorrelationSequence = data.CorrelationSequence
+            });
+            return true;
         }
 
         /// <inheritdoc/>
@@ -383,7 +463,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                     {
                         context.Data.Add(data.Item[i].Key.ToString(), data.Item[i].BatchOperation);
                     }
-
                 }
                 catch (DbException e)
                 {

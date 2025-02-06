@@ -17,6 +17,7 @@
  * 
  */
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite.Configuration;
 using System;
@@ -72,6 +73,34 @@ namespace SanteDB.Persistence.Data.Configuration
         [XmlEnum("default")]
         Default = FullVersioning | AssociationVersioning,
 
+    }
+
+    /// <summary>
+    /// Correation behavior
+    /// </summary>
+    [XmlType(nameof(BundleCorrelationBehaviorType), Namespace = "http://santedb.org/configuration")]
+    public enum BundleCorrelationBehaviorType
+    {
+        /// <summary>
+        /// Inform the caller that the content was not modified via throwing a <see cref="PreconditionFailedException"/>
+        /// </summary>
+        [XmlEnum("not-modified")]
+        NotModified,
+        /// <summary>
+        /// Throw an error that the data is invalid
+        /// </summary>
+        [XmlEnum("error")]
+        ThrowError,
+        /// <summary>
+        /// Ignore the condition and don't commit any data
+        /// </summary>
+        [XmlEnum("ignore")]
+        Ignore,
+        /// <summary>
+        /// Process the data anyways
+        /// </summary>
+        [XmlEnum("process")]
+        ProcessAnyways
     }
 
     /// <summary>
@@ -241,6 +270,12 @@ namespace SanteDB.Persistence.Data.Configuration
         [XmlElement("trim"), Category("Maintenance"), DisplayName("Database Trimming"), Description("Configures how the database is maintained including retention time for old versions, sessions, etc.")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public AdoTrimSettings TrimSettings { get; set; }
+
+        /// <summary>
+        /// Gets or sets the behavior when a bundle is recieved out of sequence
+        /// </summary>
+        [XmlElement("correlationBehavior"), Category("Behavior"), DisplayName("Ordered Bundle Process"), Description("Configures how the database should handle scenarios where bundles are processed out of order")]
+        public BundleCorrelationBehaviorType BundleCorrelationBehavior { get; set; }
 
         /// <summary>
         /// Get all peppered combinations of the specified secret
