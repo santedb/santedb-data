@@ -16,11 +16,14 @@
  * the License.
  * 
  */
+using SanteDB.Core.Data.Quality;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
@@ -65,13 +68,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                 case LoadMode.FullLoad:
                     retVal.RelationshipType = retVal.RelationshipType.GetRelatedPersistenceService().Get(context, dbModel.RelationshipTypeKey);
                     retVal.SetLoaded(nameof(ConceptRelationship.RelationshipType));
-                    if (retVal.TargetConceptKey != retVal.SourceEntityKey)
-                    {
-                        retVal.TargetConcept = retVal.TargetConcept.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
-                        retVal.SetLoaded(nameof(ConceptRelationship.TargetConcept));
-                    }
+                    // Prevents infinite recursion for now when A->B->A
+                    //if (retVal.TargetConceptKey != retVal.SourceEntityKey)
+                    //{
+                    //    retVal.TargetConcept = retVal.TargetConcept.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
+                    //    retVal.SetLoaded(nameof(ConceptRelationship.TargetConcept));
+                    //}
                     break;
             }
+
             return retVal;
         }
     }

@@ -136,7 +136,6 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
                 var afterInsert = base.TestInsert(place);
                 Assert.AreEqual(1, afterInsert.LoadProperty(o => o.Services).Count);
 
-
                 // Test querying 
                 var afterQuery = base.TestQuery<Place>(o => o.Services.Any(s => s.ServiceConceptKey == service1), 1).AsResultSet().First();
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Services).Count);
