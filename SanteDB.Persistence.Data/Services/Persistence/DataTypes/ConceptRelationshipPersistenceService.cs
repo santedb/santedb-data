@@ -65,8 +65,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                 case LoadMode.FullLoad:
                     retVal.RelationshipType = retVal.RelationshipType.GetRelatedPersistenceService().Get(context, dbModel.RelationshipTypeKey);
                     retVal.SetLoaded(nameof(ConceptRelationship.RelationshipType));
-                    retVal.TargetConcept = retVal.TargetConcept.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
-                    retVal.SetLoaded(nameof(ConceptRelationship.TargetConcept));
+                    if (retVal.TargetConceptKey != retVal.SourceEntityKey)
+                    {
+                        retVal.TargetConcept = retVal.TargetConcept.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
+                        retVal.SetLoaded(nameof(ConceptRelationship.TargetConcept));
+                    }
                     break;
             }
             return retVal;

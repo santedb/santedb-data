@@ -63,7 +63,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
         /// <inheritdoc/>
         protected override DbEntityRelationship DoInsertInternal(DataContext context, DbEntityRelationship dbModel)
-        {
+        {   
             try
             {
                 if(this.m_configuration.AutoUpdateExisting)
