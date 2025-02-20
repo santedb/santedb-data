@@ -484,11 +484,13 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence
                         new EntityIdentifier(patientsOnly, "P0")
                     }
                 });
-                patient = base.TestQuery<Patient>(o => o.Identifiers.Any(i => i.Value == "P0"), 2).AsResultSet().OrderByDescending(o => o.VersionSequence).First();
                 Assert.AreEqual(1, patient.LoadProperty(o => o.Extensions).Count);
                 Assert.AreEqual(ExtensionTypeKeys.DataQualityExtension, patient.Extensions[0].ExtensionTypeKey);
                 var extension = patient.Extensions[0].GetValue<List<DetectedIssue>>();
                 Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierNotUnique), "Expected a not unique issue");
+                patient = base.TestQuery<Patient>(o => o.Identifiers.Any(i => i.Value == "P0"), 2).AsResultSet().OrderByDescending(o => o.VersionSequence).First();
+                // Detected issue should not be persisted
+                Assert.AreEqual(0, patient.LoadProperty(o => o.Extensions).Count);
 
                 // We should be able to register a identifier validation but the result should have a detected issue
                 patient = base.TestInsert(new Patient()
@@ -498,13 +500,14 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence
                         new EntityIdentifier(patientsOnly, "P000000") // <--- THIS WILL FAIL VALIDATION
                     }
                 });
-                patient = base.TestQuery<Patient>(o => o.Identifiers.Any(i => i.Value == "P000000"), 1).First();
                 Assert.AreEqual(1, patient.LoadProperty(o => o.Extensions).Count);
                 Assert.AreEqual(ExtensionTypeKeys.DataQualityExtension, patient.Extensions[0].ExtensionTypeKey);
                 extension = patient.Extensions[0].GetValue<List<DetectedIssue>>();
                 Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierValidatorFailed), "Expected a check digit fail issue");
                 Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierPatternFormatFail), "Expected a format fail issue");
 
+                patient = base.TestQuery<Patient>(o => o.Identifiers.Any(i => i.Value == "P000000"), 1).First();
+               
                 // We should not be able to register an act with a patient identifier
                 var act = base.TestInsert(new Act()
                 {
@@ -516,7 +519,6 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence
                         new ActIdentifier(patientsOnly, "A00")
                     }
                 });
-                act = base.TestQuery<Act>(o => o.Identifiers.Any(i => i.Value == "A00"), 1).First();
                 Assert.AreEqual(1, act.LoadProperty(o => o.Extensions).Count);
                 Assert.AreEqual(ExtensionTypeKeys.DataQualityExtension, act.Extensions[0].ExtensionTypeKey);
                 extension = act.Extensions[0].GetValue<List<DetectedIssue>>();

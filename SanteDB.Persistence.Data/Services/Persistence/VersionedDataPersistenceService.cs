@@ -58,6 +58,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         // Validation configuration
         private readonly IDictionary<Type, AdoValidationPolicy> m_validationConfigurationCache = new ConcurrentDictionary<Type, AdoValidationPolicy>();
 
+        // Default validation
+        private readonly AdoValidationPolicy m_defaultValidationPolicy = new AdoValidationPolicy()
+        {
+            Authority = AdoValidationEnforcement.Off,
+            Scope = AdoValidationEnforcement.Off,
+            Uniqueness = AdoValidationEnforcement.Off,
+            Format = AdoValidationEnforcement.Off,
+            CheckDigit = AdoValidationEnforcement.Off
+        };
+
         // Class key map
         private Guid[] m_classKeyMap;
 
@@ -173,7 +183,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 this.m_classKeyMap = AppDomain.CurrentDomain.GetAllTypes().Where(o => typeof(TModel).IsAssignableFrom(o)).SelectMany(o => o.GetCustomAttributes<ClassConceptKeyAttribute>()).Select(o => Guid.Parse(o.ClassConcept)).ToArray();
             }
-
         }
 
         /// <summary>
@@ -187,14 +196,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             if (!this.m_validationConfigurationCache.TryGetValue(objectToVerify.GetType(), out var validation))
             {
                 var applicableConfigurations = this.m_configuration.Validation.Where(t => t.Target == null || t.Target.Type.IsAssignableFrom(objectToVerify.GetType()));
-                validation = new AdoValidationPolicy()
-                {
-                    Authority = AdoValidationEnforcement.Off,
-                    CheckDigit = AdoValidationEnforcement.Off,
-                    Format = AdoValidationEnforcement.Off,
-                    Scope = AdoValidationEnforcement.Off,
-                    Uniqueness = AdoValidationEnforcement.Off
-                };
+                validation = this.m_defaultValidationPolicy;
+
                 foreach (var itm in applicableConfigurations)
                 {
                     validation.Authority = validation.Authority < itm.Authority ? itm.Authority : validation.Authority;

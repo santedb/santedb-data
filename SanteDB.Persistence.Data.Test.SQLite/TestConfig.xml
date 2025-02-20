@@ -24,8 +24,10 @@
     <add type="SanteDB.Core.Configuration.AuditAccountabilityConfigurationSection, SanteDB.Core.Api" />
     <add type="SanteDB.Persistence.Data.Configuration.AdoPersistenceConfigurationSection, SanteDB.Persistence.Data" />
     <add type="SanteDB.OrmLite.Configuration.OrmConfigurationSection, SanteDB.OrmLite" />
-    <add type="SanteDB.Core.Configuration.Data.DataConfigurationSection, SanteDB.Core.Api" />
+	  <add type="SanteDB.Core.Configuration.Data.DataConfigurationSection, SanteDB.Core.Api" />
+	  <add type="SanteDB.Core.Data.Quality.Configuration.DataQualityConfigurationSection, SanteDB.Core.Api" />
   </sections>
+	<section xsi:type="DataQualityConfigurationSection" tagIssues="true"></section>
   <section xsi:type="DiagnosticsConfigurationSection">
     <sources>
       <add name="SanteDB" filter="Informational" />
@@ -149,6 +151,7 @@
       <add type="SanteDB.Core.Security.SHA256PasswordHashingService,SanteDB.Core.Api" />
       <add type="SanteDB.Core.Security.AesSymmetricCrypographicProvider,SanteDB.Core.Api" />
       <add type="SanteDB.Persistence.Data.Test.SQLite.TestForeignDataMapRepository, SanteDB.Persistence.Data.Test.SQLite"/>
+	<add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api" />
     </serviceProviders>
     <appSettings>
       <add key="allow.patient.martialStatus" value="true" />

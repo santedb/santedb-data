@@ -367,6 +367,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             {
                 throw new DetectedIssueException(issues);
             }
+            else if(issues.Any())
+            {
+                data.AddAnnotation(issues);
+            }
             
             return base.BeforePersisting(context, data);
         }

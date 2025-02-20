@@ -17,11 +17,15 @@
  * 
  */
 using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Extensions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
@@ -301,6 +305,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var dbInstance = this.DoConvertToDataModel(context, data);
                 dbInstance = this.DoInsertInternal(context, dbInstance);
                 var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
+
+                var issueAnnotation = data.GetAnnotations<DetectedIssue[]>();
+                if(issueAnnotation.Any() && retVal is IExtendable ext)
+                {
+                    ext.AddExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issueAnnotation.First());
+                }
                 return this.AfterPersisted(context, retVal); // TODO: Perhaps
 #if DEBUG
             }

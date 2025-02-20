@@ -484,7 +484,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                         new EntityIdentifier(patientsOnly, "P0")
                     }
                 });
-                patient = base.TestQuery<Patient>(o => o.Identifiers.Any(i => i.Value == "P0"), 2).AsResultSet().OrderByDescending(o => o.VersionSequence).First();
                 Assert.AreEqual(1, patient.LoadProperty(o => o.Extensions).Count);
                 Assert.AreEqual(ExtensionTypeKeys.DataQualityExtension, patient.Extensions[0].ExtensionTypeKey);
                 var extension = patient.Extensions[0].GetValue<List<DetectedIssue>>();
@@ -498,7 +497,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                         new EntityIdentifier(patientsOnly, "P000000") // <--- THIS WILL FAIL VALIDATION
                     }
                 });
-                patient = base.TestQuery<Patient>(o => o.Identifiers.Any(i => i.Value == "P000000"), 1).First();
                 Assert.AreEqual(1, patient.LoadProperty(o => o.Extensions).Count);
                 Assert.AreEqual(ExtensionTypeKeys.DataQualityExtension, patient.Extensions[0].ExtensionTypeKey);
                 extension = patient.Extensions[0].GetValue<List<DetectedIssue>>();
@@ -516,7 +514,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                         new ActIdentifier(patientsOnly, "A00")
                     }
                 });
-                act = base.TestQuery<Act>(o => o.Identifiers.Any(i => i.Value == "A00"), 1).First();
                 Assert.AreEqual(1, act.LoadProperty(o => o.Extensions).Count);
                 Assert.AreEqual(ExtensionTypeKeys.DataQualityExtension, act.Extensions[0].ExtensionTypeKey);
                 extension = act.Extensions[0].GetValue<List<DetectedIssue>>();
