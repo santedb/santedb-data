@@ -17,6 +17,7 @@
  * 
  */
 using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;

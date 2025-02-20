@@ -381,28 +381,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 throw new DetectedIssueException(issues);
             }
-            else if (issues.Any()) // There are issues
-            {
-                // Remove all detected issue extensions
-                context.UpdateAll<DbEntityExtension>(o => o.SourceKey == data.Key && o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension && o.ObsoleteVersionSequenceId == null, o=>o.ObsoleteVersionSequenceId == data.VersionSequence);
-                data.Extensions = data.Extensions ?? new List<EntityExtension>();
-                var extension = data.Extensions?.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension);
-                if (extension == null)
-                {
-                    data.Extensions.Add(new EntityExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issues));
-                }
-                else
-                {
-                    var existingValues = extension.GetValue<List<DetectedIssue>>();
-                    if (existingValues == null)
-                    {
-                        throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.EXTENSION_INVALID_TYPE, new { extension = ExtensionTypeKeys.DataQualityExtensionName }));
-                    }
-                    existingValues.AddRange(issues);
-                    extension.ExtensionValue = existingValues;
-                }
-            }
-
+            
             return base.BeforePersisting(context, data);
         }
 

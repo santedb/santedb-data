@@ -33,19 +33,21 @@ namespace SanteDB.Persistence.Data.Configuration
         /// Do no enforce th policy
         /// </summary>
         [XmlEnum("off")]
-        Off,
+        Off = 0,
+
+        
+        /// <summary>
+        /// Violations raise warnings
+        /// </summary>
+        [XmlEnum("loose")]
+        Loose = 1,
 
         /// <summary>
         /// Violations raise errors
         /// </summary>
         [XmlEnum("strict")]
-        Strict,
+        Strict = 2,
 
-        /// <summary>
-        /// Violations raise warnings
-        /// </summary>
-        [XmlEnum("loose")]
-        Loose
     }
 
     /// <summary>
