@@ -105,7 +105,6 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public IQueryPersistenceService QueryPersistence => this.m_queryPersistenceService;
 
-        string IServiceImplementation.ServiceName => throw new NotImplementedException();
 
         /// <inheritdoc/>
         public DataTemplateDefinition AddOrUpdate(DataTemplateDefinition definition)
