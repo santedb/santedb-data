@@ -134,7 +134,7 @@ namespace SanteDB.Persistence.Data.Services
             //    throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_CIRCULAR_DEPENDENCY));
             //}
 
-            return new Dataset(input.Id) { Action = resolved.ToList(), ServiceExec = input.ServiceExec, SqlExec = input.SqlExec };
+            return new Dataset(input.Id) { Action = resolved.ToList(), ServiceExec = input.ServiceExec, SqlExec = input.SqlExec, PreSqlExec = input.PreSqlExec };
         }
 
         /// <summary>
@@ -209,6 +209,16 @@ namespace SanteDB.Persistence.Data.Services
                     using (var tx = context.BeginTransaction())
                     {
                         context.ContextId = context.EstablishProvenance(AuthenticationContext.Current.Principal, null);
+
+                        // Insert the post install trigger
+                        if (dataset.PreSqlExec?.Any() == true)
+                        {
+                            this.m_tracer.TraceInfo("Executing post-install triggers for {0}...", dataset.Id);
+                            foreach (var itm in dataset.PreSqlExec.Where(o => o.InvariantName == this.m_configuration.Provider.Invariant))
+                            {
+                                context.ExecuteNonQuery(itm.QueryText);
+                            }
+                        }
 
                         for (var i = 0; i < dataset.Action.Count; i++)
                         {
