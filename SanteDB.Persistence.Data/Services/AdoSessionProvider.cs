@@ -211,7 +211,7 @@ namespace SanteDB.Persistence.Data.Services
                         this.m_adhocCacheService?.Remove(this.CreateCacheKey(sessionId));
                         this.m_adhocCacheService?.Remove($"{this.CreateCacheKey(sessionId)}.idt");
 
-                        this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(null, session, true, false, null, null));
+                        this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(AuthenticationContext.Current.Principal, session, true, false, null, null));
                     }
                 }
                 catch (Exception e)
