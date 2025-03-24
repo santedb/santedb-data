@@ -22,6 +22,7 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Concepts;
+using SanteDB.Persistence.Data.Model.Extensibility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,6 +50,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             // Delete other objects
             context.DeleteAll<DbConceptName>(o => o.SourceKey == key);
             context.DeleteAll<DbConceptRelationship>(o => o.SourceKey == key);
+            context.DeleteAll<DbConceptTag>(o => o.SourceKey == key);
+            context.DeleteAll<DbConceptExtension>(o => o.SourceKey == key);
             context.DeleteAll<DbConceptReferenceTerm>(o => o.SourceKey == key);
             base.DoDeleteReferencesInternal(context, key);
         }
@@ -91,6 +94,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 
             }
 
+            if (data.Tags != null)
+            {
+                retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
+            }
+
+            if (data.Extensions != null)
+            {
+                retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
+            }
+
             // Concept sets
             if (data.ConceptSetsXml != null)
             {
@@ -129,6 +142,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             {
                 retVal.ConceptNames = base.UpdateModelVersionedAssociations<ConceptName>(context, retVal, data.ConceptNames).ToList();
 
+            }
+            if (data.Tags != null)
+            {
+                retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
+            }
+            if (data.Extensions != null)
+            {
+                retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
             }
 
             // Update concept sets
@@ -175,6 +196,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                     retVal.SetLoaded(nameof(Concept.Relationships));
                     retVal.ReferenceTerms = retVal.ReferenceTerms.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoaded(nameof(Concept.ReferenceTerms));
+                    retVal.Extensions = retVal.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                    retVal.SetLoaded(o => o.Extensions);
+                    retVal.Tags = retVal.Tags.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.SetLoaded(o => o.Tags);
+
                     goto case LoadMode.QuickLoad;
                 case LoadMode.QuickLoad:
                     retVal.ConceptSetsXml = context.Query<DbConceptSetConceptAssociation>(o => o.ConceptKey == dbModel.Key).Select(o => o.SourceKey).ToList();

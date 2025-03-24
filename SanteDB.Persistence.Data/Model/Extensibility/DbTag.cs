@@ -18,6 +18,7 @@
  */
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Acts;
+using SanteDB.Persistence.Data.Model.Concepts;
 using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
@@ -132,5 +133,23 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
         }
     }
 
+
+    /// <summary>
+    /// Represents a tag associated with an act
+    /// </summary>
+    [Table("cd_tag_tbl")]
+    public class DbConceptTag : DbTag
+    {
+        /// <summary>
+        /// Gets or sets the source.
+        /// </summary>
+        /// <value>The source.</value>
+        [Column("cd_id"), ForeignKey(typeof(DbConceptVersion), nameof(DbConcept.Key))]
+        public override Guid SourceKey
+        {
+            get;
+            set;
+        }
+    }
 }
 

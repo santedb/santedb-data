@@ -544,4 +544,20 @@
     <property modelName="StateData" domainName="State" />
      <property modelName="Tag" queryOnly="true" domainName="Key" /> 
   </class>
+
+	<class modelClass="SanteDB.Core.Model.DataTypes.ConceptExtension, SanteDB.Core.Model"
+ domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbConceptExtension, SanteDB.Persistence.Data">
+		<property modelName="SourceEntityKey" domainName="SourceKey" />
+		<property modelName="ExtensionValueData" domainName="Value" />
+		<property modelName="ExtensionDisplay" domainName="Display" />
+		<property modelName="Tag" queryOnly="true" domainName="Key" />
+	</class>
+
+
+	<class modelClass="SanteDB.Core.Model.DataTypes.ConceptTag, SanteDB.Core.Model"
+   domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbConceptTag, SanteDB.Persistence.Data">
+		<property modelName="SourceEntityKey" domainName="SourceKey" />
+		<property modelName="Tag" queryOnly="true" domainName="Key" />
+	</class>
+
 </modelMap>
