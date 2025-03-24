@@ -324,6 +324,7 @@
     <EmbeddedResource Include="SQL\SQLITE\20230509.sql">
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\SQLITE\20241118.sql" />
+    <EmbeddedResource Include="SQL\SQLITE\20250324.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20250127.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20250117.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20241207.sql" />
