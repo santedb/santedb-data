@@ -1,13 +1,13 @@
 /** 
  * <feature scope="SanteDB.Persistence.Data" id="20250324" name="Update:20250324"  invariantName="sqlite">
  *	<summary>Update: Fixes unique enforcement on relationships</summary>
- *  <isInstalled>SELECT EXISTS (SELECT * FROM sqlite_master WHERE name = 'ACT_PTCPT_TBL_REL_UNQ_IDX' OR name = 'act_ptcpt_tbl_rel_unq_idx')</isInstalled>
+ *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE name = 'ACT_PTCPT_TBL_REL_UNQ_IDX' OR name = 'act_ptcpt_tbl_rel_unq_idx')</isInstalled>
  * </feature>
  */
 
  -- MARK ANY DUPLICATES AS OBSOLETED
 UPDATE ACT_PTCPT_TBL SET OBSLT_VRSN_SEQ_ID = 1 
-FROM ACT_PTCPT_TBL WHERE 
+WHERE 
 ACT_PTCPT_ID IN (
 	SELECT MIN(ACT_PTCPT_ID) ACT_PTCPT_ID FROM ACT_PTCPT_TBL
 	GROUP BY ENT_ID, ACT_ID, ROL_CD_ID
@@ -19,7 +19,7 @@ ACT_PTCPT_ID IN (
 CREATE UNIQUE INDEX ACT_PTCPT_TBL_REL_UNQ_IDX ON ACT_PTCPT_TBL(ENT_ID, ACT_ID, ROL_CD_ID) WHERE (OBSLT_VRSN_SEQ_ID IS NULL);--#!
 
 -- MARK ANY DUPLICATES AS OBSOLETED
-UPDATE ACT_REL_TBL SET OBSLT_VRSN_SEQ_ID = 1 FROM ACT_REL_TBL WHERE 
+UPDATE ACT_REL_TBL SET OBSLT_VRSN_SEQ_ID = 1 WHERE 
 REL_ID IN (
 	SELECT MIN(REL_ID) REL_ID FROM ACT_REL_TBL
 	GROUP BY SRC_ACT_ID, TRG_ACT_ID, REL_TYP_CD_ID
