@@ -223,7 +223,7 @@ namespace SanteDB.Persistence.Data.Services
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceWarning("Could not refresh BI - {0}", e.ToHumanReadableString());
             }
@@ -279,8 +279,11 @@ namespace SanteDB.Persistence.Data.Services
                         using (var ms = new MemoryStream(itm.Object2.DefinitionContents))
                         {
                             retVal = (TBisDefinition)BiDefinition.Load(ms);
-                            retVal.MetaData.LastModified = itm.Object2.CreationTime.DateTime;
-                            retVal.MetaData.LastModifiedBy = itm.Object2.CreatedByKey;
+                            if (retVal.MetaData != null)
+                            {
+                                retVal.MetaData.LastModified = itm.Object2.CreationTime.DateTime;
+                                retVal.MetaData.LastModifiedBy = itm.Object2.CreatedByKey;
+                            }
                             this.m_adhocCacheService.Add(cacheKey, retVal);
                         }
 
@@ -523,11 +526,11 @@ namespace SanteDB.Persistence.Data.Services
 
             try
             {
-                try
+                if (this.m_modelMapper.MapModelExpression<TBisDefinition, bool>(filter, typeof(DbBiQueryResult), false) != null)
                 {
                     return new MappedQueryResultSet<TBisDefinition>(new MappedQueryProvider<TBisDefinition>(this.m_configuration.Provider, this.m_modelMapper, this.m_adhocCacheService)).Where(filter);
                 }
-                catch // Fallback to a fat query
+                else
                 {
                     using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                     {
