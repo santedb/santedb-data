@@ -26,7 +26,7 @@ namespace SanteDB.Persistence.Data.Model.Notifications
     /// <summary>
     /// Represents a notification template.
     /// </summary>
-    [Table("tpl_tbl")]
+    [Table("nfn_tpl_tbl")]
     public class DbNotificationTemplate : DbNonVersionedBaseData
     {
 
@@ -59,7 +59,7 @@ namespace SanteDB.Persistence.Data.Model.Notifications
         /// <summary>
         /// Gets or sets the name of the notification template.
         /// </summary>
-        [Column("name")]
+        [Column("tpl_name")]
         public string Name { get; set; }
 
         /// <summary>
