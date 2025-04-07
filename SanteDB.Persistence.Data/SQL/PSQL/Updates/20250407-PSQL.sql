@@ -79,7 +79,7 @@ CREATE TABLE nfn_inst_prm_tbl (
     nfn_tpl_prm_id UUID NOT NULL,
     expr TEXT NOT NULL,
     CONSTRAINT fk_nfn_inst_id_nfn_inst_tbl FOREIGN KEY (nfn_inst_id) REFERENCES nfn_inst_tbl(inst_id),
-    CONSTRAINT fk_nfn_tpl_prm_id_nfn_tpl_prm_tbl FOREIGN KEY (nfn_tpl_prm_id) REFERENCES nfn_inst_tbl(tpl_prm_id)
+    CONSTRAINT fk_nfn_tpl_prm_id_nfn_tpl_prm_tbl FOREIGN KEY (nfn_tpl_prm_id) REFERENCES nfn_tpl_prm_tbl(tpl_prm_id)
 );
 
 SELECT REG_PATCH('20250407-01');
