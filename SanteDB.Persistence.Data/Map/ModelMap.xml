@@ -560,4 +560,9 @@
 		<property modelName="Tag" queryOnly="true" domainName="Key" />
 	</class>
 
+  <!-- Notification Maps -->
+  <class modelClass="SanteDB.Core.Notifications.NotificationTemplate, SanteDB.Core.Api"
+         domainClass="SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplate, SanteDB.Persistence.Data">
+  </class>
+
 </modelMap>
