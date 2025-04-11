@@ -85,16 +85,16 @@ namespace SanteDB.Persistence.Data.Model.Notifications
         public String FilterExpression { get; set; }
 
         /// <summary>
-        /// Gets or sets the target expression of the notification instance.
-        /// </summary>
-        [Column("trg_expr")]
-        public String TargetExpression { get; set; }
-
-        /// <summary>
         /// Gets or sets the trigger expression of the notification instance.
         /// </summary>
         [Column("trgr_expr")]
         public String TriggerExpression { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target expression of the notification instance.
+        /// </summary>
+        [Column("trg_expr")]
+        public String TargetExpression { get; set; }
 
         /// <summary>
         /// Gets or sets the last sent at date time of the notification instance.
