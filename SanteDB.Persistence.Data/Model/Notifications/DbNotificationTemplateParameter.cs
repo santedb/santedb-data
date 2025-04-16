@@ -44,10 +44,10 @@ namespace SanteDB.Persistence.Data.Model.Notifications
         public override Guid Key { get; set; }
 
         /// <summary>
-        /// Gets or sets the template of the parameter.
+        /// Gets or sets the notification template key of the parameter.
         /// </summary>
         [Column("nfn_tpl_id"), ForeignKey(typeof(DbNotificationTemplate), nameof(DbNotificationTemplate.Key))]
-        public Guid NotificationTemplate { get; set; }
+        public Guid NotificationTemplateKey { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the parameter.
