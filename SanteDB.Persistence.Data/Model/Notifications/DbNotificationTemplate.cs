@@ -45,10 +45,10 @@ namespace SanteDB.Persistence.Data.Model.Notifications
         public override Guid Key { get; set; }
 
         /// <summary>
-        /// Gets or sets the status of the notification template.
+        /// Gets or sets the status key of the notification template.
         /// </summary>
         [Column("sts_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-        public Guid Status { get; set; }
+        public Guid StatusKey { get; set; }
 
         /// <summary>
         /// Gets or sets the mnemonic of the notification template.

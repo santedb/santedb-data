@@ -43,16 +43,16 @@ namespace SanteDB.Persistence.Data.Model.Notifications
         public override Guid Key { get; set; }
 
         /// <summary>
-        /// Gets or sets the template of the notification instance.
+        /// Gets or sets the notification template key of the notification instance.
         /// </summary>
         [Column("nfn_tpl_id"), ForeignKey(typeof(DbNotificationTemplate), nameof(DbNotificationTemplate.Key))]
-        public Guid NotificationTemplate { get; set; }
+        public Guid NotificationTemplateKey { get; set; }
 
         /// <summary>
-        /// Gets or sets the entity type of the notification instance.
+        /// Gets or sets the entity type key of the notification instance.
         /// </summary>
         [Column("ent_typ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-        public Guid EntityType { get; set; }
+        public Guid EntityTypeKey { get; set; }
 
         /// <summary>
         /// Gets or sets the mnemonic of the notification instance.
@@ -67,10 +67,10 @@ namespace SanteDB.Persistence.Data.Model.Notifications
         public String Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the state of the notification instance.
+        /// Gets or sets the state key of the notification instance.
         /// </summary>
         [Column("state_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-        public Guid State { get; set; }
+        public Guid StateKey { get; set; }
 
         /// <summary>
         /// Gets or sets the description of the notification instance.

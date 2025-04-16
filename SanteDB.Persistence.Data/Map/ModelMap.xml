@@ -577,4 +577,8 @@
 	       domainClass="SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateParameter, SanteDB.Persistence.Data">
 	</class>
 
+	<class modelClass="SanteDB.Core.Notifications.NotificationInstanceParameter, SanteDB.Core.Api"
+   domainClass="SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstanceParameter, SanteDB.Persistence.Data">
+	</class>
+
 </modelMap>
