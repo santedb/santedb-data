@@ -18,7 +18,9 @@
  */
 using SanteDB.Core.Notifications;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Notifications;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Notifications
 {
@@ -33,5 +35,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Notifications
         public NotificationInstancePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
+
+        protected override NotificationInstance DoInsertModel(DataContext context, NotificationInstance data)
+        {
+            var retVal = base.DoInsertModel(context, data);
+            
+            if (data.InstanceParameters?.Any() == true)
+            {
+                retVal.InstanceParameters = base.UpdateModelAssociations(context, retVal, data.InstanceParameters).ToList();
+            }
+
+            return retVal;
+        }
+
     }
 }
