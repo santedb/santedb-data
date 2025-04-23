@@ -26,7 +26,7 @@ namespace SanteDB.Persistence.Data.Model.Notifications
     /// Represents a notification template's contents.
     /// </summary>
     [Table("nfn_tpl_cnt_tbl")]
-    public class DbNotificationTemplateContents : DbNonVersionedBaseData
+    public class DbNotificationTemplateContents : DbIdentified
     {
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace SanteDB.Persistence.Data.Model.Notifications
         /// Gets or sets the template of the template contents.
         /// </summary>
         [Column("nfn_tpl_id"), ForeignKey(typeof(DbNotificationTemplate), nameof(DbNotificationTemplate.Key))]
-        public Guid NotificationTemplate { get; set; }
+        public Guid NotificationTemplateKey { get; set; }
 
         /// <summary>
         /// Gets or sets the language of the template contents.
