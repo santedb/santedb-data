@@ -579,6 +579,7 @@
 
 	<class modelClass="SanteDB.Core.Notifications.NotificationInstanceParameter, SanteDB.Core.Api"
    domainClass="SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstanceParameter, SanteDB.Persistence.Data">
+		<property modelName="SourceEntityKey" domainName="NotificationInstanceKey" />
 	</class>
 
 </modelMap>
