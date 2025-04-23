@@ -25,7 +25,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Notifications
     /// <summary>
     /// Notification template parameter persistence service
     /// </summary>
-    public class NotificationTemplateParameterPersistenceService : IdentifiedDataPersistenceService<NotificationTemplateContents, DbNotificationTemplateContents>
+    public class NotificationTemplateParameterPersistenceService : IdentifiedDataPersistenceService<NotificationTemplateParameter, DbNotificationTemplateParameter>
     {
         /// <summary>
         /// Creates a new notification template parameter persistence service
