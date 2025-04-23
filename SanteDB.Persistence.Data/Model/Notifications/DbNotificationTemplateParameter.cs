@@ -26,7 +26,7 @@ namespace SanteDB.Persistence.Data.Model.Notifications
     /// Represents a notification template parameter.
     /// </summary>
     [Table("nfn_tpl_prm_tbl")]
-    public class DbNotificationTemplateParameter : DbNonVersionedBaseData
+    public class DbNotificationTemplateParameter : DbIdentified
     {
 
         /// <summary>
