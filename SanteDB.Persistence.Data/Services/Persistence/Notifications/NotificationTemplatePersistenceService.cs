@@ -16,8 +16,10 @@
  * the License.
  * 
  */
+using System.Linq;
 using SanteDB.Core.Notifications;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Notifications;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Notifications
@@ -32,6 +34,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Notifications
         /// </summary>
         public NotificationTemplatePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
+        }
+
+        protected override NotificationTemplate DoInsertModel(DataContext context, NotificationTemplate data)
+        {
+            var retVal = base.DoInsertModel(context, data);
+
+            if (data.Contents?.Any() == true)
+            {
+                retVal.Contents = base.UpdateModelAssociations(context, retVal, data.Contents).ToList();
+            }
+
+            if (data.Parameters?.Any() == true)
+            {
+                retVal.Parameters = base.UpdateModelAssociations(context, retVal, data.Parameters).ToList();
+            }
+
+            return retVal;
         }
     }
 }
