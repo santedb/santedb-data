@@ -571,10 +571,12 @@
 
 	<class modelClass="SanteDB.Core.Notifications.NotificationTemplateContents, SanteDB.Core.Api"
 	       domainClass="SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateContents, SanteDB.Persistence.Data">
+		<property modelName="SourceEntityKey" domainName="NotificationInstanceKey" />
 	</class>
 
 	<class modelClass="SanteDB.Core.Notifications.NotificationTemplateParameter, SanteDB.Core.Api"
 	       domainClass="SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateParameter, SanteDB.Persistence.Data">
+		<property modelName="SourceEntityKey" domainName="NotificationInstanceKey" />
 	</class>
 
 	<class modelClass="SanteDB.Core.Notifications.NotificationInstanceParameter, SanteDB.Core.Api"
