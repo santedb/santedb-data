@@ -20,6 +20,7 @@ using System.Linq;
 using SanteDB.Core.Notifications;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Notifications;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Notifications
@@ -49,6 +50,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Notifications
             {
                 retVal.Parameters = base.UpdateModelAssociations(context, retVal, data.Parameters).ToList();
             }
+
+            return retVal;
+        }
+
+        protected override NotificationTemplate DoConvertToInformationModel(DataContext context, DbNotificationTemplate dbModel,
+            params object[] referenceObjects)
+        {
+            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+
+            retVal.Contents = retVal.Contents.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+            retVal.SetLoaded(o => o.Contents);
+
+            retVal.Parameters = retVal.Parameters.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+            retVal.SetLoaded(o => o.Parameters);
 
             return retVal;
         }
