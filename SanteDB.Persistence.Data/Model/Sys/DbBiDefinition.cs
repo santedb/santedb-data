@@ -66,7 +66,7 @@ namespace SanteDB.Persistence.Data.Model.Sys
         /// <summary>
         /// The BI definition to which this version belongs
         /// </summary>
-        [Column("bi_id"), NotNull, ForeignKey(typeof(DbBiDefinition), nameof(DbBiDefinition.Key))]
+        [Column("bi_id"), NotNull, ForeignKey(typeof(DbBiDefinition), nameof(DbBiDefinition.Key)), AlwaysJoin]
         public override Guid Key { get; set; }
 
         /// <summary>
@@ -98,13 +98,13 @@ namespace SanteDB.Persistence.Data.Model.Sys
         /// <summary>
         /// Gets or sets the type of BI definition
         /// </summary>
-        [Column("typ"), NotNull]
+        [Column("typ", DeclaredTable = typeof(DbBiDefinition)), NotNull]
         public String Type { get; set; }
 
         /// <summary>
         /// Gets or sets the identifier of the BI version
         /// </summary>
-        [Column("pub_id"), NotNull]
+        [Column("pub_id", DeclaredTable = typeof(DbBiDefinition)), NotNull]
         public string Id { get; set; }
     }
 }
