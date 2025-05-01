@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2025, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -15,6 +15,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
+ * User: fyfej
+ * Date: 2023-6-21
  */
 using SanteDB.BI.Model;
 using SanteDB.OrmLite.Attributes;
@@ -64,7 +66,7 @@ namespace SanteDB.Persistence.Data.Model.Sys
         /// <summary>
         /// The BI definition to which this version belongs
         /// </summary>
-        [Column("bi_id"), NotNull, ForeignKey(typeof(DbBiDefinition), nameof(DbBiDefinition.Key))]
+        [Column("bi_id"), NotNull, ForeignKey(typeof(DbBiDefinition), nameof(DbBiDefinition.Key)), AlwaysJoin]
         public override Guid Key { get; set; }
 
         /// <summary>
@@ -96,13 +98,13 @@ namespace SanteDB.Persistence.Data.Model.Sys
         /// <summary>
         /// Gets or sets the type of BI definition
         /// </summary>
-        [Column("typ"), NotNull]
+        [Column("typ", DeclaredTable = typeof(DbBiDefinition)), NotNull]
         public String Type { get; set; }
 
         /// <summary>
         /// Gets or sets the identifier of the BI version
         /// </summary>
-        [Column("pub_id"), NotNull]
+        [Column("pub_id", DeclaredTable = typeof(DbBiDefinition)), NotNull]
         public string Id { get; set; }
     }
 }

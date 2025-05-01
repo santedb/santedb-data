@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2025, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -15,6 +15,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
+ * User: fyfej
+ * Date: 2023-6-21
  */
 using DocumentFormat.OpenXml.Wordprocessing;
 using SanteDB.Core.Configuration;
@@ -211,7 +213,7 @@ namespace SanteDB.Persistence.Data.Services
                         this.m_adhocCacheService?.Remove(this.CreateCacheKey(sessionId));
                         this.m_adhocCacheService?.Remove($"{this.CreateCacheKey(sessionId)}.idt");
 
-                        this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(null, session, true, false, null, null));
+                        this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(AuthenticationContext.Current.Principal, session, true, false, null, null));
                     }
                 }
                 catch (Exception e)

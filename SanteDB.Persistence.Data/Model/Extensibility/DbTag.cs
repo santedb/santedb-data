@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2025, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -15,9 +15,12 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
+ * User: fyfej
+ * Date: 2023-6-21
  */
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Acts;
+using SanteDB.Persistence.Data.Model.Concepts;
 using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
@@ -132,5 +135,23 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
         }
     }
 
+
+    /// <summary>
+    /// Represents a tag associated with an act
+    /// </summary>
+    [Table("cd_tag_tbl")]
+    public class DbConceptTag : DbTag
+    {
+        /// <summary>
+        /// Gets or sets the source.
+        /// </summary>
+        /// <value>The source.</value>
+        [Column("cd_id"), ForeignKey(typeof(DbConceptVersion), nameof(DbConcept.Key))]
+        public override Guid SourceKey
+        {
+            get;
+            set;
+        }
+    }
 }
 

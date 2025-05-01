@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2025, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -15,6 +15,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
+ * User: fyfej
+ * Date: 2023-6-21
  */
 using NUnit.Framework;
 using SanteDB.Core.Model.Constants;
@@ -135,7 +137,6 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Entities
 
                 var afterInsert = base.TestInsert(place);
                 Assert.AreEqual(1, afterInsert.LoadProperty(o => o.Services).Count);
-
 
                 // Test querying 
                 var afterQuery = base.TestQuery<Place>(o => o.Services.Any(s => s.ServiceConceptKey == service1), 1).AsResultSet().First();

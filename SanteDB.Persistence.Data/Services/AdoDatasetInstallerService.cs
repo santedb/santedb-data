@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2025, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -15,6 +15,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
+ * User: fyfej
+ * Date: 2023-6-21
  */
 using SanteDB.Core;
 using SanteDB.Core.Data.Initialization;
@@ -134,7 +136,7 @@ namespace SanteDB.Persistence.Data.Services
             //    throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_CIRCULAR_DEPENDENCY));
             //}
 
-            return new Dataset(input.Id) { Action = resolved.ToList(), ServiceExec = input.ServiceExec, SqlExec = input.SqlExec };
+            return new Dataset(input.Id) { Action = resolved.ToList(), ServiceExec = input.ServiceExec, SqlExec = input.SqlExec, PreSqlExec = input.PreSqlExec };
         }
 
         /// <summary>
@@ -209,6 +211,16 @@ namespace SanteDB.Persistence.Data.Services
                     using (var tx = context.BeginTransaction())
                     {
                         context.ContextId = context.EstablishProvenance(AuthenticationContext.Current.Principal, null);
+
+                        // Insert the post install trigger
+                        if (dataset.PreSqlExec?.Any() == true)
+                        {
+                            this.m_tracer.TraceInfo("Executing post-install triggers for {0}...", dataset.Id);
+                            foreach (var itm in dataset.PreSqlExec.Where(o => o.InvariantName == this.m_configuration.Provider.Invariant))
+                            {
+                                context.ExecuteNonQuery(itm.QueryText);
+                            }
+                        }
 
                         for (var i = 0; i < dataset.Action.Count; i++)
                         {

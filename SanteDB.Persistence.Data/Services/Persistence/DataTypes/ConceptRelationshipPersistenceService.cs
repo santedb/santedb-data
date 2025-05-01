@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2025, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -15,12 +15,17 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
+ * User: fyfej
+ * Date: 2023-6-21
  */
+using SanteDB.Core.Data.Quality;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
@@ -65,10 +70,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                 case LoadMode.FullLoad:
                     retVal.RelationshipType = retVal.RelationshipType.GetRelatedPersistenceService().Get(context, dbModel.RelationshipTypeKey);
                     retVal.SetLoaded(nameof(ConceptRelationship.RelationshipType));
-                    retVal.TargetConcept = retVal.TargetConcept.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
-                    retVal.SetLoaded(nameof(ConceptRelationship.TargetConcept));
+                    // Prevents infinite recursion for now when A->B->A
+                    //if (retVal.TargetConceptKey != retVal.SourceEntityKey)
+                    //{
+                    //    retVal.TargetConcept = retVal.TargetConcept.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
+                    //    retVal.SetLoaded(nameof(ConceptRelationship.TargetConcept));
+                    //}
                     break;
             }
+
             return retVal;
         }
     }

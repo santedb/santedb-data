@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2025, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -15,13 +15,19 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
+ * User: fyfej
+ * Date: 2023-6-21
  */
 using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Extensions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
@@ -301,6 +307,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var dbInstance = this.DoConvertToDataModel(context, data);
                 dbInstance = this.DoInsertInternal(context, dbInstance);
                 var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
+
+                var issueAnnotation = data.GetAnnotations<DetectedIssue[]>();
+                if(issueAnnotation.Any() && retVal is IExtendable ext)
+                {
+                    ext.AddExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issueAnnotation.First());
+                }
                 return this.AfterPersisted(context, retVal); // TODO: Perhaps
 #if DEBUG
             }

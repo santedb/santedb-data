@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2025, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -15,6 +15,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
+ * User: fyfej
+ * Date: 2023-6-21
  */
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
@@ -63,7 +65,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
         /// <inheritdoc/>
         protected override DbEntityRelationship DoInsertInternal(DataContext context, DbEntityRelationship dbModel)
-        {
+        {   
             try
             {
                 if(this.m_configuration.AutoUpdateExisting)
@@ -87,6 +89,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             try
             {
+                // Get the existing key of the object
+                var existingKey = context.Query<DbEntityRelationship>(o => o.SourceKey == dbModel.SourceKey && o.RelationshipTypeKey == dbModel.RelationshipTypeKey && o.TargetKey == dbModel.TargetKey && o.ObsoleteVersionSequenceId == null).Select(o => o.Key).FirstOrDefault();
+                if (existingKey != Guid.Empty && existingKey != dbModel.Key)
+                {
+                    dbModel.Key = existingKey;
+                }
                 return base.DoUpdateInternal(context, dbModel);
             }
             catch (DbException e) when (e.Message.Contains("ENTITY RELATIONSHIP FAILED VALIDATION") || e.Message.Contains("Validation error: Relationship"))

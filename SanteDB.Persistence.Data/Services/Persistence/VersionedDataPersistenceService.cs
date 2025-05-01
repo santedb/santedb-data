@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2025, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -15,6 +15,8 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
+ * User: fyfej
+ * Date: 2023-6-21
  */
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Data.Quality;
@@ -35,6 +37,7 @@ using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.DataType;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
@@ -55,7 +58,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     {
 
         // Validation configuration
-        private IDictionary<Type, AdoValidationPolicy> m_validationConfiguration;
+        private readonly IDictionary<Type, AdoValidationPolicy> m_validationConfigurationCache = new ConcurrentDictionary<Type, AdoValidationPolicy>();
+
+        // Default validation
+        private readonly AdoValidationPolicy m_defaultValidationPolicy = new AdoValidationPolicy()
+        {
+            Authority = AdoValidationEnforcement.Off,
+            Scope = AdoValidationEnforcement.Off,
+            Uniqueness = AdoValidationEnforcement.Off,
+            Format = AdoValidationEnforcement.Off,
+            CheckDigit = AdoValidationEnforcement.Off
+        };
 
         // Class key map
         private Guid[] m_classKeyMap;
@@ -172,32 +185,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 this.m_classKeyMap = AppDomain.CurrentDomain.GetAllTypes().Where(o => typeof(TModel).IsAssignableFrom(o)).SelectMany(o => o.GetCustomAttributes<ClassConceptKeyAttribute>()).Select(o => Guid.Parse(o.ClassConcept)).ToArray();
             }
-
-            // Validation map
-            this.m_validationConfiguration =
-                this.m_configuration.Validation?
-                .Where(o => o.Target == null || typeof(TModel).IsAssignableFrom(o.Target.Type))
-                .GroupBy(o => o.Target?.Type ?? typeof(Object))
-                .ToDictionary(o => o.Key ?? typeof(Object), o => o.First());
-
-            // Apply defaults
-            if (this.m_validationConfiguration?.Any() != true)
-            {
-                this.m_validationConfiguration = new Dictionary<Type, AdoValidationPolicy>()
-                {
-                    {
-                        typeof(object),
-                        new AdoValidationPolicy()
-                        {
-                            Authority = AdoValidationEnforcement.Strict,
-                            Scope = AdoValidationEnforcement.Strict,
-                            Uniqueness = AdoValidationEnforcement.Strict,
-                            Format = AdoValidationEnforcement.Loose,
-                            CheckDigit = AdoValidationEnforcement.Loose
-                        }
-                    }
-                };
-            }
         }
 
         /// <summary>
@@ -208,11 +195,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
 
             // Validate unique values for IDs
-            if (!this.m_validationConfiguration.TryGetValue(objectToVerify.GetType(), out var validation) &&
-                !this.m_validationConfiguration.TryGetValue(typeof(object), out validation) ||
-                objectToVerify.GetAnnotations<String>().Contains(SystemTagNames.UpstreamDataTag))
+            if (!this.m_validationConfigurationCache.TryGetValue(objectToVerify.GetType(), out var validation))
             {
-                yield break;
+                var applicableConfigurations = this.m_configuration.Validation.Where(t => t.Target == null || t.Target.Type.IsAssignableFrom(objectToVerify.GetType()));
+                validation = this.m_defaultValidationPolicy;
+
+                foreach (var itm in applicableConfigurations)
+                {
+                    validation.Authority = validation.Authority < itm.Authority ? itm.Authority : validation.Authority;
+                    validation.CheckDigit = validation.CheckDigit < itm.CheckDigit ? itm.CheckDigit : validation.CheckDigit;
+                    validation.Format = validation.Format < itm.Format ? itm.Format : validation.Format;
+                    validation.Scope = validation.Scope < itm.Scope ? itm.Scope : validation.Scope;
+                    validation.Uniqueness = validation.Uniqueness < itm.Uniqueness ? itm.Uniqueness : validation.Uniqueness;
+                }
+                this.m_validationConfigurationCache.Add(objectToVerify.GetType(), validation);
             }
 
             // No validation is enabled
