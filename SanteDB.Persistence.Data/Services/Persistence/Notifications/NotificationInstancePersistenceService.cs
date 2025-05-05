@@ -48,5 +48,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Notifications
             return retVal;
         }
 
+        protected override NotificationInstance DoConvertToInformationModel(DataContext context, DbNotificationInstance dbModel, params object[] referenceObjects)
+        {
+            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+
+            retVal.InstanceParameters = retVal.InstanceParameters.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+            retVal.SetLoaded(o => o.InstanceParameters);
+
+            return retVal;
+        }
+
     }
 }
