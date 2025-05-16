@@ -67,5 +67,25 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Notifications
 
             return retVal;
         }
+
+        /// <summary>
+        /// Perform the actual update of a model object
+        /// </summary>
+        protected override NotificationTemplate DoUpdateModel(DataContext context, NotificationTemplate data)
+        {
+            var retVal = base.DoUpdateModel(context, data);
+
+            if (data.Contents?.Any() == true)
+            {
+                retVal.Contents = base.UpdateModelAssociations(context, retVal, data.Contents).ToList();
+            }
+
+            if (data.Parameters?.Any() == true)
+            {
+                retVal.Parameters = base.UpdateModelAssociations(context, retVal, data.Parameters).ToList();
+            }
+
+            return retVal;
+        }
     }
 }
