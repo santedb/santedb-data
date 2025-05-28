@@ -52,7 +52,7 @@ namespace SanteDB.Persistence.Data.Model.Notifications
         /// <summary>
         /// Gets or sets the name of the parameter.
         /// </summary>
-        [Column("prm_name")]
+        [Column("prm_name"), NotNull]
         public string Name { get; set; }
 
         /// <summary>

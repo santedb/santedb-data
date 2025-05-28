@@ -45,31 +45,31 @@ namespace SanteDB.Persistence.Data.Model.Notifications
         /// <summary>
         /// Gets or sets the notification template key of the notification instance.
         /// </summary>
-        [Column("nfn_tpl_id"), ForeignKey(typeof(DbNotificationTemplate), nameof(DbNotificationTemplate.Key))]
+        [Column("nfn_tpl_id"), ForeignKey(typeof(DbNotificationTemplate), nameof(DbNotificationTemplate.Key)), NotNull]
         public Guid NotificationTemplateKey { get; set; }
 
         /// <summary>
         /// Gets or sets the entity type key of the notification instance.
         /// </summary>
-        [Column("ent_typ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("ent_typ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key)), NotNull]
         public Guid EntityTypeKey { get; set; }
 
         /// <summary>
         /// Gets or sets the mnemonic of the notification instance.
         /// </summary>
-        [Column("mnemonic")]
+        [Column("mnemonic"), NotNull]
         public String Mnemonic { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the notification instance.
         /// </summary>
-        [Column("inst_name")]
+        [Column("inst_name"), NotNull]
         public String Name { get; set; }
 
         /// <summary>
         /// Gets or sets the state key of the notification instance.
         /// </summary>
-        [Column("state_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("state_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key)), NotNull]
         public Guid StateKey { get; set; }
 
         /// <summary>
@@ -81,19 +81,19 @@ namespace SanteDB.Persistence.Data.Model.Notifications
         /// <summary>
         /// Gets or sets the filter expression of the notification instance.
         /// </summary>
-        [Column("fltr_expr")]
+        [Column("fltr_expr"), NotNull]
         public String FilterExpression { get; set; }
 
         /// <summary>
         /// Gets or sets the trigger expression of the notification instance.
         /// </summary>
-        [Column("trgr_expr")]
+        [Column("trgr_expr"), NotNull]
         public String TriggerExpression { get; set; }
 
         /// <summary>
         /// Gets or sets the target expression of the notification instance.
         /// </summary>
-        [Column("trg_expr")]
+        [Column("trg_expr"), NotNull]
         public String TargetExpression { get; set; }
 
         /// <summary>

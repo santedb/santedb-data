@@ -64,7 +64,7 @@ namespace SanteDB.Persistence.Data.Model.Notifications
         /// <summary>
         /// Gets or sets the body of the template contents.
         /// </summary>
-        [Column("bdy")]
+        [Column("bdy"), NotNull]
         public string Body { get; set; }
 
     }

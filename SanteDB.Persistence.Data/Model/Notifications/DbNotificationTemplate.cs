@@ -47,19 +47,19 @@ namespace SanteDB.Persistence.Data.Model.Notifications
         /// <summary>
         /// Gets or sets the status key of the notification template.
         /// </summary>
-        [Column("sts_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("sts_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key)), NotNull]
         public Guid StatusKey { get; set; }
 
         /// <summary>
         /// Gets or sets the mnemonic of the notification template.
         /// </summary>
-        [Column("mnemonic")]
+        [Column("mnemonic"), NotNull]
         public string Mnemonic { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the notification template.
         /// </summary>
-        [Column("tpl_name")]
+        [Column("tpl_name"), NotNull]
         public string Name { get; set; }
 
         /// <summary>
