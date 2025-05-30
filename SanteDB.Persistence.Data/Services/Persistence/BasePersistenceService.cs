@@ -357,6 +357,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var dbInstance = this.DoConvertToDataModel(context, data);
                 dbInstance = this.DoUpdateInternal(context, dbInstance);
                 var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
+                this.m_dataCacheService?.Remove(retVal); // Force a reload
+
                 return this.AfterPersisted(context, retVal);
 
 #if DEBUG
@@ -431,6 +433,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     }
                 }
                 var dbInstance = this.DoDeleteInternal(context, key, deleteMode);
+                
+                // Remove from cache 
+                this.m_dataCacheService?.Remove(key);
 
                 if (!this.m_configuration.FastDelete && deleteMode != DeleteMode.PermanentDelete)
                 {

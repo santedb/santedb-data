@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using DocumentFormat.OpenXml.EMMA;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Data.Quality;
 using SanteDB.Core.Exceptions;
@@ -723,6 +724,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     switch (deletionMode)
                     {
                         case DeleteMode.LogicalDelete:
+
                             existing.ObsoletionTime = DateTimeOffset.Now;
                             existing.ObsoletedByKey = context.ContextId;
                             retVal = context.Update(existing);

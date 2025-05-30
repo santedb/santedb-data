@@ -55,7 +55,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             data.AddressUseKey = this.EnsureExists(context, data.AddressUse)?.Key ?? data.AddressUseKey;
             
             // If the address is a place reference we want to supplement the data going into the database with the appropriate information
-            if(Guid.TryParse(data.Component?.Find(p=>p.ComponentTypeKey == AddressComponentKeys.PlaceReference)?.Value, out var placeUuid))
+            if(Guid.TryParse(data.Component?.Find(p=>p.ComponentTypeKey == AddressComponentKeys.PlaceRef)?.Value, out var placeUuid))
             {
                 var dbPlaceQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityAddress), typeof(DbEntityAddressComponent))
                    .InnerJoin<DbEntityAddress, DbEntityAddressComponent>(o => o.Key, o => o.SourceKey)
@@ -119,7 +119,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             }
 
             // If there is a place ref we want to set the components based on the place's address
-            if(Guid.TryParse(retVal.Component?.Find(o => o.ComponentTypeKey == AddressComponentKeys.PlaceReference)?.Value, out var placeUuid))
+            if(Guid.TryParse(retVal.Component?.Find(o => o.ComponentTypeKey == AddressComponentKeys.PlaceRef)?.Value, out var placeUuid))
             {
                 var dbPlaceQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityAddress), typeof(DbEntityAddressComponent))
                     .InnerJoin<DbEntityAddress, DbEntityAddressComponent>(o => o.Key, o => o.SourceKey)

@@ -20,6 +20,7 @@
  */
 using SanteDB.BI.Model;
 using SanteDB.BI.Services;
+using SanteDB.Core;
 using SanteDB.Core.Applets;
 using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Diagnostics;
@@ -190,14 +191,17 @@ namespace SanteDB.Persistence.Data.Services
 
             this.m_appletManager.Changed += AppletManagerContentChanged;
 
-            if (this.m_appletSolutionManager != null)
+            ApplicationServiceContext.Current.Started += (o, e) =>
             {
-                this.m_appletSolutionManager.Solutions.ForEach(o => this.ProcessAppletCollection(this.m_appletSolutionManager.GetApplets(o.Meta.Id)));
-            }
-            else
-            {
-                this.ProcessAppletCollection(this.m_appletManager.Applets);
-            }
+                if (this.m_appletSolutionManager != null)
+                {
+                    this.m_appletSolutionManager.Solutions.ForEach(a => this.ProcessAppletCollection(this.m_appletSolutionManager.GetApplets(a.Meta.Id)));
+                }
+                else
+                {
+                    this.ProcessAppletCollection(this.m_appletManager.Applets);
+                }
+            };
         }
 
         /// <summary>
