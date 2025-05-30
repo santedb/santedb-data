@@ -232,6 +232,7 @@
     <EmbeddedResource Include="SQL\FBSQL\Updates\20250210.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20250127.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20241119.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20250530.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20250210.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20250127.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20250117.sql" />
