@@ -100,6 +100,6 @@ namespace SanteDB.Persistence.Data.Model.Notifications
         /// Gets or sets the last sent at date time of the notification instance.
         /// </summary>
         [Column("last_sent_utc")]
-        public DateTimeOffset LastSentAt { get; set; }
+        public DateTimeOffset? LastSentAt { get; set; }
     }
 }
