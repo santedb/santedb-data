@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2025, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -15,9 +15,12 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
+ * User: fyfej
+ * Date: 2023-6-21
  */
 using SanteDB.BI.Model;
 using SanteDB.BI.Services;
+using SanteDB.Core;
 using SanteDB.Core.Applets;
 using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Diagnostics;
@@ -188,14 +191,17 @@ namespace SanteDB.Persistence.Data.Services
 
             this.m_appletManager.Changed += AppletManagerContentChanged;
 
-            if (this.m_appletSolutionManager != null)
+            ApplicationServiceContext.Current.Started += (o, e) =>
             {
-                this.m_appletSolutionManager.Solutions.ForEach(o => this.ProcessAppletCollection(this.m_appletSolutionManager.GetApplets(o.Meta.Id)));
-            }
-            else
-            {
-                this.ProcessAppletCollection(this.m_appletManager.Applets);
-            }
+                if (this.m_appletSolutionManager != null)
+                {
+                    this.m_appletSolutionManager.Solutions.ForEach(a => this.ProcessAppletCollection(this.m_appletSolutionManager.GetApplets(a.Meta.Id)));
+                }
+                else
+                {
+                    this.ProcessAppletCollection(this.m_appletManager.Applets);
+                }
+            };
         }
 
         /// <summary>
@@ -223,7 +229,7 @@ namespace SanteDB.Persistence.Data.Services
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceWarning("Could not refresh BI - {0}", e.ToHumanReadableString());
             }
@@ -279,8 +285,11 @@ namespace SanteDB.Persistence.Data.Services
                         using (var ms = new MemoryStream(itm.Object2.DefinitionContents))
                         {
                             retVal = (TBisDefinition)BiDefinition.Load(ms);
-                            retVal.MetaData.LastModified = itm.Object2.CreationTime.DateTime;
-                            retVal.MetaData.LastModifiedBy = itm.Object2.CreatedByKey;
+                            if (retVal.MetaData != null)
+                            {
+                                retVal.MetaData.LastModified = itm.Object2.CreationTime.DateTime;
+                                retVal.MetaData.LastModifiedBy = itm.Object2.CreatedByKey;
+                            }
                             this.m_adhocCacheService.Add(cacheKey, retVal);
                         }
 
@@ -523,11 +532,11 @@ namespace SanteDB.Persistence.Data.Services
 
             try
             {
-                try
+                if (this.m_modelMapper.MapModelExpression<TBisDefinition, bool>(filter, typeof(DbBiQueryResult), false) != null)
                 {
                     return new MappedQueryResultSet<TBisDefinition>(new MappedQueryProvider<TBisDefinition>(this.m_configuration.Provider, this.m_modelMapper, this.m_adhocCacheService)).Where(filter);
                 }
-                catch // Fallback to a fat query
+                else
                 {
                     using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                     {
