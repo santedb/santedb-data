@@ -228,10 +228,7 @@ namespace SanteDB.Persistence.Data.Services
                                     existingView.Description = definition.Description;
                                     existingView.Readonly = definition.Readonly;
                                 }
-                                else if( existingView.Definition.ComputeMd5Hash() != ms.ToArray().ComputeMd5Hash())
-                                {
-                                    throw new InvalidOperationException(ErrorMessages.OBJECT_READONLY);
-                                }
+                                
 
                                 existingView = context.Update(existingView);
                             }
