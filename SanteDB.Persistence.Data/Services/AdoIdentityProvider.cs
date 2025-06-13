@@ -503,7 +503,7 @@ namespace SanteDB.Persistence.Data.Services
                         dbUser.Password = this.m_passwordHashingService.ComputeHash(this.m_configuration.AddPepper(newPassword));
                         dbUser.UpdatedByKey = context.EstablishProvenance(principal, null);
                         dbUser.UpdatedTime = DateTimeOffset.Now;
-
+                        dbUser.SecurityHash = this.m_passwordHashingService.ComputeHash(userName + newPassword);
                         // Password expire policy
                         var pwdExpire = this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.MaxPasswordAge);
                         if (pwdExpire != default(TimeSpan) && AuthenticationContext.Current.Principal != AuthenticationContext.SystemPrincipal) // system principal setting password doesn't expire
