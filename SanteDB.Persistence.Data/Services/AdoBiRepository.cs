@@ -190,21 +190,11 @@ namespace SanteDB.Persistence.Data.Services
             this.m_localizationService = localizationService;
             this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
 
-            if (this.m_appletSolutionManager != null && this.m_appletSolutionManager.Solutions is INotifyCollectionChanged notify)
+            // Re-scans the loaded applets for definitions when the collection has changed
+            this.m_appletManager.Changed += (o, e) =>
             {
-                notify.CollectionChanged += (o, e) =>
-                {
-                    this.m_appletSolutionManager.Solutions.ForEach(a => this.ProcessAppletCollection(this.m_appletSolutionManager.GetApplets(a.Meta.Id)));
-                };
-            }
-            else
-            {
-                // Re-scans the loaded applets for definitions when the collection has changed
-                this.m_appletManager.Changed += (o, e) =>
-                {
-                    this.ProcessAppletCollection(this.m_appletManager.Applets);
-                };
-            }
+                this.ProcessAppletCollection(this.m_appletManager.Applets);
+            };
 
             ApplicationServiceContext.Current.Started += (o, e) =>
             {
