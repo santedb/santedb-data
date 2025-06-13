@@ -118,7 +118,7 @@ namespace SanteDB.Persistence.Data.Services
 
                         tx.Commit();
 
-                        users.ForEach(u => this.m_policyDecision.ClearCache<IIdentity>(u));
+                        users.ForEach(u => this.m_policyDecision.ClearCacheByName<IIdentity>(u));
                     }
                 }
                 catch (Exception e)
@@ -328,7 +328,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         tx.Commit();
-                        users.ForEach(u => this.m_policyDecision.ClearCache<IIdentity>(u));
+                        users.ForEach(u => this.m_policyDecision.ClearCacheByName<IIdentity>(u));
 
                     }
                 }
