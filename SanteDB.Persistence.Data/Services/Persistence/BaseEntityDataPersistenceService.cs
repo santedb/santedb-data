@@ -103,6 +103,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
             // Un-delete the object
+            // Base objects for created time and by are not logged 
+            model.CreatedByKey = context.GetProvenance().Key;
+            model.CreationTime = DateTimeOffset.Now;
             existing.CopyObjectData(model, true);
             existing.ObsoletedByKey = null;
             existing.ObsoletionTime = null;
