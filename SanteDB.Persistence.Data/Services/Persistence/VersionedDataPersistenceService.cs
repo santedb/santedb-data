@@ -495,6 +495,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 dbModel.CreationTime = DateTimeOffset.Now;
                 dbModel.CreatedByKey = context.ContextId;
                 dbModel.VersionSequenceId = null;
+                dbModel.ReplacesVersionKey = null;
                 // Insert the version link data
                 return context.Insert(dbModel);
 #if DEBUG
