@@ -357,7 +357,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var dbInstance = this.DoConvertToDataModel(context, data);
                 dbInstance = this.DoUpdateInternal(context, dbInstance);
                 var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
-                this.m_dataCacheService?.Remove(retVal); // Force a reload
 
                 return this.AfterPersisted(context, retVal);
 
@@ -954,6 +953,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         }
 
                     }
+
+                    this.m_dataCacheService?.Remove(data); // Force a reload
 
                     // Broadcast
                     var postEvt = new DataPersistedEventArgs<TModel>(data, mode, principal);

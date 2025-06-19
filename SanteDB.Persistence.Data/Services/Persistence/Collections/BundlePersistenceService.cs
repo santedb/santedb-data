@@ -39,6 +39,7 @@ using SanteDB.OrmLite;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Sys;
+using SharpCompress;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;

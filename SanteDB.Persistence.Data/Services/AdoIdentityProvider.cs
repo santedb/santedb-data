@@ -277,6 +277,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
 
+                    IClaimsPrincipal retVal = null;
                     using (var tx = context.BeginTransaction())
                     {
                         var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
@@ -385,20 +386,8 @@ namespace SanteDB.Persistence.Data.Services
                             }
 
                             // Create principal
-                            var retVal = new AdoClaimsPrincipal(identity);
+                            retVal = new AdoClaimsPrincipal(identity);
 
-                            if (retVal.HasClaim(o => o.Type == SanteDBClaimTypes.ForceResetPassword))
-                            {
-                                throw new PasswordExpiredException(retVal);
-                            }
-                            else
-                            {
-                                this.m_pepService.Demand(PermissionPolicyIdentifiers.Login, retVal);
-                            }
-
-                            // Fire authentication
-                            this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, retVal, true));
-                            return retVal;
                         }
                         catch (LockedIdentityAuthenticationException e)
                         {
@@ -426,7 +415,21 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             tx.Commit();
                         }
+
                     }
+
+                    if (retVal.HasClaim(o => o.Type == SanteDBClaimTypes.ForceResetPassword))
+                    {
+                        throw new PasswordExpiredException(retVal);
+                    }
+                    else
+                    {
+                        this.m_pepService.Demand(PermissionPolicyIdentifiers.Login, retVal);
+                    }
+
+                    // Fire authentication
+                    this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, retVal, true));
+                    return retVal;
                 }
                 catch (AuthenticationException)
                 {
@@ -436,7 +439,7 @@ namespace SanteDB.Persistence.Data.Services
                 catch (Exception e)
                 {
                     this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, null, false));
-                    this.m_tracer.TraceError("Could not authenticate user {0}- {1]", userName, e);
+                    this.m_tracer.TraceError("Could not authenticate user {0} - {1}", userName, e);
                     throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_GENERAL), e);
                 }
             }
