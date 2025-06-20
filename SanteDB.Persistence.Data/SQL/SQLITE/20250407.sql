@@ -89,8 +89,7 @@ CREATE TABLE nfn_inst_tbl (
 CREATE TABLE nfn_inst_prm_tbl (
     prm_val_id blob(16) DEFAULT (randomblob(16)) NOT NULL,
     nfn_inst_id blob(16) NOT NULL,
-    nfn_tpl_prm_id blob(16) NOT NULL,
+    nfn_tpl_prm_name VARCHAR(128) NOT NULL,
     expr TEXT NOT NULL,
-    CONSTRAINT fk_nfn_inst_id_nfn_inst_tbl FOREIGN KEY (nfn_inst_id) REFERENCES nfn_inst_tbl(inst_id),
-    CONSTRAINT fk_nfn_tpl_prm_id_nfn_tpl_prm_tbl FOREIGN KEY (nfn_tpl_prm_id) REFERENCES nfn_tpl_prm_tbl(tpl_prm_id)
+    CONSTRAINT fk_nfn_inst_id_nfn_inst_tbl FOREIGN KEY (nfn_inst_id) REFERENCES nfn_inst_tbl(inst_id)
 );

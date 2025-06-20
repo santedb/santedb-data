@@ -50,10 +50,10 @@ namespace SanteDB.Persistence.Data.Model.Notifications
         public Guid NotificationInstanceKey { get; set; }
 
         /// <summary>
-        /// Gets or sets the template parameter key of the instance parameter.
+        /// Gets or sets the template parameter name which this instance parameter refrences.
         /// </summary>
-        [Column("nfn_tpl_prm_id"), ForeignKey(typeof(DbNotificationTemplateParameter), nameof(DbNotificationTemplateParameter.Key)), NotNull]
-        public Guid TemplateParameterKey { get; set; }
+        [Column("nfn_tpl_prm_name"), NotNull]
+        public string TemplateParameterName { get; set; }
 
         /// <summary>
         /// Gets or sets the expression of the instance parameter.
