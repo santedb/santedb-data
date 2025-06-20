@@ -248,7 +248,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     using (var tx = context.BeginTransaction())
                     {
 
