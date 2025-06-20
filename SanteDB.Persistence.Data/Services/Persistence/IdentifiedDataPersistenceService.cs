@@ -67,6 +67,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             where TData : IdentifiedData, new()
         {
 
+            if(data?.ShouldDisablePersistenceConstraints() == true)
+            {
+                return data;
+            }
+
             try
             {
                 if (context == null)

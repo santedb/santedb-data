@@ -194,6 +194,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<DetectedIssue> VerifyEntity<TToVerify>(DataContext context, TToVerify objectToVerify)
             where TToVerify : TModel, IHasIdentifiers
         {
+            if(objectToVerify.ShouldDisablePersistenceConstraints())
+            {
+                yield break;
+            }
 
             // Validate unique values for IDs
             if (!this.m_validationConfigurationCache.TryGetValue(objectToVerify.GetType(), out var validation))
