@@ -137,7 +137,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new InvalidOperationException(ErrorMessages.SUBSCRIPTION_MISSING_DEFINITION);
             }
-            else if (!this.m_allowedTypes.Contains(subscription.ResourceType))
+            else if (subscription.ResourceType == null)
             {
                 throw new InvalidOperationException(String.Format(ErrorMessages.SUBSCRIPTION_NOT_SUPPORTED_RESOURCE, String.Join(" or ", this.m_allowedTypes.Select(o => o.Name))));
             }

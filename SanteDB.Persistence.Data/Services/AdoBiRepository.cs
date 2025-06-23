@@ -42,6 +42,7 @@ using SanteDB.Persistence.Data.Services.Persistence;
 using SharpCompress;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
@@ -189,7 +190,11 @@ namespace SanteDB.Persistence.Data.Services
             this.m_localizationService = localizationService;
             this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
 
-            this.m_appletManager.Changed += AppletManagerContentChanged;
+            // Re-scans the loaded applets for definitions when the collection has changed
+            this.m_appletManager.Changed += (o, e) =>
+            {
+                this.ProcessAppletCollection(this.m_appletManager.Applets);
+            };
 
             ApplicationServiceContext.Current.Started += (o, e) =>
             {
@@ -235,13 +240,6 @@ namespace SanteDB.Persistence.Data.Services
             }
         }
 
-        /// <summary>
-        /// Process the applet because it has changed
-        /// </summary>
-        private void AppletManagerContentChanged(object sender, EventArgs e)
-        {
-            this.ProcessAppletCollection(this.m_appletManager.Applets);
-        }
 
         /// <inheritdoc/>
         public bool IsLocal => true;

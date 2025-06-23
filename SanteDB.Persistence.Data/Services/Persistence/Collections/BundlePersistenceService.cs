@@ -39,6 +39,7 @@ using SanteDB.OrmLite;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Sys;
+using SharpCompress;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -130,64 +131,69 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 CorrelationKey = input.CorrelationKey,
                 CorrelationSequence = input.CorrelationSequence
             };
-            var resolved = input.Item.Where(e=>!retVal.Item.Contains(e)).ToArray();
-
-            // Process each object in our queue of to be processed
-            bool swapped = true;
-            for (var outer = 0; outer < resolved.Length && swapped; outer++)
+            try // Use newer version of the reordering function
             {
-                swapped = false;
-                for (var inner = 0; inner < resolved.Length; inner++)
+                retVal.AddRange(input.Item.Where(o => o.BatchOperation != BatchOperationType.Delete).ReorganizeForInsert());
+            }
+            catch (InvalidOperationException) // fallback
+            {
+                var resolved = input.Item.Where(e => !retVal.Item.Contains(e)).ToArray();
+                // Process each object in our queue of to be processed
+                bool swapped = true;
+                for (var outer = 0; outer < resolved.Length && swapped; outer++)
                 {
-                    var itm = resolved[inner];
-                    IEnumerable<int> dependencies = new int[0];
-                    switch (itm)
+                    swapped = false;
+                    for (var inner = 0; inner < resolved.Length; inner++)
                     {
-                        case Entity entity:
-                            dependencies = dependencies.Concat(entity.Relationships?.Select(r => Array.FindIndex(resolved, k => k.Key == r.TargetEntityKey)) ?? new int[0]);
-                            dependencies = dependencies.Concat(entity.Participations?.Select(p => Array.FindIndex(resolved, i => i.Key == p.ActKey)) ?? new int[0]);
-                            if(entity.CreationActKey.HasValue && resolved.Any(r=>r.Key == entity.CreationActKey))
-                            {
-                                dependencies = dependencies.Concat(new int[] { Array.FindIndex(resolved, i => i.Key == entity.CreationActKey) });
-                            }
-                            break;
-                        case Act act:
-                            dependencies = dependencies.Concat(act.Relationships?.Select(r => Array.FindIndex(resolved, i => i.Key == r.TargetActKey)) ?? new int[0]);
-                            dependencies = dependencies.Concat(act.Participations?.Select(p => Array.FindIndex(resolved, i => i.Key == p.PlayerEntityKey)) ?? new int[0]);
-                            break;
-                        case Concept concept:
-                            dependencies = dependencies.Concat(concept.Relationships?.Select(r => Array.FindIndex(resolved, i => i.Key == r.TargetConceptKey)) ?? new int[0]);
-                            break;
-                        case ITargetedAssociation ta:
-                            dependencies = new int[] { Array.FindIndex(resolved, i => i.Key == ta.TargetEntityKey), Array.FindIndex(resolved, i => i.Key == ta.SourceEntityKey) };
-                            break;
-
-                    }
-
-                    // Scan dependencies and swap
-                    var index = inner;
-                    var scanSwap = dependencies.ToArray();
-                    foreach (var dep in scanSwap)
-                    {
-                        if (dep > index)
+                        var itm = resolved[inner];
+                        IEnumerable<int> dependencies = new int[0];
+                        switch (itm)
                         {
-                            swapped = true;
-                            resolved[index] = resolved[dep];
-                            resolved[dep] = itm;
-                            index = dep;
+                            case Entity entity:
+                                dependencies = dependencies.Concat(entity.Relationships?.Select(r => Array.FindIndex(resolved, k => k.Key == r.TargetEntityKey)) ?? new int[0]);
+                                dependencies = dependencies.Concat(entity.Participations?.Select(p => Array.FindIndex(resolved, i => i.Key == p.ActKey)) ?? new int[0]);
+                                if (entity.CreationActKey.HasValue && resolved.Any(r => r.Key == entity.CreationActKey))
+                                {
+                                    dependencies = dependencies.Concat(new int[] { Array.FindIndex(resolved, i => i.Key == entity.CreationActKey) });
+                                }
+                                break;
+                            case Act act:
+                                dependencies = dependencies.Concat(act.Relationships?.Select(r => Array.FindIndex(resolved, i => i.Key == r.TargetActKey)) ?? new int[0]);
+                                dependencies = dependencies.Concat(act.Participations?.Select(p => Array.FindIndex(resolved, i => i.Key == p.PlayerEntityKey)) ?? new int[0]);
+                                break;
+                            case Concept concept:
+                                dependencies = dependencies.Concat(concept.Relationships?.Select(r => Array.FindIndex(resolved, i => i.Key == r.TargetConceptKey)) ?? new int[0]);
+                                break;
+                            case ITargetedAssociation ta:
+                                dependencies = new int[] { Array.FindIndex(resolved, i => i.Key == ta.TargetEntityKey), Array.FindIndex(resolved, i => i.Key == ta.SourceEntityKey) };
+                                break;
+
+                        }
+
+                        // Scan dependencies and swap
+                        var index = inner;
+                        var scanSwap = dependencies.ToArray();
+                        foreach (var dep in scanSwap)
+                        {
+                            if (dep > index)
+                            {
+                                swapped = true;
+                                resolved[index] = resolved[dep];
+                                resolved[dep] = itm;
+                                index = dep;
+                            }
                         }
                     }
                 }
+                // Could not order dependencies
+                //if (swapped)
+                //{
+                //    throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_CIRCULAR_DEPENDENCY));
+                //}
+
+                retVal.AddRange(resolved);
             }
-
-            // Could not order dependencies
-            //if (swapped)
-            //{
-            //    throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_CIRCULAR_DEPENDENCY));
-            //}
-
-            retVal.AddRange(resolved);
-            return retVal; 
+            return retVal;
         }
 
 
@@ -224,7 +230,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             {
                 throw new ArgumentNullException(nameof(principal), ErrorMessages.ARGUMENT_NULL);
             }
-            else if(data.Item.All(o=>o.BatchOperation == BatchOperationType.Ignore) || !data.Item.Any())
+            else if (data.Item.All(o => o.BatchOperation == BatchOperationType.Ignore) || !data.Item.Any())
             {
                 this.m_tracer.TraceWarning("Ignoring bundle - all items are set to IGNORE");
                 return data;
@@ -238,49 +244,36 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 return preEventArgs.Data;
             }
 
-            var deferConstraints = data.ShouldDisablePersistenceConstraints();
             try
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     using (var tx = context.BeginTransaction())
                     {
-                        try
+
+                        context.EstablishProvenance(principal, null);
+
+                        // Correlation and message control
+                        // JF - 20250127 - This set of code will register the bundle's correlation key and sequence into the database and will perform necessary actions
+                        // to prevent changes where none is desired. 
+                        if (this.ValidateBundleCorrelation(context, data))
                         {
-                            if (deferConstraints)
+
+                            data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty, this.m_configuration.StrictKeyAgreement);
+
+                            data = this.Insert(context, data);
+
+                            data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
+
+                            if (transactionMode == TransactionMode.Commit)
                             {
-                                context.DisableConstraints();
+                                tx.Commit();
                             }
-                            context.EstablishProvenance(principal, null);
 
-                            // Correlation and message control
-                            // JF - 20250127 - This set of code will register the bundle's correlation key and sequence into the database and will perform necessary actions
-                            // to prevent changes where none is desired. 
-                            if (this.ValidateBundleCorrelation(context, data))
-                            {
-
-                                data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty, this.m_configuration.StrictKeyAgreement);
-
-                                data = this.Insert(context, data);
-
-                                data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
-
-                                if (transactionMode == TransactionMode.Commit)
-                                {
-                                    tx.Commit();
-                                }
-
-                                data.Item.ForEach(i => this.m_dataCachingService.Add(i));
-                            }
+                            data.Item.ForEach(i => this.m_dataCachingService.Add(i));
                         }
-                        finally
-                        {
-                            if (deferConstraints)
-                            {
-                                context.RestoreConstraints();
-                            }
-                        }
+
                     }
                 }
 
@@ -304,7 +297,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         /// </summary>
         private bool ValidateBundleCorrelation(DataContext context, Bundle data)
         {
-            if(context == null)
+            if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
@@ -314,7 +307,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             }
 
             // The bundle is un-correlated so don't check
-            if(!data.CorrelationKey.HasValue)
+            if (!data.CorrelationKey.HasValue)
             {
                 return true;
             }
@@ -327,7 +320,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             }
             else if (lastSequence > data.CorrelationSequence) // We already received a future sequence so ignore this one
             {
-                switch (this.m_configuration.BundleCorrelationBehavior) {
+                switch (this.m_configuration.BundleCorrelationBehavior)
+                {
                     case BundleCorrelationBehaviorType.NotModified:
                         throw new PreconditionFailedException(String.Format(ErrorMessages.BUNDLE_CORRELATION_SEQUENCE_ERROR, data.CorrelationSequence, lastSequence));
                     case BundleCorrelationBehaviorType.Ignore:
@@ -339,11 +333,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
             // Assign a bundle id to uniquely track the message
             data.Key = data.Key ?? Guid.NewGuid();
-            
+
             // Already processed? 
-            if(context.Any<DbBundleCorrelationSubmission>(o=>o.Key == data.Key))
+            if (context.Any<DbBundleCorrelationSubmission>(o => o.Key == data.Key))
             {
-                switch(this.m_configuration.BundleCorrelationBehavior)
+                switch (this.m_configuration.BundleCorrelationBehavior)
                 {
                     case BundleCorrelationBehaviorType.NotModified:
                         throw new PreconditionFailedException(String.Format(ErrorMessages.BUNDLE_ALREADY_PROCESSED, data.Key));
@@ -396,7 +390,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         /// <inheritdoc/>
         public Bundle Insert(OrmLite.DataContext context, Bundle data)
         {
-            
+
             // Process the bundle components
             data = this.ReorganizeForInsert(data);
             for (var i = 0; i < data.Item.Count; i++)
@@ -409,7 +403,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 var objectType = data.Item[i].GetType();
                 if (data.Item[i] is IdentifiedDataReference idr)
                 {
-                    if(idr.BatchOperation != BatchOperationType.Delete)
+                    if (idr.BatchOperation != BatchOperationType.Delete)
                     {
                         throw new InvalidOperationException(String.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, "Insert on IdentifiedDataReference"));
                     }
@@ -445,7 +439,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                             break;
                         case BatchOperationType.InsertOrUpdate:
                         case BatchOperationType.Auto:
-                            
+
                             // Ensure that the object exists
                             if (data.Item[i].Key.HasValue && persistenceService.Exists(context, data.Item[i].Key.Value))
                             {
