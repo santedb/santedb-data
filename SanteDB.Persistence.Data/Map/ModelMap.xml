@@ -561,6 +561,31 @@
    domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbConceptTag, SanteDB.Persistence.Data">
 		<property modelName="SourceEntityKey" domainName="SourceKey" />
 		<property modelName="Tag" queryOnly="true" domainName="Key" />
+    </class>
+
+  <!-- Notification Maps -->
+	<class modelClass="SanteDB.Core.Notifications.NotificationTemplate, SanteDB.Core.Api"
+            domainClass="SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplate, SanteDB.Persistence.Data">
+	</class>
+
+    <class modelClass="SanteDB.Core.Notifications.NotificationInstance, SanteDB.Core.Api"
+	    domainClass="SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstance, SanteDB.Persistence.Data">
+    </class>
+
+	<class modelClass="SanteDB.Core.Notifications.NotificationTemplateContents, SanteDB.Core.Api"
+	       domainClass="SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateContents, SanteDB.Persistence.Data">
+		<property modelName="SourceEntityKey" domainName="NotificationTemplateKey" />
+	</class>
+
+	<class modelClass="SanteDB.Core.Notifications.NotificationTemplateParameter, SanteDB.Core.Api"
+	       domainClass="SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateParameter, SanteDB.Persistence.Data">
+		<property modelName="SourceEntityKey" domainName="NotificationTemplateKey" />
+	</class>
+
+	<class modelClass="SanteDB.Core.Notifications.NotificationInstanceParameter, SanteDB.Core.Api"
+   domainClass="SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstanceParameter, SanteDB.Persistence.Data">
+		<property modelName="SourceEntityKey" domainName="NotificationInstanceKey" />
+    <property modelName="ParameterName" domainName="TemplateParameterName" />
 	</class>
 
 </modelMap>
