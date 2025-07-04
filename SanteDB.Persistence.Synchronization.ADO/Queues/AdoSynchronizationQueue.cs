@@ -41,6 +41,7 @@ using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Xml;
 
 namespace SanteDB.Persistence.Synchronization.ADO.Queues
 {
@@ -131,7 +132,14 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
 
                 using (var queueData = m_dataStreamManager.Get(dbData.Object1.DataFileKey))
                 {
-                    retVal.Data = (IdentifiedData)m_messageSerializer.DeSerialize(queueData, new System.Net.Mime.ContentType(dbData.Object1.ContentType), m_modelSerializationBinder.BindToType(null, dbData.Object1.ResourceType));
+                    try
+                    {
+                        retVal.Data = (IdentifiedData)m_messageSerializer.DeSerialize(queueData, new System.Net.Mime.ContentType(dbData.Object1.ContentType), m_modelSerializationBinder.BindToType(null, dbData.Object1.ResourceType));
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new DataPersistenceException($"Error de-serializing contents for ${dbData.Object1.DataFileKey}", ex);
+                    }
                 }
 
                 return retVal;
