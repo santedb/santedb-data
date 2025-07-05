@@ -67,7 +67,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             where TData : IdentifiedData, new()
         {
 
-            if(data?.ShouldDisablePersistenceConstraints() == true)
+            if(data?.ShouldDisablePersistenceValidation() == true || context.Data.TryGetValue(DataConstants.DisableObjectValidation, out var validate) && (bool)validate == true)
             {
                 return data;
             }

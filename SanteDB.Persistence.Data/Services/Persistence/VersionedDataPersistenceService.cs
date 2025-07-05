@@ -194,7 +194,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<DetectedIssue> VerifyEntity<TToVerify>(DataContext context, TToVerify objectToVerify)
             where TToVerify : TModel, IHasIdentifiers
         {
-            if(objectToVerify.ShouldDisablePersistenceConstraints())
+            if(objectToVerify.ShouldDisablePersistenceValidation())
             {
                 yield break;
             }

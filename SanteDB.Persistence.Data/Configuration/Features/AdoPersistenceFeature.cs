@@ -135,7 +135,7 @@ namespace SanteDB.Persistence.Data.Configuration.Features
                 {
                     if (!serviceConfiguration.ServiceProviders.Any(o => o.Type == itm))
                     {
-                        serviceConfiguration.ServiceProviders.Add(new TypeReferenceConfiguration(itm));
+                        serviceConfiguration.AddService(new TypeReferenceConfiguration(itm));
                     }
                 }
                 return true;
