@@ -704,7 +704,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                     if(data.ShouldDisablePersistenceValidation())
                     {
-                        context.PushData(DataConstants.DisableObjectValidation, true);
+                        context.Data.Add(DataConstants.DisableObjectValidation, true);
                     }
 
                     using (var tx = context.BeginTransaction())
@@ -935,7 +935,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                     if (data.ShouldDisablePersistenceValidation())
                     {
-                        context.PushData(DataConstants.DisableObjectValidation, true);
+                        context.Data.Add(DataConstants.DisableObjectValidation, true);
                     }
 
                     using (var tx = context.BeginTransaction())
