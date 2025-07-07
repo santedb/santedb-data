@@ -63,6 +63,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 data.SourceType.GetRelatedPersistenceService().Touch(context, data.SourceEntityKey.Value);
             }
+            if(!data.SourceEntityKey.HasValue && data.Key.HasValue)
+            {
+                data.SourceEntityKey = context.Query<TDbModel>(o=>o.Key == data.Key).Select(o=>o.SourceKey).First();
+            }
             data.EffectiveVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, data.SourceEntityKey.Value);
             return base.BeforePersisting(context, data);
         }

@@ -67,6 +67,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             where TData : IdentifiedData, new()
         {
 
+            if(data?.ShouldDisablePersistenceValidation() == true || context.Data.TryGetValue(DataConstants.DisableObjectValidation, out var validate) && true.Equals(validate))
+            {
+                this.m_tracer.TraceWarning("Caller has instructed to disable all existance checks.");
+                return data;
+            }
+
             try
             {
                 if (context == null)

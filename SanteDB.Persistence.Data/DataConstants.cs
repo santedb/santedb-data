@@ -112,5 +112,10 @@ namespace SanteDB.Persistence.Data
         /// The key for source context key
         /// </summary>
         public const string NoTouchSourceContextKey = "no.touch.source";
+
+        /// <summary>
+        /// Instructs the data persistence layer to not validate the contents of the 
+        /// </summary>
+        public const string DisableObjectValidation = "DisableRelatedObjectValidation";
     }
 }

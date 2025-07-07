@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using DocumentFormat.OpenXml.Drawing.Diagrams;
 using DocumentFormat.OpenXml.EMMA;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Data.Quality;
@@ -194,6 +195,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<DetectedIssue> VerifyEntity<TToVerify>(DataContext context, TToVerify objectToVerify)
             where TToVerify : TModel, IHasIdentifiers
         {
+            if(objectToVerify?.ShouldDisablePersistenceValidation() == true ||  context.Data.TryGetValue(DataConstants.DisableObjectValidation, out var noValidation) && true.Equals(noValidation))
+            {
+                yield break;
+            }
 
             // Validate unique values for IDs
             if (!this.m_validationConfigurationCache.TryGetValue(objectToVerify.GetType(), out var validation))
@@ -495,6 +500,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 dbModel.CreationTime = DateTimeOffset.Now;
                 dbModel.CreatedByKey = context.ContextId;
                 dbModel.VersionSequenceId = null;
+                dbModel.ReplacesVersionKey = null;
                 // Insert the version link data
                 return context.Insert(dbModel);
 #if DEBUG

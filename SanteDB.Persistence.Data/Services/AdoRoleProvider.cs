@@ -26,6 +26,7 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Security;
+using SharpCompress;
 using System;
 using System.Linq;
 using System.Security.Principal;
@@ -57,15 +58,17 @@ namespace SanteDB.Persistence.Data.Services
 
         // Localization service
         private readonly ILocalizationService m_localizationService;
+        private readonly IPolicyDecisionService m_policyDecision;
 
         /// <summary>
         /// ADO Role Provider
         /// </summary>
-        public AdoRoleProvider(IPolicyEnforcementService policyEnforcementService, IConfigurationManager configuration, ILocalizationService localizationService)
+        public AdoRoleProvider(IPolicyEnforcementService policyEnforcementService, IConfigurationManager configuration, IPolicyDecisionService policyDecisionService, ILocalizationService localizationService)
         {
             this.m_policyEnforcement = policyEnforcementService;
             this.m_configuration = configuration.GetSection<AdoPersistenceConfigurationSection>();
             this.m_localizationService = localizationService;
+            this.m_policyDecision = policyDecisionService;
         }
 
         /// <summary>
@@ -114,6 +117,8 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         tx.Commit();
+
+                        users.ForEach(u => this.m_policyDecision.ClearCacheByName<IIdentity>(u));
                     }
                 }
                 catch (Exception e)
@@ -323,6 +328,8 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         tx.Commit();
+                        users.ForEach(u => this.m_policyDecision.ClearCacheByName<IIdentity>(u));
+
                     }
                 }
                 catch (Exception e)

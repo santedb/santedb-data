@@ -20,6 +20,7 @@
  */
 using SanteDB.BI.Model;
 using SanteDB.BI.Services;
+using SanteDB.Core;
 using SanteDB.Core.Applets;
 using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Data.Backup;
@@ -31,6 +32,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.Migration;
+using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Jobs;
 using SanteDB.Persistence.Data.Services.Persistence;
@@ -104,6 +106,7 @@ namespace SanteDB.Persistence.Data.Services
 
                 QueryBuilder.AddQueryHacks(serviceManager.CreateAll<IQueryBuilderHack>(this.m_mapper));
 
+
                 // Upgrade the schema
                 this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.Data", serviceManager.NotifyStartupProgress);
 
@@ -152,7 +155,10 @@ namespace SanteDB.Persistence.Data.Services
                         ProviderType = typeof(OrmBiDataProvider)
                     });
 
-                };
+                    this.DisableConstraintsForGateway();
+
+                }
+                ;
             }
             catch (ModelMapValidationException e)
             {
@@ -163,6 +169,53 @@ namespace SanteDB.Persistence.Data.Services
                 }
 
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// HACK for DCDR on POSTGRES: Disable constraints for gateway
+        /// </summary>
+        private void DisableConstraintsForGateway()
+        {
+            this.m_tracer.TraceInfo("Disabling Constraints in Database");
+
+            if (this.m_configuration.Provider is IDisableConstraintProvider idcp && ApplicationServiceContext.Current.HostType == SanteDBHostType.Gateway)
+            {
+                try
+                {
+                    using (var dbc = this.m_configuration.Provider.GetWriteConnection())
+                    {
+                        dbc.Open();
+                        idcp.DisableAllConstraints(dbc);
+                    }
+                }
+                catch(Exception e)
+                {
+                    this.m_tracer.TraceWarning("WARNING: Could not disable constraints - synchronization may be impacted");
+                }
+            }
+        }
+
+        /// <summary>
+        /// HACK for DCDR on POSTGRES: Enable all constraints on the gateway
+        /// </summary>
+        private void EnableConstraintsForGateway()
+        {
+            this.m_tracer.TraceInfo("Re-Enabling Constraints in Database");
+            if (this.m_configuration.Provider is IDisableConstraintProvider idcp && ApplicationServiceContext.Current.HostType == SanteDBHostType.Gateway)
+            {
+                try
+                {
+                    using (var dbc = this.m_configuration.Provider.GetWriteConnection())
+                    {
+                        dbc.Open();
+                        idcp.EnableAllConstraints(dbc);
+                    }
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceWarning("WARNING: Could not enable constraints - data integrity may be impacted");
+                }
             }
         }
 
@@ -249,6 +302,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <inheritdoc/>
         public void Dispose()
         {
+            this.EnableConstraintsForGateway();
             if(this.m_configuration.Provider is IDisposable dispose)
             {
                 dispose.Dispose();

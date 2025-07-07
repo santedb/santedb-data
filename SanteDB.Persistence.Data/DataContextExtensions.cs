@@ -54,6 +54,15 @@ namespace SanteDB.Persistence.Data
     /// </summary>
     public static class DataContextExtensions
     {
+
+        /// <summary>
+        /// Defer constraints annotation
+        /// </summary>
+        private struct DeferConstraints
+        {
+
+        }
+
         // Localization service
         private static readonly ILocalizationService s_localizationService = ApplicationServiceContext.Current.GetService<ILocalizationService>();
 
@@ -430,5 +439,21 @@ namespace SanteDB.Persistence.Data
                 throw new SecurityException(s_localizationService.GetString(ErrorMessageStrings.SEC_PROVENANCE_GEN_ERR), e);
             }
         }
+
+
+
+        /// <summary>
+        /// Defer check constraints on the object in the persistence layer
+        /// </summary>
+        public static void DisablePersistenceValidation(this IdentifiedData me)
+        {
+            me.AddAnnotation(new DeferConstraints());
+        }
+
+        /// <summary>
+        /// Determine if the object has been flagged for constraint deferral
+        /// </summary>
+        public static bool ShouldDisablePersistenceValidation(this IdentifiedData me) => me.GetAnnotations<DeferConstraints>().Any();
+
     }
 }

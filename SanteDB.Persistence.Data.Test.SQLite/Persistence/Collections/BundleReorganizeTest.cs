@@ -30,6 +30,7 @@ using SanteDB.Persistence.Data.Services.Persistence.Collections;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Collections
 {
@@ -74,14 +75,21 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Collections
         [Test]
         public void TestReorganizeComplex()
         {
-            IdentifiedData e = new Organization() { Key = Guid.NewGuid() },
-                f = new Person() { Key = Guid.NewGuid(), Relationships = new List<EntityRelationship>() { new EntityRelationship(EntityRelationshipTypeKeys.Employee, e as Entity) } },
-                b = new Patient() { Key = Guid.NewGuid(), Relationships = new List<EntityRelationship>() { new EntityRelationship(EntityRelationshipTypeKeys.Mother, f as Entity) } },
-                a = new Provider() { Key = Guid.NewGuid(), Relationships = new List<EntityRelationship>() { new EntityRelationship(EntityRelationshipTypeKeys.HealthcareProvider, b as Entity), new EntityRelationship(EntityRelationshipTypeKeys.Employee, e as Entity) } },
-                c = new Act() { Key = Guid.NewGuid(), Participations = new List<ActParticipation>() { new ActParticipation(ActParticipationKeys.Admitter, a as Entity) } },
+            Guid aUuid = Guid.Parse("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"),
+                bUuid = Guid.Parse("BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB"),
+                cUuid = Guid.Parse("CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC"),
+                dUuid = Guid.Parse("DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD"),
+                eUuid = Guid.Parse("EEEEEEEE-EEEE-EEEE-EEEE-EEEEEEEEEEEE"),
+                fUuid = Guid.Parse("FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF");
+
+            IdentifiedData e = new Organization() { Key = eUuid, Relationships = new List<EntityRelationship>() },
+                f = new Person() { Key = fUuid, Relationships = new List<EntityRelationship>() { new EntityRelationship(EntityRelationshipTypeKeys.Employee, e as Entity) } },
+                b = new Patient() { Key = bUuid, Relationships = new List<EntityRelationship>() { new EntityRelationship(EntityRelationshipTypeKeys.Mother, f as Entity) } },
+                a = new Provider() { Key =aUuid, Relationships = new List<EntityRelationship>() { new EntityRelationship(EntityRelationshipTypeKeys.HealthcareProvider, b as Entity), new EntityRelationship(EntityRelationshipTypeKeys.Employee, e as Entity) } },
+                c = new Act() { Key =cUuid, Participations = new List<ActParticipation>() { new ActParticipation(ActParticipationKeys.Admitter, a as Entity) } },
                 d = new Act()
                 {
-                    Key = Guid.NewGuid(),
+                    Key = dUuid,
                     Relationships = new List<ActRelationship>() { new ActRelationship(ActRelationshipTypeKeys.HasComponent, c as Act) },
                     Participations = new List<ActParticipation>()
                 {
@@ -89,6 +97,10 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Collections
                     new ActParticipation(ActParticipationKeys.Admitter, a as Entity)
                 }
                 };
+
+            var ror = CollectionUtils.ReorganizeForInsert(new IdentifiedData[] { a, b, c, d, e, f }).ToArray();
+            ror = CollectionUtils.ReorganizeForInsert(new IdentifiedData[] { f, a, d, e, b, c }).ToArray();
+            ror = CollectionUtils.ReorganizeForInsert(new IdentifiedData[] { a, e, d, b, f, c }).ToArray();
 
             var serviceManager = ApplicationServiceContext.Current.GetService<IServiceManager>();
             var persistenceService = serviceManager.CreateInjected<BundlePersistenceService>();
