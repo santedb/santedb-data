@@ -194,7 +194,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     if (versionUuuid.GetValueOrDefault() != Guid.Empty)
                     {
                         return this.Get(context, libraryUuid, versionUuuid);
@@ -281,7 +281,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     using (var tx = context.BeginTransaction())
                     {
 
@@ -426,7 +426,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     using (var tx = context.BeginTransaction())
                     {
                         var existingRegistration = context.FirstOrDefault<DbCdssLibrary>(o => o.Key == libraryUuid);

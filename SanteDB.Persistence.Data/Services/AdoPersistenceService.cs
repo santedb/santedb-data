@@ -185,7 +185,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     using (var dbc = this.m_configuration.Provider.GetWriteConnection())
                     {
-                        dbc.Open();
+                        dbc.Open(initializeExtensions: false);
                         idcp.DisableAllConstraints(dbc);
                     }
                 }
@@ -208,7 +208,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     using (var dbc = this.m_configuration.Provider.GetWriteConnection())
                     {
-                        dbc.Open();
+                        dbc.Open(initializeExtensions: false);
                         idcp.EnableAllConstraints(dbc);
                     }
                 }
@@ -243,7 +243,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     using (var tx = context.BeginTransaction())
                     {

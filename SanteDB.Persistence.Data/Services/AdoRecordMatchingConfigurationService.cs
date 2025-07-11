@@ -70,7 +70,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
 
                         var stmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbMatchConfiguration), typeof(DbMatchConfigurationVersion))
                             .InnerJoin<DbMatchConfiguration, DbMatchConfigurationVersion>(o => o.Key, o => o.Key)
@@ -116,7 +116,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var config = context.FirstOrDefault<DbMatchConfiguration>(o => o.Id == configurationId);
                     if (config == null)
                     {
@@ -161,7 +161,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
 
                         var stmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbMatchConfiguration), typeof(DbMatchConfigurationVersion))
                           .InnerJoin<DbMatchConfiguration, DbMatchConfigurationVersion>(o => o.Key, o => o.Key)
@@ -206,7 +206,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     using (var tx = context.BeginTransaction())
                     {

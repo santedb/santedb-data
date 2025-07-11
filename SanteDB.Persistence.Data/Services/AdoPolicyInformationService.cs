@@ -45,7 +45,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// A PIP service which stores data in the database
     /// </summary>
-    public class AdoPolicyInformationService : IPolicyInformationService, ILocalServiceProvider<IPolicyInformationService>
+    public class AdoPolicyInformationService : IPolicyInformationServiceEx, ILocalServiceProvider<IPolicyInformationService>
     {
         /// <summary>
         /// Gets the service name
@@ -109,7 +109,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     context.EstablishProvenance(principal, null);
 
                     using (var tx = context.BeginTransaction())
@@ -294,7 +294,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     // Security Device
                     if (securable is SecurityDevice sd)
@@ -379,7 +379,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     try
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
 
                         // Security Device
                         switch (securable)
@@ -557,7 +557,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    dataContext.Open();
+                    dataContext.Open(initializeExtensions: false);
                     return dataContext.Query<DbSecurityPolicy>(o => o.ObsoletionTime == null).ToArray().Select(o => new AdoSecurityPolicy(o)).ToArray();
                 }
                 catch (Exception e)
@@ -589,7 +589,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     retVal = context.SingleOrDefault<DbSecurityPolicy>(o => o.Oid == policyOid && o.ObsoletionTime == null);
 
                     this.m_adhocCache?.Add($"pip.{policyOid}", retVal, new TimeSpan(0, 0, 30));
@@ -641,7 +641,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     using (var tx = context.BeginTransaction())
                     {
                         var policies = context.Query<DbSecurityPolicy>(o => oid.Contains(o.Oid)).Select(o => o.Key).ToArray();
@@ -700,44 +700,68 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
+            this.CreatePolicies(new IPolicy[] { policy }, principal);
+        }
+
+        /// <inheritdoc/>
+        public void CreatePolicies(IEnumerable<IPolicy> policies, IPrincipal principal)
+        {
+            if (null == policies)
+            {
+                throw new ArgumentNullException(nameof(policies), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+            if (null == principal)
+            {
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
             this.m_policyEnforcement.Demand(PermissionPolicyIdentifiers.AlterPolicy, principal);
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
-                    // Find an existing policy which may have been created with a different key
-                    var existingPolicy = context.FirstOrDefault<DbSecurityPolicy>(o => o.Oid == policy.Oid);
-                    if (existingPolicy == null)
+                    using (var transaction = context.BeginTransaction())
                     {
-                        existingPolicy = new DbSecurityPolicy()
+                        foreach (var policy in policies)
                         {
-                            Key = policy.Key
-                        };
-                    }
-                    else if (existingPolicy.Key != policy.Key)
-                    {
-                        existingPolicy.ObsoletionTime = DateTimeOffset.Now;
-                        existingPolicy.ObsoletedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
-                        context.Update(existingPolicy);
-                        existingPolicy = new DbSecurityPolicy()
-                        {
-                            Key = policy.Key
-                        };
-                    }
+                            // Find an existing policy which may have been created with a different key
+                            var existingPolicy = context.FirstOrDefault<DbSecurityPolicy>(o => o.Oid == policy.Oid);
+                            if (existingPolicy == null)
+                            {
+                                existingPolicy = new DbSecurityPolicy()
+                                {
+                                    Key = policy.Key
+                                };
+                            }
+                            else if (existingPolicy.Key != policy.Key)
+                            {
+                                existingPolicy.ObsoletionTime = DateTimeOffset.Now;
+                                existingPolicy.ObsoletedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
+                                context.Update(existingPolicy);
+                                existingPolicy = new DbSecurityPolicy()
+                                {
+                                    Key = policy.Key
+                                };
+                            }
 
-                    existingPolicy.CanOverride = policy.CanOverride;
-                    existingPolicy.IsPublic = true;
-                    existingPolicy.Name = policy.Name;
-                    existingPolicy.Oid = policy.Oid;
-                    existingPolicy.CreatedByKey = context.EstablishProvenance(principal, null);
-                    existingPolicy = context.Insert(existingPolicy);
+                            existingPolicy.CanOverride = policy.CanOverride;
+                            existingPolicy.IsPublic = true;
+                            existingPolicy.Name = policy.Name;
+                            existingPolicy.Oid = policy.Oid;
+                            existingPolicy.CreatedByKey = context.EstablishProvenance(principal, null);
+                            existingPolicy = context.Insert(existingPolicy);
+                        }
+
+                        transaction.Commit();
+                    }
                 }
                 catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
                 {
-                    this.m_traceSource.TraceError("Error creating policy {0} : {1}", policy.Oid, ex);
+                    this.m_traceSource.TraceError("Error creating policies {0} : {1}", String.Join(",", policies.Select(o => o.Oid)), ex);
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_GEN), ex);
                 }
             }

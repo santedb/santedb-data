@@ -95,7 +95,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     using (var tx = context.BeginTransaction())
                     {
                         string[] lroles = roles.Select(o => o.ToLowerInvariant()).ToArray(), lusers = users.Select(o => o.ToLowerInvariant()).ToArray();
@@ -149,7 +149,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var dbRole = new DbSecurityRole()
                     {
@@ -182,7 +182,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     return context.Query<DbSecurityUser>(context.CreateSqlStatementBuilder()
                         .SelectFrom(typeof(DbSecurityUser))
@@ -209,7 +209,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     return context.Query<DbSecurityRole>(o => o.ObsoletionTime == null).Select(o => o.Name).ToArray();
                 }
@@ -235,7 +235,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     return context.Query<DbSecurityRole>(context.CreateSqlStatementBuilder()
                         .SelectFrom(typeof(DbSecurityRole))
@@ -271,7 +271,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     return context.Any(context.CreateSqlStatementBuilder()
                         .SelectFrom(typeof(DbSecurityUserRole))
@@ -312,7 +312,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     using (var tx = context.BeginTransaction())
                     {

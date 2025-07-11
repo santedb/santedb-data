@@ -324,7 +324,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 {
                     using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                     {
-                        context.Open();
+                        context.Open(); // Validation rules may require extended functions 
                         context.EstablishProvenance(AuthenticationContext.Current.Principal);
                         return this.VerifyEntity(context, strong).ToArray(); // force execute
                     }

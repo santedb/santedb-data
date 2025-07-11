@@ -87,7 +87,7 @@ namespace SanteDB.Persistence.Data.BI
             {
                 using (var context = this.m_dbProvider.GetReadonlyConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     return context.Query<DbDatamartLogEntry>(o => o.ExecutionContextId == this.Key).ToList().Select(o => new AdoDatamartLogEntry(o));
                 }
             }

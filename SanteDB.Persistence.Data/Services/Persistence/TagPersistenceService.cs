@@ -70,7 +70,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var provenanceId = context.EstablishProvenance(AuthenticationContext.Current.Principal, null);
                     if (context.Any<DbEntity>(o => o.Key == sourceKey))

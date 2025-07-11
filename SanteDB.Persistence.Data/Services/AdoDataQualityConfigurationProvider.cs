@@ -108,7 +108,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var ctx = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    ctx.Open();
+                    ctx.Open(initializeExtensions: false);
                     var ruleSet = ctx.FirstOrDefault<DbDataQualityConfiguration>(o => o.Id == id);
                     if (ruleSet == null)
                     {
@@ -183,7 +183,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var ctx = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    ctx.Open();
+                    ctx.Open(initializeExtensions: false);
                     Expression<Func<DbDataQualityConfiguration, Boolean>> qry = o => o.ObsoletionTime == null;
                     if(includeObsolete)
                     {
@@ -220,7 +220,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var ctx = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    ctx.Open();
+                    ctx.Open(initializeExtensions: false);
 
                     var stmt = ctx.CreateSqlStatementBuilder().SelectFrom(typeof(DbDataQualityResourceConfiguration), typeof(DbDataQualityConfiguration))
                         .InnerJoin<DbDataQualityResourceConfiguration, DbDataQualityConfiguration>(o => o.DataQualityConfigurationKey, o => o.Key)
@@ -261,7 +261,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var ctx = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    ctx.Open();
+                    ctx.Open(initializeExtensions: false);
                     using (var tx = ctx.BeginTransaction())
                     {
                         this.m_adhocCache?.Remove(this.CreateCacheKey(configuration.Id));
@@ -345,7 +345,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var ctx = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    ctx.Open();
+                    ctx.Open(initializeExtensions: false);
 
                     var existing = ctx.FirstOrDefault<DbDataQualityConfiguration>(o => o.Id == id);
                     if (existing == null)

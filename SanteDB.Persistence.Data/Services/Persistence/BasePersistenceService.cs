@@ -632,7 +632,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     try
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
 
                         // Is there an ad-hoc version from the database?
                         retVal = this.DoGetModel(context, key, versionKey, true);
@@ -700,7 +700,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 using (var context = this.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     if(data.ShouldDisablePersistenceValidation())
                     {
@@ -931,7 +931,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     if (data.ShouldDisablePersistenceValidation())
                     {
@@ -1151,7 +1151,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     TModel retVal = default(TModel);
                     using (var tx = context.BeginTransaction())
@@ -1255,7 +1255,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     using (var tx = context.BeginTransaction())
                     {

@@ -819,8 +819,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             //}
 
             // Is there any class concept key
-            var queryString = query.ToString();
-            if (m_classKeyMap != null && !queryString.Contains(nameof(IHasClassConcept.ClassConceptKey)))
+            
+            if (m_classKeyMap != null && !query.ContainsPropertyReference(nameof(IHasClassConcept.ClassConceptKey)))
             {
                 var classKeyProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IHasClassConcept.ClassConceptKey)));
                 classKeyProperty = Expression.MakeMemberAccess(classKeyProperty, classKeyProperty.Type.GetProperty("Value"));
@@ -846,13 +846,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             // Ensure that we always apply HEAD filter if not applied
 
-            if (!queryString.Contains(nameof(IVersionedData.IsHeadVersion)) && !queryString.Contains(nameof(IVersionedData.VersionKey)))
+            if (!query.ContainsPropertyReference(nameof(IVersionedData.IsHeadVersion)) && !query.ContainsPropertyReference(nameof(IVersionedData.VersionKey)))
             {
                 var headProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedData.IsHeadVersion)));
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, headProperty, Expression.Constant(true))), query.Parameters[0]);
             }
 
-            if (!queryString.Contains(nameof(BaseEntityData.ObsoletionTime)) && !queryString.Contains(nameof(IVersionedData.VersionKey)))
+            if (!query.ContainsPropertyReference(nameof(BaseEntityData.ObsoletionTime)) && !query.ContainsPropertyReference(nameof(IVersionedData.VersionKey)))
             {
                 var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);

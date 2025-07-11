@@ -148,7 +148,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     // Query for application matching application ID
                     var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationId.ToLowerInvariant() && o.ObsoletionTime == null);
@@ -315,7 +315,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     // Query for application matching application ID
                     var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationId.ToLowerInvariant() && o.ObsoletionTime == null);
@@ -406,7 +406,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (app == null)
@@ -435,7 +435,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var app = context.FirstOrDefault<DbSecurityApplication>(o => o.Key == sid && o.ObsoletionTime == null);
                     if (app == null)
                     {
@@ -473,7 +473,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (app == null)
                     {
@@ -522,7 +522,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (app == null)
                     {
@@ -570,7 +570,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     using (var tx = context.BeginTransaction())
                     {
@@ -633,7 +633,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var app = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
                     if (app == Guid.Empty)
                     {
@@ -669,7 +669,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var dbApp = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (dbApp == null)
@@ -711,7 +711,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var dbApplication = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationName.ToLowerInvariant() && o.ObsoletionTime == null).FirstOrDefault();
                     if (dbApplication == null)
@@ -775,7 +775,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var dbApplication = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationName.ToLowerInvariant() && o.ObsoletionTime == null).FirstOrDefault();
                     if (dbApplication == null)
@@ -813,7 +813,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var dbDeviceKey = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationName.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
                     if (dbDeviceKey == null)

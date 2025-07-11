@@ -189,8 +189,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected override Expression<Func<TModel, bool>> ApplyDefaultQueryFilters(Expression<Func<TModel, bool>> query)
         {
             // If the user has not explicitly set the obsoletion time parameter then we will add it
-            var queryStr = query.ToString();
-            if (!queryStr.Contains(nameof(BaseEntityData.ObsoletionTime)))
+            if (!query.ContainsPropertyReference(nameof(BaseEntityData.ObsoletionTime)))
             {
                 var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);

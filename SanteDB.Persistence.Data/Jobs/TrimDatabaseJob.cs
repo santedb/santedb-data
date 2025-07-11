@@ -117,7 +117,7 @@ namespace SanteDB.Persistence.Data.Jobs
 
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     context.EstablishProvenance(AuthenticationContext.SystemPrincipal);
                     // First we want to trim old sessions
                     var cutoff = DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxSessionRetention.Value);

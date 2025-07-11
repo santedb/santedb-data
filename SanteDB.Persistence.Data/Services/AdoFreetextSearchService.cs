@@ -133,7 +133,7 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         try
                         {
-                            ctx.Open();
+                            ctx.Open(initializeExtensions: false);
                             ctx.ExecuteProcedure<object>("reindex_fti_ent", p);
                         }
                         catch (Exception ex) when (ex.Message.Contains("CALL")) // HACK: PostgreSQL < 11 does not support procedures

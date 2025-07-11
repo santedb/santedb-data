@@ -155,7 +155,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
                 {
                     using (var context = m_dataProvider.GetReadonlyConnection())
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
                         return (int)context.Count<DbSynchronizationQueueEntry>(o => o.QueueKey == m_queueRecord.Key);
                     }
                 }
@@ -179,7 +179,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
                 {
                     using (var context = m_dataProvider.GetWriteConnection())
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
 
                         var queueEntry = context.FirstOrDefault<DbSynchronizationQueueEntry>(o => o.Id == id && o.QueueKey == m_queueRecord.Key);
 
@@ -224,7 +224,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
                 {
                     using (var context = m_dataProvider.GetWriteConnection())
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
 
                         var nextEntry = GetNextQueueEntry(context);
 
@@ -285,7 +285,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
                 {
                     using (var context = m_dataProvider.GetWriteConnection())
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
                         using (var tx = context.BeginTransaction())
                         {
 
@@ -385,7 +385,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
                 {
                     using (var context = m_dataProvider.GetWriteConnection())
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
 
                         var otherQueueObject = context.FirstOrDefault<DbSynchronizationQueueEntry>(o => o.Id == otherQueueEntry.Id);
                         if (otherQueueObject == null)
@@ -470,7 +470,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
                 {
                     using (var context = m_dataProvider.GetReadonlyConnection())
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
 
 
                         var query = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbSynchronizationQueueEntry), typeof(DbSynchronizationDeadLetterQueueEntry), typeof(DbSynchronizationQueue))
@@ -519,7 +519,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
                 {
                     using (var context = m_dataProvider.GetReadonlyConnection())
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
 
                         var entry = GetNextQueueEntry(context);
                         return entry;
@@ -550,7 +550,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
                 {
                     using (var context = m_dataProvider.GetReadonlyConnection())
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
                         SqlStatement domainQuery = null;
                         var domainLambda = m_mapper.MapModelExpression<ISynchronizationQueueEntry, DbSynchronizationQueueEntry, bool>(query, false);
                         if (domainLambda == null)

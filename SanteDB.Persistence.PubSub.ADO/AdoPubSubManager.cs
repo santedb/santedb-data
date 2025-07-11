@@ -173,7 +173,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             {
                 try
                 {
-                    conn.Open();
+                    conn.Open(initializeExtensions: false);
                     var domainInstance = conn.FirstOrDefault<DbChannel>(o => o.Key == id);
                     if (domainInstance == null)
                     {
@@ -232,7 +232,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             {
                 try
                 {
-                    conn.Open();
+                    conn.Open(initializeExtensions: false);
                     var dbExisting = conn.FirstOrDefault<DbChannel>(o => o.Key == key);
                     if (dbExisting == null)
                     {
@@ -286,7 +286,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             {
                 try
                 {
-                    conn.Open();
+                    conn.Open(initializeExtensions: false);
                     var dbExisting = conn.FirstOrDefault<DbSubscription>(o => o.Key == key);
                     if (dbExisting == null)
                     {
@@ -367,7 +367,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             {
                 try
                 {
-                    conn.Open();
+                    conn.Open(initializeExtensions: false);
                     using (var tx = conn.BeginTransaction())
                     {
                         var dbChannel = this.m_mapper.MapModelInstance<PubSubChannelDefinition, DbChannel>(channel);
@@ -459,7 +459,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             {
                 try
                 {
-                    conn.Open();
+                    conn.Open(initializeExtensions: false);
                     using (var tx = conn.BeginTransaction())
                     {
                         var dbExisting = conn.FirstOrDefault<DbChannel>(o => o.Key == key);
@@ -556,7 +556,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             {
                 try
                 {
-                    conn.Open();
+                    conn.Open(initializeExtensions: false);
                     using (var tx = conn.BeginTransaction())
                     {
                         // First construct db instance
@@ -611,7 +611,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             {
                 try
                 {
-                    conn.Open();
+                    conn.Open(initializeExtensions: false);
                     using (var tx = conn.BeginTransaction())
                     {
                         var dbExisting = conn.FirstOrDefault<DbSubscription>(o => o.Key == key);
@@ -676,7 +676,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             {
                 try
                 {
-                    conn.Open();
+                    conn.Open(initializeExtensions: false);
                     var dbExisting = conn.FirstOrDefault<DbSubscription>(o => o.Key == key);
                     if (dbExisting == null)
                     {

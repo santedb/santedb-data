@@ -125,7 +125,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     using (var tx = context.BeginTransaction())
                     {
                         context.EstablishProvenance(AuthenticationContext.Current.Principal);
@@ -294,7 +294,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     return this.Get(context, key);
                 }
             }
@@ -346,7 +346,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     using (var tx = context.BeginTransaction())
                     {
                         context.EstablishProvenance(AuthenticationContext.Current.Principal);

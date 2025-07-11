@@ -159,7 +159,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var dev = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceId.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (dev == null)
                     {
@@ -258,7 +258,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var dev = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (dev == null)
@@ -288,7 +288,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var dev = context.FirstOrDefault<DbSecurityDevice>(d => d.Key == sid && d.ObsoletionTime == null);
                     if (dev == null)
                     {
@@ -321,7 +321,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var dev = context.FirstOrDefault<DbSecurityDevice>(d => d.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && d.ObsoletionTime == null);
                     if (dev == null)
                     {
@@ -366,7 +366,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var dev = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (dev == null)
                     {
@@ -427,7 +427,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     using (var tx = context.BeginTransaction())
                     {
@@ -498,7 +498,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var dbDev = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (dbDev == null)
@@ -532,7 +532,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     return context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
                 }
                 catch (Exception e)
@@ -566,7 +566,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var dbDevice = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceName.ToLowerInvariant() && o.ObsoletionTime == null).FirstOrDefault();
                     if (dbDevice == null)
@@ -629,7 +629,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var dbDevice = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceName.ToLowerInvariant() && o.ObsoletionTime == null).FirstOrDefault();
                     if (dbDevice == null)
                     {
@@ -667,7 +667,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var dbDeviceKey = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceName.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
                     if (dbDeviceKey == null)

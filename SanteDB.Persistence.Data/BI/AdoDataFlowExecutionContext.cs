@@ -84,7 +84,7 @@ namespace SanteDB.Persistence.Data.BI
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     if (context.Query<DbDatamartExecutionEntry>(o => o.Key == this.Key).Any())
                     {
                         throw new InvalidOperationException(String.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, nameof(LogStart)));
@@ -120,7 +120,7 @@ namespace SanteDB.Persistence.Data.BI
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var existing = context.Query<DbDatamartExecutionEntry>(o => o.Key == this.Key).FirstOrDefault();
                     if (existing == null)
                     {
@@ -158,7 +158,7 @@ namespace SanteDB.Persistence.Data.BI
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var existing = context.Query<DbDatamartExecutionEntry>(o => o.Key == this.Key).FirstOrDefault();
                     if (existing == null)
                     {
@@ -222,7 +222,7 @@ namespace SanteDB.Persistence.Data.BI
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var logEntry = new AdoDatamartLogEntry(context.Insert(new DbDatamartLogEntry()
                     {

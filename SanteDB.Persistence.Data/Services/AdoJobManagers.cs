@@ -80,7 +80,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     using (var tx = context.BeginTransaction())
                     {
@@ -152,7 +152,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var provId = context.EstablishProvenance(AuthenticationContext.Current.Principal);
                     context.UpdateAll<DbJobScheule>(o => o.JobId == job.Id, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == provId);
                 }
@@ -181,7 +181,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     return context.Query<DbJobScheule>(o => o.JobId == job.Id && o.ObsoletionTime == null).ToList().Select(o => new AdoJobSchedule(o));
                 }
             }
@@ -209,7 +209,7 @@ namespace SanteDB.Persistence.Data.Services
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     // The cache is the source (i.e. we don't persist state and stuff in DB) but it is supplemented by data in the db
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var cacheStatus = this.m_adhocCache.Get<XmlJobState>($"sts.job.{job.Id}");
                     var dbStatus = context.FirstOrDefault<DbJobState>(o => o.JobId == job.Id);
                     return new AdoJobState(dbStatus, cacheStatus, job);
@@ -239,7 +239,7 @@ namespace SanteDB.Persistence.Data.Services
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     // The cache is the source (i.e. we don't persist state and stuff in DB) but it is supplemented by data in the db
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var cacheStatus = this.m_adhocCache.Get<XmlJobState>($"sts.job.{job.Id}");
                     var dbStatus = context.FirstOrDefault<DbJobState>(o => o.JobId == job.Id);
                     if (cacheStatus == null)
@@ -286,7 +286,7 @@ namespace SanteDB.Persistence.Data.Services
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     // The cache is the source (i.e. we don't persist state and stuff in DB) but it is supplemented by data in the db
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var cacheStatus = this.m_adhocCache.Get<XmlJobState>($"sts.job.{job.Id}");
                     var dbStatus = context.FirstOrDefault<DbJobState>(o => o.JobId == job.Id);
 

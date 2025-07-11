@@ -116,7 +116,7 @@ namespace SanteDB.Persistence.Data.Services
                 // Now insert into database
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     // Enusre there is no active mapping
                     var existingMap = context.FirstOrDefault<DbCertificateMapping>(o => o.X509Thumbprint == authenticationCertificate.Thumbprint && o.Use == CertificateMappingUse.Authentication && o.ObsoletionTime == null);
@@ -208,7 +208,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var authSql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping), typeof(DbSecurityUser), typeof(DbSecurityApplication), typeof(DbSecurityDevice))
                         .Join<DbCertificateMapping, DbSecurityUser>("LEFT", o => o.SecurityUserKey, o => o.Key)
@@ -325,7 +325,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var authSql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping), typeof(DbSecurityUser), typeof(DbSecurityApplication), typeof(DbSecurityDevice))
                         .Join<DbCertificateMapping, DbSecurityUser>("LEFT", o => o.SecurityUserKey, o => o.Key)
@@ -377,7 +377,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     OrmResultSet<DbCertificateMapping> retVal = null;
                     if (identityOfCertificte is IDeviceIdentity did)
                     {
@@ -442,7 +442,7 @@ namespace SanteDB.Persistence.Data.Services
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
 
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     // Lookup the certificate
                     DbCertificateMapping dbCertMapping = null;

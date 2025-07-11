@@ -107,7 +107,7 @@ namespace SanteDB.Persistence.Data.Services
                 try
                 {
 
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     using (var tx = context.BeginTransaction())
                     {
                         context.EstablishProvenance(AuthenticationContext.Current.Principal);
@@ -147,7 +147,7 @@ namespace SanteDB.Persistence.Data.Services
 
             using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
-                context.Open();
+                context.Open(initializeExtensions: false);
 
                 var rule = context.Query<DbRelationshipValidationRule>(r => r.Key == key).FirstOrDefault();
 
@@ -169,7 +169,7 @@ namespace SanteDB.Persistence.Data.Services
             using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
                 var tclass = GetRelationshipTargetType<TRelationship>();
-                context.Open();
+                context.Open(initializeExtensions: false);
 
                 foreach (var itm in context.Query<DbRelationshipValidationRule>(o => o.RelationshipClassType == tclass && o.ObsoletionTime == null))
                 {
@@ -185,7 +185,7 @@ namespace SanteDB.Persistence.Data.Services
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 var tclass = GetRelationshipTargetType<TRelationship>();
-                context.Open();
+                context.Open(initializeExtensions: false);
 
                 foreach (var itm in context.Query<DbRelationshipValidationRule>(o => (o.SourceClassKey == sourceClassKey || o.SourceClassKey == null) && o.RelationshipClassType == tclass && o.ObsoletionTime == null))
                 {
@@ -206,7 +206,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     using (var tx = context.BeginTransaction())
                     {
 
@@ -237,7 +237,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     using (var tx = context.BeginTransaction())
                     {
