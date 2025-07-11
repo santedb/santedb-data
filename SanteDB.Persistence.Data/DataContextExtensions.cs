@@ -455,5 +455,19 @@ namespace SanteDB.Persistence.Data
         /// </summary>
         public static bool ShouldDisablePersistenceValidation(this IdentifiedData me) => me.GetAnnotations<DeferConstraints>().Any();
 
+
+        /// <summary>
+        /// Adds or updates data on the context
+        /// </summary>
+        public static void AddOrUpdateData(this DataContext dataContext, String key, object value)
+        {
+            if(dataContext.Data.ContainsKey(key)) {
+                dataContext.Data[key] = value;
+            }
+            else
+            {
+                dataContext.Data.Add(key, value);
+            }
+        }
     }
 }

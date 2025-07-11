@@ -494,6 +494,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override TEntity DoInsertModel(DataContext context, TEntity data)
         {
             var retVal = base.DoInsertModel(context, data);
+            context.AddOrUpdateData($"Entity{retVal.Key}Version", retVal.VersionSequence);
 
             if (data.Addresses != null)
             {
@@ -557,6 +558,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
 
             var retVal = base.DoUpdateModel(context, data);
+            context.AddOrUpdateData($"Entity{retVal.Key}Version", retVal.VersionSequence);
 
             if (data.Addresses != null)
             {

@@ -44,6 +44,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
@@ -249,7 +250,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open(initializeExtensions: false);
-                    using (var tx = context.BeginTransaction())
+                    using (IDbTransaction tx = data.ShouldDisablePersistenceValidation() ? null : context.BeginTransaction())
                     {
 
                         context.EstablishProvenance(principal, null);
@@ -273,7 +274,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
                             if (transactionMode == TransactionMode.Commit)
                             {
-                                tx.Commit();
+                                tx?.Commit();
                             }
 
                             data.Item.ForEach(i => this.m_dataCachingService.Add(i));

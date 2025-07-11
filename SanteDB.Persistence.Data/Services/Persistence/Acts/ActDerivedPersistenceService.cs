@@ -481,6 +481,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override TAct DoInsertModel(DataContext context, TAct data)
         {
             var retVal = base.DoInsertModel(context, data);
+            context.AddOrUpdateData($"Act{retVal.Key}Version", retVal.VersionSequence);
 
             if (data.Extensions != null)
             {
@@ -542,6 +543,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override TAct DoUpdateModel(DataContext context, TAct data)
         {
             var retVal = base.DoUpdateModel(context, data);
+            context.AddOrUpdateData($"Act{retVal.Key}Version", retVal.VersionSequence);
 
             if (data.Extensions != null)
             {

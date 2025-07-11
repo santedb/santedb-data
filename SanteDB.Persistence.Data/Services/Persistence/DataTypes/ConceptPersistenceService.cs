@@ -89,6 +89,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             // Do Insertion of themodel
             var retVal = base.DoInsertModel(context, data);
 
+            context.AddOrUpdateData($"Concept{retVal.Key}Version", retVal.VersionSequence);
+
             // Insert names
             if (data.ConceptNames != null)
             {
@@ -138,6 +140,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override Concept DoUpdateModel(DataContext context, Concept data)
         {
             var retVal = base.DoUpdateModel(context, data);
+            context.AddOrUpdateData($"Concept{retVal.Key}Version", retVal.VersionSequence);
 
             // Update names
             if (data.ConceptNames != null)
