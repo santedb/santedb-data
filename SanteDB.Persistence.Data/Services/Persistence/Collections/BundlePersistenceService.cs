@@ -49,6 +49,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
+using System.Threading;
 using ZstdSharp.Unsafe;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Collections
@@ -401,9 +402,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             data = this.ReorganizeForInsert(data);
             for (var i = 0; i < data.Item.Count; i++)
             {
-                if (i % 100 == 0)
+                if (i % 200 == 0)
                 {
-                    this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(BundlePersistenceService), (float)i / (float)data.Item.Count, UserMessages.PROCESSING));
+                    this.ProgressChanged?.Invoke(
+                        this,
+                        new ProgressChangedEventArgs(nameof(BundlePersistenceService), (float)i / (float)data.Item.Count, UserMessages.PROCESSING)
+                    );
                 }
 
                 var objectType = data.Item[i].GetType();

@@ -307,6 +307,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var dbInstance = this.DoConvertToDataModel(context, data);
                 dbInstance = this.DoInsertInternal(context, dbInstance);
                 var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
+                retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
 
                 var issueAnnotation = data.GetAnnotations<DetectedIssue[]>();
                 if (issueAnnotation.Any() && retVal is IExtendable ext)
@@ -357,6 +358,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var dbInstance = this.DoConvertToDataModel(context, data);
                 dbInstance = this.DoUpdateInternal(context, dbInstance);
                 var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
+                retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
 
                 return this.AfterPersisted(context, retVal);
 
@@ -436,14 +438,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 // Remove from cache 
                 this.m_dataCacheService?.Remove(key);
 
+                TModel retVal = null;
                 if (!this.m_configuration.FastDelete && deleteMode != DeleteMode.PermanentDelete)
                 {
-                    return this.DoConvertToInformationModel(context, dbInstance);
+                    retVal = this.DoConvertToInformationModel(context, dbInstance);
                 }
                 else
                 {
-                    return this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
+                    retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
                 }
+            retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Delete;
+            return retVal;
 #if DEBUG
             }
             finally
