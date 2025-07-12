@@ -121,6 +121,7 @@ namespace SanteDB.Persistence.Data.Services
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open(initializeExtensions: false);
+                    context.EstablishProvenance(principal, null);
 
                     using (var transaction = context.BeginTransaction())
                     {
@@ -130,7 +131,7 @@ namespace SanteDB.Persistence.Data.Services
                             // get the identity
                             var certificateRegistration = new DbCertificateMapping()
                             {
-                                CreatedByKey = context.EstablishProvenance(principal, null),
+                                CreatedByKey = context.ContextId,
                                 CreationTime = DateTimeOffset.Now,
                                 Expiration = cert.NotAfter,
                                 X509Thumbprint = cert.Thumbprint,

@@ -723,13 +723,17 @@ namespace SanteDB.Persistence.Data.Services
                 try
                 {
                     context.Open(initializeExtensions: false);
-
+                    context.EstablishProvenance(principal, null);
                     using (var transaction = context.BeginTransaction())
                     {
                         foreach (var policy in policies)
                         {
                             // Find an existing policy which may have been created with a different key
                             var existingPolicy = context.FirstOrDefault<DbSecurityPolicy>(o => o.Oid == policy.Oid);
+                            if (existingPolicy != null && existingPolicy.Key == policy.Key)
+                            {
+                                continue; // ignore existing
+                            }
                             if (existingPolicy == null)
                             {
                                 existingPolicy = new DbSecurityPolicy()
@@ -752,7 +756,7 @@ namespace SanteDB.Persistence.Data.Services
                             existingPolicy.IsPublic = true;
                             existingPolicy.Name = policy.Name;
                             existingPolicy.Oid = policy.Oid;
-                            existingPolicy.CreatedByKey = context.EstablishProvenance(principal, null);
+                            existingPolicy.CreatedByKey = context.ContextId;
                             existingPolicy = context.Insert(existingPolicy);
                         }
 
