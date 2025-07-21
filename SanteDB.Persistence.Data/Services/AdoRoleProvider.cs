@@ -30,6 +30,7 @@ using SharpCompress;
 using System;
 using System.Linq;
 using System.Security.Principal;
+using SanteDB;
 
 namespace SanteDB.Persistence.Data.Services
 {
@@ -118,6 +119,7 @@ namespace SanteDB.Persistence.Data.Services
 
                         tx.Commit();
 
+                        
                         users.ForEach(u => this.m_policyDecision.ClearCacheByName<IIdentity>(u));
                     }
                 }

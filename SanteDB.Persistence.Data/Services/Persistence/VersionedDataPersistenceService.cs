@@ -548,7 +548,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     if (existing.Count() > 1) // We only keep recent and last
                     {
                         var lastVersionSequence = existing[0].VersionSequenceId;
-                        this.DoDeleteAllModel(context, o => o.Key == model.Key && o.VersionSequence < lastVersionSequence, DeleteMode.PermanentDelete);
+                        context.DeleteAll<TDbModel>(o => o.Key == model.Key && o.VersionSequenceId < lastVersionSequence);
                     }
                 }
                 else
@@ -1028,6 +1028,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
         /// <inheritdoc/>
         public abstract IEnumerable<DetectedIssue> Validate(object objectToValidate);
-        
+
+
     }
 }
