@@ -258,6 +258,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     if (context.Exists<TDbModel>(dbModel))
                     {
+                        this.m_tracer.TraceVerbose("Update will be performed instead of insert");
                         return context.Update(dbModel);
                     }
                     else

@@ -883,7 +883,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             context.PushData(DataConstants.NoTouchSourceContextKey, true);
 
-            // We now want to fetch the perssitence serivce of this
+            // We now want to fetch the persistence service of this
             var persistenceService = typeof(TModelAssociation).GetRelatedPersistenceService() as IAdoPersistenceProvider<TModelAssociation>;
             if (persistenceService == null)
             {
@@ -930,6 +930,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Anything to remove?
             if (toDelete.Any())
             {
+                this.m_tracer.TraceVerbose("UpdateAssociations: Removing {0}", String.Join(",", toDelete));
                 // Deletion mode or update mode for the associations as a batch
                 var dbType = this.m_modelMapper.GetModelMapper(typeof(TModelAssociation)).TargetType;
                 var whereClause = this.m_modelMapper.MapModelExpression<TModelAssociation, bool>(o => toDelete.Contains(o.Key), dbType);
@@ -950,7 +951,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                a = persistenceService.Insert(context, a);
                a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
                return a;
-           });
+           }).ToArray();
+
             var updatedRelationships = associations.Where(o => !o.IsEmpty() && o.BatchOperation != BatchOperationType.Delete && o.Key.HasValue && existing.Contains(o.Key)).Select(a =>
             {
                 a = persistenceService.Update(context, a);

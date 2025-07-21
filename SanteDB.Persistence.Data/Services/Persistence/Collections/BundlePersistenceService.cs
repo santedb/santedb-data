@@ -251,7 +251,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open(initializeExtensions: false);
-                    using (IDbTransaction tx = data.ShouldDisablePersistenceValidation() ? null : context.BeginTransaction())
+                    using (var tx = context.BeginTransaction())
                     {
 
                         context.EstablishProvenance(principal, null);
@@ -275,7 +275,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
                             if (transactionMode == TransactionMode.Commit)
                             {
-                                tx?.Commit();
+                                this.m_tracer.TraceVerbose("Committing Transaction...");
+                                tx.Commit();
                             }
 
                             data.Item.ForEach(i => this.m_dataCachingService.Add(i));
