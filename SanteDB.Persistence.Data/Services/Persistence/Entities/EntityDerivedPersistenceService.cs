@@ -543,9 +543,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 retVal.Telecoms = this.UpdateModelVersionedAssociations(context, retVal, data.Telecoms).ToList();
             }
-            if (data.GeoTag != null && data.GeoTag.Key.HasValue)
+            if (data.GeoTag != null)
             {
-                data.GeoTag.GetRelatedPersistenceService().Update(context, data.GeoTag);
+                data.GeoTag.GetRelatedPersistenceService().Insert(context, data.GeoTag);
             }
 
             return retVal;
@@ -608,9 +608,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 retVal.Telecoms = this.UpdateModelVersionedAssociations(context, retVal, data.Telecoms).ToList();
             }
 
-            if (data.GeoTag != null && data.GeoTag.Key.HasValue)
+            if (data.GeoTag != null)
             {
-                data.GeoTag.GetRelatedPersistenceService().Update(context, data.GeoTag);
+                if (!data.GeoTag.Key.HasValue || !context.Any<DbGeoTag>(o => o.Key == data.GeoTag.Key))
+                {
+                    data.GeoTag.GetRelatedPersistenceService().Insert(context, data.GeoTag);
+                }
+                else
+                {
+                    data.GeoTag.GetRelatedPersistenceService().Update(context, data.GeoTag);
+                }
             }
 
             return retVal;

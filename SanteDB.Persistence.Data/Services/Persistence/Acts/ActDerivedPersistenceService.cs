@@ -531,6 +531,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 }).ToList();
             }
 
+            if (data.GeoTag != null)
+            {
+                data.GeoTag.GetRelatedPersistenceService().Insert(context, data.GeoTag);
+            }
+
+
             return retVal;
         }
 
@@ -592,6 +598,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     p.SourceEntityKey = retVal.Key;
                     return typeof(ActProtocol).GetRelatedPersistenceService().Insert(context, p) as ActProtocol;
                 }).ToList();
+            }
+
+            if (data.GeoTag != null)
+            {
+                if (!data.GeoTag.Key.HasValue || !context.Any<DbGeoTag>(o => o.Key == data.GeoTag.Key))
+                {
+                    data.GeoTag.GetRelatedPersistenceService().Insert(context, data.GeoTag);
+                }
+                else
+                {
+                    data.GeoTag.GetRelatedPersistenceService().Update(context, data.GeoTag);
+                }
             }
 
             return retVal;
