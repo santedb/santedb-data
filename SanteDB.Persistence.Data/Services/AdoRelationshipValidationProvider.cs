@@ -69,7 +69,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_pepService = pepService;
             this.m_queryPersistence = queryPersistenceService;
-            this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
+            this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap", this.GetType().Assembly);
             this.Provider = this.m_configuration.Provider;
         }
 

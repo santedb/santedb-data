@@ -188,7 +188,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_appletSolutionManager = solutionManagerService;
             this.m_adhocCacheService = adhocCacheService;
             this.m_localizationService = localizationService;
-            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
+            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap", this.GetType().Assembly);
 
             // Re-scans the loaded applets for definitions when the collection has changed
             this.m_appletManager.Changed += (o, e) =>

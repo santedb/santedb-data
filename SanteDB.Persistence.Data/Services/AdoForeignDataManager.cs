@@ -83,7 +83,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_importService = importService;
 
             this.m_foreignDataMapRepository = foreignDataMapRepository;
-            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
+            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap", this.GetType().Assembly);
 
             // Reset the state of running jobs
             try
