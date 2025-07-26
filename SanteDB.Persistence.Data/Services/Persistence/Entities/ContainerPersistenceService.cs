@@ -48,32 +48,38 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc/>
         protected override Container DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var containerData = referenceObjects?.OfType<DbContainer>().FirstOrDefault();
-            if (containerData == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceWarning("Using slow join to DbContainer from DbEntityVersion");
-                containerData = context.FirstOrDefault<DbContainer>(o => o.ParentKey == dbModel.VersionKey);
-            }
-            var materialData = referenceObjects?.OfType<DbMaterial>().FirstOrDefault();
-            if (materialData == null)
-            {
-                this.m_tracer.TraceWarning("Using slow join to DbMaterial from DbEntityVersion");
-                materialData = context.FirstOrDefault<DbMaterial>(o => o.ParentKey == dbModel.VersionKey);
-            }
+                var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                var containerData = referenceObjects?.OfType<DbContainer>().FirstOrDefault();
+                if (containerData == null)
+                {
+                    this.m_tracer.TraceWarning("Using slow join to DbContainer from DbEntityVersion");
+                    containerData = context.FirstOrDefault<DbContainer>(o => o.ParentKey == dbModel.VersionKey);
+                }
+                var materialData = referenceObjects?.OfType<DbMaterial>().FirstOrDefault();
+                if (materialData == null)
+                {
+                    this.m_tracer.TraceWarning("Using slow join to DbMaterial from DbEntityVersion");
+                    materialData = context.FirstOrDefault<DbMaterial>(o => o.ParentKey == dbModel.VersionKey);
+                }
 
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
-            {
-                case LoadMode.FullLoad:
-                    modelData.FormConcept = modelData.FormConcept.GetRelatedPersistenceService().Get(context, materialData.FormConceptKey);
-                    modelData.SetLoaded(o => o.FormConcept);
-                    modelData.QuantityConcept = modelData.QuantityConcept.GetRelatedPersistenceService().Get(context, materialData.QuantityConceptKey);
-                    modelData.SetLoaded(o => o.QuantityConcept);
-                    break;
-            }
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            modelData.FormConcept = modelData.FormConcept.GetRelatedPersistenceService().Get(context, materialData.FormConceptKey);
+                            modelData.SetLoaded(o => o.FormConcept);
+                            modelData.QuantityConcept = modelData.QuantityConcept.GetRelatedPersistenceService().Get(context, materialData.QuantityConceptKey);
+                            modelData.SetLoaded(o => o.QuantityConcept);
+                        }
+                        break;
+                }
 
-            modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbMaterial, Material>(materialData), false, declaredOnly: true);
-            return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbContainer, Container>(containerData), false, declaredOnly: true);
+                modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbMaterial, Material>(materialData), false, declaredOnly: true);
+                return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbContainer, Container>(containerData), false, declaredOnly: true);
+            }
         }
     }
 }

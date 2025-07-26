@@ -72,21 +72,27 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// </summary>
         protected override IdentityDomain DoConvertToInformationModel(DataContext context, DbIdentityDomain dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            retVal.AuthorityScopeXml = context.Query<DbIdentityDomainScope>(s => s.SourceKey == retVal.Key).Select(o => o.ScopeConceptKey).ToList();
-
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.IdentifierClassification = retVal.IdentifierClassification.GetRelatedPersistenceService().Get(context, dbModel.IdentifierClassificationKey.GetValueOrDefault());
-                    retVal.SetLoaded(o => o.IdentifierClassification);
-                    goto case LoadMode.SyncLoad;
-                case LoadMode.SyncLoad:
-                    retVal.AssigningAuthority = retVal.AssigningAuthority.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                    retVal.SetLoaded(o => o.AssigningAuthority);
-                    break;
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+                retVal.AuthorityScopeXml = context.Query<DbIdentityDomainScope>(s => s.SourceKey == retVal.Key).Select(o => o.ScopeConceptKey).ToList();
+
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            retVal.IdentifierClassification = retVal.IdentifierClassification.GetRelatedPersistenceService().Get(context, dbModel.IdentifierClassificationKey.GetValueOrDefault());
+                            retVal.SetLoaded(o => o.IdentifierClassification);
+                        }
+                        goto case LoadMode.SyncLoad;
+                    case LoadMode.SyncLoad:
+                        retVal.AssigningAuthority = retVal.AssigningAuthority.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                        retVal.SetLoaded(o => o.AssigningAuthority);
+                        break;
+                }
+                return retVal;
             }
-            return retVal;
         }
 
         /// <summary>

@@ -46,16 +46,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc />
         protected override PlaceService DoConvertToInformationModel(DataContext context, DbPlaceService dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.ServiceConcept = retVal.ServiceConcept.GetRelatedPersistenceService().Get(context, dbModel.ServiceConceptKey);
-                    retVal.SetLoaded(o => o.ServiceConcept);
-                    break;
-            }
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            retVal.ServiceConcept = retVal.ServiceConcept.GetRelatedPersistenceService().Get(context, dbModel.ServiceConceptKey);
+                            retVal.SetLoaded(o => o.ServiceConcept);
+                        }
+                        break;
+                }
 
-            return retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbPlaceService, PlaceService>(dbModel));
+                return retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbPlaceService, PlaceService>(dbModel));
+            }
         }
     }
 }

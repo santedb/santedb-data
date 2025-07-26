@@ -21,6 +21,7 @@
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Http;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
@@ -187,18 +188,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The converted model</returns>
         protected override TModel DoConvertToInformationModel(DataContext context, TDbModel dbModel, params Object[] referenceObjects)
         {
-            if (context == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+                if (context == null)
+                {
+                    throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+                }
+                else if (dbModel == default(TDbModel))
+                {
+                    throw new ArgumentNullException(nameof(dbModel), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+                }
+                var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbModel);
+                retVal.AddAnnotation(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy);
+                return retVal;
             }
-            else if (dbModel == default(TDbModel))
-            {
-                throw new ArgumentNullException(nameof(dbModel), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
-            }
-
-            var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbModel);
-            retVal.AddAnnotation(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy);
-            return retVal;
         }
 
 

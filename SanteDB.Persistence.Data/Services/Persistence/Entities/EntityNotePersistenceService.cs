@@ -63,16 +63,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override EntityNote DoConvertToInformationModel(DataContext context, DbEntityNote dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.Author = retVal.Author.GetRelatedPersistenceService().Get(context, dbModel.AuthorKey);
-                    retVal.SetLoaded(nameof(EntityNote.Author));
-                    break;
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            retVal.Author = retVal.Author.GetRelatedPersistenceService().Get(context, dbModel.AuthorKey);
+                            retVal.SetLoaded(nameof(EntityNote.Author));
+                        }
+                        break;
+                }
+                return retVal;
             }
-            return retVal;
         }
     }
 }

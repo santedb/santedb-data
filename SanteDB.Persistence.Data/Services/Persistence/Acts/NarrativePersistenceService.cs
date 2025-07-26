@@ -41,16 +41,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override Narrative DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
-            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var narrativeData = referenceObjects?.OfType<DbNarrative>().FirstOrDefault();
-            if (narrativeData == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceVerbose("Using slow method of loading DbNarrative data from DbActVersion - Consider using the Narrative persistence service instead");
-                narrativeData = context.FirstOrDefault<DbNarrative>(o => o.ParentKey == dbModel.VersionKey);
-            }
 
-            modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbNarrative, Narrative>(narrativeData), declaredOnly: true);
-            return modelData;
+                var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                var narrativeData = referenceObjects?.OfType<DbNarrative>().FirstOrDefault();
+                if (narrativeData == null)
+                {
+                    this.m_tracer.TraceVerbose("Using slow method of loading DbNarrative data from DbActVersion - Consider using the Narrative persistence service instead");
+                    narrativeData = context.FirstOrDefault<DbNarrative>(o => o.ParentKey == dbModel.VersionKey);
+                }
+
+                modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbNarrative, Narrative>(narrativeData), declaredOnly: true);
+                return modelData;
+            }
         }
 
     }

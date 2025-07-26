@@ -54,19 +54,25 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override EntityTelecomAddress DoConvertToInformationModel(DataContext context, DbTelecomAddress dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.AddressUse = retVal.AddressUse.GetRelatedPersistenceService().Get(context, dbModel.TelecomUseKey);
-                    retVal.SetLoaded(nameof(EntityTelecomAddress.AddressUse));
-                    retVal.TypeConcept = retVal.TypeConcept.GetRelatedPersistenceService().Get(context, dbModel.TypeConceptKey.GetValueOrDefault());
-                    retVal.SetLoaded(nameof(EntityTelecomAddress.TypeConcept));
-                    break;
-            }
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            return retVal;
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            retVal.AddressUse = retVal.AddressUse.GetRelatedPersistenceService().Get(context, dbModel.TelecomUseKey);
+                            retVal.SetLoaded(nameof(EntityTelecomAddress.AddressUse));
+                            retVal.TypeConcept = retVal.TypeConcept.GetRelatedPersistenceService().Get(context, dbModel.TypeConceptKey.GetValueOrDefault());
+                            retVal.SetLoaded(nameof(EntityTelecomAddress.TypeConcept));
+                        }
+                        break;
+                }
+
+                return retVal;
+            }
         }
     }
 }

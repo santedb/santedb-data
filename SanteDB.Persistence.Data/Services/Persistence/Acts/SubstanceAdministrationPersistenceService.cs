@@ -50,32 +50,36 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override SubstanceAdministration DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var dbSubst = referenceObjects?.OfType<DbSubstanceAdministration>().FirstOrDefault();
-            if (dbSubst == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceWarning("Using slow loading for substance administration (hint: use the correct persistence service instead)");
-                dbSubst = context.FirstOrDefault<DbSubstanceAdministration>(o => o.ParentKey == dbModel.VersionKey);
-            }
 
-            // Loading mode
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
-            {
-                case LoadMode.FullLoad:
-                    if (dbSubst != null)
-                    {
-                        retVal.DoseUnit = retVal.DoseUnit.GetRelatedPersistenceService().Get(context, dbSubst.DoseUnitConceptKey);
-                        retVal.SetLoaded(o => o.DoseQuantity);
-                        retVal.Route = retVal.Route.GetRelatedPersistenceService().Get(context, dbSubst.RouteConceptKey);
-                        retVal.SetLoaded(o => o.Route);
-                        retVal.Site = retVal.Site.GetRelatedPersistenceService().Get(context, dbSubst.SiteConceptKey);
-                    }
-                    break;
-            }
+                var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                var dbSubst = referenceObjects?.OfType<DbSubstanceAdministration>().FirstOrDefault();
+                if (dbSubst == null)
+                {
+                    this.m_tracer.TraceWarning("Using slow loading for substance administration (hint: use the correct persistence service instead)");
+                    dbSubst = context.FirstOrDefault<DbSubstanceAdministration>(o => o.ParentKey == dbModel.VersionKey);
+                }
 
-            // Copy other properties to the return value
-            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbSubstanceAdministration, SubstanceAdministration>(dbSubst), declaredOnly: true);
-            return retVal;
+                // Loading mode
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (dbSubst != null && context.ValidateMaximumStackDepth())
+                        {
+                            retVal.DoseUnit = retVal.DoseUnit.GetRelatedPersistenceService().Get(context, dbSubst.DoseUnitConceptKey);
+                            retVal.SetLoaded(o => o.DoseQuantity);
+                            retVal.Route = retVal.Route.GetRelatedPersistenceService().Get(context, dbSubst.RouteConceptKey);
+                            retVal.SetLoaded(o => o.Route);
+                            retVal.Site = retVal.Site.GetRelatedPersistenceService().Get(context, dbSubst.SiteConceptKey);
+                        }
+                        break;
+                }
+
+                // Copy other properties to the return value
+                retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbSubstanceAdministration, SubstanceAdministration>(dbSubst), declaredOnly: true);
+                return retVal;
+            }
 
         }
     }

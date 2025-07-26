@@ -133,36 +133,41 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc/>
         protected override Patient DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-
-            var dbPatient = referenceObjects?.OfType<DbPatient>()?.FirstOrDefault();
-            if (dbPatient == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceVerbose("Using slow fetch of DbPatient for DbEntityVersion (consider using the appropriate persister class)");
-                dbPatient = context.FirstOrDefault<DbPatient>(o => o.ParentKey == dbModel.VersionKey);
+                var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+
+                var dbPatient = referenceObjects?.OfType<DbPatient>()?.FirstOrDefault();
+                if (dbPatient == null)
+                {
+                    this.m_tracer.TraceVerbose("Using slow fetch of DbPatient for DbEntityVersion (consider using the appropriate persister class)");
+                    dbPatient = context.FirstOrDefault<DbPatient>(o => o.ParentKey == dbModel.VersionKey);
+                }
+
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            var conceptPersister = typeof(Concept).GetRelatedPersistenceService() as IAdoPersistenceProvider<Concept>;
+                            modelData.EducationLevel = conceptPersister.Get(context, dbPatient.EducationLevelKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.EducationLevel);
+                            modelData.EthnicGroup = conceptPersister.Get(context, dbPatient.EthnicGroupKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.EthnicGroup);
+                            modelData.LivingArrangement = conceptPersister.Get(context, dbPatient.LivingArrangementKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.LivingArrangement);
+                            modelData.MaritalStatus = conceptPersister.Get(context, dbPatient.MaritalStatusKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.MaritalStatus);
+                            modelData.ReligiousAffiliation = conceptPersister.Get(context, dbPatient.ReligiousAffiliationKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.ReligiousAffiliation);
+                        }
+                        break;
+                }
+
+                modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbPatient, Patient>(dbPatient), false, declaredOnly: true);
+
+                return modelData;
             }
-
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
-            {
-                case LoadMode.FullLoad:
-                    var conceptPersister = typeof(Concept).GetRelatedPersistenceService() as IAdoPersistenceProvider<Concept>;
-                    modelData.EducationLevel = conceptPersister.Get(context, dbPatient.EducationLevelKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.EducationLevel);
-                    modelData.EthnicGroup = conceptPersister.Get(context, dbPatient.EthnicGroupKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.EthnicGroup);
-                    modelData.LivingArrangement = conceptPersister.Get(context, dbPatient.LivingArrangementKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.LivingArrangement);
-                    modelData.MaritalStatus = conceptPersister.Get(context, dbPatient.MaritalStatusKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.MaritalStatus);
-                    modelData.ReligiousAffiliation = conceptPersister.Get(context, dbPatient.ReligiousAffiliationKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.ReligiousAffiliation);
-
-                    break;
-            }
-
-            modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbPatient, Patient>(dbPatient), false, declaredOnly: true);
-
-            return modelData;
         }
     }
 }

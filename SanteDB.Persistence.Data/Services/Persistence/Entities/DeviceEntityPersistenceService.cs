@@ -60,24 +60,29 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc/>
         protected override DeviceEntity DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-
-            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var dbDevice = referenceObjects?.OfType<DbDeviceEntity>().FirstOrDefault();
-            if (dbDevice == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceWarning("Using slow cross reference of device");
-                dbDevice = context.FirstOrDefault<DbDeviceEntity>(o => o.ParentKey == dbModel.VersionKey);
-            }
+                var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                var dbDevice = referenceObjects?.OfType<DbDeviceEntity>().FirstOrDefault();
+                if (dbDevice == null)
+                {
+                    this.m_tracer.TraceWarning("Using slow cross reference of device");
+                    dbDevice = context.FirstOrDefault<DbDeviceEntity>(o => o.ParentKey == dbModel.VersionKey);
+                }
 
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
-            {
-                case LoadMode.FullLoad:
-                    modelData.SecurityDevice = modelData.SecurityDevice.GetRelatedPersistenceService().Get(context, dbDevice.SecurityDeviceKey);
-                    modelData.SetLoaded(o => o.SecurityDevice);
-                    break;
-            }
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            modelData.SecurityDevice = modelData.SecurityDevice.GetRelatedPersistenceService().Get(context, dbDevice.SecurityDeviceKey);
+                            modelData.SetLoaded(o => o.SecurityDevice);
+                        }
+                        break;
+                }
 
-            return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbDeviceEntity, DeviceEntity>(dbDevice), false, declaredOnly: true);
+                return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbDeviceEntity, DeviceEntity>(dbDevice), false, declaredOnly: true);
+            }
 
         }
     }

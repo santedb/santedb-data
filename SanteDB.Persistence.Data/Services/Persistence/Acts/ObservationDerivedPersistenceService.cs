@@ -51,24 +51,27 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override TModel DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var obsData = referenceObjects?.OfType<DbObservation>().FirstOrDefault();
-            if (obsData == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceWarning("Using slow lookup of observation data from database");
-                obsData = context.FirstOrDefault<DbObservation>(o => o.ParentKey == dbModel.VersionKey);
+                var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                var obsData = referenceObjects?.OfType<DbObservation>().FirstOrDefault();
+                if (obsData == null)
+                {
+                    this.m_tracer.TraceWarning("Using slow lookup of observation data from database");
+                    obsData = context.FirstOrDefault<DbObservation>(o => o.ParentKey == dbModel.VersionKey);
+                }
+
+                if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad && context.ValidateMaximumStackDepth())
+                {
+                    retVal.InterpretationConcept = retVal.InterpretationConcept.GetRelatedPersistenceService().Get(context, obsData.InterpretationConceptKey);
+                    retVal.SetLoaded(o => o.InterpretationConcept);
+                }
+
+                retVal.InterpretationConceptKey = obsData?.InterpretationConceptKey;
+                retVal.ValueType = obsData?.ValueType;
+
+                return retVal;
             }
-
-            if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad)
-            {
-                retVal.InterpretationConcept = retVal.InterpretationConcept.GetRelatedPersistenceService().Get(context, obsData.InterpretationConceptKey);
-                retVal.SetLoaded(o => o.InterpretationConcept);
-            }
-
-            retVal.InterpretationConceptKey = obsData?.InterpretationConceptKey;
-            retVal.ValueType = obsData?.ValueType;
-
-            return retVal;
         }
     }
 }

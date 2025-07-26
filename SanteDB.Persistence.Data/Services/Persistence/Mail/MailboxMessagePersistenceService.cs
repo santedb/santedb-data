@@ -45,13 +45,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Mail
         /// <inheritdoc/>
         protected override MailboxMailMessage DoConvertToInformationModel(DataContext context, DbMailboxMessageAssociation dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                retVal.Target = retVal.Target.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
-                retVal.SetLoaded(o => o.Target);
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+                if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad && !context.ValidateMaximumStackDepth())
+                {
+                    retVal.Target = retVal.Target.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
+                    retVal.SetLoaded(o => o.Target);
+                }
+                return retVal;
             }
-            return retVal;
         }
     }
 }
