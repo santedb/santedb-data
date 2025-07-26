@@ -359,7 +359,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 dbInstance = this.DoUpdateInternal(context, dbInstance);
                 var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
                 retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
-
                 return this.AfterPersisted(context, retVal);
 
 #if DEBUG
