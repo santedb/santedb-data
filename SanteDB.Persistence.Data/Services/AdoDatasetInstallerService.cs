@@ -32,6 +32,7 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
@@ -198,6 +199,8 @@ namespace SanteDB.Persistence.Data.Services
                 try
                 {
                     context.Open(initializeExtensions: false);
+                    context.AddOrUpdateData(DataConstants.DisableObjectValidation, true);
+
                     var patchId = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(dataset.Id)).HexEncode();
 
                     // Check if dataset is installed
