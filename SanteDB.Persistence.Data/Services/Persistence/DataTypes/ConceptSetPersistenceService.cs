@@ -92,18 +92,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// </summary>
         protected override ConceptSet DoConvertToInformationModel(DataContext context, DbConceptSet dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            retVal.ConceptsXml = context.Query<DbConceptSetConceptAssociation>(o => o.SourceKey == dbModel.Key).Select(o => o.ConceptKey).ToList();
-
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                case LoadMode.SyncLoad:
-                    retVal.Composition = retVal.Composition.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                    retVal.SetLoaded(o=>o.Composition);
-                    break;
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+                retVal.ConceptsXml = context.Query<DbConceptSetConceptAssociation>(o => o.SourceKey == dbModel.Key).Select(o => o.ConceptKey).ToList();
+
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                    case LoadMode.SyncLoad:
+                        retVal.Composition = retVal.Composition.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                        retVal.SetLoaded(o => o.Composition);
+                        break;
+                }
+                return retVal;
             }
-            return retVal;
         }
 
         /// <inheritdoc/>

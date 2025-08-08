@@ -54,15 +54,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <inheritdoc/>
         protected override AssigningAuthority DoConvertToInformationModel(DataContext context, DbAssigningAuthority dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
-            if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                retVal.AssigningApplication = retVal.AssigningApplication.GetRelatedPersistenceService().Get(context, dbModel.AssigningApplicationKey);
-                retVal.SetLoaded(o => o.AssigningApplication);
-            }
 
-            return retVal;
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+
+                if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad && context.ValidateMaximumStackDepth())
+                {
+                    retVal.AssigningApplication = retVal.AssigningApplication.GetRelatedPersistenceService().Get(context, dbModel.AssigningApplicationKey);
+                    retVal.SetLoaded(o => o.AssigningApplication);
+                }
+
+                return retVal;
+            }
         }
     }
 }

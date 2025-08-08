@@ -63,21 +63,32 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override ActParticipation DoConvertToInformationModel(DataContext context, DbActParticipation dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.PlayerEntity = retVal.PlayerEntity.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
-                    retVal.SetLoaded(o => o.PlayerEntity);
-                    retVal.Classification = retVal.Classification.GetRelatedPersistenceService().Get(context, dbModel.ClassificationKey.GetValueOrDefault());
-                    retVal.SetLoaded(o => o.Classification);
-                    retVal.ParticipationRole = retVal.ParticipationRole.GetRelatedPersistenceService().Get(context, dbModel.ParticipationRoleKey);
-                    retVal.SetLoaded(o => o.ParticipationRole);
-                    break;
-            }
 
-            return retVal;
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            if (!context.IsLoadingInformationModel(dbModel.TargetKey))
+                            {
+                                retVal.PlayerEntity = retVal.PlayerEntity.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
+                                retVal.SetLoaded(o => o.PlayerEntity);
+                            }
+                            retVal.Classification = retVal.Classification.GetRelatedPersistenceService().Get(context, dbModel.ClassificationKey.GetValueOrDefault());
+                            retVal.SetLoaded(o => o.Classification);
+                            retVal.ParticipationRole = retVal.ParticipationRole.GetRelatedPersistenceService().Get(context, dbModel.ParticipationRoleKey);
+                            retVal.SetLoaded(o => o.ParticipationRole);
+                        }
+                        break;
+                }
+
+                return retVal;
+            }
+            
         }
 
 

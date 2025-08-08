@@ -46,20 +46,26 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Mail
         /// <inheritdoc/>
         protected override Mailbox DoConvertToInformationModel(DataContext context, DbMailbox dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.Owner = retVal.Owner.GetRelatedPersistenceService().Get(context, dbModel.OwnerKey);
-                    retVal.SetLoaded(o => o.Owner);
-                    goto case LoadMode.SyncLoad;
-                case LoadMode.SyncLoad:
-                    retVal.Messages = retVal.Messages.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                    retVal.SetLoaded(o => o.Messages);
-                    break;
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            retVal.Owner = retVal.Owner.GetRelatedPersistenceService().Get(context, dbModel.OwnerKey);
+                            retVal.SetLoaded(o => o.Owner);
+                        }
+                        goto case LoadMode.SyncLoad;
+                    case LoadMode.SyncLoad:
+                        retVal.Messages = retVal.Messages.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                        retVal.SetLoaded(o => o.Messages);
+                        break;
+                }
+                return retVal;
             }
-            return retVal;
         }
     }
 }

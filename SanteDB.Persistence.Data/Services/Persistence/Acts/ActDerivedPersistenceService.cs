@@ -324,7 +324,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 {
                     using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                     {
-                        context.Open();
+                        context.Open(); // Validation rules may require extended functions 
                         context.EstablishProvenance(AuthenticationContext.Current.Principal);
                         return this.VerifyEntity(context, strong).ToArray(); // force execute
                     }
@@ -382,94 +382,104 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// </summary>
         protected virtual TAct DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            var conceptPersistence = typeof(Concept).GetRelatedPersistenceService() as IAdoPersistenceProvider<Concept>;
+            using(context.CreateInformationModelGuard(dbModel.Key)) { 
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+                var conceptPersistence = typeof(Concept).GetRelatedPersistenceService() as IAdoPersistenceProvider<Concept>;
 
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
-            {
-                case LoadMode.FullLoad:
-                    retVal.ClassConcept = conceptPersistence.Get(context, dbModel.ClassConceptKey);
-                    retVal.SetLoaded(o => o.ClassConcept);
-                    retVal.MoodConcept = conceptPersistence.Get(context, dbModel.MoodConceptKey);
-                    retVal.SetLoaded(o => o.MoodConcept);
-                    retVal.StatusConcept = conceptPersistence.Get(context, dbModel.StatusConceptKey);
-                    retVal.SetLoaded(o => o.StatusConcept);
-                    retVal.TypeConcept = conceptPersistence.Get(context, dbModel.TypeConceptKey);
-                    retVal.SetLoaded(o => o.TypeConcept);
-                    retVal.Template = retVal.Template.GetRelatedPersistenceService().Get(context, dbModel.TemplateKey.GetValueOrDefault());
-                    retVal.SetLoaded(o => o.Template);
-                    retVal.ReasonConcept = conceptPersistence.Get(context, dbModel.ReasonConceptKey.GetValueOrDefault());
-                    retVal.SetLoaded(o => o.ReasonConcept);
-                    goto case LoadMode.SyncLoad;
-                case LoadMode.SyncLoad:
-                    retVal.Extensions = retVal.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(o => o.Extensions);
-                    retVal.Identifiers = retVal.Identifiers.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(o => o.Identifiers);
-                    retVal.Notes = retVal.Notes.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(o => o.Notes);
-                    retVal.Relationships = retVal.Relationships.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(o => o.Relationships);
-                    retVal.Tags = retVal.Tags.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                    retVal.SetLoaded(o => o.Tags);
-                    retVal.Participations = retVal.Participations.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(o => o.Participations);
-                    retVal.Protocols = retVal.Protocols.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                    retVal.SetLoaded(o => o.Protocols);
-                    if (dbModel.GeoTagKey.HasValue)
-                    {
-                        var dbGeoTag = referenceObjects?.OfType<DbGeoTag>().FirstOrDefault();
-                        if (dbGeoTag == null)
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
                         {
-                            this.m_tracer.TraceWarning("Using slow geo-tag reference of device");
-                            dbGeoTag = context.FirstOrDefault<DbGeoTag>(o => o.Key == dbModel.GeoTagKey);
+                            retVal.ClassConcept = conceptPersistence.Get(context, dbModel.ClassConceptKey);
+                            retVal.SetLoaded(o => o.ClassConcept);
+                            retVal.MoodConcept = conceptPersistence.Get(context, dbModel.MoodConceptKey);
+                            retVal.SetLoaded(o => o.MoodConcept);
+                            retVal.StatusConcept = conceptPersistence.Get(context, dbModel.StatusConceptKey);
+                            retVal.SetLoaded(o => o.StatusConcept);
+                            retVal.TypeConcept = conceptPersistence.Get(context, dbModel.TypeConceptKey);
+                            retVal.SetLoaded(o => o.TypeConcept);
+                            retVal.Template = retVal.Template.GetRelatedPersistenceService().Get(context, dbModel.TemplateKey.GetValueOrDefault());
+                            retVal.SetLoaded(o => o.Template);
+                            retVal.ReasonConcept = conceptPersistence.Get(context, dbModel.ReasonConceptKey.GetValueOrDefault());
+                            retVal.SetLoaded(o => o.ReasonConcept);
                         }
-                        retVal.GeoTag = retVal.GeoTag.GetRelatedMappingProvider().ToModelInstance(context, dbGeoTag);
-                        retVal.SetLoaded(o => o.GeoTag);
-                    }
+                        goto case LoadMode.SyncLoad;
+                    case LoadMode.SyncLoad:
+                        retVal.Extensions = retVal.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                        retVal.SetLoaded(o => o.Extensions);
+                        retVal.Identifiers = retVal.Identifiers.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                        retVal.SetLoaded(o => o.Identifiers);
+                        retVal.Notes = retVal.Notes.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                        retVal.SetLoaded(o => o.Notes);
+                        retVal.Relationships = retVal.Relationships.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                        retVal.SetLoaded(o => o.Relationships);
+                        retVal.Tags = retVal.Tags.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                        retVal.SetLoaded(o => o.Tags);
+                        retVal.Participations = retVal.Participations.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                        retVal.SetLoaded(o => o.Participations);
+                        retVal.Protocols = retVal.Protocols.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                        retVal.SetLoaded(o => o.Protocols);
+                        if (dbModel.GeoTagKey.HasValue)
+                        {
+                            var dbGeoTag = referenceObjects?.OfType<DbGeoTag>().FirstOrDefault();
+                            if (dbGeoTag == null)
+                            {
+                                this.m_tracer.TraceWarning("Using slow geo-tag reference of device");
+                                dbGeoTag = context.FirstOrDefault<DbGeoTag>(o => o.Key == dbModel.GeoTagKey);
+                            }
+                            retVal.GeoTag = retVal.GeoTag.GetRelatedMappingProvider().ToModelInstance(context, dbGeoTag);
+                            retVal.SetLoaded(o => o.GeoTag);
+                        }
 
-                    goto case LoadMode.QuickLoad;
-                case LoadMode.QuickLoad:
-                    var query = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbActSecurityPolicy), typeof(DbSecurityPolicy))
-                       .InnerJoin<DbActSecurityPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
-                       .Where<DbActSecurityPolicy>(o => o.SourceKey == dbModel.Key)
-                       .Statement;
-                    retVal.Policies = context.Query<CompositeResult<DbActSecurityPolicy, DbSecurityPolicy>>(query)
-                        .ToList()
-                        .Select(o => new SecurityPolicyInstance(new SecurityPolicy(o.Object2.Name, o.Object2.Oid, o.Object2.IsPublic, o.Object2.CanOverride), PolicyGrantType.Grant))
-                        .ToList();
-                    retVal.SetLoaded(o => o.Policies);
-                    break;
+                        goto case LoadMode.QuickLoad;
+                    case LoadMode.QuickLoad:
+                        var query = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbActSecurityPolicy), typeof(DbSecurityPolicy))
+                           .InnerJoin<DbActSecurityPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
+                           .Where<DbActSecurityPolicy>(o => o.SourceKey == dbModel.Key)
+                           .Statement;
+                        retVal.Policies = context.Query<CompositeResult<DbActSecurityPolicy, DbSecurityPolicy>>(query)
+                            .ToList()
+                            .Select(o => new SecurityPolicyInstance(new SecurityPolicy(o.Object2.Name, o.Object2.Oid, o.Object2.IsPublic, o.Object2.CanOverride), PolicyGrantType.Grant))
+                            .ToList();
+                        retVal.SetLoaded(o => o.Policies);
+                        break;
+                }
+
+                return retVal;
             }
-
-            return retVal;
+            
         }
 
         /// <inheritdoc/>
         protected override TAct DoConvertToInformationModel(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
-
-            if (this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var persistenceProvider) && persistenceProvider is IAdoClassMapper edps)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
 
-                if (referenceObjects.Length == 0)
+                if (this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var persistenceProvider) && persistenceProvider is IAdoClassMapper edps)
                 {
-                    referenceObjects = edps.GetReferencedObjects(context, dbModel) ?? new object[0];
-                }
-                var retVal = edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
-                if (retVal is TAct ta)
-                {
-                    return ta;
+
+                    if (referenceObjects.Length == 0)
+                    {
+                        referenceObjects = edps.GetReferencedObjects(context, dbModel) ?? new object[0];
+                    }
+                    var retVal = edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
+                    if (retVal is TAct ta)
+                    {
+                        return ta;
+                    }
+                    else
+                    {
+                        return this.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                    }
                 }
                 else
                 {
                     return this.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
                 }
             }
-            else
-            {
-                return this.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            }
+           
         }
 
         /// <summary>
@@ -481,6 +491,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override TAct DoInsertModel(DataContext context, TAct data)
         {
             var retVal = base.DoInsertModel(context, data);
+            context.AddOrUpdateData($"Act{retVal.Key}Version", retVal.VersionSequence);
 
             if (data.Extensions != null)
             {
@@ -530,6 +541,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 }).ToList();
             }
 
+            if (data.GeoTag != null)
+            {
+                data.GeoTag.GetRelatedPersistenceService().Insert(context, data.GeoTag);
+            }
+
+
             return retVal;
         }
 
@@ -542,6 +559,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override TAct DoUpdateModel(DataContext context, TAct data)
         {
             var retVal = base.DoUpdateModel(context, data);
+            context.AddOrUpdateData($"Act{retVal.Key}Version", retVal.VersionSequence);
 
             if (data.Extensions != null)
             {
@@ -590,6 +608,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     p.SourceEntityKey = retVal.Key;
                     return typeof(ActProtocol).GetRelatedPersistenceService().Insert(context, p) as ActProtocol;
                 }).ToList();
+            }
+
+            if (data.GeoTag != null)
+            {
+                if (!data.GeoTag.Key.HasValue || !context.Any<DbGeoTag>(o => o.Key == data.GeoTag.Key))
+                {
+                    data.GeoTag.GetRelatedPersistenceService().Insert(context, data.GeoTag);
+                }
+                else
+                {
+                    data.GeoTag.GetRelatedPersistenceService().Update(context, data.GeoTag);
+                }
             }
 
             return retVal;

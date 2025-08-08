@@ -192,7 +192,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     using (var tx = context.BeginTransaction())
                     {
@@ -302,7 +302,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     // When the system is configured only for one facility login then we want an XSPA facility ID to be set
                     // TODO: Determine whether this is the best place to perform this type of check
@@ -564,7 +564,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     using (var tx = context.BeginTransaction())
                     {
@@ -662,7 +662,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var now = DateTimeOffset.Now;
 
@@ -708,7 +708,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     try
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
 
                         var dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionguid);
                         if (dbSession == null)
@@ -767,7 +767,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     try
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
                         var sql = context.CreateSqlStatementBuilder()
                             .SelectFrom(typeof(DbSession), typeof(DbSecurityApplication), typeof(DbSecurityUser), typeof(DbSecurityDevice))
                             .InnerJoin<DbSession, DbSecurityApplication>(o => o.ApplicationKey, o => o.Key)
@@ -863,7 +863,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var sessions = context.Query<DbSession>(
                         s => s.NotAfter >= DateTimeOffset.Now

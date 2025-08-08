@@ -246,7 +246,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected override Expression<Func<TModel, bool>> ApplyDefaultQueryFilters(Expression<Func<TModel, bool>> query)
         {
             // TODO: Write a utility function that looks for this
-            if (!query.ToString().Contains(nameof(IVersionedAssociation.ObsoleteVersionSequenceId)))
+            if (!query.ContainsPropertyReference(nameof(IVersionedAssociation.ObsoleteVersionSequenceId)))
             {
                 var obsoletionVersionSequenceClause = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId)));
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, obsoletionVersionSequenceClause, Expression.Constant(null))), query.Parameters);

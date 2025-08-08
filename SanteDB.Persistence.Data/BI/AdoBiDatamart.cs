@@ -73,7 +73,7 @@ namespace SanteDB.Persistence.Data.BI
             {
                 using (var context = this.m_provider.GetReadonlyConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     return context.Query<DbDatamartExecutionEntry>(o => o.DatamartKey == this.Key).OrderByDescending(o => o.StartTime).ToList().Select(o => new AdoBiDatamartExecutionEntry(o, this.m_provider));
                 }
             }

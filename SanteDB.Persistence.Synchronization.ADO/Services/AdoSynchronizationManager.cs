@@ -73,11 +73,11 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
 
                 using (var mapStream = typeof(AdoSynchronizationQueue).Assembly.GetManifestResourceStream("SanteDB.Persistence.Synchronization.ADO.Map.ModelMap.xml"))
                 {
-                    var mapper = new ModelMapper(mapStream, "SynchronizationMap", true);
+                    var mapper = new ModelMapper(mapStream, "SynchronizationMap", useReflectionOnly: true);
                     // Load all queues 
                     using (var ctx = _Provider.GetReadonlyConnection())
                     {
-                        ctx.Open();
+                        ctx.Open(initializeExtensions: false);
                         _RegisteredQueues = new ConcurrentBag<AdoSynchronizationQueue>(ctx.Query<DbSynchronizationQueue>(o => true)
                             .ToArray()
                             .Select(o => new AdoSynchronizationQueue(this, dataStreamManager, _Provider, mapper, o)));
@@ -113,7 +113,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
         {
             using (var conn = _Provider.GetReadonlyConnection())
             {
-                conn.Open();
+                conn.Open(initializeExtensions: false);
                 return conn.Query<DbSynchronizationLogEntry>(e => e.QueryId == null).ToArray(); // ToArray() is called because the conn is disposed 
             }
         }
@@ -128,7 +128,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
 
             using (var conn = _Provider.GetReadonlyConnection())
             {
-                conn.Open();
+                conn.Open(initializeExtensions: false);
                 if (entry is DbSynchronizationLogEntry dbs)
                 {
                     return conn.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == dbs.Key && o.QueryId != null);
@@ -145,7 +145,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
         {
             using (var conn = _Provider.GetWriteConnection())
             {
-                conn.Open();
+                conn.Open(initializeExtensions: false);
                 if (entry is DbSynchronizationLogEntry dbsyncentry)
                 {
                     conn.Delete(dbsyncentry);
@@ -174,7 +174,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
 
             using (var context = this._Provider.GetWriteConnection())
             {
-                context.Open();
+                context.Open(initializeExtensions: false);
                 var modelName = modelType.GetSerializationName();
                 var existing = context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.ResourceType == modelName && o.Filter == filter);
                 if (existing != null)
@@ -202,7 +202,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
 
             using (var context = this._Provider.GetReadonlyConnection())
             {
-                context.Open();
+                context.Open(initializeExtensions: false);
                 var modelName = modelType.GetSerializationName();
                 return context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.ResourceType == modelName && o.Filter == filter);
             }
@@ -218,7 +218,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
 
             using (var context = this._Provider.GetWriteConnection())
             {
-                context.Open();
+                context.Open(initializeExtensions: false);
 
                 var existing = context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == entry.Key || (o.ResourceType == entry.ResourceType && o.Filter == entry.Filter));
                 if (existing == null)
@@ -251,7 +251,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
 
             using (var context = this._Provider.GetWriteConnection())
             {
-                context.Open();
+                context.Open(initializeExtensions: false);
 
                 var existing = context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == entry.Key || (o.ResourceType == entry.ResourceType && o.Filter == entry.Filter));
                 if (existing == null)
@@ -273,7 +273,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
 
             using (var context = this._Provider.GetWriteConnection())
             {
-                context.Open();
+                context.Open(initializeExtensions: false);
 
                 var existing = context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == entry.Key || (o.ResourceType == entry.ResourceType && o.Filter == entry.Filter));
                 if (existing == null)
@@ -307,7 +307,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
 
             using (var context = this._Provider.GetWriteConnection())
             {
-                context.Open();
+                context.Open(initializeExtensions: false);
                 DbSynchronizationLogEntry existing = context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == query.Key && o.QueryId != null || o.QueryId == query.QueryId);
                 if (existing == null)
                 {
@@ -333,7 +333,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
 
             using (var context = this._Provider.GetWriteConnection())
             {
-                context.Open();
+                context.Open(initializeExtensions: false);
                 DbSynchronizationLogEntry existing = context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == query.Key || o.QueryId == query.QueryId);
                 if (existing == null)
                 {
@@ -357,7 +357,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
 
             using (var context = this._Provider.GetReadonlyConnection())
             {
-                context.Open();
+                context.Open(initializeExtensions: false);
                 return context.FirstOrDefault<DbSynchronizationLogEntry>(o => o.Key == entry.Key && o.QueryId != null);
             }
         }

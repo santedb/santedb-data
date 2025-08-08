@@ -117,5 +117,10 @@ namespace SanteDB.Persistence.Data
         /// Instructs the data persistence layer to not validate the contents of the 
         /// </summary>
         public const string DisableObjectValidation = "DisableRelatedObjectValidation";
+
+        /// <summary>
+        /// Convert to information model stack
+        /// </summary>
+        public const string DoConvertToInformationModelStack = "ConvertToInformationModelStack";
     }
 }

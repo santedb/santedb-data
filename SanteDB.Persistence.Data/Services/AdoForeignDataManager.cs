@@ -83,14 +83,14 @@ namespace SanteDB.Persistence.Data.Services
             this.m_importService = importService;
 
             this.m_foreignDataMapRepository = foreignDataMapRepository;
-            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
+            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap", this.GetType().Assembly);
 
             // Reset the state of running jobs
             try
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     foreach (var rj in context.Query<DbForeignDataStage>(o => o.Status == ForeignDataStatus.Running).ToArray())
                     {
                         rj.Status = ForeignDataStatus.Staged;
@@ -129,7 +129,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     using (var tx = context.BeginTransaction())
                     {
@@ -190,7 +190,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var existing = context.Query<DbForeignDataStage>(o => o.Key == foreignDataId && o.ObsoletionTime == null).FirstOrDefault();
                     if (existing == null)
@@ -384,7 +384,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var existing = context.Query<DbForeignDataStage>(o => o.Key == foreignDataId && o.ObsoletionTime == null).FirstOrDefault();
                     if (existing == null)
                     {
@@ -430,7 +430,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var existing = context.Query<DbForeignDataStage>(o => o.Key == foreignDataId && o.ObsoletionTime == null).FirstOrDefault();
                     if (existing == null)
@@ -492,7 +492,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     using (var tx = context.BeginTransaction())
                     {

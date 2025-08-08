@@ -40,10 +40,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override Protocol DoConvertToInformationModel(DataContext context, DbProtocol dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            retVal.Name = dbModel.Name;
-            retVal.Oid = dbModel.Oid;
-            return retVal;
+            using (context.CreateInformationModelGuard(dbModel.Key))
+            {
+
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+                retVal.Name = dbModel.Name;
+                retVal.Oid = dbModel.Oid;
+                return retVal;
+            }
         }
 
         /// <inheritdoc/>

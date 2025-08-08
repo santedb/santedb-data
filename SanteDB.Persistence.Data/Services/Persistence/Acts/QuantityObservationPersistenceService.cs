@@ -49,22 +49,26 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override QuantityObservation DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var obsData = referenceObjects?.OfType<DbQuantityObservation>().FirstOrDefault();
-            if (obsData == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceWarning("Using slow loading of observation data");
-                obsData = context.FirstOrDefault<DbQuantityObservation>(o => o.ParentKey == dbModel.VersionKey);
-            }
 
-            if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad)
-            {
-                retVal.UnitOfMeasure = retVal.UnitOfMeasure.GetRelatedPersistenceService().Get(context, obsData?.UnitOfMeasureKey ?? Guid.Empty);
-                retVal.SetLoaded(o => o.UnitOfMeasure);
+                var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                var obsData = referenceObjects?.OfType<DbQuantityObservation>().FirstOrDefault();
+                if (obsData == null)
+                {
+                    this.m_tracer.TraceWarning("Using slow loading of observation data");
+                    obsData = context.FirstOrDefault<DbQuantityObservation>(o => o.ParentKey == dbModel.VersionKey);
+                }
+
+                if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad && context.ValidateMaximumStackDepth())
+                {
+                    retVal.UnitOfMeasure = retVal.UnitOfMeasure.GetRelatedPersistenceService().Get(context, obsData?.UnitOfMeasureKey ?? Guid.Empty);
+                    retVal.SetLoaded(o => o.UnitOfMeasure);
+                }
+                retVal.UnitOfMeasureKey = obsData?.UnitOfMeasureKey;
+                retVal.Value = obsData?.Value;
+                return retVal;
             }
-            retVal.UnitOfMeasureKey = obsData?.UnitOfMeasureKey;
-            retVal.Value = obsData?.Value;
-            return retVal;
         }
     }
 }

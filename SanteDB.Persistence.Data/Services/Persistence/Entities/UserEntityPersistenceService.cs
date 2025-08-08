@@ -71,24 +71,30 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc/>
         protected override UserEntity DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-
-            var userData = referenceObjects?.OfType<DbUserEntity>().FirstOrDefault();
-            if (userData == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceWarning("Will use slow loading method for DbUserEntity from DbEntityVersion");
-                userData = context.FirstOrDefault<DbUserEntity>(o => o.ParentKey == dbModel.VersionKey);
-            }
+                var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
 
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
-            {
-                case LoadMode.FullLoad:
-                    modelData.SecurityUser = modelData.SecurityUser.GetRelatedPersistenceService().Get(context, userData.SecurityUserKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.SecurityUser);
-                    break;
+                var userData = referenceObjects?.OfType<DbUserEntity>().FirstOrDefault();
+                if (userData == null)
+                {
+                    this.m_tracer.TraceWarning("Will use slow loading method for DbUserEntity from DbEntityVersion");
+                    userData = context.FirstOrDefault<DbUserEntity>(o => o.ParentKey == dbModel.VersionKey);
+                }
+
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            modelData.SecurityUser = modelData.SecurityUser.GetRelatedPersistenceService().Get(context, userData.SecurityUserKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.SecurityUser);
+                        }
+                        break;
+                }
+                modelData.SecurityUserKey = userData.SecurityUserKey;
+                return modelData;
             }
-            modelData.SecurityUserKey = userData.SecurityUserKey;
-            return modelData;
         }
     }
 

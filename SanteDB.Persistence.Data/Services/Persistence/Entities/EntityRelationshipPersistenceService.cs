@@ -108,24 +108,33 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override EntityRelationship DoConvertToInformationModel(DataContext context, DbEntityRelationship dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.TargetEntity = retVal.TargetEntity.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
-                    retVal.SetLoaded(nameof(EntityRelationship.TargetEntity));
-                    retVal.Classification = retVal.Classification.GetRelatedPersistenceService().Get(context, dbModel.ClassificationKey.GetValueOrDefault());
-                    retVal.SetLoaded(nameof(EntityRelationship.Classification));
-                    retVal.RelationshipRole = retVal.RelationshipRole.GetRelatedPersistenceService().Get(context, dbModel.RelationshipRoleKey.GetValueOrDefault());
-                    retVal.SetLoaded(o => o.RelationshipRole);
-                    retVal.RelationshipType = retVal.RelationshipType.GetRelatedPersistenceService().Get(context, dbModel.RelationshipTypeKey);
-                    retVal.SetLoaded(o => o.RelationshipType);
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-                    break;
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            if (!context.IsLoadingInformationModel(dbModel.TargetKey))
+                            {
+                                retVal.TargetEntity = retVal.TargetEntity.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
+                                retVal.SetLoaded(nameof(EntityRelationship.TargetEntity));
+                            }
+                            retVal.Classification = retVal.Classification.GetRelatedPersistenceService().Get(context, dbModel.ClassificationKey.GetValueOrDefault());
+                            retVal.SetLoaded(nameof(EntityRelationship.Classification));
+                            retVal.RelationshipRole = retVal.RelationshipRole.GetRelatedPersistenceService().Get(context, dbModel.RelationshipRoleKey.GetValueOrDefault());
+                            retVal.SetLoaded(o => o.RelationshipRole);
+                            retVal.RelationshipType = retVal.RelationshipType.GetRelatedPersistenceService().Get(context, dbModel.RelationshipTypeKey);
+                            retVal.SetLoaded(o => o.RelationshipType);
+                        }
+
+                        break;
+                }
+
+                return retVal;
             }
-
-            return retVal;
         }
     }
 }

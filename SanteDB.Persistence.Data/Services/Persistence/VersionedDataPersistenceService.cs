@@ -548,7 +548,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     if (existing.Count() > 1) // We only keep recent and last
                     {
                         var lastVersionSequence = existing[0].VersionSequenceId;
-                        this.DoDeleteAllModel(context, o => o.Key == model.Key && o.VersionSequence < lastVersionSequence, DeleteMode.PermanentDelete);
+                        context.DeleteAll<TDbModel>(o => o.Key == model.Key && o.VersionSequenceId < lastVersionSequence);
                     }
                 }
                 else
@@ -819,8 +819,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             //}
 
             // Is there any class concept key
-            var queryString = query.ToString();
-            if (m_classKeyMap != null && !queryString.Contains(nameof(IHasClassConcept.ClassConceptKey)))
+            
+            if (m_classKeyMap != null && !query.ContainsPropertyReference(nameof(IHasClassConcept.ClassConceptKey)))
             {
                 var classKeyProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IHasClassConcept.ClassConceptKey)));
                 classKeyProperty = Expression.MakeMemberAccess(classKeyProperty, classKeyProperty.Type.GetProperty("Value"));
@@ -846,13 +846,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             // Ensure that we always apply HEAD filter if not applied
 
-            if (!queryString.Contains(nameof(IVersionedData.IsHeadVersion)) && !queryString.Contains(nameof(IVersionedData.VersionKey)))
+            if (!query.ContainsPropertyReference(nameof(IVersionedData.IsHeadVersion)) && !query.ContainsPropertyReference(nameof(IVersionedData.VersionKey)))
             {
                 var headProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedData.IsHeadVersion)));
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, headProperty, Expression.Constant(true))), query.Parameters[0]);
             }
 
-            if (!queryString.Contains(nameof(BaseEntityData.ObsoletionTime)) && !queryString.Contains(nameof(IVersionedData.VersionKey)))
+            if (!query.ContainsPropertyReference(nameof(BaseEntityData.ObsoletionTime)) && !query.ContainsPropertyReference(nameof(IVersionedData.VersionKey)))
             {
                 var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
@@ -921,7 +921,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // TODO: Determine if this line performs better than selecting the entire object (I suspect it would - but need to check)
             var contextKeys = context.Data.Where(o => o.Value is BatchOperationType bt && bt != BatchOperationType.Delete).Select(o => (Guid?)Guid.Parse(o.Key)).ToArray();
             var assocKeys = associations.Select(k => k.Key).ToArray();
-            var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && o.ObsoleteVersionSequenceId == null || assocKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
+            var existing = data.BatchOperation == BatchOperationType.Insert ? new Guid?[0] : persistenceService.Query(context, o => o.SourceEntityKey == data.Key && o.ObsoleteVersionSequenceId == null || assocKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
             var associationKeys = associations.Select(o => o.Key).ToArray();
             var toDelete = associations.Where(a => a.BatchOperation == BatchOperationType.Delete).Select(o => o.Key)
                 .Union(existing.Where(e => !associationKeys.Contains(e)));
@@ -1028,6 +1028,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
         /// <inheritdoc/>
         public abstract IEnumerable<DetectedIssue> Validate(object objectToValidate);
-        
+
+
     }
 }

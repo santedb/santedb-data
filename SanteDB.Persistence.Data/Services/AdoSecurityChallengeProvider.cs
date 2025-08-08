@@ -147,7 +147,7 @@ namespace SanteDB.Persistence.Data.Services
                     DbSecurityUser dbUser = null;
                     try
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
                         dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
 
                         // User found?
@@ -296,7 +296,7 @@ namespace SanteDB.Persistence.Data.Services
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
 
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var sqlQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbSecurityChallenge), typeof(DbSecurityUserChallengeAssoc))
                             .InnerJoin<DbSecurityChallenge, DbSecurityUserChallengeAssoc>(o => o.Key, o => o.ChallengeKey)
                             .InnerJoin<DbSecurityUserChallengeAssoc, DbSecurityUser>(o => o.UserKey, o => o.Key)
@@ -350,7 +350,7 @@ namespace SanteDB.Persistence.Data.Services
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
 
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var sqlQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbSecurityChallenge), typeof(DbSecurityUserChallengeAssoc))
                             .InnerJoin<DbSecurityChallenge, DbSecurityUserChallengeAssoc>(o => o.Key, o => o.ChallengeKey)
                             .Where<DbSecurityUserChallengeAssoc>(o => o.UserKey == userKey)
@@ -411,7 +411,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant());
                     if (dbUser == null)
                     {
@@ -460,7 +460,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant());
                     if (dbUser == null)
                     {

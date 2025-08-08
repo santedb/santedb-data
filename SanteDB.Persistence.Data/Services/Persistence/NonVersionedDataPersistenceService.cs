@@ -108,18 +108,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected override TModel DoConvertToInformationModel(DataContext context, TDbModel dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
-            // Load strategy
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.UpdatedBy = retVal.UpdatedBy.GetRelatedPersistenceService().Get(context, dbModel.UpdatedByKey.GetValueOrDefault());
-                    retVal.SetLoaded(nameof(NonVersionedEntityData.UpdatedBy));
-                    break;
-            }
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            return retVal;
+                // Load strategy
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        retVal.UpdatedBy = retVal.UpdatedBy.GetRelatedPersistenceService().Get(context, dbModel.UpdatedByKey.GetValueOrDefault());
+                        retVal.SetLoaded(nameof(NonVersionedEntityData.UpdatedBy));
+                        break;
+                }
+
+                return retVal;
+            }
         }
     }
 }

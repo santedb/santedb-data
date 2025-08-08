@@ -59,25 +59,29 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc/>
         protected override ApplicationEntity DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-
-            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var dbApplication = referenceObjects?.OfType<DbApplicationEntity>().FirstOrDefault();
-            if (dbApplication == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceWarning("Using slow cross reference of application");
-                dbApplication = context.FirstOrDefault<DbApplicationEntity>(o => o.ParentKey == dbModel.VersionKey);
+                var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                var dbApplication = referenceObjects?.OfType<DbApplicationEntity>().FirstOrDefault();
+                if (dbApplication == null)
+                {
+                    this.m_tracer.TraceWarning("Using slow cross reference of application");
+                    dbApplication = context.FirstOrDefault<DbApplicationEntity>(o => o.ParentKey == dbModel.VersionKey);
+                }
+
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            modelData.SecurityApplication = modelData.SecurityApplication.GetRelatedPersistenceService().Get(context, dbApplication.SecurityApplicationKey);
+                            modelData.SetLoaded(o => o.SecurityApplication);
+                        }
+                        break;
+                }
+
+                return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbApplicationEntity, ApplicationEntity>(dbApplication), false, declaredOnly: true);
             }
-
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
-            {
-                case LoadMode.FullLoad:
-                    modelData.SecurityApplication = modelData.SecurityApplication.GetRelatedPersistenceService().Get(context, dbApplication.SecurityApplicationKey);
-                    modelData.SetLoaded(o => o.SecurityApplication);
-                    break;
-            }
-
-            return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbApplicationEntity, ApplicationEntity>(dbApplication), false, declaredOnly: true);
-
         }
     }
 }

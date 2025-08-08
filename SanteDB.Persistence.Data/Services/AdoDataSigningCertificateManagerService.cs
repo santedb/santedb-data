@@ -47,7 +47,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// ADO data signing certificate 
     /// </summary>
-    public class AdoDataSigningCertificateManagerService : IDataSigningCertificateManagerService, IAdoTrimProvider, ILocalServiceProvider<IDataSigningCertificateManagerService>
+    public class AdoDataSigningCertificateManagerService : IDataSigningCertificateManagerServiceEx, IAdoTrimProvider, ILocalServiceProvider<IDataSigningCertificateManagerService>
     {
         // Tracer
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoDataSigningCertificateManagerService));
@@ -92,6 +92,24 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(principal));
             }
 
+            this.AddSigningCertificates(identity, new X509Certificate2[] { x509Certificate }, principal);
+        }
+
+        /// <inheritdoc/>
+        public void AddSigningCertificates(IIdentity identity, IEnumerable<X509Certificate2> x509Certificates, IPrincipal principal) {
+            if (identity == null)
+            {
+                throw new ArgumentNullException(nameof(identity));
+            }
+            else if (x509Certificates == null)
+            {
+                throw new ArgumentNullException(nameof(x509Certificates));
+            }
+            else if (principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal));
+            }
+
             // Doing this to some other identity requires special permission
             if (!identity.Name.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase))
             {
@@ -102,57 +120,67 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
+                    context.EstablishProvenance(principal, null);
 
-                    // get the identity
-                    var certificateRegistration = new DbCertificateMapping()
+                    using (var transaction = context.BeginTransaction())
                     {
-                        CreatedByKey = context.EstablishProvenance(principal, null),
-                        CreationTime = DateTimeOffset.Now,
-                        Expiration = x509Certificate.NotAfter,
-                        X509Thumbprint = x509Certificate.Thumbprint,
-                        X509PublicKeyData = x509Certificate.GetRawCertData(),
-                        Use = CertificateMappingUse.Signature
-                    };
 
-                    switch (identity)
-                    {
-                        case IDeviceIdentity did:
-                            certificateRegistration.SecurityDeviceKey = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == did.Name.ToLowerInvariant()).Select(o => o.Key).FirstOrDefault();
-                            break;
-                        case IApplicationIdentity aid:
-                            certificateRegistration.SecurityApplicationKey = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == aid.Name.ToLowerInvariant()).Select(o => o.Key).FirstOrDefault();
-                            break;
-                        default:
-                            certificateRegistration.SecurityUserKey = context.Query<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == identity.Name.ToLowerInvariant()).Select(o => o.Key).FirstOrDefault();
-                            break;
-                    }
+                        foreach (var cert in x509Certificates)
+                        {
+                            // get the identity
+                            var certificateRegistration = new DbCertificateMapping()
+                            {
+                                CreatedByKey = context.ContextId,
+                                CreationTime = DateTimeOffset.Now,
+                                Expiration = cert.NotAfter,
+                                X509Thumbprint = cert.Thumbprint,
+                                X509PublicKeyData = cert.GetRawCertData(),
+                                Use = CertificateMappingUse.Signature
+                            };
 
-                    // Enusre there is no active mapping
-                    var existingMap = context.FirstOrDefault<DbCertificateMapping>(o =>
-                        o.X509Thumbprint == x509Certificate.Thumbprint &&
-                        o.Use == CertificateMappingUse.Signature &&
-                        o.ObsoletionTime == null &&
-                        o.SecurityDeviceKey == certificateRegistration.SecurityDeviceKey &&
-                        o.SecurityUserKey == certificateRegistration.SecurityUserKey &&
-                        o.SecurityApplicationKey == certificateRegistration.SecurityApplicationKey);
+                            switch (identity)
+                            {
+                                case IDeviceIdentity did:
+                                    certificateRegistration.SecurityDeviceKey = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == did.Name.ToLowerInvariant()).Select(o => o.Key).FirstOrDefault();
+                                    break;
+                                case IApplicationIdentity aid:
+                                    certificateRegistration.SecurityApplicationKey = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == aid.Name.ToLowerInvariant()).Select(o => o.Key).FirstOrDefault();
+                                    break;
+                                default:
+                                    certificateRegistration.SecurityUserKey = context.Query<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == identity.Name.ToLowerInvariant()).Select(o => o.Key).FirstOrDefault();
+                                    break;
+                            }
 
-                    if (existingMap != null &&
-                        (existingMap.SecurityApplicationKey.GetValueOrDefault() == certificateRegistration.SecurityApplicationKey || existingMap.SecurityDeviceKey.GetValueOrDefault() == certificateRegistration.SecurityDeviceKey || existingMap.SecurityUserKey.GetValueOrDefault() == certificateRegistration.SecurityUserKey))
-                    {
-                        certificateRegistration.Key = existingMap.Key;
-                        certificateRegistration.UpdatedByKey = context.ContextId;
-                        certificateRegistration.UpdatedTime = DateTimeOffset.Now;
-                        context.Update(certificateRegistration);
-                    }
-                    else if (existingMap != null)
-                    {
-                        throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.SIG_CERT_ALREADY_ASSIGNED));
-                    }
-                    else
-                    {
-                        // attempt storage
-                        context.Insert(certificateRegistration);
+                            // Enusre there is no active mapping
+                            var existingMap = context.FirstOrDefault<DbCertificateMapping>(o =>
+                                o.X509Thumbprint == cert.Thumbprint &&
+                                o.Use == CertificateMappingUse.Signature &&
+                                o.ObsoletionTime == null &&
+                                o.SecurityDeviceKey == certificateRegistration.SecurityDeviceKey &&
+                                o.SecurityUserKey == certificateRegistration.SecurityUserKey &&
+                                o.SecurityApplicationKey == certificateRegistration.SecurityApplicationKey);
+
+                            if (existingMap != null &&
+                                (existingMap.SecurityApplicationKey.GetValueOrDefault() == certificateRegistration.SecurityApplicationKey || existingMap.SecurityDeviceKey.GetValueOrDefault() == certificateRegistration.SecurityDeviceKey || existingMap.SecurityUserKey.GetValueOrDefault() == certificateRegistration.SecurityUserKey))
+                            {
+                                certificateRegistration.Key = existingMap.Key;
+                                certificateRegistration.UpdatedByKey = context.ContextId;
+                                certificateRegistration.UpdatedTime = DateTimeOffset.Now;
+                                context.Update(certificateRegistration);
+                            }
+                            else if (existingMap != null)
+                            {
+                                throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.SIG_CERT_ALREADY_ASSIGNED));
+                            }
+                            else
+                            {
+                                // attempt storage
+                                context.Insert(certificateRegistration);
+                            }
+                        }
+
+                        transaction.Commit();
                     }
                 }
             }
@@ -162,11 +190,11 @@ namespace SanteDB.Persistence.Data.Services
             }
             catch (Exception e)
             {
-                this.m_tracer.TraceError("Error registering signing certificate to identity {0} with {1} - {2}", identity.Name, x509Certificate.Subject, e.Message);
+                this.m_tracer.TraceError("Error registering signing certificate to identity {0} with {1} - {2}", identity.Name, String.Join(";", x509Certificates.Select(o=>o.Subject)), e.Message);
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SIG_CERT_CREATE_GEN, new
                 {
                     identity = identity.Name,
-                    subject = x509Certificate.Subject
+                    subject = String.Join(";", x509Certificates.Select(o => o.Subject))
                 }), e);
             }
         }
@@ -181,7 +209,7 @@ namespace SanteDB.Persistence.Data.Services
 
             using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
-                context.Open();
+                context.Open(initializeExtensions: false);
 
                 var dsigSql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbCertificateMapping), typeof(DbSecurityUser), typeof(DbSecurityApplication), typeof(DbSecurityDevice))
                     .Join<DbCertificateMapping, DbSecurityUser>("LEFT", o => o.SecurityUserKey, o => o.Key)
@@ -224,7 +252,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     OrmResultSet<DbCertificateMapping> retVal = null;
                     if (identity is IDeviceIdentity did)
@@ -277,7 +305,7 @@ namespace SanteDB.Persistence.Data.Services
 
             using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
-                context.Open();
+                context.Open(initializeExtensions: false);
 
                 SqlStatementBuilder sqlStatementBuilder = null;
                 if (classOfIdentity == typeof(IDeviceIdentity) || classOfIdentity == typeof(SecurityDevice))
@@ -351,7 +379,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     // Lookup the certificate
                     DbCertificateMapping dbCertMapping = null;
 
@@ -430,7 +458,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var candidateCertificate = context.Query<DbCertificateMapping>(o => o.ObsoletionTime == null && o.Use == CertificateMappingUse.Signature && o.X509Thumbprint == x509Thumbprint).Select(o => o.X509PublicKeyData).FirstOrDefault();
                     if (candidateCertificate == null)

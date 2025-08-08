@@ -88,7 +88,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Jobs
 
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     using (var tx = context.BeginTransaction())
                     {
 

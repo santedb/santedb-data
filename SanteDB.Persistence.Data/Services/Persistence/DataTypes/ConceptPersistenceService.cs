@@ -89,6 +89,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             // Do Insertion of themodel
             var retVal = base.DoInsertModel(context, data);
 
+            context.AddOrUpdateData($"Concept{retVal.Key}Version", retVal.VersionSequence);
+
             // Insert names
             if (data.ConceptNames != null)
             {
@@ -138,6 +140,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override Concept DoUpdateModel(DataContext context, Concept data)
         {
             var retVal = base.DoUpdateModel(context, data);
+            context.AddOrUpdateData($"Concept{retVal.Key}Version", retVal.VersionSequence);
 
             // Update names
             if (data.ConceptNames != null)
@@ -183,34 +186,41 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <inheritdoc/>
         protected override Concept DoConvertToInformationModel(DataContext context, DbConceptVersion dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.Class = retVal.Class.GetRelatedPersistenceService().Get(context, dbModel.ClassKey);
-                    retVal.SetLoaded(nameof(Concept.Class));
-                    goto case LoadMode.SyncLoad; // special case - FullLoad implies SyncLoad so we want a fallthrough - the only way to do this in C# is with this messy GOTO stuff
-                case LoadMode.SyncLoad:
-                    retVal.ConceptNames = retVal.ConceptNames.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(nameof(Concept.ConceptNames));
-                    retVal.Relationships = retVal.Relationships.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(nameof(Concept.Relationships));
-                    retVal.ReferenceTerms = retVal.ReferenceTerms.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(nameof(Concept.ReferenceTerms));
-                    retVal.Extensions = retVal.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(o => o.Extensions);
-                    retVal.Tags = retVal.Tags.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                    retVal.SetLoaded(o => o.Tags);
 
-                    goto case LoadMode.QuickLoad;
-                case LoadMode.QuickLoad:
-                    retVal.ConceptSetsXml = context.Query<DbConceptSetConceptAssociation>(o => o.ConceptKey == dbModel.Key).Select(o => o.SourceKey).ToList();
-                    retVal.SetLoaded(nameof(Concept.ConceptSets));
-                    break;
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            retVal.Class = retVal.Class.GetRelatedPersistenceService().Get(context, dbModel.ClassKey);
+                            retVal.SetLoaded(nameof(Concept.Class));
+                        }
+                        goto case LoadMode.SyncLoad; // special case - FullLoad implies SyncLoad so we want a fallthrough - the only way to do this in C# is with this messy GOTO stuff
+                    case LoadMode.SyncLoad:
+                        retVal.ConceptNames = retVal.ConceptNames.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                        retVal.SetLoaded(nameof(Concept.ConceptNames));
+                        retVal.Relationships = retVal.Relationships.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                        retVal.SetLoaded(nameof(Concept.Relationships));
+                        retVal.ReferenceTerms = retVal.ReferenceTerms.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                        retVal.SetLoaded(nameof(Concept.ReferenceTerms));
+                        retVal.Extensions = retVal.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                        retVal.SetLoaded(o => o.Extensions);
+                        retVal.Tags = retVal.Tags.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                        retVal.SetLoaded(o => o.Tags);
+
+                        goto case LoadMode.QuickLoad;
+                    case LoadMode.QuickLoad:
+                        retVal.ConceptSetsXml = context.Query<DbConceptSetConceptAssociation>(o => o.ConceptKey == dbModel.Key).Select(o => o.SourceKey).ToList();
+                        retVal.SetLoaded(nameof(Concept.ConceptSets));
+                        break;
+                }
+
+                return retVal;
             }
-
-            return retVal;
         }
 
         /// <inheritdoc/>

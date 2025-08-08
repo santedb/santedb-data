@@ -71,28 +71,34 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override EntityIdentifier DoConvertToInformationModel(DataContext context, DbEntityIdentifier dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.IdentifierType = retVal.IdentifierType.GetRelatedPersistenceService().Get(context, dbModel.TypeKey.GetValueOrDefault());
-                    retVal.SetLoaded(nameof(EntityIdentifier.IdentifierType));
-                    goto case LoadMode.SyncLoad;
-                case LoadMode.SyncLoad:
-                    retVal.IdentityDomain = retVal.IdentityDomain.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects?.OfType<DbIdentityDomain>().FirstOrDefault()) ??
-                        retVal.IdentityDomain.GetRelatedPersistenceService().Get(context, dbModel.IdentityDomainKey);
-                    retVal.SetLoaded(nameof(EntityIdentifier.IdentityDomain));
-                    break;
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            retVal.IdentifierType = retVal.IdentifierType.GetRelatedPersistenceService().Get(context, dbModel.TypeKey.GetValueOrDefault());
+                            retVal.SetLoaded(nameof(EntityIdentifier.IdentifierType));
+                        }
+                        goto case LoadMode.SyncLoad;
+                    case LoadMode.SyncLoad:
+                        retVal.IdentityDomain = retVal.IdentityDomain.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects?.OfType<DbIdentityDomain>().FirstOrDefault()) ??
+                            retVal.IdentityDomain.GetRelatedPersistenceService().Get(context, dbModel.IdentityDomainKey);
+                        retVal.SetLoaded(nameof(EntityIdentifier.IdentityDomain));
+                        break;
 
-                case LoadMode.QuickLoad:
-                    retVal.IdentityDomain = retVal.IdentityDomain.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects?.OfType<DbIdentityDomain>().FirstOrDefault());
-                    if (retVal.IdentityDomain != null)
-                    {
-                        retVal.SetLoaded(o => o.IdentityDomain);
-                    }
-                    break;
+                    case LoadMode.QuickLoad:
+                        retVal.IdentityDomain = retVal.IdentityDomain.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects?.OfType<DbIdentityDomain>().FirstOrDefault());
+                        if (retVal.IdentityDomain != null)
+                        {
+                            retVal.SetLoaded(o => o.IdentityDomain);
+                        }
+                        break;
+                }
+                return retVal;
             }
-            return retVal;
         }
     }
 }

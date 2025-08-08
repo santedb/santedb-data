@@ -49,24 +49,30 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc/>
         protected override Provider DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-
-            var dbProvider = referenceObjects?.OfType<DbProvider>().FirstOrDefault();
-            if (dbProvider == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceVerbose("Using slow loading for DbProvider data on DbEntityVersion. Consider using the IDataPersistenceService<Provider> instead");
-                dbProvider = context.FirstOrDefault<DbProvider>(o => o.ParentKey == dbModel.VersionKey);
-            }
+                var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
 
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
-            {
-                case LoadMode.FullLoad:
-                    modelData.Specialty = modelData.Specialty.GetRelatedPersistenceService().Get(context, dbProvider.SpecialtyKey);
-                    modelData.SetLoaded(o => o.Specialty);
-                    break;
+                var dbProvider = referenceObjects?.OfType<DbProvider>().FirstOrDefault();
+                if (dbProvider == null)
+                {
+                    this.m_tracer.TraceVerbose("Using slow loading for DbProvider data on DbEntityVersion. Consider using the IDataPersistenceService<Provider> instead");
+                    dbProvider = context.FirstOrDefault<DbProvider>(o => o.ParentKey == dbModel.VersionKey);
+                }
+
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            modelData.Specialty = modelData.Specialty.GetRelatedPersistenceService().Get(context, dbProvider.SpecialtyKey);
+                            modelData.SetLoaded(o => o.Specialty);
+                        }
+                        break;
+                }
+                modelData.SpecialtyKey = dbProvider.SpecialtyKey;
+                return modelData; // no additional data to be loaded
             }
-            modelData.SpecialtyKey = dbProvider.SpecialtyKey;
-            return modelData; // no additional data to be loaded
         }
     }
 }

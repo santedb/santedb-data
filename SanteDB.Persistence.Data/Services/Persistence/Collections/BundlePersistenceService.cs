@@ -44,10 +44,12 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
+using System.Threading;
 using ZstdSharp.Unsafe;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Collections
@@ -77,7 +79,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             this.m_localizationService = localizationService;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.Provider = this.m_configuration.Provider;
-            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
+            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap", this.GetType().Assembly);
             this.m_dataCachingService = dataCachingService;
 
         }
@@ -249,7 +251,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open(initializeExtensions: false);
-                    using (var tx = context.BeginTransaction())
+                    using (IDbTransaction tx = data.ShouldDisablePersistenceValidation() ? null : context.BeginTransaction())
                     {
 
                         context.EstablishProvenance(principal, null);
@@ -273,7 +275,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
                             if (transactionMode == TransactionMode.Commit)
                             {
-                                tx.Commit();
+                                tx?.Commit();
                             }
 
                             data.Item.ForEach(i => this.m_dataCachingService.Add(i));
@@ -400,9 +402,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             data = this.ReorganizeForInsert(data);
             for (var i = 0; i < data.Item.Count; i++)
             {
-                if (i % 100 == 0)
+                if (i % 200 == 0)
                 {
-                    this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(BundlePersistenceService), (float)i / (float)data.Item.Count, UserMessages.PROCESSING));
+                    this.ProgressChanged?.Invoke(
+                        this,
+                        new ProgressChangedEventArgs(nameof(BundlePersistenceService), (float)i / (float)data.Item.Count, UserMessages.PROCESSING)
+                    );
                 }
 
                 var objectType = data.Item[i].GetType();

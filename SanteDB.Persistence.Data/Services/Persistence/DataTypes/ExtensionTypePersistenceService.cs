@@ -82,9 +82,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// <inheritdoc/>
         protected override ExtensionType DoConvertToInformationModel(DataContext context, DbExtensionType dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            retVal.ScopeXml = context.Query<DbExtensionTypeScope>(s => s.SourceKey == retVal.Key).Select(o => o.ClassCodeKey).ToList();
-            return retVal;
+            using (context.CreateInformationModelGuard(dbModel.Key))
+            {
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+                retVal.ScopeXml = context.Query<DbExtensionTypeScope>(s => s.SourceKey == retVal.Key).Select(o => o.ClassCodeKey).ToList();
+                return retVal;
+            }
         }
 
         /// <inheritdoc/>

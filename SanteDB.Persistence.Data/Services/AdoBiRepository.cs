@@ -188,7 +188,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_appletSolutionManager = solutionManagerService;
             this.m_adhocCacheService = adhocCacheService;
             this.m_localizationService = localizationService;
-            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
+            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap", this.GetType().Assembly);
 
             // Re-scans the loaded applets for definitions when the collection has changed
             this.m_appletManager.Changed += (o, e) =>
@@ -264,7 +264,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                     {
-                        context.Open();
+                        context.Open(initializeExtensions: false);
 
                         var typeName = typeof(TBisDefinition).GetSerializationName();
                         var stmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbBiDefinition), typeof(DbBiDefinitionVersion))
@@ -319,7 +319,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     using (var tx = context.BeginTransaction())
                     {
 
@@ -505,7 +505,7 @@ namespace SanteDB.Persistence.Data.Services
         {
             using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
-                context.Open();
+                context.Open(initializeExtensions: false);
                 var typeName = biType.GetSerializationName();
                 var stmt = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbBiDefinitionVersion), typeof(DbBiDefinition))
                     .InnerJoin<DbBiDefinitionVersion, DbBiDefinition>(o => o.Key, o => o.Key)
@@ -591,7 +591,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var typeName = typeof(TBisDefinition).GetSerializationName();
 

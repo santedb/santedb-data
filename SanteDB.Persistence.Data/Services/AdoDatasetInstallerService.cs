@@ -32,6 +32,7 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
@@ -150,7 +151,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     var patchId = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(dataSetId)).HexEncode();
 
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     return context.Query<DbPatch>(o => o.PatchId == patchId).Select(o => o.ApplyDate).FirstOrDefault();
                 }
                 catch (Exception e)
@@ -169,7 +170,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     return context.Query<DbPatch>(o => true).Select(o => o.PatchId);
                 }
                 catch (Exception e)
@@ -197,7 +198,9 @@ namespace SanteDB.Persistence.Data.Services
             {
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
+                    context.AddOrUpdateData(DataConstants.DisableObjectValidation, true);
+
                     var patchId = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(dataset.Id)).HexEncode();
 
                     // Check if dataset is installed

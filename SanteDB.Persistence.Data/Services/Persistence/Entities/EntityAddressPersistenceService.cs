@@ -105,37 +105,43 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override EntityAddress DoConvertToInformationModel(DataContext context, DbEntityAddress dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.AddressUse = retVal.AddressUse.GetRelatedPersistenceService().Get(context, dbModel.UseConceptKey);
-                    retVal.SetLoaded(nameof(EntityAddress.AddressUse));
-                    goto case LoadMode.SyncLoad;
-                case LoadMode.SyncLoad:
-                    retVal.Component = retVal.Component.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).OrderBy(o => o.OrderSequence).ToList();
-                    retVal.SetLoaded(nameof(EntityAddress.Component));
-                    break;
-            }
-
-            // If there is a place ref we want to set the components based on the place's address
-            if(Guid.TryParse(retVal.Component?.Find(o => o.ComponentTypeKey == AddressComponentKeys.PlaceRef)?.Value, out var placeUuid))
-            {
-                var dbPlaceQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityAddress), typeof(DbEntityAddressComponent))
-                    .InnerJoin<DbEntityAddress, DbEntityAddressComponent>(o => o.Key, o => o.SourceKey)
-                    .Where<DbEntityAddress>(o => o.SourceKey == placeUuid && o.ObsoleteVersionSequenceId == null && s_placeRefAddressTypes.Contains(o.UseConceptKey));
-                var components = context.Query<DbEntityAddressComponent>(dbPlaceQuery.Statement);
-
-                // Now we cascade - the address component in our retVal overrides 
-                foreach(var itm in components)
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
                 {
-                    if(!retVal.Component.Any(o=>o.ComponentTypeKey == itm.ComponentTypeKey))
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            retVal.AddressUse = retVal.AddressUse.GetRelatedPersistenceService().Get(context, dbModel.UseConceptKey);
+                            retVal.SetLoaded(nameof(EntityAddress.AddressUse));
+                        }
+                        goto case LoadMode.SyncLoad;
+                    case LoadMode.SyncLoad:
+                        retVal.Component = retVal.Component.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).OrderBy(o => o.OrderSequence).ToList();
+                        retVal.SetLoaded(nameof(EntityAddress.Component));
+                        break;
+                }
+
+                // If there is a place ref we want to set the components based on the place's address
+                if (Guid.TryParse(retVal.Component?.Find(o => o.ComponentTypeKey == AddressComponentKeys.PlaceRef)?.Value, out var placeUuid))
+                {
+                    var dbPlaceQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityAddress), typeof(DbEntityAddressComponent))
+                        .InnerJoin<DbEntityAddress, DbEntityAddressComponent>(o => o.Key, o => o.SourceKey)
+                        .Where<DbEntityAddress>(o => o.SourceKey == placeUuid && o.ObsoleteVersionSequenceId == null && s_placeRefAddressTypes.Contains(o.UseConceptKey));
+                    var components = context.Query<DbEntityAddressComponent>(dbPlaceQuery.Statement);
+
+                    // Now we cascade - the address component in our retVal overrides 
+                    foreach (var itm in components)
                     {
-                        retVal.Component.Add(new EntityAddressComponent(itm.ComponentTypeKey.Value, itm.Value));
+                        if (!retVal.Component.Any(o => o.ComponentTypeKey == itm.ComponentTypeKey))
+                        {
+                            retVal.Component.Add(new EntityAddressComponent(itm.ComponentTypeKey.Value, itm.Value));
+                        }
                     }
                 }
+                return retVal;
             }
-            return retVal;
         }
     }
 }

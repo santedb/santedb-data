@@ -198,7 +198,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                         });
                 };
 
-                this.m_mapper = new ModelMapper(typeof(AdoAuditRepositoryService).Assembly.GetManifestResourceStream("SanteDB.Persistence.Auditing.ADO.Data.Map.ModelMap.xml"), AuditConstants.ModelMapName, true);
+                this.m_mapper = new ModelMapper(typeof(AdoAuditRepositoryService).Assembly.GetManifestResourceStream("SanteDB.Persistence.Auditing.ADO.Data.Map.ModelMap.xml"), AuditConstants.ModelMapName, useReflectionOnly: true);
                 this.m_builder = new QueryBuilder(this.m_mapper, this.m_configuration.Provider.StatementFactory);
 
                 // Register the audit jobs
@@ -413,7 +413,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 IDbTransaction tx = null;
                 try
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     tx = context.BeginTransaction();
 
                     // Insert core
@@ -589,7 +589,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 // Fetch
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
 
                     var sql = this.m_builder.CreateQuery<AuditEventData>(o => o.Key == pk).Statement;
                     var res = context.FirstOrDefault<CompositeResult<DbAuditEventData, DbAuditCode>>(sql);
@@ -637,7 +637,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             {
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    context.Open();
+                    context.Open(initializeExtensions: false);
                     var results = new MappedQueryResultSet<AuditEventData>(this).Where(query);
 
                     ApplicationServiceContext.Current.GetAuditService().Audit().ForAuditLogUsed(ActionType.Read, OutcomeIndicator.Success, query.ToString()).Send();

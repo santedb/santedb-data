@@ -48,22 +48,28 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc/>
         protected override Organization DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var organizationData = referenceObjects?.OfType<DbOrganization>().FirstOrDefault();
-            if (organizationData == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceWarning("Using slow join to DbOrganization from DbEntityVersion");
-                organizationData = context.FirstOrDefault<DbOrganization>(o => o.ParentKey == dbModel.VersionKey);
-            }
+                var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                var organizationData = referenceObjects?.OfType<DbOrganization>().FirstOrDefault();
+                if (organizationData == null)
+                {
+                    this.m_tracer.TraceWarning("Using slow join to DbOrganization from DbEntityVersion");
+                    organizationData = context.FirstOrDefault<DbOrganization>(o => o.ParentKey == dbModel.VersionKey);
+                }
 
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
-            {
-                case LoadMode.FullLoad:
-                    modelData.IndustryConcept = modelData.IndustryConcept.GetRelatedPersistenceService().Get(context, organizationData.IndustryConceptKey);
-                    modelData.SetLoaded(o => o.IndustryConcept);
-                    break;
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            modelData.IndustryConcept = modelData.IndustryConcept.GetRelatedPersistenceService().Get(context, organizationData.IndustryConceptKey);
+                            modelData.SetLoaded(o => o.IndustryConcept);
+                        }
+                        break;
+                }
+                return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbOrganization, Organization>(organizationData), false, declaredOnly: true);
             }
-            return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbOrganization, Organization>(organizationData), false, declaredOnly: true);
         }
     }
 }

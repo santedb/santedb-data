@@ -85,19 +85,25 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override EntityName DoConvertToInformationModel(DataContext context, DbEntityName dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.NameUse = retVal.NameUse.GetRelatedPersistenceService().Get(context, dbModel.UseConceptKey);
-                    retVal.SetLoaded(nameof(EntityName.NameUse));
-                    goto case LoadMode.SyncLoad;
-                case LoadMode.SyncLoad:
-                    retVal.Component = retVal.Component.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).OrderBy(o => o.OrderSequence).ToList();
-                    retVal.SetLoaded(nameof(EntityName.Component));
-                    break;
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            retVal.NameUse = retVal.NameUse.GetRelatedPersistenceService().Get(context, dbModel.UseConceptKey);
+                            retVal.SetLoaded(nameof(EntityName.NameUse));
+                        }
+                        goto case LoadMode.SyncLoad;
+                    case LoadMode.SyncLoad:
+                        retVal.Component = retVal.Component.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).OrderBy(o => o.OrderSequence).ToList();
+                        retVal.SetLoaded(nameof(EntityName.Component));
+                        break;
+                }
+                return retVal;
             }
-            return retVal;
         }
     }
 }
