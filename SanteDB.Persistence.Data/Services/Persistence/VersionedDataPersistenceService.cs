@@ -120,7 +120,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     if (existing.Count() > 1) // We only keep recent and last
                     {
                         var lastVersionSequence = existing[0].VersionSequenceId;
-                        this.DoDeleteAllModel(context, o => o.Key == key && o.VersionSequence < lastVersionSequence, DeleteMode.PermanentDelete);
+                        this.DoDeleteAllInternal(context, o => o.Key == key && o.VersionSequence < lastVersionSequence, DeleteMode.PermanentDelete);
                     }
                 }
                 else
