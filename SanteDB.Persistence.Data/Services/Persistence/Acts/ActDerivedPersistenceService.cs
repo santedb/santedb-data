@@ -143,6 +143,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbTopLevelTable, TAct>(dbSubEntity), onlyNullFields: true);
             return retVal;
         }
+
+
     }
 
     /// <summary>
@@ -623,6 +625,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             }
 
             return retVal;
+        }
+
+
+        /// <inheritdoc/>
+        protected override TAct DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode)
+        {
+            // Cascade the deletion of data down 
+            foreach (var ar in context.Query<DbActRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null))
+            {
+                typeof(Act).GetRelatedPersistenceService().Delete(context, ar.TargetKey, deleteMode);
+            }
+            return base.DoDeleteModel(context, key, deleteMode);
         }
 
         /// <summary>
