@@ -634,6 +634,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             return retVal;
         }
 
+
+        /// <inheritdoc/>
+        protected override TEntity DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode)
+        {
+            // Cascade the deletion of data down 
+            foreach (var ar in context.Query<DbEntityRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null))
+            {
+                typeof(Entity).GetRelatedPersistenceService().Delete(context, ar.TargetKey, deleteMode);
+            }
+            return base.DoDeleteModel(context, key, deleteMode);
+        }
         /// <summary>
         /// Map to model instance
         /// </summary>
