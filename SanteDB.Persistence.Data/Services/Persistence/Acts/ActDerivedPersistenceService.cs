@@ -632,7 +632,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override TAct DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode)
         {
             // Cascade the deletion of data down 
-            foreach (var ar in context.Query<DbActRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null))
+            foreach (var ar in context.Query<DbActRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToArray())
             {
                 typeof(Act).GetRelatedPersistenceService().Delete(context, ar.TargetKey, deleteMode);
             }
