@@ -639,7 +639,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override TEntity DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode)
         {
             // Cascade the deletion of data down 
-            foreach (var ar in context.Query<DbEntityRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null))
+            foreach (var ar in context.Query<DbEntityRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToList())
             {
                 typeof(Entity).GetRelatedPersistenceService().Delete(context, ar.TargetKey, deleteMode);
             }
