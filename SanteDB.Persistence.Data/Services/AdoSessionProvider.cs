@@ -93,7 +93,8 @@ namespace SanteDB.Persistence.Data.Services
             SanteDBClaimTypes.XspaOrganizationNameClaim,
             SanteDBClaimTypes.XspaPurposeOfUseClaim,
             SanteDBClaimTypes.XspaUserNpi,
-            SanteDBClaimTypes.XspaUserRoleClaim
+            SanteDBClaimTypes.XspaUserRoleClaim,
+            SanteDBClaimTypes.Language
         };
 
         /// <summary>
@@ -496,7 +497,7 @@ namespace SanteDB.Persistence.Data.Services
                             claims.Add(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, purpose));
                         }
 
-                        // Specialized language for this user?
+                        // Specialized language for this session?
                         if (!String.IsNullOrEmpty(lang))
                         {
                             claims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, lang));
