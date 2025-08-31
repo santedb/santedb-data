@@ -1,0 +1,17 @@
+/** 
+ * <feature scope="SanteDB.Persistence.Data" id="20250831-01" name="Update:20250831-01"   invariantName="npgsql" >
+ *	<summary>Update: Adds date observations to the database</summary>
+ *	<isInstalled>select ck_patch('20250831-01')</isInstalled>
+ * </feature>
+ */
+
+
+ CREATE TABLE DT_OBS_TBL (
+	ACT_VRSN_ID UUID NOT NULL, -- THE VERSION TO WHICH THE OBSERVATION DTA APPLIES
+	VAL_DT DATE NULL, -- THE CONCEPT WHICH REPRESENTS THE VALUE
+	CONSTRAINT PK_DT_OBS_TBL PRIMARY KEY (ACT_VRSN_ID),
+	CONSTRAINT FK_DT_OBS_ACT_VRSN_ID FOREIGN KEY (ACT_VRSN_ID) REFERENCES OBS_TBL(ACT_VRSN_ID)
+ );
+ ALTER TABLE OBS_TBL DROP CONSTRAINT obs_tbl_val_typ_check;
+ ALTER TABLE OBS_TBL ADD CONSTRAINT CK_OBS_VAL_TYP CHECK (VAL_TYP IN ('CD','TS','ST','PQ'));
+ SELECT REG_PATCH('20250831-01');

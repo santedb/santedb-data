@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SanteDB.Core.Model.Map.Ado {
+namespace SanteDB.Persistence.Data.ModelMap {
     
     
     public sealed class RelationshipValidationRuleToDbRelationshipValidationRuleModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.RelationshipValidationRule, SanteDB.Persistence.Data.Model.Sys.DbRelationshipValidationRule> {
@@ -93,6 +93,7 @@ namespace SanteDB.Core.Model.Map.Ado {
                 return default(SanteDB.Core.Model.DataTypes.RelationshipValidationRule);
             }
             SanteDB.Core.Model.DataTypes.RelationshipValidationRule retVal = new SanteDB.Core.Model.DataTypes.RelationshipValidationRule();
+            retVal.CreationTime = instance.CreationTime;
             retVal.Key = instance.Key;
             retVal.RelationshipTypeKey = instance.RelationshipTypeKey;
             if (instance.SourceClassKey.HasValue) {
@@ -106,7 +107,6 @@ namespace SanteDB.Core.Model.Map.Ado {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -271,18 +271,18 @@ namespace SanteDB.Core.Model.Map.Ado {
                 return default(SanteDB.Core.Mail.MailMessage);
             }
             SanteDB.Core.Mail.MailMessage retVal = new SanteDB.Core.Mail.MailMessage();
-            retVal.Body = instance.Body;
-            retVal.Flags = ((SanteDB.Core.Mail.MailMessageFlags)(instance.Flags));
-            retVal.From = instance.FromInfo;
-            retVal.Key = instance.Key;
-            retVal.TimeStamp = instance.MessageUtc;
-            retVal.Subject = instance.Subject;
-            retVal.To = instance.ToInfo;
-            if (instance.UpdatedByKey.HasValue) {
-                retVal.UpdatedByKey = instance.UpdatedByKey.Value;
-            }
             if (instance.UpdatedTime.HasValue) {
                 retVal.UpdatedTime = instance.UpdatedTime.Value;
+            }
+            retVal.From = instance.FromInfo;
+            retVal.TimeStamp = instance.MessageUtc;
+            retVal.To = instance.ToInfo;
+            retVal.Key = instance.Key;
+            retVal.Body = instance.Body;
+            retVal.Flags = ((SanteDB.Core.Mail.MailMessageFlags)(instance.Flags));
+            retVal.Subject = instance.Subject;
+            if (instance.UpdatedByKey.HasValue) {
+                retVal.UpdatedByKey = instance.UpdatedByKey.Value;
             }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
@@ -372,6 +372,7 @@ namespace SanteDB.Core.Model.Map.Ado {
                 return default(SanteDB.Core.Mail.Mailbox);
             }
             SanteDB.Core.Mail.Mailbox retVal = new SanteDB.Core.Mail.Mailbox();
+            retVal.CreationTime = instance.CreationTime;
             retVal.Key = instance.Key;
             retVal.OwnerKey = instance.OwnerKey;
             retVal.Name = instance.Name;
@@ -379,7 +380,6 @@ namespace SanteDB.Core.Model.Map.Ado {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -456,8 +456,8 @@ namespace SanteDB.Core.Model.Map.Ado {
                 return default(SanteDB.Core.Mail.MailboxMailMessage);
             }
             SanteDB.Core.Mail.MailboxMailMessage retVal = new SanteDB.Core.Mail.MailboxMailMessage();
-            retVal.Key = instance.Key;
             retVal.SourceEntityKey = instance.SourceKey;
+            retVal.Key = instance.Key;
             retVal.TargetKey = instance.TargetKey;
             retVal.MailStatusFlag = ((SanteDB.Core.Mail.MailStatusFlags)(instance.MailStatusFlag));
             return retVal;
@@ -566,6 +566,10 @@ namespace SanteDB.Core.Model.Map.Ado {
                 return default(SanteDB.Core.Model.Security.SecurityUser);
             }
             SanteDB.Core.Model.Security.SecurityUser retVal = new SanteDB.Core.Model.Security.SecurityUser();
+            if (instance.UpdatedTime.HasValue) {
+                retVal.UpdatedTime = instance.UpdatedTime.Value;
+            }
+            retVal.Key = instance.Key;
             retVal.Email = instance.Email;
             if (instance.InvalidLoginAttempts.HasValue) {
                 retVal.InvalidLoginAttempts = instance.InvalidLoginAttempts.Value;
@@ -584,7 +588,6 @@ namespace SanteDB.Core.Model.Map.Ado {
             retVal.UserClass = instance.UserClass;
             retVal.EmailConfirmed = instance.EmailConfirmed;
             retVal.PhoneNumberConfirmed = instance.PhoneNumberConfirmed;
-            retVal.Key = instance.Key;
             if (instance.TwoFactorMechnaismKey.HasValue) {
                 retVal.TwoFactorMechnaismKey = instance.TwoFactorMechnaismKey.Value;
             }
@@ -593,9 +596,6 @@ namespace SanteDB.Core.Model.Map.Ado {
             }
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
-            }
-            if (instance.UpdatedTime.HasValue) {
-                retVal.UpdatedTime = instance.UpdatedTime.Value;
             }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
@@ -690,13 +690,13 @@ namespace SanteDB.Core.Model.Map.Ado {
                 return default(SanteDB.Core.Model.Security.SecurityChallenge);
             }
             SanteDB.Core.Model.Security.SecurityChallenge retVal = new SanteDB.Core.Model.Security.SecurityChallenge();
+            if (instance.UpdatedTime.HasValue) {
+                retVal.UpdatedTime = instance.UpdatedTime.Value;
+            }
             retVal.Key = instance.Key;
             retVal.ChallengeText = instance.ChallengeText;
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
-            }
-            if (instance.UpdatedTime.HasValue) {
-                retVal.UpdatedTime = instance.UpdatedTime.Value;
             }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
@@ -801,9 +801,10 @@ namespace SanteDB.Core.Model.Map.Ado {
                 return default(SanteDB.Core.Model.Security.SecurityApplication);
             }
             SanteDB.Core.Model.Security.SecurityApplication retVal = new SanteDB.Core.Model.Security.SecurityApplication();
-            retVal.Key = instance.Key;
             retVal.Name = instance.PublicId;
+            retVal.CreationTime = instance.CreationTime;
             retVal.ApplicationSecret = instance.Secret;
+            retVal.Key = instance.Key;
             if (instance.Lockout.HasValue) {
                 retVal.Lockout = instance.Lockout.Value;
             }
@@ -823,7 +824,6 @@ namespace SanteDB.Core.Model.Map.Ado {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -923,6 +923,8 @@ namespace SanteDB.Core.Model.Map.Ado {
             }
             SanteDB.Core.Model.Security.SecurityDevice retVal = new SanteDB.Core.Model.Security.SecurityDevice();
             retVal.Name = instance.PublicId;
+            retVal.CreationTime = instance.CreationTime;
+            retVal.Key = instance.Key;
             retVal.DeviceSecret = instance.DeviceSecret;
             if (instance.Lockout.HasValue) {
                 retVal.Lockout = instance.Lockout.Value;
@@ -933,7 +935,6 @@ namespace SanteDB.Core.Model.Map.Ado {
             if (instance.LastAuthentication.HasValue) {
                 retVal.LastAuthentication = instance.LastAuthentication.Value;
             }
-            retVal.Key = instance.Key;
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
             }
@@ -944,7 +945,6 @@ namespace SanteDB.Core.Model.Map.Ado {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -1034,14 +1034,14 @@ namespace SanteDB.Core.Model.Map.Ado {
                 return default(SanteDB.Core.Model.Security.SecurityRole);
             }
             SanteDB.Core.Model.Security.SecurityRole retVal = new SanteDB.Core.Model.Security.SecurityRole();
+            if (instance.UpdatedTime.HasValue) {
+                retVal.UpdatedTime = instance.UpdatedTime.Value;
+            }
             retVal.Key = instance.Key;
             retVal.Name = instance.Name;
             retVal.Description = instance.Description;
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
-            }
-            if (instance.UpdatedTime.HasValue) {
-                retVal.UpdatedTime = instance.UpdatedTime.Value;
             }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
@@ -1136,6 +1136,9 @@ namespace SanteDB.Core.Model.Map.Ado {
                 return default(SanteDB.Core.Model.Security.SecurityProvenance);
             }
             SanteDB.Core.Model.Security.SecurityProvenance retVal = new SanteDB.Core.Model.Security.SecurityProvenance();
+            if (instance.Established.HasValue) {
+                retVal.CreationTime = instance.Established.Value;
+            }
             retVal.Key = instance.Key;
             retVal.ApplicationKey = instance.ApplicationKey;
             if (instance.UserKey.HasValue) {
@@ -1143,9 +1146,6 @@ namespace SanteDB.Core.Model.Map.Ado {
             }
             if (instance.DeviceKey.HasValue) {
                 retVal.DeviceKey = instance.DeviceKey.Value;
-            }
-            if (instance.Established.HasValue) {
-                retVal.CreationTime = instance.Established.Value;
             }
             if (instance.SessionKey.HasValue) {
                 retVal.SessionKey = instance.SessionKey.Value;
@@ -1230,8 +1230,8 @@ namespace SanteDB.Core.Model.Map.Ado {
             }
             SanteDB.Core.Model.Security.SecurityPolicyInstance retVal = new SanteDB.Core.Model.Security.SecurityPolicyInstance();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.Key = instance.Key;
+            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.PolicyKey = instance.PolicyKey;
             return retVal;
         }
@@ -1260,8 +1260,8 @@ namespace SanteDB.Core.Model.Map.Ado {
             }
             SanteDB.Core.Model.Security.SecurityPolicyInstance retVal = new SanteDB.Core.Model.Security.SecurityPolicyInstance();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.Key = instance.Key;
+            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.PolicyKey = instance.PolicyKey;
             return retVal;
         }
@@ -1290,8 +1290,8 @@ namespace SanteDB.Core.Model.Map.Ado {
             }
             SanteDB.Core.Model.Security.SecurityPolicyInstance retVal = new SanteDB.Core.Model.Security.SecurityPolicyInstance();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.Key = instance.Key;
+            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.PolicyKey = instance.PolicyKey;
             return retVal;
         }
@@ -1353,10 +1353,10 @@ namespace SanteDB.Core.Model.Map.Ado {
             if (instance.SourceEntityKey.HasValue) {
                 retVal.SourceKey = instance.SourceEntityKey.Value;
             }
-            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
+            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.PolicyKey.HasValue) {
                 retVal.PolicyKey = instance.PolicyKey.Value;
             }
@@ -1369,8 +1369,8 @@ namespace SanteDB.Core.Model.Map.Ado {
             }
             SanteDB.Core.Model.Security.SecurityPolicyInstance retVal = new SanteDB.Core.Model.Security.SecurityPolicyInstance();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.Key = instance.Key;
+            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.PolicyKey = instance.PolicyKey;
             return retVal;
         }
@@ -1383,10 +1383,10 @@ namespace SanteDB.Core.Model.Map.Ado {
             if (instance.SourceEntityKey.HasValue) {
                 retVal.SourceKey = instance.SourceEntityKey.Value;
             }
-            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
+            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.PolicyKey.HasValue) {
                 retVal.PolicyKey = instance.PolicyKey.Value;
             }
@@ -1399,8 +1399,8 @@ namespace SanteDB.Core.Model.Map.Ado {
             }
             SanteDB.Core.Model.Security.SecurityPolicyInstance retVal = new SanteDB.Core.Model.Security.SecurityPolicyInstance();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.Key = instance.Key;
+            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.PolicyKey = instance.PolicyKey;
             return retVal;
         }
@@ -1413,10 +1413,10 @@ namespace SanteDB.Core.Model.Map.Ado {
             if (instance.SourceEntityKey.HasValue) {
                 retVal.SourceKey = instance.SourceEntityKey.Value;
             }
-            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
+            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.PolicyKey.HasValue) {
                 retVal.PolicyKey = instance.PolicyKey.Value;
             }
@@ -1429,8 +1429,8 @@ namespace SanteDB.Core.Model.Map.Ado {
             }
             SanteDB.Core.Model.Security.SecurityPolicyInstance retVal = new SanteDB.Core.Model.Security.SecurityPolicyInstance();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.Key = instance.Key;
+            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.PolicyKey = instance.PolicyKey;
             return retVal;
         }
@@ -1492,10 +1492,10 @@ namespace SanteDB.Core.Model.Map.Ado {
             if (instance.SourceEntityKey.HasValue) {
                 retVal.SourceKey = instance.SourceEntityKey.Value;
             }
-            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
+            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.PolicyKey.HasValue) {
                 retVal.PolicyKey = instance.PolicyKey.Value;
             }
@@ -1508,8 +1508,8 @@ namespace SanteDB.Core.Model.Map.Ado {
             }
             SanteDB.Core.Model.Security.SecurityPolicyInstance retVal = new SanteDB.Core.Model.Security.SecurityPolicyInstance();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.Key = instance.Key;
+            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.PolicyKey = instance.PolicyKey;
             return retVal;
         }
@@ -1522,10 +1522,10 @@ namespace SanteDB.Core.Model.Map.Ado {
             if (instance.SourceEntityKey.HasValue) {
                 retVal.SourceKey = instance.SourceEntityKey.Value;
             }
-            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
+            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.PolicyKey.HasValue) {
                 retVal.PolicyKey = instance.PolicyKey.Value;
             }
@@ -1538,8 +1538,8 @@ namespace SanteDB.Core.Model.Map.Ado {
             }
             SanteDB.Core.Model.Security.SecurityPolicyInstance retVal = new SanteDB.Core.Model.Security.SecurityPolicyInstance();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.Key = instance.Key;
+            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.PolicyKey = instance.PolicyKey;
             return retVal;
         }
@@ -1552,10 +1552,10 @@ namespace SanteDB.Core.Model.Map.Ado {
             if (instance.SourceEntityKey.HasValue) {
                 retVal.SourceKey = instance.SourceEntityKey.Value;
             }
-            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
+            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.PolicyKey.HasValue) {
                 retVal.PolicyKey = instance.PolicyKey.Value;
             }
@@ -1568,8 +1568,8 @@ namespace SanteDB.Core.Model.Map.Ado {
             }
             SanteDB.Core.Model.Security.SecurityPolicyInstance retVal = new SanteDB.Core.Model.Security.SecurityPolicyInstance();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.Key = instance.Key;
+            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.PolicyKey = instance.PolicyKey;
             return retVal;
         }
@@ -1654,17 +1654,17 @@ namespace SanteDB.Core.Model.Map.Ado {
                 return default(SanteDB.Core.Model.Security.SecurityPolicy);
             }
             SanteDB.Core.Model.Security.SecurityPolicy retVal = new SanteDB.Core.Model.Security.SecurityPolicy();
+            retVal.CreationTime = instance.CreationTime;
+            retVal.Key = instance.Key;
             retVal.Handler = instance.Handler;
             retVal.Name = instance.Name;
             retVal.IsPublic = instance.IsPublic;
             retVal.CanOverride = instance.CanOverride;
             retVal.Oid = instance.Oid;
-            retVal.Key = instance.Key;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -9673,6 +9673,221 @@ namespace SanteDB.Core.Model.Map.Ado {
                 return default(SanteDB.Core.Model.Acts.QuantityObservation);
             }
             SanteDB.Core.Model.Acts.QuantityObservation retVal = new SanteDB.Core.Model.Acts.QuantityObservation();
+            retVal.VersionKey = instance.ParentKey;
+            retVal.InterpretationConceptKey = instance.InterpretationConceptKey;
+            retVal.ValueType = instance.ValueType;
+            return retVal;
+        }
+    }
+    
+    public sealed class DateObservationToDbDateObservationModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.DateObservation, SanteDB.Persistence.Data.Model.Acts.DbDateObservation>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.DateObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.DateObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation> {
+        
+        private SanteDB.Core.Model.Map.ModelMapper m_mapper;
+        
+        public DateObservationToDbDateObservationModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
+            this.m_mapper = mapper;
+        }
+        
+        public System.Type SourceType {
+            get {
+                return typeof(SanteDB.Core.Model.Acts.DateObservation);
+            }
+        }
+        
+        public System.Type TargetType {
+            get {
+                return typeof(SanteDB.Persistence.Data.Model.Acts.DbDateObservation);
+            }
+        }
+        
+        public object MapToSource(object o) {
+            if ((o == null)) {
+                throw new System.ArgumentNullException("o");
+            }
+            SanteDB.Persistence.Data.Model.Acts.DbDateObservation instance;
+            try {
+                instance = ((SanteDB.Persistence.Data.Model.Acts.DbDateObservation)(o));
+            }
+            catch (System.Exception e) {
+                throw new System.ArgumentException("instance", string.Format("Expected instance of {0}", o.GetType()), e);
+            }
+            return this.MapToSource(instance);
+        }
+        
+        public object MapToTarget(object o) {
+            if ((o == null)) {
+                throw new System.ArgumentNullException("o");
+            }
+            SanteDB.Core.Model.Acts.DateObservation instance;
+            try {
+                instance = ((SanteDB.Core.Model.Acts.DateObservation)(o));
+            }
+            catch (System.Exception e) {
+                throw new System.ArgumentException("instance", string.Format("Expected instance of {0}", o.GetType()), e);
+            }
+            return this.MapToTarget(instance);
+        }
+        
+        public SanteDB.Persistence.Data.Model.Acts.DbDateObservation MapToTarget(SanteDB.Core.Model.Acts.DateObservation instance) {
+            if ((instance == null)) {
+                return default(SanteDB.Persistence.Data.Model.Acts.DbDateObservation);
+            }
+            SanteDB.Persistence.Data.Model.Acts.DbDateObservation retVal = new SanteDB.Persistence.Data.Model.Acts.DbDateObservation();
+            if (instance.Value.HasValue) {
+                retVal.Value = instance.Value.Value;
+            }
+            if (instance.VersionKey.HasValue) {
+                retVal.ParentKey = instance.VersionKey.Value;
+            }
+            return retVal;
+        }
+        
+        public SanteDB.Core.Model.Acts.DateObservation MapToSource(SanteDB.Persistence.Data.Model.Acts.DbDateObservation instance) {
+            if ((instance == null)) {
+                return default(SanteDB.Core.Model.Acts.DateObservation);
+            }
+            SanteDB.Core.Model.Acts.DateObservation retVal = new SanteDB.Core.Model.Acts.DateObservation();
+            retVal.Value = instance.Value;
+            retVal.VersionKey = instance.ParentKey;
+            return retVal;
+        }
+        
+        SanteDB.Persistence.Data.Model.Acts.DbActVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.DateObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToTarget(SanteDB.Core.Model.Acts.DateObservation instance) {
+            if ((instance == null)) {
+                return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
+            }
+            SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
+            if (instance.TemplateKey.HasValue) {
+                retVal.TemplateKey = instance.TemplateKey.Value;
+            }
+            if (instance.ClassConceptKey.HasValue) {
+                retVal.ClassConceptKey = instance.ClassConceptKey.Value;
+            }
+            if (instance.MoodConceptKey.HasValue) {
+                retVal.MoodConceptKey = instance.MoodConceptKey.Value;
+            }
+            retVal.IsNegated = instance.IsNegated;
+            if (instance.ActTime.HasValue) {
+                retVal.ActTime = instance.ActTime.Value;
+            }
+            if (instance.StartTime.HasValue) {
+                retVal.StartTime = instance.StartTime.Value;
+            }
+            if (instance.StopTime.HasValue) {
+                retVal.StopTime = instance.StopTime.Value;
+            }
+            if (instance.ReasonConceptKey.HasValue) {
+                retVal.ReasonConceptKey = instance.ReasonConceptKey.Value;
+            }
+            if (instance.ObsoletionReasonKey.HasValue) {
+                retVal.ObsoletionReasonKey = instance.ObsoletionReasonKey.Value;
+            }
+            if (instance.StatusConceptKey.HasValue) {
+                retVal.StatusConceptKey = instance.StatusConceptKey.Value;
+            }
+            if (instance.TypeConceptKey.HasValue) {
+                retVal.TypeConceptKey = instance.TypeConceptKey.Value;
+            }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
+            if (instance.Key.HasValue) {
+                retVal.Key = instance.Key.Value;
+            }
+            if (instance.GeoTagKey.HasValue) {
+                retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            retVal.IsHeadVersion = instance.IsHeadVersion;
+            if (instance.CreatedByKey.HasValue) {
+                retVal.CreatedByKey = instance.CreatedByKey.Value;
+            }
+            if (instance.ObsoletedByKey.HasValue) {
+                retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.ObsoletionTime.HasValue) {
+                retVal.ObsoletionTime = instance.ObsoletionTime.Value;
+            }
+            return retVal;
+        }
+        
+        SanteDB.Core.Model.Acts.DateObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.DateObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActVersion instance) {
+            if ((instance == null)) {
+                return default(SanteDB.Core.Model.Acts.DateObservation);
+            }
+            SanteDB.Core.Model.Acts.DateObservation retVal = new SanteDB.Core.Model.Acts.DateObservation();
+            if (instance.TemplateKey.HasValue) {
+                retVal.TemplateKey = instance.TemplateKey.Value;
+            }
+            retVal.ClassConceptKey = instance.ClassConceptKey;
+            retVal.MoodConceptKey = instance.MoodConceptKey;
+            retVal.IsNegated = instance.IsNegated;
+            if (instance.ActTime.HasValue) {
+                retVal.ActTime = instance.ActTime.Value;
+            }
+            if (instance.StartTime.HasValue) {
+                retVal.StartTime = instance.StartTime.Value;
+            }
+            if (instance.StopTime.HasValue) {
+                retVal.StopTime = instance.StopTime.Value;
+            }
+            if (instance.ReasonConceptKey.HasValue) {
+                retVal.ReasonConceptKey = instance.ReasonConceptKey.Value;
+            }
+            if (instance.ObsoletionReasonKey.HasValue) {
+                retVal.ObsoletionReasonKey = instance.ObsoletionReasonKey.Value;
+            }
+            retVal.StatusConceptKey = instance.StatusConceptKey;
+            retVal.TypeConceptKey = instance.TypeConceptKey;
+            retVal.VersionKey = instance.VersionKey;
+            retVal.Key = instance.Key;
+            if (instance.GeoTagKey.HasValue) {
+                retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            retVal.IsHeadVersion = instance.IsHeadVersion;
+            retVal.CreatedByKey = instance.CreatedByKey;
+            if (instance.ObsoletedByKey.HasValue) {
+                retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.ObsoletionTime.HasValue) {
+                retVal.ObsoletionTime = instance.ObsoletionTime.Value;
+            }
+            return retVal;
+        }
+        
+        SanteDB.Persistence.Data.Model.Acts.DbObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.DateObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation>.MapToTarget(SanteDB.Core.Model.Acts.DateObservation instance) {
+            if ((instance == null)) {
+                return default(SanteDB.Persistence.Data.Model.Acts.DbObservation);
+            }
+            SanteDB.Persistence.Data.Model.Acts.DbObservation retVal = new SanteDB.Persistence.Data.Model.Acts.DbObservation();
+            if (instance.VersionKey.HasValue) {
+                retVal.ParentKey = instance.VersionKey.Value;
+            }
+            if (instance.InterpretationConceptKey.HasValue) {
+                retVal.InterpretationConceptKey = instance.InterpretationConceptKey.Value;
+            }
+            retVal.ValueType = instance.ValueType;
+            return retVal;
+        }
+        
+        SanteDB.Core.Model.Acts.DateObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.DateObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbObservation instance) {
+            if ((instance == null)) {
+                return default(SanteDB.Core.Model.Acts.DateObservation);
+            }
+            SanteDB.Core.Model.Acts.DateObservation retVal = new SanteDB.Core.Model.Acts.DateObservation();
             retVal.VersionKey = instance.ParentKey;
             retVal.InterpretationConceptKey = instance.InterpretationConceptKey;
             retVal.ValueType = instance.ValueType;

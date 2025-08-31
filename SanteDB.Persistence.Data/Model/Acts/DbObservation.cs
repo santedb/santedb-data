@@ -82,6 +82,23 @@ namespace SanteDB.Persistence.Data.Model.Acts
 
     }
 
+
+    /// <summary>
+    /// Represents additional data related to a quantified observation
+    /// </summary>
+    [Table("dt_obs_tbl")]
+    public class DbDateObservation : DbObsSubTable
+    {
+
+        /// <summary>
+        /// Gets or sets the value of the measure
+        /// </summary>
+        [Column("val_dt"), NotNull]
+        public DateTime Value { get; set; }
+
+    }
+
+
     /// <summary>
     /// Identifies the observation as a text obseration
     /// </summary>
