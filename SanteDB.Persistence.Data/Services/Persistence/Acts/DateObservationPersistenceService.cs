@@ -22,6 +22,7 @@ using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
+using SanteDB.Persistence.Data.Model.Entities;
 using System;
 using System.Linq;
 
@@ -53,7 +54,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     obsData = context.FirstOrDefault<DbDateObservation>(o => o.ParentKey == dbModel.VersionKey);
                 }
 
-                retVal.Value = obsData?.Value;
+                retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbDateObservation, DateObservation>(obsData), false, declaredOnly: true);
                 return retVal;
             }
         }

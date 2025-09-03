@@ -19,6 +19,7 @@
  * Date: 2023-6-21
  */
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
@@ -93,9 +94,14 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// Gets or sets the value of the measure
         /// </summary>
-        [Column("val_dt"), NotNull]
+        [Column("val_dt")]
         public DateTime Value { get; set; }
 
+        /// <summary>
+        /// Value precision
+        /// </summary>
+        [Column("val_prec")]
+        public String ValuePrecision { get; set; }
     }
 
 

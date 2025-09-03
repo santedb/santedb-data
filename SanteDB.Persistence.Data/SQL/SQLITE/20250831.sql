@@ -1,14 +1,16 @@
 /** 
  * <feature scope="SanteDB.Persistence.Data" id="20250831" name="Update:20250831"  invariantName="sqlite">
  *	<summary>Update: Update: Adds the date observation type to the database</summary>
- *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE name='dt_obs_tbl')</isInstalled>
+ *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE name='dt_obs_tbl' AND sql LIKE '%val_prec%')</isInstalled>
  * </feature>
  */
  
+ DROP TABLE IF EXISTS DT_OBS_TBL;
  
  CREATE TABLE DT_OBS_TBL (
 	ACT_VRSN_ID BLOB(16) NOT NULL, -- THE VERSION TO WHICH THE OBSERVATION DTA APPLIES
 	VAL_DT BIGINT NULL, -- THE DATE VALUE IN EPOCH TIME
+	VAL_PREC CHAR(1) NULL,
 	CONSTRAINT PK_DT_OBS_TBL PRIMARY KEY (ACT_VRSN_ID),
 	CONSTRAINT FK_DT_OBS_ACT_VRSN_ID FOREIGN KEY (ACT_VRSN_ID) REFERENCES OBS_TBL(ACT_VRSN_ID)
  );
