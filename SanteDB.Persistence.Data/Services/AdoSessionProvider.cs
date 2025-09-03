@@ -502,6 +502,10 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             claims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, lang));
                         }
+                        else if(claimsPrincipal.TryGetClaimValue(SanteDBClaimTypes.Language, out lang))
+                        {
+                            claims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, lang));
+                        }
 
                         // Promote claims over
                         claims.AddRange(claimsPrincipal.Claims.Where(o => m_principalClaimsToSession.Contains(o.Type)));
