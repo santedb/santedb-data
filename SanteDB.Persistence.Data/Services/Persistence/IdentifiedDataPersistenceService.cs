@@ -526,7 +526,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Which are new and which are not?
             var removedRelationships = existing.Where(o => associations.Any(a => a.Key == o && a.BatchOperation == Core.Model.DataTypes.BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a =>
             {
-                return persistenceService.Delete(context, a.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
+                return persistenceService.Delete(context, a.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy, false);
             });
             var addedRelationships = associations.Where(o => !o.IsEmpty() && o.BatchOperation != Core.Model.DataTypes.BatchOperationType.Delete && (!o.Key.HasValue || !existing.Any(a => a == o.Key))).Select(a =>
             {

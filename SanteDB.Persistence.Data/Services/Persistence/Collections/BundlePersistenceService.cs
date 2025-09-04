@@ -429,10 +429,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                     switch (data.Item[i].BatchOperation)
                     {
                         case BatchOperationType.Delete:
+                        case BatchOperationType.DeletePreserveContained:
                             if (persistenceService.Exists(context, data.Item[i].Key.Value))
                             {
-                                data.Item[i] = persistenceService.Delete(context, data.Item[i].Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
-                                data.Item[i].BatchOperation = BatchOperationType.Delete;
+                                data.Item[i] = persistenceService.Delete(context, data.Item[i].Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy, data.Item[i].BatchOperation == BatchOperationType.DeletePreserveContained);                                
                             }
                             else
                             {
@@ -494,7 +494,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
         /// <inheritdoc/>
         /// <exception cref="NotSupportedException">This method is not supported on <see cref="Bundle"/></exception>
-        public Bundle Delete(OrmLite.DataContext context, Guid key, DeleteMode deletionMode)
+        public Bundle Delete(OrmLite.DataContext context, Guid key, DeleteMode deletionMode, bool preserveContained)
         {
             throw new NotSupportedException();
         }
@@ -531,7 +531,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
         /// <inheritdoc/>
         /// <exception cref="NotSupportedException">This method is not supported on <see cref="Bundle"/></exception>
-        IdentifiedData IAdoPersistenceProvider.Delete(OrmLite.DataContext context, Guid key, DeleteMode deleteMode)
+        IdentifiedData IAdoPersistenceProvider.Delete(OrmLite.DataContext context, Guid key, DeleteMode preserveContained, bool cascadeDelete)
         {
             throw new NotSupportedException();
         }

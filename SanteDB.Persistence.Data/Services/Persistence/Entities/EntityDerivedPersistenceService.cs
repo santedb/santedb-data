@@ -638,22 +638,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
 
         /// <inheritdoc/>
-        protected override TEntity DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode)
+        protected override TEntity DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained)
         {
 
             // Cascade the deletion of data down 
-            if (DataPersistenceControlContext.Current?.PreventCascadedDeletes != true)
+            if (!preserveContained)
             {
                 foreach (var ar in context.Query<DbEntityRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToArray())
                 {
                     var rps = typeof(Act).GetRelatedPersistenceService();
                     if (rps.Exists(context, ar.TargetKey))
                     {
-                        rps.Delete(context, ar.TargetKey, deleteMode);
+                        rps.Delete(context, ar.TargetKey, deleteMode, preserveContained);
                     }
                 }
             }
-            return base.DoDeleteModel(context, key, deleteMode);
+            return base.DoDeleteModel(context, key, deleteMode, preserveContained);
         }
 
         /// <summary>

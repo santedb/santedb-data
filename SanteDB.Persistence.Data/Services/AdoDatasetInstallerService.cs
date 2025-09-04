@@ -283,7 +283,7 @@ namespace SanteDB.Persistence.Data.Services
                                     case DataDelete dd:
                                         if (persistenceService.Exists(context, dd.Element.Key.Value))
                                         {
-                                            persistenceService.Delete(context, dd.Element.Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
+                                            persistenceService.Delete(context, dd.Element.Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy, false);
                                         }
                                         break;
                                 }

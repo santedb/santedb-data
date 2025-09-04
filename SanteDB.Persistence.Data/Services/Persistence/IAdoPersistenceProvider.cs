@@ -53,7 +53,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Do an obsolete of the model
         /// </summary>
-        IdentifiedData Delete(DataContext context, Guid key, DeleteMode deletionMode);
+        IdentifiedData Delete(DataContext context, Guid key, DeleteMode deletionMode, bool preserveContained);
 
         /// <summary>
         /// True if the object exists in the database
@@ -96,7 +96,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Do an obsolete of the model
         /// </summary>
-        new TModel Delete(DataContext context, Guid key, DeleteMode deletionMode);
+        new TModel Delete(DataContext context, Guid key, DeleteMode deletionMode, bool cascadeDelete);
 
         /// <summary>
         /// Perform a get on the context

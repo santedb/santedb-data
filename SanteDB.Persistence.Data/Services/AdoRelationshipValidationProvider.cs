@@ -211,7 +211,7 @@ namespace SanteDB.Persistence.Data.Services
                     {
 
                         context.EstablishProvenance(AuthenticationContext.Current.Principal);
-                        var retVal = this.Delete(context, key, DeleteMode.PermanentDelete);
+                        var retVal = this.Delete(context, key, DeleteMode.PermanentDelete, false);
                         tx.Commit();
                         return retVal;
                     }
@@ -246,7 +246,7 @@ namespace SanteDB.Persistence.Data.Services
                         var toDelete = context.FirstOrDefault<DbRelationshipValidationRule>(o => o.SourceClassKey == sourceClassKey && o.TargetClassKey == targetClassKey && o.RelationshipTypeKey == relationshipTypeKey && o.RelationshipClassType == tclass);
                         if (toDelete != null)
                         {
-                            this.Delete(context, toDelete.Key, DeleteMode.PermanentDelete);
+                            this.Delete(context, toDelete.Key, DeleteMode.PermanentDelete, false);
                         }
                         tx.Commit();
                     }
@@ -385,7 +385,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public RelationshipValidationRule Delete(DataContext context, Guid key, DeleteMode deletionMode)
+        public RelationshipValidationRule Delete(DataContext context, Guid key, DeleteMode deletionMode, bool cascadeDelete)
         {
             var existing = context.FirstOrDefault<DbRelationshipValidationRule>(r => r.Key == key);
             switch (deletionMode)
@@ -445,7 +445,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        IdentifiedData IAdoPersistenceProvider.Delete(DataContext context, Guid key, DeleteMode deletionMode) => this.Delete(context, key, deletionMode);
+        IdentifiedData IAdoPersistenceProvider.Delete(DataContext context, Guid key, DeleteMode deletionMode, bool cascadeDelete) => this.Delete(context, key, deletionMode, cascadeDelete);
 
         /// <inheritdoc/>
         public bool Exists(DataContext context, Guid key) => context.Any<DbRelationshipValidationRule>(o => o.Key == key);
