@@ -110,6 +110,9 @@ namespace SanteDB.Persistence.Data.Services
                             dependencies = dependencies.Concat(concept.Relationships?.Select(r => Array.FindIndex(resolved, i => i.Element.Key == r.TargetConceptKey)) ?? new int[0]);
                             dependencies = dependencies.Concat(concept.ConceptSetsXml?.Select(o => Array.FindIndex(resolved, i => i.Element.Key == o)) ?? new int[0]);
                             break;
+                        case ConceptSet conceptSet:
+                            dependencies = conceptSet.ConceptsXml?.Select(r => Array.FindIndex(resolved, i => i.Element.Key == r)) ?? new int[0];
+                            break;
                         case ITargetedAssociation ta:
                             dependencies = new int[] {
                                     Array.FindIndex(resolved, i => i.Element.Key == ta.TargetEntityKey), 
