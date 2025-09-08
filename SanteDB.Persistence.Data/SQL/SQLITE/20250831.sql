@@ -1,7 +1,7 @@
 /** 
  * <feature scope="SanteDB.Persistence.Data" id="20250831" name="Update:20250831"  invariantName="sqlite">
  *	<summary>Update: Update: Adds the date observation type to the database</summary>
- *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE name='dt_obs_tbl' AND sql LIKE '%val_prec%')</isInstalled>
+ *  <isInstalled>SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE name='DT_OBS_TBL' AND sql LIKE '%VAL_PREC%')</isInstalled>
  * </feature>
  */
  
