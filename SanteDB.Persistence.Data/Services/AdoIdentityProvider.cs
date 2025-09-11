@@ -313,6 +313,7 @@ namespace SanteDB.Persistence.Data.Services
                                     claims.Add(new DbUserClaim() { ClaimType = SanteDBClaimTypes.SanteDBScopeClaim, ClaimValue = PermissionPolicyIdentifiers.LoginPasswordOnly });
                                     claims.Add(new DbUserClaim() { ClaimType = SanteDBClaimTypes.SanteDBScopeClaim, ClaimValue = PermissionPolicyIdentifiers.Login });
                                     claims.Add(new DbUserClaim() { ClaimType = SanteDBClaimTypes.SanteDBScopeClaim, ClaimValue = PermissionPolicyIdentifiers.ReadMetadata });
+                                    claims.Add(new DbUserClaim() { ClaimType = SanteDBClaimTypes.SanteDBScopeClaim, ClaimValue = PermissionPolicyIdentifiers.LoginAnywhere });
                                     claims.Add(new DbUserClaim() { ClaimType = SanteDBClaimTypes.ForceResetPassword, ClaimValue = "true" });
                                 }
                             }
