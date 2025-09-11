@@ -480,6 +480,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 }
             }
 
+            //Mark the end of the bundle processing.
+            this.ProgressChanged?.Invoke(
+                this,
+                new ProgressChangedEventArgs(nameof(BundlePersistenceService), 1, UserMessages.PROCESSING)
+                );
+
             // Give the bundle a UUID indicating it was persisted (use the prov id)
             data.Key = context.ContextId;
             return data;
