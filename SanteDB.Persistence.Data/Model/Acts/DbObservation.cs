@@ -19,6 +19,7 @@
  * Date: 2023-6-21
  */
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
@@ -81,6 +82,28 @@ namespace SanteDB.Persistence.Data.Model.Acts
         public Decimal Value { get; set; }
 
     }
+
+
+    /// <summary>
+    /// Represents additional data related to a quantified observation
+    /// </summary>
+    [Table("dt_obs_tbl")]
+    public class DbDateObservation : DbObsSubTable
+    {
+
+        /// <summary>
+        /// Gets or sets the value of the measure
+        /// </summary>
+        [Column("val_dt")]
+        public DateTimeOffset Value { get; set; }
+
+        /// <summary>
+        /// Value precision
+        /// </summary>
+        [Column("val_prec")]
+        public String ValuePrecision { get; set; }
+    }
+
 
     /// <summary>
     /// Identifies the observation as a text obseration

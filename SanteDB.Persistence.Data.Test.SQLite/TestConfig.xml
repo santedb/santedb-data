@@ -50,6 +50,7 @@
     <providers>
       <add type="SanteDB.OrmLite.Providers.Firebird.FirebirdSQLProvider, SanteDB.OrmLite" invariant="FirebirdSQL" />
       <add type="SanteDB.OrmLite.Providers.Sqlite.SqliteProvider, SanteDB.OrmLite" invariant="sqlite" />
+      <add type="SanteDB.OrmLite.Providers.Sqlite.SqliteWriteBackProvider, SanteDB.OrmLite" invariant="sqlite+wb" />
     </providers>
     <dbProviderFactories>
       <add name="SQLite Data Provider" invariant="sqlite" description=".Net Framework Data Provider for SQLite" type="Microsoft.Data.Sqlite.SqliteFactory, Microsoft.Data.Sqlite" />
@@ -102,7 +103,7 @@
            readWriteConnectionString="TEST_CONNECTION"
            readOnlyConnectionString="TEST_CONNECTION"
            traceSql="false"
-           providerType="sqlite"
+           providerType="sqlite+wb"
            versioning="default"
            staOnly="false"
            autoUpdateExisting="true"
@@ -157,7 +158,7 @@
 	<add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api" />
     </serviceProviders>
     <appSettings>
-      <add key="allow.patient.martialStatus" value="true" />
+      <add key="allow.patient.maritalStatus" value="true" />
       <add key="allow.patient.ethnicity" value="true" />
       <add key="allow.patient.educationLevel" value="true" />
       <add key="allow.patient.livingArrangement" value="true" />

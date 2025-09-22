@@ -51,8 +51,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     return (QuantityObservation)typeof(QuantityObservation).GetRelatedPersistenceService().Insert(context, data);
                 case "CD":
                     return (CodedObservation)typeof(CodedObservation).GetRelatedPersistenceService().Insert(context, data);
+                case "TS":
+                    return (DateObservation)typeof(DateObservation).GetRelatedPersistenceService().Insert(context, data);
                 default:
-                    throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_OUT_OF_RANGE, data.ValueType, "ST,CD,PQ"));
+                    throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_OUT_OF_RANGE, data.ValueType, "ST,CD,PQ,TS"));
             }
         }
 
@@ -67,8 +69,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     return (QuantityObservation)typeof(QuantityObservation).GetRelatedPersistenceService().Update(context, data);
                 case "CD":
                     return (CodedObservation)typeof(CodedObservation).GetRelatedPersistenceService().Update(context, data);
+                case "TS":
+                    return (DateObservation)typeof(DateObservation).GetRelatedPersistenceService().Update(context, data);
                 default:
-                    throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_OUT_OF_RANGE, data.ValueType, "ST,CD,PQ"));
+                    throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_OUT_OF_RANGE, data.ValueType, "ST,CD,PQ,TS"));
             }
         }
 
@@ -97,6 +101,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                         break;
                     case "CD":
                         mapper = typeof(CodedObservation).GetRelatedPersistenceService() as IAdoClassMapper;
+                        break;
+                    case "TS":
+                        mapper = typeof(DateObservation).GetRelatedPersistenceService() as IAdoClassMapper;
                         break;
                 }
 

@@ -24,6 +24,7 @@ using SanteDB.Core.Exceptions;
 using SanteDB.Core.Http;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
@@ -483,6 +484,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<TModelAssociation> UpdateModelAssociations<TModelAssociation>(DataContext context, TModel data, IEnumerable<TModelAssociation> associations)
             where TModelAssociation : IdentifiedData, ISimpleAssociation, new()
         {
+
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ARGUMENT_NULL);
@@ -495,6 +497,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 throw new ArgumentNullException(nameof(IdentifiedData.Key), ErrorMessages.ARGUMENT_NULL);
             }
+
+            associations = associations.Where(a => a.BatchOperation != BatchOperationType.Ignore);
 
             context.PushData(DataConstants.NoTouchSourceContextKey, true);
 
@@ -526,7 +530,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Which are new and which are not?
             var removedRelationships = existing.Where(o => associations.Any(a => a.Key == o && a.BatchOperation == Core.Model.DataTypes.BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a =>
             {
-                return persistenceService.Delete(context, a.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
+                return persistenceService.Delete(context, a.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy, false);
             });
             var addedRelationships = associations.Where(o => !o.IsEmpty() && o.BatchOperation != Core.Model.DataTypes.BatchOperationType.Delete && (!o.Key.HasValue || !existing.Any(a => a == o.Key))).Select(a =>
             {

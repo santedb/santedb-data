@@ -45,7 +45,7 @@ namespace SanteDB.Persistence.Data
         public const string AllowReligion = "allow.patient.religion";
         public const string AllowEthnicity = "allow.patient.ethnicity";
         public const string AllowLivingArrangement = "allow.patient.livingArrangement";
-        public const string AllowMaritalStatus = "allow.patient.martialStatus";
+        public const string AllowMaritalStatus = "allow.patient.maritalStatus";
         public const string AllowEducationLevel = "allow.patient.educationLevel";
     }
 }

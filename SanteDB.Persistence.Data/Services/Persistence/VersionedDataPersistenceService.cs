@@ -881,6 +881,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(IdentifiedData.Key), ErrorMessages.ARGUMENT_NULL);
             }
 
+
+            associations = associations.Where(a => a.BatchOperation != BatchOperationType.Ignore);
+
             context.PushData(DataConstants.NoTouchSourceContextKey, true);
 
             // We now want to fetch the perssitence serivce of this

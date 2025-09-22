@@ -429,10 +429,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                     switch (data.Item[i].BatchOperation)
                     {
                         case BatchOperationType.Delete:
+                        case BatchOperationType.DeletePreserveContained:
                             if (persistenceService.Exists(context, data.Item[i].Key.Value))
                             {
-                                data.Item[i] = persistenceService.Delete(context, data.Item[i].Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
-                                data.Item[i].BatchOperation = BatchOperationType.Delete;
+                                data.Item[i] = persistenceService.Delete(context, data.Item[i].Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy, data.Item[i].BatchOperation == BatchOperationType.DeletePreserveContained);                                
                             }
                             else
                             {
@@ -480,6 +480,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 }
             }
 
+            //Mark the end of the bundle processing.
+            this.ProgressChanged?.Invoke(
+                this,
+                new ProgressChangedEventArgs(nameof(BundlePersistenceService), 1, UserMessages.PROCESSING)
+                );
+
             // Give the bundle a UUID indicating it was persisted (use the prov id)
             data.Key = context.ContextId;
             return data;
@@ -494,7 +500,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
         /// <inheritdoc/>
         /// <exception cref="NotSupportedException">This method is not supported on <see cref="Bundle"/></exception>
-        public Bundle Delete(OrmLite.DataContext context, Guid key, DeleteMode deletionMode)
+        public Bundle Delete(OrmLite.DataContext context, Guid key, DeleteMode deletionMode, bool preserveContained)
         {
             throw new NotSupportedException();
         }
@@ -531,7 +537,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
         /// <inheritdoc/>
         /// <exception cref="NotSupportedException">This method is not supported on <see cref="Bundle"/></exception>
-        IdentifiedData IAdoPersistenceProvider.Delete(OrmLite.DataContext context, Guid key, DeleteMode deleteMode)
+        IdentifiedData IAdoPersistenceProvider.Delete(OrmLite.DataContext context, Guid key, DeleteMode preserveContained, bool cascadeDelete)
         {
             throw new NotSupportedException();
         }

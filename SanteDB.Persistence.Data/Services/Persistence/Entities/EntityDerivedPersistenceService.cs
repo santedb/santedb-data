@@ -23,6 +23,7 @@ using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Extensions;
 using SanteDB.Core.i18n;
+using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
@@ -33,6 +34,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
+using SanteDB.Persistence.Data.Model.Acts;
 using SanteDB.Persistence.Data.Model.DataType;
 using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Extensibility;
@@ -636,15 +638,24 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
 
         /// <inheritdoc/>
-        protected override TEntity DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode)
+        protected override TEntity DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained)
         {
+
             // Cascade the deletion of data down 
-            foreach (var ar in context.Query<DbEntityRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToList())
+            if (!preserveContained)
             {
-                typeof(Entity).GetRelatedPersistenceService().Delete(context, ar.TargetKey, deleteMode);
+                foreach (var ar in context.Query<DbEntityRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToArray())
+                {
+                    var rps = typeof(Act).GetRelatedPersistenceService();
+                    if (rps.Exists(context, ar.TargetKey))
+                    {
+                        rps.Delete(context, ar.TargetKey, deleteMode, preserveContained);
+                    }
+                }
             }
-            return base.DoDeleteModel(context, key, deleteMode);
+            return base.DoDeleteModel(context, key, deleteMode, preserveContained);
         }
+
         /// <summary>
         /// Map to model instance
         /// </summary>

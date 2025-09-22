@@ -72,14 +72,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <inheritdoc/>
-        protected override TModel DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode)
+        protected override TModel DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained)
         {
             var sourceKey = context.Query<TDbModel>(o => o.Key == key).Select(o => o.SourceKey).FirstOrDefault();
             if(sourceKey != Guid.Empty && (!context.PeekData(DataConstants.NoTouchSourceContextKey, out var noTouch) || !(bool)noTouch))
             {
                 new TModel().SourceType.GetRelatedPersistenceService().Touch(context, sourceKey);
             }
-            return base.DoDeleteModel(context, key, deleteMode);
+            return base.DoDeleteModel(context, key, deleteMode, preserveContained);
         }
 
         /// <summary>

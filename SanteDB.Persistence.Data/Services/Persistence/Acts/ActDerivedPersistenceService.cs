@@ -304,6 +304,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             context.DeleteAll<DbCodedObservation>(o => o.ParentKey == key);
             context.DeleteAll<DbTextObservation>(o => o.ParentKey == key);
             context.DeleteAll<DbQuantityObservation>(o => o.ParentKey == key);
+            context.DeleteAll<DbDateObservation>(o => o.ParentKey == key);
             context.DeleteAll<DbObservation>(o => o.ParentKey == key);
             context.DeleteAll<DbPatientEncounter>(o => o.ParentKey == key);
             context.DeleteAll<DbProcedure>(o => o.ParentKey == key);
@@ -629,14 +630,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
 
         /// <inheritdoc/>
-        protected override TAct DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode)
+        protected override TAct DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained)
         {
             // Cascade the deletion of data down 
-            foreach (var ar in context.Query<DbActRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToArray())
+            if (!preserveContained)
             {
-                typeof(Act).GetRelatedPersistenceService().Delete(context, ar.TargetKey, deleteMode);
+                foreach (var ar in context.Query<DbActRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToArray())
+                {
+                    var rps = typeof(Act).GetRelatedPersistenceService();
+                    if (rps.Exists(context, ar.TargetKey))
+                    {
+                        rps.Delete(context, ar.TargetKey, deleteMode, preserveContained);
+                    }
+                }
             }
-            return base.DoDeleteModel(context, key, deleteMode);
+            return base.DoDeleteModel(context, key, deleteMode, preserveContained);
         }
 
         /// <summary>

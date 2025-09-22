@@ -410,7 +410,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Perform the actual obsolete of a model object
         /// </summary>
-        protected virtual TModel DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode)
+        protected virtual TModel DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained)
         {
             if (context == null)
             {
@@ -1119,12 +1119,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// ADO persistence delete
         /// </summary>
-        TModel IAdoPersistenceProvider<TModel>.Delete(DataContext context, Guid key, DeleteMode deleteMode) => this.DoDeleteModel(context, key, deleteMode);
+        TModel IAdoPersistenceProvider<TModel>.Delete(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained) => this.DoDeleteModel(context, key, deleteMode, preserveContained);
 
         /// <summary>
         /// ADO non-generic delete
         /// </summary>
-        public IdentifiedData Delete(DataContext context, Guid key, DeleteMode deleteMode) => this.DoDeleteModel(context, key, deleteMode);
+        public IdentifiedData Delete(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained) => this.DoDeleteModel(context, key, deleteMode, preserveContained);
 
 
         /// <summary>
@@ -1163,7 +1163,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         // Establish provenance object
                         context.EstablishProvenance(principal, null);
 
-                        retVal = this.DoDeleteModel(context, key, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
+                        retVal = this.DoDeleteModel(context, key, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy, false);
                         retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Delete;
                         if (mode == TransactionMode.Commit)
                         {
