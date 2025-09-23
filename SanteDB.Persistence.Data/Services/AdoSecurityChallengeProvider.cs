@@ -38,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
+using System.Security.Claims;
 using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.Services
@@ -229,6 +230,9 @@ namespace SanteDB.Persistence.Data.Services
                             identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
                             identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
                             identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
+                            identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.Login));
+                            identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginAnywhere));
+                            identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.ForceResetPassword, "true"));
 
                             var retVal = new AdoClaimsPrincipal(identity);
                             this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, retVal, true));
