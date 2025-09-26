@@ -90,7 +90,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_subscriptionRepository = subscriptionDefinition;
             this.m_localizationService = localizationService;
             this.m_serviceManager = serviceManager;
-            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
+            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap", this.GetType().Assembly);
         }
 
         /// <summary>

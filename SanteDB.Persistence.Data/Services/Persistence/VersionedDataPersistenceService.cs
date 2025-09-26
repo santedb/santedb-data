@@ -120,7 +120,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     if (existing.Count() > 1) // We only keep recent and last
                     {
                         var lastVersionSequence = existing[0].VersionSequenceId;
-                        this.DoDeleteAllModel(context, o => o.Key == key && o.VersionSequence < lastVersionSequence, DeleteMode.PermanentDelete);
+                        this.DoDeleteAllInternal(context, o => o.Key == key && o.VersionSequence < lastVersionSequence, DeleteMode.PermanentDelete);
                     }
                 }
                 else
@@ -881,6 +881,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(IdentifiedData.Key), ErrorMessages.ARGUMENT_NULL);
             }
 
+
+            associations = associations.Where(a => a.BatchOperation != BatchOperationType.Ignore);
+
             context.PushData(DataConstants.NoTouchSourceContextKey, true);
 
             // We now want to fetch the persistence service of this
@@ -921,7 +924,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // TODO: Determine if this line performs better than selecting the entire object (I suspect it would - but need to check)
             var contextKeys = context.Data.Where(o => o.Value is BatchOperationType bt && bt != BatchOperationType.Delete).Select(o => (Guid?)Guid.Parse(o.Key)).ToArray();
             var assocKeys = associations.Select(k => k.Key).ToArray();
-            var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && o.ObsoleteVersionSequenceId == null || assocKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
+            var existing = data.BatchOperation == BatchOperationType.Insert ? new Guid?[0] : persistenceService.Query(context, o => o.SourceEntityKey == data.Key && o.ObsoleteVersionSequenceId == null || assocKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
             var associationKeys = associations.Select(o => o.Key).ToArray();
             var toDelete = associations.Where(a => a.BatchOperation == BatchOperationType.Delete).Select(o => o.Key)
                 .Union(existing.Where(e => !associationKeys.Contains(e)));

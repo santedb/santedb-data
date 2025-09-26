@@ -254,19 +254,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected override TModel DoConvertToInformationModel(DataContext context, TDbModel dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.CreatedBy = retVal.CreatedBy.GetRelatedPersistenceService().Get(context, dbModel.CreatedByKey);
-                    retVal.SetLoaded(nameof(BaseEntityData.CreatedBy));
-                    retVal.ObsoletedBy = retVal.ObsoletedBy.GetRelatedPersistenceService().Get(context, dbModel.ObsoletedByKey.GetValueOrDefault());
-                    retVal.SetLoaded(nameof(BaseEntityData.ObsoletedBy));
-                    break;
-            }
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            return retVal;
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        retVal.CreatedBy = retVal.CreatedBy.GetRelatedPersistenceService().Get(context, dbModel.CreatedByKey);
+                        retVal.SetLoaded(nameof(BaseEntityData.CreatedBy));
+                        retVal.ObsoletedBy = retVal.ObsoletedBy.GetRelatedPersistenceService().Get(context, dbModel.ObsoletedByKey.GetValueOrDefault());
+                        retVal.SetLoaded(nameof(BaseEntityData.ObsoletedBy));
+                        break;
+                }
+
+                return retVal;
+            }
         }
     }
 }

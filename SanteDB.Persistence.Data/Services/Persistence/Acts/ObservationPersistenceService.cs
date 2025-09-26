@@ -51,8 +51,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     return (QuantityObservation)typeof(QuantityObservation).GetRelatedPersistenceService().Insert(context, data);
                 case "CD":
                     return (CodedObservation)typeof(CodedObservation).GetRelatedPersistenceService().Insert(context, data);
+                case "TS":
+                    return (DateObservation)typeof(DateObservation).GetRelatedPersistenceService().Insert(context, data);
                 default:
-                    throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_OUT_OF_RANGE, data.ValueType, "ST,CD,PQ"));
+                    throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_OUT_OF_RANGE, data.ValueType, "ST,CD,PQ,TS"));
             }
         }
 
@@ -67,8 +69,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     return (QuantityObservation)typeof(QuantityObservation).GetRelatedPersistenceService().Update(context, data);
                 case "CD":
                     return (CodedObservation)typeof(CodedObservation).GetRelatedPersistenceService().Update(context, data);
+                case "TS":
+                    return (DateObservation)typeof(DateObservation).GetRelatedPersistenceService().Update(context, data);
                 default:
-                    throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_OUT_OF_RANGE, data.ValueType, "ST,CD,PQ"));
+                    throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_OUT_OF_RANGE, data.ValueType, "ST,CD,PQ,TS"));
             }
         }
 
@@ -77,32 +81,39 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// </summary>
         protected override Observation DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
-            var obsData = referenceObjects?.OfType<DbObservation>().FirstOrDefault();
-            if (obsData == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                obsData = context.FirstOrDefault<DbObservation>(o => o.ParentKey == dbModel.VersionKey);
-            }
 
-            IAdoClassMapper mapper = null;
-            switch (obsData?.ValueType)
-            {
-                case "ST":
-                    mapper = typeof(TextObservation).GetRelatedPersistenceService() as IAdoClassMapper;
-                    break;
-                case "PQ":
-                    mapper = typeof(QuantityObservation).GetRelatedPersistenceService() as IAdoClassMapper;
-                    break;
-                case "CD":
-                    mapper = typeof(CodedObservation).GetRelatedPersistenceService() as IAdoClassMapper;
-                    break;
-            }
+                var obsData = referenceObjects?.OfType<DbObservation>().FirstOrDefault();
+                if (obsData == null)
+                {
+                    obsData = context.FirstOrDefault<DbObservation>(o => o.ParentKey == dbModel.VersionKey);
+                }
 
-            if (referenceObjects.Length == 0)
-            {
-                referenceObjects = mapper.GetReferencedObjects(context, dbModel);
+                IAdoClassMapper mapper = null;
+                switch (obsData?.ValueType)
+                {
+                    case "ST":
+                        mapper = typeof(TextObservation).GetRelatedPersistenceService() as IAdoClassMapper;
+                        break;
+                    case "PQ":
+                        mapper = typeof(QuantityObservation).GetRelatedPersistenceService() as IAdoClassMapper;
+                        break;
+                    case "CD":
+                        mapper = typeof(CodedObservation).GetRelatedPersistenceService() as IAdoClassMapper;
+                        break;
+                    case "TS":
+                        mapper = typeof(DateObservation).GetRelatedPersistenceService() as IAdoClassMapper;
+                        break;
+                }
+
+                if (referenceObjects.Length == 0)
+                {
+                    referenceObjects = mapper.GetReferencedObjects(context, dbModel);
+                }
+                return mapper?.MapToModelInstanceEx(context, dbModel, referenceObjects) as Observation ??
+                    base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             }
-            return mapper?.MapToModelInstanceEx(context, dbModel, referenceObjects) as Observation ??
-                base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
         }
     }
 }

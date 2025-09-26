@@ -81,6 +81,8 @@
     <None Remove="SQL\FBSQL\Updates\20241103.sql" />
     <None Remove="SQL\FBSQL\Updates\20241119.sql" />
     <None Remove="SQL\FBSQL\Updates\20250127.sql" />
+    <None Remove="SQL\FBSQL\Updates\20250508-FBSQL.sql" />
+    <None Remove="SQL\FBSQL\Updates\20250831.sql" />
     <None Remove="SQL\PSQL\santedb-codes.sql" />
     <None Remove="SQL\PSQL\santedb-ddl.sql" />
     <None Remove="SQL\PSQL\santedb-fn.sql" />
@@ -234,6 +236,9 @@
     <EmbeddedResource Include="SQL\FBSQL\Updates\20250210.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20250127.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20241119.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20250508-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20250831.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20250831.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20250530.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20250210.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20250127.sql" />
@@ -331,6 +336,7 @@
     <EmbeddedResource Include="SQL\SQLITE\20230509.sql">
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\SQLITE\20241118.sql" />
+    <EmbeddedResource Include="SQL\SQLITE\20250831.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20250720.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20250530.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20250324.sql" />

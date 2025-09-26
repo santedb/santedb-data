@@ -114,7 +114,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_localizationService = localizationService;
             this.Provider = this.m_configuration.Provider;
-            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
+            this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap", this.GetType().Assembly);
         }
 
         /// <summary>
@@ -356,14 +356,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-            this.m_tracer.TraceVerbose("Updating {0}", data);
-
-            var dbInstance = this.DoConvertToDataModel(context, data);
-            dbInstance = this.DoUpdateInternal(context, dbInstance);
-            var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
-            retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
-
-            return this.AfterPersisted(context, retVal);
+                var dbInstance = this.DoConvertToDataModel(context, data);
+                dbInstance = this.DoUpdateInternal(context, dbInstance);
+                var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
+                retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
+                return this.AfterPersisted(context, retVal);
 
 #if DEBUG
             }
@@ -414,7 +411,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Perform the actual obsolete of a model object
         /// </summary>
-        protected virtual TModel DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode)
+        protected virtual TModel DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained)
         {
             if (context == null)
             {
@@ -1125,12 +1122,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// ADO persistence delete
         /// </summary>
-        TModel IAdoPersistenceProvider<TModel>.Delete(DataContext context, Guid key, DeleteMode deleteMode) => this.DoDeleteModel(context, key, deleteMode);
+        TModel IAdoPersistenceProvider<TModel>.Delete(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained) => this.DoDeleteModel(context, key, deleteMode, preserveContained);
 
         /// <summary>
         /// ADO non-generic delete
         /// </summary>
-        public IdentifiedData Delete(DataContext context, Guid key, DeleteMode deleteMode) => this.DoDeleteModel(context, key, deleteMode);
+        public IdentifiedData Delete(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained) => this.DoDeleteModel(context, key, deleteMode, preserveContained);
 
 
         /// <summary>
@@ -1169,7 +1166,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         // Establish provenance object
                         context.EstablishProvenance(principal, null);
 
-                        retVal = this.DoDeleteModel(context, key, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
+                        retVal = this.DoDeleteModel(context, key, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy, false);
                         retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Delete;
                         if (mode == TransactionMode.Commit)
                         {

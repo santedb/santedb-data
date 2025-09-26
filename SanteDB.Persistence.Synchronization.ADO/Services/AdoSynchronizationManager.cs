@@ -73,7 +73,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
 
                 using (var mapStream = typeof(AdoSynchronizationQueue).Assembly.GetManifestResourceStream("SanteDB.Persistence.Synchronization.ADO.Map.ModelMap.xml"))
                 {
-                    var mapper = new ModelMapper(mapStream, "SynchronizationMap", true);
+                    var mapper = new ModelMapper(mapStream, "SynchronizationMap", useReflectionOnly: true);
                     // Load all queues 
                     using (var ctx = _Provider.GetReadonlyConnection())
                     {

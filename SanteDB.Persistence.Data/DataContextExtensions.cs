@@ -18,7 +18,9 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using Newtonsoft.Json.Bson;
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
@@ -33,6 +35,7 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.Persistence.Data.Configuration;
+using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
 using SanteDB.Persistence.Data.Services.Persistence;
@@ -43,6 +46,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Security;
 using System.Security.Principal;
 
@@ -54,6 +58,40 @@ namespace SanteDB.Persistence.Data
     /// </summary>
     public static class DataContextExtensions
     {
+        private const int MAX_STACK_DEPTH = 30;
+
+        /// <summary>
+        /// Data context information model entry allows for a using
+        /// </summary>
+        public class DataContextInformationModelEntry : IDisposable
+        {
+            private readonly DataContext m_dataContext;
+            private readonly Guid m_entryId;
+
+            /// <summary>
+            /// Create new data context
+            /// </summary>
+            public DataContextInformationModelEntry(DataContext dataContext, Guid entryId)
+            {
+                this.m_dataContext = dataContext;
+                this.m_entryId = entryId;
+                dataContext.PushData(DataConstants.DoConvertToInformationModelStack, entryId);
+            }
+
+           
+            /// <summary>
+            /// Dispose the context
+            /// </summary>
+            public void Dispose()
+            {
+                if(!this.m_dataContext.PopData(DataConstants.DoConvertToInformationModelStack, out var entryId) || 
+                    !entryId.Equals(this.m_entryId))
+                {
+                    throw new InvalidOperationException(String.Format(ErrorMessages.WOULD_RESULT_INVALID_STATE, nameof(DataContextInformationModelEntry)));
+                }
+            }
+
+        }
 
         /// <summary>
         /// Defer constraints annotation
@@ -263,17 +301,27 @@ namespace SanteDB.Persistence.Data
         /// <summary>
         /// Set data on the context in a safe manner
         /// </summary>
-        public static void PopData(this DataContext me, String dataKey, out Object data)
+        public static bool PopData(this DataContext me, String dataKey, out Object data)
         {
             if (me.Data.TryGetValue(dataKey, out var existing) && existing is Stack<Object> stk)
             {
-                data = stk.Pop();
+                if (stk.Any())
+                {
+                    data = stk.Pop();
+                    return true;
+                }
+                else
+                {
+                    data = null;
+                    return false;
+                }
             }
             else
             {
                 stk = new Stack<object>();
                 me.Data.Add(dataKey, stk);
                 data = null;
+                return false;
             }
         }
 
@@ -290,6 +338,21 @@ namespace SanteDB.Persistence.Data
             else
             {
                 data = null;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the data stack contains an entry
+        /// </summary>
+        public static bool ContainsStackEntry(this DataContext me, String dataKey, Object checkData)
+        {
+            if (me.Data.TryGetValue(dataKey, out var existing) && existing is Stack<Object> stk)
+            {
+                return stk.Contains(checkData);
+            }
+            else
+            {
                 return false;
             }
         }
@@ -469,5 +532,21 @@ namespace SanteDB.Persistence.Data
                 dataContext.Data.Add(key, value);
             }
         }
+
+        /// <summary>
+        /// Should be called when converting to information model to prevent stack overflows
+        /// </summary>
+        public static DataContextInformationModelEntry CreateInformationModelGuard(this DataContext dataContext, Guid entryId) => new DataContextInformationModelEntry(dataContext, entryId);
+
+        /// <summary>
+        /// Determine if the information model is loading
+        /// </summary>
+        public static bool IsLoadingInformationModel(this DataContext dataContext, Guid entryId) => dataContext.ContainsStackEntry(DataConstants.DoConvertToInformationModelStack, entryId);
+
+        /// <summary>
+        /// Validate that the current context is under the maximum stack depth
+        /// </summary>
+        public static bool ValidateMaximumStackDepth(this DataContext dataContext) => (dataContext.Data[DataConstants.DoConvertToInformationModelStack] as IEnumerable<Object>).Distinct().Count() < MAX_STACK_DEPTH;
+
     }
 }

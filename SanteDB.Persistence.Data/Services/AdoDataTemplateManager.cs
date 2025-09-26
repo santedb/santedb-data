@@ -90,7 +90,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// DI constructor
         /// </summary>
-        public AdoDataTemplateManager(IConfigurationManager configurationManager, IQueryPersistenceService queryPersistenceService, IPolicyEnforcementService pepService, IPasswordHashingService hashingService)
+        public AdoDataTemplateManager(IConfigurationManager configurationManager, IPolicyEnforcementService pepService, IPasswordHashingService hashingService, IQueryPersistenceService queryPersistenceService = null)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_queryPersistenceService = queryPersistenceService;

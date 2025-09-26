@@ -101,7 +101,7 @@ namespace SanteDB.Persistence.Data.Services
             try
             {
                 this.m_configuration = configManager.GetSection<AdoPersistenceConfigurationSection>();
-                this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
+                this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap", this.GetType().Assembly);
                 this.m_serviceManager = serviceManager;
 
                 QueryBuilder.AddQueryHacks(serviceManager.CreateAll<IQueryBuilderHack>(this.m_mapper));

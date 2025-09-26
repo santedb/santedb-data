@@ -48,17 +48,25 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override CarePathwayDefinition DoConvertToInformationModel(DataContext context, DbCarePathwayDefinition dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
-            switch(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.Template = retVal.Template.GetRelatedPersistenceService().Get(context, retVal.TemplateKey.GetValueOrDefault());
-                    retVal.SetLoaded(o => o.Template);
-                    break;
-            }
 
-            return retVal;
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            retVal.Template = retVal.Template.GetRelatedPersistenceService().Get(context, retVal.TemplateKey.GetValueOrDefault());
+                            retVal.SetLoaded(o => o.Template);
+                        }
+                        break;
+                }
+
+                return retVal;
+            }
+           
         }
 
     }

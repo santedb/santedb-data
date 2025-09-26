@@ -57,15 +57,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Notifications
         protected override NotificationTemplate DoConvertToInformationModel(DataContext context, DbNotificationTemplate dbModel,
             params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+            using (context.CreateInformationModelGuard(dbModel.Key))
+            {
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            retVal.Contents = retVal.Contents.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-            retVal.SetLoaded(o => o.Contents);
+                retVal.Contents = retVal.Contents.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                retVal.SetLoaded(o => o.Contents);
 
-            retVal.Parameters = retVal.Parameters.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-            retVal.SetLoaded(o => o.Parameters);
+                retVal.Parameters = retVal.Parameters.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                retVal.SetLoaded(o => o.Parameters);
 
-            return retVal;
+                return retVal;
+            }
         }
 
         /// <summary>

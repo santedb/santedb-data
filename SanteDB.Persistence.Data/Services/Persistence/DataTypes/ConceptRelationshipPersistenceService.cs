@@ -64,22 +64,32 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// </summary>
         protected override ConceptRelationship DoConvertToInformationModel(DataContext context, DbConceptRelationship dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.RelationshipType = retVal.RelationshipType.GetRelatedPersistenceService().Get(context, dbModel.RelationshipTypeKey);
-                    retVal.SetLoaded(nameof(ConceptRelationship.RelationshipType));
-                    // Prevents infinite recursion for now when A->B->A
-                    //if (retVal.TargetConceptKey != retVal.SourceEntityKey)
-                    //{
-                    //    retVal.TargetConcept = retVal.TargetConcept.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
-                    //    retVal.SetLoaded(nameof(ConceptRelationship.TargetConcept));
-                    //}
-                    break;
-            }
 
-            return retVal;
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            if (!context.IsLoadingInformationModel(dbModel.RelationshipTypeKey))
+                            {
+                                retVal.RelationshipType = retVal.RelationshipType.GetRelatedPersistenceService().Get(context, dbModel.RelationshipTypeKey);
+                                retVal.SetLoaded(nameof(ConceptRelationship.RelationshipType));
+                            }
+                            // Prevents infinite recursion for now when A->B->A
+                            if (retVal.TargetConceptKey != retVal.SourceEntityKey && !context.IsLoadingInformationModel(retVal.TargetConceptKey.GetValueOrDefault()))
+                            {
+                                retVal.TargetConcept = retVal.TargetConcept.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
+                                retVal.SetLoaded(nameof(ConceptRelationship.TargetConcept));
+                            }
+                        }
+                        break;
+                }
+
+                return retVal;
+            }
         }
     }
 }

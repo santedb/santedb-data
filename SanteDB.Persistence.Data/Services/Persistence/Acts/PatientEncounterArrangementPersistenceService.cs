@@ -47,16 +47,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override PatientEncounterArrangement DoConvertToInformationModel(DataContext context, DbPatientEncounterArrangement dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
-            if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                retVal.ArrangementType = retVal.ArrangementType.GetRelatedPersistenceService().Get(context, dbModel.ArrangementTypeKey);
-                retVal.SetLoaded(o => o.ArrangementType);
+
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+
+                if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad && context.ValidateMaximumStackDepth())
+                {
+                    retVal.ArrangementType = retVal.ArrangementType.GetRelatedPersistenceService().Get(context, dbModel.ArrangementTypeKey);
+                    retVal.SetLoaded(o => o.ArrangementType);
+                }
+                retVal.StartTime = dbModel.StartTime;
+                retVal.StopTime = dbModel.StopTime;
+                return retVal;
             }
-            retVal.StartTime = dbModel.StartTime;
-            retVal.StopTime = dbModel.StopTime;
-            return retVal;
         }
     }
 }

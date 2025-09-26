@@ -32,6 +32,7 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
@@ -107,9 +108,16 @@ namespace SanteDB.Persistence.Data.Services
                             break;
                         case Concept concept:
                             dependencies = dependencies.Concat(concept.Relationships?.Select(r => Array.FindIndex(resolved, i => i.Element.Key == r.TargetConceptKey)) ?? new int[0]);
+                            dependencies = dependencies.Concat(concept.ConceptSetsXml?.Select(o => Array.FindIndex(resolved, i => i.Element.Key == o)) ?? new int[0]);
+                            break;
+                        case ConceptSet conceptSet:
+                            dependencies = conceptSet.ConceptsXml?.Select(r => Array.FindIndex(resolved, i => i.Element.Key == r)) ?? new int[0];
                             break;
                         case ITargetedAssociation ta:
-                            dependencies = new int[] { Array.FindIndex(resolved, i => i.Element.Key == ta.TargetEntityKey), Array.FindIndex(resolved, i => i.Element.Key == ta.SourceEntityKey) };
+                            dependencies = new int[] {
+                                    Array.FindIndex(resolved, i => i.Element.Key == ta.TargetEntityKey), 
+                                Array.FindIndex(resolved, i => i.Element.Key == ta.SourceEntityKey) 
+                            };
                             break;
 
                     }
@@ -191,13 +199,13 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(dataset), ErrorMessages.ARGUMENT_NULL);
             }
 
-            dataset = this.ReorganizeForInsert(dataset);
-
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
                 {
                     context.Open(initializeExtensions: false);
+                    context.AddOrUpdateData(DataConstants.DisableObjectValidation, true);
+
                     var patchId = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(dataset.Id)).HexEncode();
 
                     // Check if dataset is installed
@@ -210,6 +218,8 @@ namespace SanteDB.Persistence.Data.Services
 
                     using (var tx = context.BeginTransaction())
                     {
+
+
                         context.ContextId = context.EstablishProvenance(AuthenticationContext.Current.Principal, null);
 
                         // Insert the post install trigger
@@ -222,18 +232,20 @@ namespace SanteDB.Persistence.Data.Services
                             }
                         }
 
+                        dataset = this.ReorganizeForInsert(dataset);
+
                         for (var i = 0; i < dataset.Action.Count; i++)
                         {
                             var itm = dataset.Action[i];
                             // Clear the provenance times
-                            if(itm.Element is BaseEntityData be)
+                            if (itm.Element is BaseEntityData be)
                             {
                                 be.CreationTime = default(DateTimeOffset);
                                 be.CreatedByKey = null;
                                 be.ObsoletionTime = null;
                                 be.ObsoletedByKey = null;
                             }
-                            if(itm.Element is NonVersionedEntityData nve)
+                            if (itm.Element is NonVersionedEntityData nve)
                             {
                                 nve.CreationTime = default(DateTimeOffset);
                                 nve.CreatedByKey = null;
@@ -271,14 +283,14 @@ namespace SanteDB.Persistence.Data.Services
                                     case DataDelete dd:
                                         if (persistenceService.Exists(context, dd.Element.Key.Value))
                                         {
-                                            persistenceService.Delete(context, dd.Element.Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
+                                            persistenceService.Delete(context, dd.Element.Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy, false);
                                         }
                                         break;
                                 }
                             }
-                            catch(DbException e)
+                            catch (DbException e)
                             {
-                                
+
                                 this.m_tracer.TraceError("Installing {0} (#{1} in dataset) failed", itm, i);
                                 throw e.TranslateDbException();
                             }

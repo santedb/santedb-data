@@ -34,7 +34,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
     public class AdoSynchronizationRestoreService : OrmBackupRestoreServiceBase<AdoPubSubConfigurationSection>
     {
 
-
+        /// <inheritdoc />
         public AdoSynchronizationRestoreService(IConfigurationManager configurationManager) : base(configurationManager, Constants.SYNC_DATABASE_ASSET_ID)
         {
         }

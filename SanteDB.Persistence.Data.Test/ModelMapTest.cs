@@ -89,7 +89,7 @@ namespace SanteDB.Persistence.Data.Test
         [Test]
         public void TestProcessModelMapReflector()
         {
-            var mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream("SanteDB.Persistence.Data.Map.ModelMap.xml"), "AdoModelMapRef", true);
+            var mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream("SanteDB.Persistence.Data.Map.ModelMap.xml"), "AdoModelMapRef", useReflectionOnly: true);
 
             var patient = new Patient()
             {

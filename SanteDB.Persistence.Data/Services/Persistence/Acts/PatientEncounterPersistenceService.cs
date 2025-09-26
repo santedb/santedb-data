@@ -92,30 +92,37 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override PatientEncounter DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var dbEncounter = referenceObjects?.OfType<DbPatientEncounter>().FirstOrDefault();
-            if (dbEncounter == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceWarning("Using slow loading of encounter data (hint: use the appropriate persistence API)");
-                dbEncounter = context.FirstOrDefault<DbPatientEncounter>(o => o.ParentKey == dbModel.VersionKey);
+
+                var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                var dbEncounter = referenceObjects?.OfType<DbPatientEncounter>().FirstOrDefault();
+                if (dbEncounter == null)
+                {
+                    this.m_tracer.TraceWarning("Using slow loading of encounter data (hint: use the appropriate persistence API)");
+                    dbEncounter = context.FirstOrDefault<DbPatientEncounter>(o => o.ParentKey == dbModel.VersionKey);
+                }
+
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            retVal.DischargeDisposition = retVal.DischargeDisposition.GetRelatedPersistenceService().Get(context, dbEncounter.DischargeDispositionKey);
+                            retVal.SetLoaded(o => o.DischargeDisposition);
+                            retVal.AdmissionSourceType = retVal.AdmissionSourceType.GetRelatedPersistenceService().Get(context, dbEncounter.AdmissionSourceTypeKey);
+                            retVal.SetLoaded(o => o.AdmissionSourceType);
+                        }
+                        goto case LoadMode.SyncLoad;
+                    case LoadMode.SyncLoad:
+                        retVal.SpecialArrangements = retVal.SpecialArrangements.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+
+                        break;
+                }
+
+                retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbPatientEncounter, PatientEncounter>(dbEncounter), declaredOnly: true);
+                return retVal;
             }
-
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
-            {
-                case LoadMode.FullLoad:
-                    retVal.DischargeDisposition = retVal.DischargeDisposition.GetRelatedPersistenceService().Get(context, dbEncounter.DischargeDispositionKey);
-                    retVal.SetLoaded(o => o.DischargeDisposition);
-                    retVal.AdmissionSourceType = retVal.AdmissionSourceType.GetRelatedPersistenceService().Get(context, dbEncounter.AdmissionSourceTypeKey);
-                    retVal.SetLoaded(o => o.AdmissionSourceType);
-                    goto case LoadMode.SyncLoad;
-                case LoadMode.SyncLoad:
-                    retVal.SpecialArrangements = retVal.SpecialArrangements.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-
-                    break;
-            }
-
-            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbPatientEncounter, PatientEncounter>(dbEncounter), declaredOnly: true);
-            return retVal;
         }
     }
 }

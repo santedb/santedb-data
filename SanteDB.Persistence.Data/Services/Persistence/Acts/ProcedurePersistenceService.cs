@@ -50,28 +50,35 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override Procedure DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
-            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var procedureData = referenceObjects?.OfType<DbProcedure>().FirstOrDefault();
-            if (procedureData == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceVerbose("Using slow method of loading DbNarrative data from DbActVersion - Consider using the Narrative persistence service instead");
-                procedureData = context.FirstOrDefault<DbProcedure>(o => o.ParentKey == dbModel.VersionKey);
-            }
 
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
-            {
-                case LoadMode.FullLoad:
-                    modelData.ApproachSite = modelData.ApproachSite.GetRelatedMappingProvider().Get(context, procedureData.ApproachSiteConceptKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.ApproachSite);
-                    modelData.Method = modelData.Method.GetRelatedMappingProvider().Get(context, procedureData.MethodConceptKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.Method);
-                    modelData.TargetSite = modelData.TargetSite.GetRelatedMappingProvider().Get(context, procedureData.TargetSiteConceptKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.TargetSite);
-                    break;
-            }
+                var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                var procedureData = referenceObjects?.OfType<DbProcedure>().FirstOrDefault();
+                if (procedureData == null)
+                {
+                    this.m_tracer.TraceVerbose("Using slow method of loading DbNarrative data from DbActVersion - Consider using the Narrative persistence service instead");
+                    procedureData = context.FirstOrDefault<DbProcedure>(o => o.ParentKey == dbModel.VersionKey);
+                }
 
-            modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbProcedure, Procedure>(procedureData), declaredOnly: true);
-            return modelData;
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            modelData.ApproachSite = modelData.ApproachSite.GetRelatedMappingProvider().Get(context, procedureData.ApproachSiteConceptKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.ApproachSite);
+                            modelData.Method = modelData.Method.GetRelatedMappingProvider().Get(context, procedureData.MethodConceptKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.Method);
+                            modelData.TargetSite = modelData.TargetSite.GetRelatedMappingProvider().Get(context, procedureData.TargetSiteConceptKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.TargetSite);
+                        }
+                        break;
+                }
+
+                modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbProcedure, Procedure>(procedureData), declaredOnly: true);
+                return modelData;
+            }
         }
     }
 }

@@ -21,8 +21,10 @@
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Http;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
@@ -187,18 +189,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The converted model</returns>
         protected override TModel DoConvertToInformationModel(DataContext context, TDbModel dbModel, params Object[] referenceObjects)
         {
-            if (context == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+                if (context == null)
+                {
+                    throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+                }
+                else if (dbModel == default(TDbModel))
+                {
+                    throw new ArgumentNullException(nameof(dbModel), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+                }
+                var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbModel);
+                retVal.AddAnnotation(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy);
+                return retVal;
             }
-            else if (dbModel == default(TDbModel))
-            {
-                throw new ArgumentNullException(nameof(dbModel), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
-            }
-
-            var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbModel);
-            retVal.AddAnnotation(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy);
-            return retVal;
         }
 
 
@@ -481,6 +485,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<TModelAssociation> UpdateModelAssociations<TModelAssociation>(DataContext context, TModel data, IEnumerable<TModelAssociation> associations)
             where TModelAssociation : IdentifiedData, ISimpleAssociation, new()
         {
+
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), ErrorMessages.ARGUMENT_NULL);
@@ -493,6 +498,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 throw new ArgumentNullException(nameof(IdentifiedData.Key), ErrorMessages.ARGUMENT_NULL);
             }
+
+            associations = associations.Where(a => a.BatchOperation != BatchOperationType.Ignore);
 
             context.PushData(DataConstants.NoTouchSourceContextKey, true);
 
@@ -520,11 +527,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }).ToArray();
             var existingKeys = associations.Select(k => k.Key).Where(o => o.HasValue).ToArray();
             // Next we want to perform a relationship query to establish what is being loaded and what is being persisted
-            var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key || existingKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
+            var existing = data.BatchOperation == Core.Model.DataTypes.BatchOperationType.Insert ? new Guid?[0] : persistenceService.Query(context, o => o.SourceEntityKey == data.Key || existingKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
             // Which are new and which are not?
             var removedRelationships = existing.Where(o => associations.Any(a => a.Key == o && a.BatchOperation == Core.Model.DataTypes.BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a =>
             {
-                return persistenceService.Delete(context, a.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
+                return persistenceService.Delete(context, a.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy, false);
             });
             var addedRelationships = associations.Where(o => !o.IsEmpty() && o.BatchOperation != Core.Model.DataTypes.BatchOperationType.Delete && (!o.Key.HasValue || !existing.Any(a => a == o.Key))).Select(a =>
             {

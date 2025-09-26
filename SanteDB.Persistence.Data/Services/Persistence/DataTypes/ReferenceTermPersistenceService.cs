@@ -64,21 +64,27 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// </summary>
         protected override ReferenceTerm DoConvertToInformationModel(DataContext context, DbReferenceTerm dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.CodeSystem = retVal.CodeSystem.GetRelatedPersistenceService().Get(context, dbModel.CodeSystemKey);
-                    retVal.SetLoaded(nameof(ReferenceTerm.CodeSystem));
-                    goto case LoadMode.SyncLoad;
-                case LoadMode.SyncLoad:
-                    retVal.DisplayNames = retVal.DisplayNames.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                    retVal.SetLoaded(nameof(ReferenceTerm.DisplayNames));
-                    break;
-            }
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            return retVal;
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            retVal.CodeSystem = retVal.CodeSystem.GetRelatedPersistenceService().Get(context, dbModel.CodeSystemKey);
+                            retVal.SetLoaded(nameof(ReferenceTerm.CodeSystem));
+                        }
+                        goto case LoadMode.SyncLoad;
+                    case LoadMode.SyncLoad:
+                        retVal.DisplayNames = retVal.DisplayNames.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                        retVal.SetLoaded(nameof(ReferenceTerm.DisplayNames));
+                        break;
+                }
+
+                return retVal;
+            }
         }
 
         /// <summary>

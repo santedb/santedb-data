@@ -82,36 +82,41 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc/>
         protected override TModel DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var personData = referenceObjects?.OfType<DbPerson>()?.FirstOrDefault();
-            if (personData == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceWarning("Using slow join to DbPerson from DbEntityVersion");
-                personData = context.FirstOrDefault<DbPerson>(o => o.ParentKey == dbModel.VersionKey);
-            }
+                var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                var personData = referenceObjects?.OfType<DbPerson>()?.FirstOrDefault();
+                if (personData == null)
+                {
+                    this.m_tracer.TraceWarning("Using slow join to DbPerson from DbEntityVersion");
+                    personData = context.FirstOrDefault<DbPerson>(o => o.ParentKey == dbModel.VersionKey);
+                }
 
-            // Deep loading?
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
-            {
-                case LoadMode.FullLoad:
-                    var conceptLoader = modelData.GenderConcept.GetRelatedPersistenceService();
-                    modelData.GenderConcept = conceptLoader.Get(context, personData.GenderConceptKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.GenderConcept);
-                    modelData.Occupation = conceptLoader.Get(context, personData.OccupationKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.Occupation);
-                    modelData.Nationality = conceptLoader.Get(context, personData.NationalityKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.Nationality);
-                    modelData.VipStatus = conceptLoader.Get(context, personData.VipStatusKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.VipStatus);
-
-                    goto case LoadMode.SyncLoad;
-                case LoadMode.SyncLoad:
-                    modelData.LanguageCommunication = modelData.LanguageCommunication.GetRelatedPersistenceService().Query(context, r => r.SourceEntityKey == dbModel.Key)?.ToList();
-                    modelData.SetLoaded(o => o.LanguageCommunication);
-                    break;
+                // Deep loading?
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            var conceptLoader = modelData.GenderConcept.GetRelatedPersistenceService();
+                            modelData.GenderConcept = conceptLoader.Get(context, personData.GenderConceptKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.GenderConcept);
+                            modelData.Occupation = conceptLoader.Get(context, personData.OccupationKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.Occupation);
+                            modelData.Nationality = conceptLoader.Get(context, personData.NationalityKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.Nationality);
+                            modelData.VipStatus = conceptLoader.Get(context, personData.VipStatusKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.VipStatus);
+                        }
+                        goto case LoadMode.SyncLoad;
+                    case LoadMode.SyncLoad:
+                        modelData.LanguageCommunication = modelData.LanguageCommunication.GetRelatedPersistenceService().Query(context, r => r.SourceEntityKey == dbModel.Key)?.ToList();
+                        modelData.SetLoaded(o => o.LanguageCommunication);
+                        break;
+                }
+                modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbPerson, Person>(personData), false, declaredOnly: true);
+                return modelData;
             }
-            modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbPerson, Person>(personData), false, declaredOnly: true);
-            return modelData;
         }
     }
 }

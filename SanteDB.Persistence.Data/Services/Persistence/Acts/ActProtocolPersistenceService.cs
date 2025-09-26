@@ -49,15 +49,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// </summary>
         protected override ActProtocol DoConvertToInformationModel(DataContext context, DbActProtocol dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.Protocol = retVal.Protocol.GetRelatedPersistenceService().Get(context, dbModel.ProtocolKey);
-                    retVal.SetLoaded(o => o.Protocol);
-                    break;
+
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            retVal.Protocol = retVal.Protocol.GetRelatedPersistenceService().Get(context, dbModel.ProtocolKey);
+                            retVal.SetLoaded(o => o.Protocol);
+                        }
+                        break;
+                }
+                return retVal;
             }
-            return retVal;
+           
         }
     }
 }

@@ -49,22 +49,27 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override CodedObservation DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var obsData = referenceObjects?.OfType<DbCodedObservation>().FirstOrDefault();
-            if (obsData == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceWarning("Performing slow load of coded observation data from database");
-                obsData = context.FirstOrDefault<DbCodedObservation>(o => o.ParentKey == dbModel.VersionKey);
-            }
 
-            if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad)
-            {
-                retVal.Value = retVal.Value.GetRelatedPersistenceService().Get(context, obsData?.Value ?? Guid.Empty);
-                retVal.SetLoaded(o => o.Value);
-            }
+                var retVal = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                var obsData = referenceObjects?.OfType<DbCodedObservation>().FirstOrDefault();
+                if (obsData == null)
+                {
+                    this.m_tracer.TraceWarning("Performing slow load of coded observation data from database");
+                    obsData = context.FirstOrDefault<DbCodedObservation>(o => o.ParentKey == dbModel.VersionKey);
+                }
 
-            retVal.ValueKey = obsData?.Value;
-            return retVal;
+                if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad && context.ValidateMaximumStackDepth())
+                {
+                    retVal.Value = retVal.Value.GetRelatedPersistenceService().Get(context, obsData?.Value ?? Guid.Empty);
+                    retVal.SetLoaded(o => o.Value);
+                }
+
+                retVal.ValueKey = obsData?.Value;
+                return retVal;
+            }
+           
         }
     }
 }

@@ -53,17 +53,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override EntityNameComponent DoConvertToInformationModel(DataContext context, DbEntityNameComponent dbModel, params Object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                case LoadMode.FullLoad:
-                    retVal.ComponentType = retVal.ComponentType.GetRelatedPersistenceService().Get(context, dbModel.ComponentTypeKey.GetValueOrDefault());
-                    retVal.SetLoaded(nameof(EntityAddressComponent.ComponentType));
-                    break;
-            }
+                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            return retVal;
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            retVal.ComponentType = retVal.ComponentType.GetRelatedPersistenceService().Get(context, dbModel.ComponentTypeKey.GetValueOrDefault());
+                            retVal.SetLoaded(nameof(EntityAddressComponent.ComponentType));
+                        }
+                        break;
+                }
+
+                return retVal;
+            }
         }
     }
 }

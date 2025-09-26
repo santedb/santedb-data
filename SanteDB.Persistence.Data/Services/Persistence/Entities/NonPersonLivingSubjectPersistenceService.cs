@@ -48,23 +48,28 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override NonPersonLivingSubject DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
-            var nplsData = referenceObjects?.OfType<DbNonPersonLivingSubject>().FirstOrDefault();
-            if (nplsData == null)
+            using (context.CreateInformationModelGuard(dbModel.Key))
             {
-                this.m_tracer.TraceWarning("Using slow load of NonPersonLivingSubjectData to DbEntityVersion");
-                nplsData = context.FirstOrDefault<DbNonPersonLivingSubject>(o => o.ParentKey == modelData.VersionKey);
-            }
+                var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                var nplsData = referenceObjects?.OfType<DbNonPersonLivingSubject>().FirstOrDefault();
+                if (nplsData == null)
+                {
+                    this.m_tracer.TraceWarning("Using slow load of NonPersonLivingSubjectData to DbEntityVersion");
+                    nplsData = context.FirstOrDefault<DbNonPersonLivingSubject>(o => o.ParentKey == modelData.VersionKey);
+                }
 
-            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
-            {
-                case LoadMode.FullLoad:
-                    modelData.Strain = modelData.Strain.GetRelatedPersistenceService().Get(context, nplsData.StrainKey.GetValueOrDefault());
-                    modelData.SetLoaded(o => o.Strain);
-                    break;
+                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+                {
+                    case LoadMode.FullLoad:
+                        if (context.ValidateMaximumStackDepth())
+                        {
+                            modelData.Strain = modelData.Strain.GetRelatedPersistenceService().Get(context, nplsData.StrainKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.Strain);
+                        }
+                        break;
+                }
+                return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbNonPersonLivingSubject, NonPersonLivingSubject>(nplsData), false, declaredOnly: true);
             }
-            return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbNonPersonLivingSubject, NonPersonLivingSubject>(nplsData), false, declaredOnly: true);
-
         }
     }
 }
