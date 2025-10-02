@@ -404,7 +404,8 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
                                 DataFileKey = otherQueueObject.DataFileKey,
                                 ResourceType = otherQueueObject.ResourceType,
                                 ContentType = otherQueueObject.ContentType,
-                                QueueKey = m_queueRecord.Key
+                                QueueKey = m_queueRecord.Key,
+                                RetryCount = otherQueueEntry.RetryCount
                             };
 
                             if (otherQueueEntry is ISynchronizationDeadLetterQueueEntry idlqe)

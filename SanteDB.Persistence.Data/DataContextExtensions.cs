@@ -94,11 +94,33 @@ namespace SanteDB.Persistence.Data
         }
 
         /// <summary>
+        /// Persistence validation flags
+        /// </summary>
+        [Flags]
+        public enum DisablePersistenceValidationFlags : byte
+        {
+            None = 0x0,
+            Exists = 0x1,
+            BusinessContstraints = 0x2,
+            Relationships = 0x4,
+            All = Exists | BusinessContstraints | Relationships
+        }
+
+
+        /// <summary>
         /// Defer constraints annotation
         /// </summary>
         private struct DeferConstraints
         {
+            public DeferConstraints(DisablePersistenceValidationFlags settings)
+            {
+                this.Settings = settings;
+            }
 
+            /// <summary>
+            /// Disable validation settings
+            /// </summary>
+            public DisablePersistenceValidationFlags Settings { get; }
         }
 
         // Localization service
@@ -358,6 +380,12 @@ namespace SanteDB.Persistence.Data
         }
 
         /// <summary>
+        /// Should disable object validation
+        /// </summary>
+        public static DisablePersistenceValidationFlags ShouldDisableObjectValidation(this DataContext me) => me.Data.TryGetValue(DataConstants.DisableObjectValidation, out var vRaw) ? (DisablePersistenceValidationFlags)vRaw : DisablePersistenceValidationFlags.None;
+
+
+        /// <summary>
         /// Get provenance from the context
         /// </summary>
         public static DbSecurityProvenance GetProvenance(this DataContext me)
@@ -508,15 +536,15 @@ namespace SanteDB.Persistence.Data
         /// <summary>
         /// Defer check constraints on the object in the persistence layer
         /// </summary>
-        public static void DisablePersistenceValidation(this IdentifiedData me)
+        public static void DisablePersistenceValidation(this IdentifiedData me, DisablePersistenceValidationFlags settings)
         {
-            me.AddAnnotation(new DeferConstraints());
+            me.AddAnnotation(new DeferConstraints(settings));
         }
 
         /// <summary>
         /// Determine if the object has been flagged for constraint deferral
         /// </summary>
-        public static bool ShouldDisablePersistenceValidation(this IdentifiedData me) => me.GetAnnotations<DeferConstraints>().Any();
+        public static DisablePersistenceValidationFlags ShouldDisablePersistenceValidation(this IdentifiedData me) => me.GetAnnotations<DeferConstraints>().FirstOrDefault().Settings;
 
 
         /// <summary>

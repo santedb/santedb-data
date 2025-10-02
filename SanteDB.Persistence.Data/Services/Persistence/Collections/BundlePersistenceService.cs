@@ -257,9 +257,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                         context.EstablishProvenance(principal, null);
 
                         // If the data has instructed us not to validate then we don't
-                        if(data.ShouldDisablePersistenceValidation())
+                        if(data.ShouldDisablePersistenceValidation() != DataContextExtensions.DisablePersistenceValidationFlags.None)
                         {
-                            context.Data.Add(DataConstants.DisableObjectValidation, true);
+                            context.Data.Add(DataConstants.DisableObjectValidation, data.ShouldDisablePersistenceValidation());
                         }
                         // Correlation and message control
                         // JF - 20250127 - This set of code will register the bundle's correlation key and sequence into the database and will perform necessary actions

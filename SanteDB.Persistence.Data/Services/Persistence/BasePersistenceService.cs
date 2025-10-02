@@ -709,9 +709,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     context.Open(initializeExtensions: false);
 
-                    if (data.ShouldDisablePersistenceValidation())
+                    if (data.ShouldDisablePersistenceValidation() != DataContextExtensions.DisablePersistenceValidationFlags.None)
                     {
-                        context.Data.Add(DataConstants.DisableObjectValidation, true);
+                        context.Data.Add(DataConstants.DisableObjectValidation, data.ShouldDisablePersistenceValidation());
                     }
 
                     using (var tx = context.BeginTransaction())
@@ -940,9 +940,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     context.Open(initializeExtensions: false);
 
-                    if (data.ShouldDisablePersistenceValidation())
+                    if (data.ShouldDisablePersistenceValidation() != DataContextExtensions.DisablePersistenceValidationFlags.None)
                     {
-                        context.Data.Add(DataConstants.DisableObjectValidation, true);
+                        context.Data.Add(DataConstants.DisableObjectValidation, data.ShouldDisablePersistenceValidation());
                     }
 
                     using (var tx = context.BeginTransaction())
