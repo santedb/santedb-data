@@ -48,10 +48,10 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Acts
             using (AuthenticationContext.EnterSystemContext())
             {
 
-                var testDate = DateTimeOffset.Now;
+                var testDate = DateTime.Now;
                 var dateObservation = new DateObservation()
                 {
-                    ActTime = DateTimeOffset.Now.Date,
+                    ActTime = DateTimeOffset.Now,
                     MoodConceptKey = ActMoodKeys.Goal,
                     TypeConceptKey = ObservationTypeKeys.Symptom,
                     InterpretationConceptKey = ActInterpretationKeys.AbnormalHigh,

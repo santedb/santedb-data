@@ -95,7 +95,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// Gets or sets the value of the measure
         /// </summary>
         [Column("val_dt")]
-        public DateTimeOffset Value { get; set; }
+        public DateTime Value { get; set; }
 
         /// <summary>
         /// Value precision
