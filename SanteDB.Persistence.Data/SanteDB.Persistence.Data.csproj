@@ -238,6 +238,7 @@
     <EmbeddedResource Include="SQL\FBSQL\Updates\20241119.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20250508-FBSQL.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20250831.sql" />
+    <EmbeddedResource Include="SQL\PSQL\Updates\20251007.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20250831.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20250530.sql" />
     <EmbeddedResource Include="SQL\PSQL\Updates\20250210.sql" />
@@ -336,6 +337,7 @@
     <EmbeddedResource Include="SQL\SQLITE\20230509.sql">
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\SQLITE\20241118.sql" />
+    <EmbeddedResource Include="SQL\SQLITE\20251007.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20250831.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20250720.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20250530.sql" />
