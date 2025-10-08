@@ -28,7 +28,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
             using (AuthenticationContext.EnterSystemContext())
             {
 
-                var testDate = DateTimeOffset.Now;
+                var testDate = DateTime.Now;
                 var dateObservation = new DateObservation()
                 {
                     ActTime = DateTimeOffset.Now.Date,

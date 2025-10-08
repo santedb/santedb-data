@@ -465,7 +465,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                             .Statement;
                         retVal.Policies = context.Query<CompositeResult<DbEntitySecurityPolicy, DbSecurityPolicy>>(query)
                             .ToList()
-                            .Select(o => new SecurityPolicyInstance(new SecurityPolicy(o.Object2.Name, o.Object2.Oid, o.Object2.IsPublic, o.Object2.CanOverride), PolicyGrantType.Grant))
+                            .Select(o => new SecurityPolicyInstance(new SecurityPolicy(o.Object2.Name, o.Object2.Oid, o.Object2.IsPublic, o.Object2.CanOverride), PolicyGrantType.Grant)
+                            {
+                                PolicyKey = o.Object2.Key
+                            })
                             .ToList();
                         retVal.SetLoaded(o => o.Policies);
                         break;

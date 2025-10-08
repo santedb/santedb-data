@@ -41,6 +41,7 @@ using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Services;
 using SanteDB.Persistence.PubSub.ADO;
 using SanteDB.Persistence.Synchronization.ADO.Services;
+using SanteDB.Rest.HDSI.Configuration;
 using System;
 using System.Collections.Generic;
 
@@ -140,6 +141,15 @@ namespace SanteDB.Persistence.Synchronization.ADO.Configuration
                 adoConfiguration.MaxPageSize = 25;
 
             }
+
+
+            var hdsiConfig = configuration.GetSection<HdsiConfigurationSection>();
+            if (hdsiConfig == null)
+            {
+                hdsiConfig = configuration.AddSection(new HdsiConfigurationSection());
+            }
+            hdsiConfig.AutomaticallyForwardRequests = false;
+
 
         }
     }

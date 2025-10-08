@@ -251,15 +251,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open(initializeExtensions: false);
-                    using (IDbTransaction tx = data.ShouldDisablePersistenceValidation() ? null : context.BeginTransaction())
+                    using (var tx = context.BeginTransaction())
                     {
 
                         context.EstablishProvenance(principal, null);
 
                         // If the data has instructed us not to validate then we don't
-                        if(data.ShouldDisablePersistenceValidation())
+                        if(data.ShouldDisablePersistenceValidation() != DataContextExtensions.DisablePersistenceValidationFlags.None)
                         {
-                            context.Data.Add(DataConstants.DisableObjectValidation, true);
+                            context.Data.Add(DataConstants.DisableObjectValidation, data.ShouldDisablePersistenceValidation());
                         }
                         // Correlation and message control
                         // JF - 20250127 - This set of code will register the bundle's correlation key and sequence into the database and will perform necessary actions
@@ -275,7 +275,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
                             if (transactionMode == TransactionMode.Commit)
                             {
-                                tx?.Commit();
+                                this.m_tracer.TraceVerbose("Committing Transaction...");
+                                tx.Commit();
                             }
 
                             data.Item.ForEach(i => this.m_dataCachingService.Add(i));

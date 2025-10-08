@@ -204,7 +204,7 @@ namespace SanteDB.Persistence.Data.Services
                 try
                 {
                     context.Open(initializeExtensions: false);
-                    context.AddOrUpdateData(DataConstants.DisableObjectValidation, true);
+                    context.AddOrUpdateData(DataConstants.DisableObjectValidation, DataContextExtensions.DisablePersistenceValidationFlags.All);
 
                     var patchId = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(dataset.Id)).HexEncode();
 

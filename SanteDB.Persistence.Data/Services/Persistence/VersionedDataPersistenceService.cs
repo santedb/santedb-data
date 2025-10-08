@@ -195,7 +195,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<DetectedIssue> VerifyEntity<TToVerify>(DataContext context, TToVerify objectToVerify)
             where TToVerify : TModel, IHasIdentifiers
         {
-            if(objectToVerify?.ShouldDisablePersistenceValidation() == true ||  context.Data.TryGetValue(DataConstants.DisableObjectValidation, out var noValidation) && true.Equals(noValidation))
+            if(objectToVerify?.ShouldDisablePersistenceValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.BusinessContstraints) == true ||  context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.BusinessContstraints))
             {
                 yield break;
             }
@@ -226,7 +226,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 yield break;
             }
-            
+
+            objectToVerify.SetLoaded(o => o.Identifiers); // Prevent delay loading
             foreach (var id in objectToVerify.Identifiers)
             {
                 if (String.IsNullOrEmpty(id.Value)) continue; // skip empty
@@ -886,7 +887,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             context.PushData(DataConstants.NoTouchSourceContextKey, true);
 
-            // We now want to fetch the perssitence serivce of this
+            // We now want to fetch the persistence service of this
             var persistenceService = typeof(TModelAssociation).GetRelatedPersistenceService() as IAdoPersistenceProvider<TModelAssociation>;
             if (persistenceService == null)
             {
@@ -924,7 +925,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // TODO: Determine if this line performs better than selecting the entire object (I suspect it would - but need to check)
             var contextKeys = context.Data.Where(o => o.Value is BatchOperationType bt && bt != BatchOperationType.Delete).Select(o => (Guid?)Guid.Parse(o.Key)).ToArray();
             var assocKeys = associations.Select(k => k.Key).ToArray();
-            var existing = data.BatchOperation == BatchOperationType.Insert ? new Guid?[0] : persistenceService.Query(context, o => o.SourceEntityKey == data.Key && o.ObsoleteVersionSequenceId == null || assocKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
+            var existing = data.BatchOperation == BatchOperationType.Insert && context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.Relationships) ? new Guid?[0] : persistenceService.Query(context, o => o.SourceEntityKey == data.Key && o.ObsoleteVersionSequenceId == null || assocKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
             var associationKeys = associations.Select(o => o.Key).ToArray();
             var toDelete = associations.Where(a => a.BatchOperation == BatchOperationType.Delete).Select(o => o.Key)
                 .Union(existing.Where(e => !associationKeys.Contains(e)));
@@ -933,6 +934,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Anything to remove?
             if (toDelete.Any())
             {
+                this.m_tracer.TraceVerbose("UpdateAssociations: Removing {0}", String.Join(",", toDelete));
                 // Deletion mode or update mode for the associations as a batch
                 var dbType = this.m_modelMapper.GetModelMapper(typeof(TModelAssociation)).TargetType;
                 var whereClause = this.m_modelMapper.MapModelExpression<TModelAssociation, bool>(o => toDelete.Contains(o.Key), dbType);
@@ -953,7 +955,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                a = persistenceService.Insert(context, a);
                a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
                return a;
-           });
+           }).ToArray();
+
             var updatedRelationships = associations.Where(o => !o.IsEmpty() && o.BatchOperation != BatchOperationType.Delete && o.Key.HasValue && existing.Contains(o.Key)).Select(a =>
             {
                 a = persistenceService.Update(context, a);

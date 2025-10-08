@@ -69,7 +69,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             where TData : IdentifiedData, new()
         {
 
-            if(data?.ShouldDisablePersistenceValidation() == true || context.Data.TryGetValue(DataConstants.DisableObjectValidation, out var validate) && true.Equals(validate))
+            if(data?.ShouldDisablePersistenceValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.Exists) == true || context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.Exists))
             {
                 return data;
             }
@@ -262,6 +262,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     if (context.Exists<TDbModel>(dbModel))
                     {
+                        this.m_tracer.TraceVerbose("Update will be performed instead of insert");
                         return context.Update(dbModel);
                     }
                     else
@@ -526,7 +527,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }).ToArray();
             var existingKeys = associations.Select(k => k.Key).Where(o => o.HasValue).ToArray();
             // Next we want to perform a relationship query to establish what is being loaded and what is being persisted
-            var existing = data.BatchOperation == Core.Model.DataTypes.BatchOperationType.Insert ? new Guid?[0] : persistenceService.Query(context, o => o.SourceEntityKey == data.Key || existingKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
+            var existing = data.BatchOperation == BatchOperationType.Insert  && context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.Relationships) ? new Guid?[0] : persistenceService.Query(context, o => o.SourceEntityKey == data.Key || existingKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
             // Which are new and which are not?
             var removedRelationships = existing.Where(o => associations.Any(a => a.Key == o && a.BatchOperation == Core.Model.DataTypes.BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a =>
             {

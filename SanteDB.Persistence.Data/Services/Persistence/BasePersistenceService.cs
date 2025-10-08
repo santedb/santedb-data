@@ -304,17 +304,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-                var dbInstance = this.DoConvertToDataModel(context, data);
-                dbInstance = this.DoInsertInternal(context, dbInstance);
-                var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
-                retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
+            this.m_tracer.TraceVerbose("Inserting {0}", data);
+            var dbInstance = this.DoConvertToDataModel(context, data);
+            dbInstance = this.DoInsertInternal(context, dbInstance);
+            var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
+            retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
 
-                var issueAnnotation = data.GetAnnotations<DetectedIssue[]>();
-                if (issueAnnotation.Any() && retVal is IExtendable ext)
-                {
-                    ext.AddExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issueAnnotation.First());
-                }
-                return this.AfterPersisted(context, retVal); // TODO: Perhaps
+            var issueAnnotation = data.GetAnnotations<DetectedIssue[]>();
+            if (issueAnnotation.Any() && retVal is IExtendable ext)
+            {
+                ext.AddExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issueAnnotation.First());
+            }
+            return this.AfterPersisted(context, retVal); // TODO: Perhaps
 #if DEBUG
             }
             finally
@@ -392,10 +393,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-                foreach (var itm in this.DoDeleteAllInternal(context, expression, deleteMode))
-                {
-                    this.m_dataCacheService?.Remove(itm);
-                }
+            foreach (var itm in this.DoDeleteAllInternal(context, expression, deleteMode))
+            {
+                this.m_dataCacheService?.Remove(itm);
+            }
 #if DEBUG
             }
             finally
@@ -423,29 +424,31 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-                if (deleteMode == DeleteMode.PermanentDelete)
-                {
-                    this.DoDeleteReferencesInternal(context, key);
+            if (deleteMode == DeleteMode.PermanentDelete)
+            {
+                this.DoDeleteReferencesInternal(context, key);
 
-                    if (this.m_configuration.Provider.StatementFactory.Features.HasFlag(SqlEngineFeatures.StoredFreetextIndex))
-                    {
-                        this.DoDeleteFreeTextIndexInternal(context, key);
-                    }
-                }
-                var dbInstance = this.DoDeleteInternal(context, key, deleteMode);
-
-                // Remove from cache 
-                this.m_dataCacheService?.Remove(key);
-
-                TModel retVal = null;
-                if (!this.m_configuration.FastDelete && deleteMode != DeleteMode.PermanentDelete)
+                if (this.m_configuration.Provider.StatementFactory.Features.HasFlag(SqlEngineFeatures.StoredFreetextIndex))
                 {
-                    retVal = this.DoConvertToInformationModel(context, dbInstance);
+                    this.DoDeleteFreeTextIndexInternal(context, key);
                 }
-                else
-                {
-                    retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
-                }
+            }
+            this.m_tracer.TraceVerbose("Deleting {0}", key);
+
+            var dbInstance = this.DoDeleteInternal(context, key, deleteMode);
+
+            // Remove from cache 
+            this.m_dataCacheService?.Remove(key);
+
+            TModel retVal = null;
+            if (!this.m_configuration.FastDelete && deleteMode != DeleteMode.PermanentDelete)
+            {
+                retVal = this.DoConvertToInformationModel(context, dbInstance);
+            }
+            else
+            {
+                retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
+            }
             retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Delete;
             return retVal;
 #if DEBUG
@@ -492,42 +495,42 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-                // Attempt fetch from master cache
-                TModel retVal = null;
-                var useCache = allowCached &&
-                    this.m_configuration.CachingPolicy?.Targets.HasFlag(AdoDataCachingPolicyTarget.ModelObjects) == true;
+            // Attempt fetch from master cache
+            TModel retVal = null;
+            var useCache = allowCached &&
+                this.m_configuration.CachingPolicy?.Targets.HasFlag(AdoDataCachingPolicyTarget.ModelObjects) == true;
 
-                if (useCache)
+            if (useCache)
+            {
+                retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
+                if (!this.ValidateCacheItemLoadMode(retVal))
                 {
-                    retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
-                    if (!this.ValidateCacheItemLoadMode(retVal))
-                    {
-                        retVal = null;
-                    }
+                    retVal = null;
+                }
+            }
+
+            // Fetch from database
+            if (retVal == null || versionKey.HasValue)
+            {
+                var dbInstance = this.DoGetInternal(context, key, versionKey, allowCached);
+                if (dbInstance == null) // not found
+                {
+                    retVal = null;
+                }
+                else
+                {
+                    retVal = this.ToModelInstance(context, dbInstance);
                 }
 
-                // Fetch from database
-                if (retVal == null || versionKey.HasValue)
+                // Add the cache object if caching is allowed on this query and if the load strategy used is less than the load strategy which would have already 
+                // been used to load it before
+                if (useCache && versionKey.GetValueOrDefault() != Guid.Empty)
                 {
-                    var dbInstance = this.DoGetInternal(context, key, versionKey, allowCached);
-                    if (dbInstance == null) // not found
-                    {
-                        retVal = null;
-                    }
-                    else
-                    {
-                        retVal = this.ToModelInstance(context, dbInstance);
-                    }
-
-                    // Add the cache object if caching is allowed on this query and if the load strategy used is less than the load strategy which would have already 
-                    // been used to load it before
-                    if (useCache && versionKey.GetValueOrDefault() != Guid.Empty)
-                    {
-                        this.m_dataCacheService?.Add(retVal);
-                    }
+                    this.m_dataCacheService?.Add(retVal);
                 }
+            }
 
-                return retVal;
+            return retVal;
 #if DEBUG
             }
             finally
@@ -706,9 +709,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     context.Open(initializeExtensions: false);
 
-                    if(data.ShouldDisablePersistenceValidation())
+                    if (data.ShouldDisablePersistenceValidation() != DataContextExtensions.DisablePersistenceValidationFlags.None)
                     {
-                        context.Data.Add(DataConstants.DisableObjectValidation, true);
+                        context.Data.Add(DataConstants.DisableObjectValidation, data.ShouldDisablePersistenceValidation());
                     }
 
                     using (var tx = context.BeginTransaction())
@@ -937,9 +940,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     context.Open(initializeExtensions: false);
 
-                    if (data.ShouldDisablePersistenceValidation())
+                    if (data.ShouldDisablePersistenceValidation() != DataContextExtensions.DisablePersistenceValidationFlags.None)
                     {
-                        context.Data.Add(DataConstants.DisableObjectValidation, true);
+                        context.Data.Add(DataConstants.DisableObjectValidation, data.ShouldDisablePersistenceValidation());
                     }
 
                     using (var tx = context.BeginTransaction())
