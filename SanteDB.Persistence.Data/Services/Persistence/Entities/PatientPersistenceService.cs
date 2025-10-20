@@ -81,51 +81,54 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <inheritdoc />
         protected override Patient BeforePersisting(DataContext context, Patient data)
         {
-            data.EducationLevelKey = this.EnsureExists(context, data.EducationLevel)?.Key ?? data.EducationLevelKey;
-            if (data.EducationLevelKey.HasValue && !m_allowEducationLevel)
+            if (!data.ShouldDisablePersistenceValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.BusinessContstraints) && !context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.BusinessContstraints))
             {
-                throw new FieldRestrictionException(nameof(Patient.EducationLevel));
-            }
-
-            data.EthnicGroupKey = this.EnsureExists(context, data.EthnicGroup)?.Key ?? data.EthnicGroupKey;
-            if (data.EthnicGroupKey.HasValue && !m_allowEthnicity)
-            {
-                throw new FieldRestrictionException(nameof(Patient.EthnicGroup));
-            }
-
-            data.MaritalStatusKey = this.EnsureExists(context, data.MaritalStatus)?.Key ?? data.MaritalStatusKey;
-            if (data.MaritalStatusKey.HasValue && !m_allowMaritalStatus)
-            {
-                throw new FieldRestrictionException(nameof(Patient.MaritalStatus));
-            }
-
-            data.LivingArrangementKey = this.EnsureExists(context, data.LivingArrangement)?.Key ?? data.LivingArrangementKey;
-            if (data.LivingArrangementKey.HasValue && !m_allowLivingArrangement)
-            {
-                throw new FieldRestrictionException(nameof(Patient.LivingArrangement));
-            }
-
-            data.ReligiousAffiliationKey = this.EnsureExists(context, data.ReligiousAffiliation)?.Key ?? data.ReligiousAffiliationKey;
-            if (data.ReligiousAffiliationKey.HasValue && !m_allowReligion)
-            {
-                throw new FieldRestrictionException(nameof(Patient.ReligiousAffiliation));
-            }
-
-            // Addresses and names containing forbidden fields?
-            data.Addresses?.ForEach(a =>
-            {
-                if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
+                data.EducationLevelKey = this.EnsureExists(context, data.EducationLevel)?.Key ?? data.EducationLevelKey;
+                if (data.EducationLevelKey.HasValue && !m_allowEducationLevel)
                 {
-                    throw new FieldRestrictionException(nameof(EntityAddress.Component));
+                    throw new FieldRestrictionException(nameof(Patient.EducationLevel));
                 }
-            });
-            data.Names?.ForEach(a =>
-            {
-                if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
+
+                data.EthnicGroupKey = this.EnsureExists(context, data.EthnicGroup)?.Key ?? data.EthnicGroupKey;
+                if (data.EthnicGroupKey.HasValue && !m_allowEthnicity)
                 {
-                    throw new FieldRestrictionException(nameof(EntityName.Component));
+                    throw new FieldRestrictionException(nameof(Patient.EthnicGroup));
                 }
-            });
+
+                data.MaritalStatusKey = this.EnsureExists(context, data.MaritalStatus)?.Key ?? data.MaritalStatusKey;
+                if (data.MaritalStatusKey.HasValue && !m_allowMaritalStatus)
+                {
+                    throw new FieldRestrictionException(nameof(Patient.MaritalStatus));
+                }
+
+                data.LivingArrangementKey = this.EnsureExists(context, data.LivingArrangement)?.Key ?? data.LivingArrangementKey;
+                if (data.LivingArrangementKey.HasValue && !m_allowLivingArrangement)
+                {
+                    throw new FieldRestrictionException(nameof(Patient.LivingArrangement));
+                }
+
+                data.ReligiousAffiliationKey = this.EnsureExists(context, data.ReligiousAffiliation)?.Key ?? data.ReligiousAffiliationKey;
+                if (data.ReligiousAffiliationKey.HasValue && !m_allowReligion)
+                {
+                    throw new FieldRestrictionException(nameof(Patient.ReligiousAffiliation));
+                }
+
+                // Addresses and names containing forbidden fields?
+                data.Addresses?.ForEach(a =>
+                {
+                    if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
+                    {
+                        throw new FieldRestrictionException(nameof(EntityAddress.Component));
+                    }
+                });
+                data.Names?.ForEach(a =>
+                {
+                    if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
+                    {
+                        throw new FieldRestrictionException(nameof(EntityName.Component));
+                    }
+                });
+            }
 
             return base.BeforePersisting(context, data);
         }
