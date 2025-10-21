@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -101,6 +102,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "data.relationship.validation", $"Relationship of type {dbModel.RelationshipTypeKey} between {dbModel.SourceKey} and {dbModel.TargetKey} is invalid", DetectedIssueKeys.CodificationIssue, e);
             }
+        }
+
+        /// <inheritdoc/>
+        protected override EntityRelationship DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained)
+        {
+            var retVal = base.DoDeleteModel(context, key, deleteMode, preserveContained);
+            if(retVal.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && !preserveContained)
+            {
+                var rps = typeof(Entity).GetRelatedPersistenceService();
+                if (rps.Exists(context, retVal.TargetEntityKey.Value))
+                {
+                    rps.Delete(context, retVal.TargetEntityKey.Value, deleteMode, preserveContained);
+                }
+            }
+            return retVal;
         }
 
         /// <summary>
