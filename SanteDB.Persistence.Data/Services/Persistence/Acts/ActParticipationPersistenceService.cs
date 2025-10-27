@@ -21,6 +21,8 @@
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
@@ -117,5 +119,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "data.relationship.validation", $"Participation of type {dbModel.ParticipationRoleKey} between {dbModel.SourceKey} and {dbModel.TargetKey} is invalid", DetectedIssueKeys.CodificationIssue, e);
             }
         }
+
+
+        /// <inheritdoc/>
+        protected override ActParticipation DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained)
+        {
+            var retVal = base.DoDeleteModel(context, key, deleteMode, preserveContained);
+            if (retVal.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && !preserveContained)
+            {
+                var rps = typeof(Entity).GetRelatedPersistenceService();
+                if (rps.Exists(context, retVal.PlayerEntityKey.Value))
+                {
+                    rps.Delete(context, retVal.PlayerEntityKey.Value, deleteMode, preserveContained);
+                }
+            }
+            return retVal;
+        }
+
     }
 }
