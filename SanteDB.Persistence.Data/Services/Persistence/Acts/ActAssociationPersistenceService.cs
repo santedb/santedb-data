@@ -63,7 +63,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             }
             else
             {
-                versionSequence = context.Query<DbActVersion>(o => o.Key == sourceKey && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault()?.VersionSequenceId ?? -1;
+                versionSequence = context.Query<DbActVersion>(o => o.Key == sourceKey).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault()?.VersionSequenceId ?? -1;
                 if (versionSequence == -1)
                 {
                     throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = sourceKey, type = nameof(Act) }));

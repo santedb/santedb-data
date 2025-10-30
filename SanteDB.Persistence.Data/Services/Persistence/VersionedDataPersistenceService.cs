@@ -883,7 +883,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
 
-            associations = associations.Where(a => a.BatchOperation != BatchOperationType.Ignore);
+            associations = associations.Where(a => a.BatchOperation != BatchOperationType.Ignore) ;
 
             context.PushData(DataConstants.NoTouchSourceContextKey, true);
 
@@ -903,7 +903,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     {
                         a.SourceEntityKey = data.Key;
                     }
-                    else if (target.SourceEntityKey.HasValue && !target.TargetEntityKey.HasValue) // Reverse relationship
+                    else if (target.SourceEntityKey.HasValue && !target.TargetEntityKey.HasValue && 
+                        target.SourceEntityKey != data.Key) // Reverse relationship
                     {
                         target.TargetEntityKey = data.Key;
                     }

@@ -19,6 +19,7 @@
  * Date: 2023-6-21
  */
 using SanteDB.Core.BusinessRules;
+using SanteDB.Core.Data.Quality;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Extensions;
 using SanteDB.Core.i18n;
@@ -26,6 +27,7 @@ using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
@@ -646,7 +648,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                         rps.Delete(context, ar.TargetKey, deleteMode, preserveContained);
                     }
                 }
+
+                // Special participations that are transient are also removed
+                foreach(var ap in context.Query<DbActParticipation>(o=>o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToArray())
+                {
+                    var rps = typeof(Entity).GetRelatedPersistenceService();
+                    if (rps.Exists(context, ap.TargetKey))
+                    {
+                        rps.Delete(context, ap.TargetKey, deleteMode, preserveContained);
+                    }
+                }
+
             }
+
             return base.DoDeleteModel(context, key, deleteMode, preserveContained);
         }
 

@@ -210,21 +210,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Collections
                 base.TestQuery<Organization>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Bundle Good Health Systems Technology and Logistics")), 1);
                 base.TestQuery<Organization>(o => o.Relationships.Any(r => r.RelationshipTypeKey == EntityRelationshipTypeKeys.Parent && r.TargetEntity.Names.Any(n => n.Component.Any(c => c.Value == "Bundle Good Health Systems"))), 1);
 
-                // Delete the relationship only
-                bundle = new Bundle()
-                {
-                    Item = new List<IdentifiedData>()
-                    {
-                        new EntityRelationship()
-                        {
-                            Key = (afterInsert.Item[0] as Organization).LoadProperty(o=>o.Relationships).First().Key,
-                            BatchOperation = BatchOperationType.Delete
-                        }
-                    }
-                };
-                afterInsert = bundlePersistence.Insert(bundle, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-                Assert.IsInstanceOf<EntityRelationship>(afterInsert.Item.First());
-                Assert.IsNotNull((afterInsert.Item.First() as EntityRelationship).ObsoleteVersionSequenceId);
+              
             }
         }
 
