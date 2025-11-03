@@ -320,6 +320,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 return true;
             }
 
+            // Bundle has no explicit correlation sequence so use the ticks 
+            data.CorrelationSequence = data.CorrelationSequence ?? DateTimeOffset.Now.Ticks;
+
             // We will determine if we've processed this bundle before
             var lastSequence = context.Query<DbBundleCorrelationSubmission>(o => o.SourceKey == data.CorrelationKey.Value).OrderByDescending(o => o.CorrelationSequence).Select(o => o.CorrelationSequence).FirstOrDefault();
             if (!lastSequence.HasValue) // Never submitted before
