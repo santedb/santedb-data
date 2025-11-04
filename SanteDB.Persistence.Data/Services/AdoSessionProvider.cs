@@ -94,7 +94,8 @@ namespace SanteDB.Persistence.Data.Services
             SanteDBClaimTypes.XspaPurposeOfUseClaim,
             SanteDBClaimTypes.XspaUserNpi,
             SanteDBClaimTypes.XspaUserRoleClaim,
-            SanteDBClaimTypes.Language
+            SanteDBClaimTypes.Language,
+            SanteDBClaimTypes.SingleUseToken
         };
 
         /// <summary>
@@ -232,6 +233,10 @@ namespace SanteDB.Persistence.Data.Services
         public IPrincipal Authenticate(ISession session)
         {
             var identities = this.GetSessionIdentities(session, true, out AdoSecuritySession adoSession);
+            if(adoSession.Claims.Any(s=>s.Type == SanteDBClaimTypes.SingleUseToken && Boolean.TryParse(s.Value, out var su) && su))
+            {
+                this.Abandon(adoSession);
+            }
             return new AdoSessionPrincipal(adoSession, identities.OfType<IClaimsIdentity>());
         }
 
@@ -271,6 +276,10 @@ namespace SanteDB.Persistence.Data.Services
                 exception.Data.Add(SecuritySessionException.DATA_CLAIM_TYPE_KEY, SanteDBClaimTypes.XspaPurposeOfUseClaim);
                 exception.Data.Add(SecuritySessionException.DATA_CLAIM_VALUE_KEY, String.Join(",", PurposeOfUseKeys.AllKeys));
                 throw exception;
+            }
+            else if(isOverride)
+            {
+                this.m_pepService.Demand(PermissionPolicyIdentifiers.OverridePolicyPermission, principal);
             }
 
             // Ensure the prinicpal has permission to access scopes they have requested
@@ -438,7 +447,7 @@ namespace SanteDB.Persistence.Data.Services
                         if (isOverride) // Overrides cannot be extended and can only be applied when the scopes allow it
                         {
                             dbSession.RefreshToken = null;
-                            dbSession.RefreshExpiration = DateTimeOffset.Now;
+                            dbSession.RefreshExpiration = default(DateTimeOffset);
 
                         }
 
@@ -457,7 +466,7 @@ namespace SanteDB.Persistence.Data.Services
                                 claimsPrincipal.FindFirst(SanteDBClaimTypes.PurposeOfUse)?.Value.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true) ||
                                 isOverride)
                             {
-                                dbSession.NotAfter = DateTimeOffset.Now.AddSeconds(120); //TODO: Need to set this somewhere as a configuration setting. This means they have ~2 minutes to click on a password reset.
+                                dbSession.NotAfter = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.ElevatedSessionLength, new TimeSpan(0, 2, 0)));
                             }
                         }
 
@@ -472,7 +481,18 @@ namespace SanteDB.Persistence.Data.Services
                         }
                         if (scope?.Any(s => !s.Equals("*")) == true) // Demand additional scopes
                         {
-                            sessionScopes.AddRange(scope.Where(s => !s.Equals("*")).Select(o => { this.m_pepService.Demand(o, principal); return o; }));
+                            sessionScopes.AddRange(scope.Where(s => !s.Equals("*")).Select(o =>
+                            {
+                                try
+                                {
+                                    this.m_pepService.Demand(o, principal);
+                                }
+                                catch (PolicyViolationException e) when (e.PolicyDecision == Core.Model.Security.PolicyGrantType.Elevate && isOverride)
+                                {
+                                    this.m_pepService.Demand(PermissionPolicyIdentifiers.OverridePolicyPermission, principal);
+                                }
+                                return o;
+                            }));
                         }
 
                         // Explicitly set scopes
