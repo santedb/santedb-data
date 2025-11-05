@@ -67,7 +67,8 @@ namespace SanteDB.Persistence.Data.Services
             SanteDBClaimTypes.XspaFacilityClaim,
             SanteDBClaimTypes.PurposeOfUse,
             SanteDBClaimTypes.XspaOrganizationIdClaim,
-            SanteDBClaimTypes.Language
+            SanteDBClaimTypes.Language,
+            SanteDBClaimTypes.TemporarySession
         };
 
         // Tracer
