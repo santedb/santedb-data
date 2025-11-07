@@ -95,6 +95,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             }
             existingVersion.ParentKey = newVersion.VersionKey;
             context.Insert(existingVersion);
+
+            
         }
 
 
@@ -441,7 +443,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     case LoadMode.QuickLoad:
                         var query = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbActSecurityPolicy), typeof(DbSecurityPolicy))
                            .InnerJoin<DbActSecurityPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
-                           .Where<DbActSecurityPolicy>(o => o.SourceKey == dbModel.Key)
+                           .Where<DbActSecurityPolicy>(o => o.SourceKey == dbModel.Key && o.ObsoleteVersionSequenceId == null)
                            .Statement;
                         retVal.Policies = context.Query<CompositeResult<DbActSecurityPolicy, DbSecurityPolicy>>(query)
                             .ToList()

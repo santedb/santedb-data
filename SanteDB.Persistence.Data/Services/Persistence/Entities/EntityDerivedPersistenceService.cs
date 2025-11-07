@@ -461,7 +461,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     case LoadMode.QuickLoad:
                         var query = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
                             .InnerJoin<DbEntitySecurityPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
-                            .Where<DbEntitySecurityPolicy>(o => o.SourceKey == dbModel.Key)
+                            .Where<DbEntitySecurityPolicy>(o => o.SourceKey == dbModel.Key && o.ObsoleteVersionSequenceId == null)
                             .Statement;
                         retVal.Policies = context.Query<CompositeResult<DbEntitySecurityPolicy, DbSecurityPolicy>>(query)
                             .ToList()

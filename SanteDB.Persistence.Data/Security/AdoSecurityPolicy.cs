@@ -56,6 +56,7 @@ namespace SanteDB.Persistence.Data.Security
             this.Key = policy.Key;
             this.Name = policy.Name;
             this.Oid = policy.Oid;
+            this.IsPublic = policy.IsPublic;
             this.IsActive = policy.ObsoletionTime == null || policy.ObsoletionTime < DateTimeOffset.Now;
 
             if (!String.IsNullOrEmpty(policy.Handler) && !s_handlers.TryGetValue(policy.Handler, out this.m_handler))
@@ -96,6 +97,11 @@ namespace SanteDB.Persistence.Data.Security
         /// Gets the name of the policy
         /// </summary>
         public string Name { get; }
+
+        /// <summary>
+        /// Gets whether the policy is public
+        /// </summary>
+        public bool IsPublic { get; }
 
         /// <summary>
         /// Gets the OID of the policy

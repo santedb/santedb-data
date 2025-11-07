@@ -95,7 +95,8 @@ namespace SanteDB.Persistence.Data.Services
             SanteDBClaimTypes.XspaUserNpi,
             SanteDBClaimTypes.XspaUserRoleClaim,
             SanteDBClaimTypes.Language,
-            SanteDBClaimTypes.SingleUseToken
+            SanteDBClaimTypes.SingleUseToken,
+            SanteDBClaimTypes.TemporarySession
         };
 
         /// <summary>
@@ -110,7 +111,6 @@ namespace SanteDB.Persistence.Data.Services
             SanteDBClaimTypes.DefaultRoleClaimType,
             SanteDBClaimTypes.Email,
             SanteDBClaimTypes.Expiration,
-            SanteDBClaimTypes.TemporarySession,
             SanteDBClaimTypes.Name,
             SanteDBClaimTypes.NameIdentifier,
             SanteDBClaimTypes.SanteDBApplicationIdentifierClaim,
@@ -461,7 +461,11 @@ namespace SanteDB.Persistence.Data.Services
                             // Establish time limit
                             dbSession.NotAfter = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.SessionLength, new TimeSpan(1, 0, 0)));
                             // User is not really logging in, they are attempting to change their password only
-                            if (scope?.Contains(PermissionPolicyIdentifiers.LoginPasswordOnly) == true &&
+                            if(Boolean.TryParse(claimsPrincipal.FindFirst(SanteDBClaimTypes.SingleUseToken)?.Value, out var su) && su)
+                            {
+                                dbSession.NotAfter = DateTimeOffset.Now.AddSeconds(30); // 30 seconds only
+                            }
+                            else if (scope?.Contains(PermissionPolicyIdentifiers.LoginPasswordOnly) == true &&
                                 (purpose?.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true ||
                                 claimsPrincipal.FindFirst(SanteDBClaimTypes.PurposeOfUse)?.Value.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true) ||
                                 isOverride)
@@ -551,7 +555,10 @@ namespace SanteDB.Persistence.Data.Services
                         //var signedRefresh = refreshToken.ToByteArray().Concat(m_dataSigningService.SignData(refreshToken.ToByteArray())).ToArray();
                         var session = new AdoSecuritySession(dbSession.Key.ToByteArray(), refreshToken, dbSession, dbClaims);
 
-                        this.m_adhocCacheService?.Add(this.CreateCacheKey(session.Key), session, dbSession.RefreshExpiration.Subtract(DateTimeOffset.Now));
+                        if (!isOverride)
+                        {
+                            this.m_adhocCacheService?.Add(this.CreateCacheKey(session.Key), session, dbSession.RefreshExpiration.Subtract(DateTimeOffset.Now));
+                        }
 
                         this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true, isOverride, purpose, scope));
 

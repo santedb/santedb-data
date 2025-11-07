@@ -58,6 +58,42 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             }
         }
 
+
+        /// <inheritdoc/>
+        protected override void DoCopyVersionSubTableInternal(DataContext context, DbActVersion newVersion)
+        {
+            base.DoCopyVersionSubTableInternal(context, newVersion);
+
+            var obsType = context.Query<DbObservation>(o => o.ParentKey == newVersion.VersionKey).Select(o => o.ValueType).FirstOrDefault();
+            switch(obsType)
+            {
+                case "ST":
+                    var existingSt = context.FirstOrDefault<DbTextObservation>(o => o.ParentKey == newVersion.ReplacesVersionKey) ?? new DbTextObservation() ;
+                    existingSt.ParentKey = newVersion.VersionKey;
+                    context.Insert(existingSt);
+                    break;
+                case "PQ":
+                    var existingPq = context.FirstOrDefault<DbQuantityObservation>(o => o.ParentKey == newVersion.ReplacesVersionKey) ?? new DbQuantityObservation();
+                    existingPq.ParentKey = newVersion.VersionKey;
+                    context.Insert(existingPq);
+                    break;
+                case "CD":
+                    var existingCd = context.FirstOrDefault<DbCodedObservation>(o => o.ParentKey == newVersion.ReplacesVersionKey) ?? new DbCodedObservation();
+                    existingCd.ParentKey = newVersion.VersionKey;
+                    context.Insert(existingCd);
+                    break;
+                case "TS":
+                    var existingTs = context.FirstOrDefault<DbDateObservation>(o => o.ParentKey == newVersion.ReplacesVersionKey) ?? new DbDateObservation();
+                    existingTs.ParentKey = newVersion.VersionKey;
+                    context.Insert(existingTs);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_OUT_OF_RANGE, obsType, "ST,CD,PQ,TS"));
+            }
+
+        }
+
+
         /// <inheritdoc/>
         protected override Observation DoUpdateModel(DataContext context, Observation data)
         {

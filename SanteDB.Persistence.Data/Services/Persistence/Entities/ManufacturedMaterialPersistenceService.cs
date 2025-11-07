@@ -45,6 +45,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <inheritdoc/>
+        protected override void DoCopyVersionSubTableInternal(DataContext context, DbEntityVersion newVersion)
+        {
+            base.DoCopyVersionSubTableInternal(context, newVersion);
+            var existingVersion = context.FirstOrDefault<DbManufacturedMaterial>(o => o.ParentKey == newVersion.ReplacesVersionKey);
+            existingVersion.ParentKey = newVersion.VersionKey;
+            context.Insert(existingVersion);
+        }
+
+
+        /// <inheritdoc/>
         protected override ManufacturedMaterial DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
             using (context.CreateInformationModelGuard(dbModel.Key))
