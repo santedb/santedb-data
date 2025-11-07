@@ -23,6 +23,7 @@ using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
@@ -32,6 +33,7 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Configuration;
+using SanteDB.Persistence.Data.Model.Acts;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
 using SanteDB.Persistence.Data.Services.Persistence;
@@ -70,6 +72,7 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         private readonly Tracer m_traceSource = Tracer.GetTracer(typeof(AdoPolicyInformationService));
         private readonly IAdoPersistenceProvider<Entity> m_entityPersistence;
+        private readonly IDataCachingService m_dataCache;
 
         /// <inheritdoc/>
         public IPolicyInformationService LocalProvider => this;
@@ -77,7 +80,13 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// Create new policy info service
         /// </summary>
-        public AdoPolicyInformationService(IConfigurationManager configurationManager, IPolicyEnforcementService pepService, ILocalizationService localizationService, IDataPersistenceService<Entity> entityPersistence, IDataPersistenceService<Act> actPersistence, IAdhocCacheService adhocCache = null)
+        public AdoPolicyInformationService(IConfigurationManager configurationManager,
+            IPolicyEnforcementService pepService,
+            ILocalizationService localizationService,
+            IDataPersistenceService<Entity> entityPersistence,
+            IDataPersistenceService<Act> actPersistence,
+            IDataCachingService dataCache = null,
+            IAdhocCacheService adhocCache = null)
         {
             this.m_policyEnforcement = pepService;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
@@ -85,6 +94,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_localizationService = localizationService;
             this.m_actPersistence = actPersistence as IAdoPersistenceProvider<Act>;
             this.m_entityPersistence = entityPersistence as IAdoPersistenceProvider<Entity>;
+            this.m_dataCache = dataCache;
         }
 
         /// <summary>
@@ -104,6 +114,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
+            this.m_policyEnforcement.Demand(PermissionPolicyIdentifiers.AssignPolicy, principal);
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
@@ -140,6 +151,7 @@ namespace SanteDB.Persistence.Data.Services
                                         PolicyKey = o
                                     }));
 
+                                    this.m_dataCache.Remove(sr.Key.Value);
                                     break;
                                 }
                             case IApplicationIdentity iaid:
@@ -163,6 +175,8 @@ namespace SanteDB.Persistence.Data.Services
                                         SourceKey = sa.Key.Value,
                                         PolicyKey = o
                                     }));
+                                    this.m_dataCache.Remove(sa.Key.Value);
+
                                     break;
                                 }
                             case IDeviceIdentity idid:
@@ -186,6 +200,8 @@ namespace SanteDB.Persistence.Data.Services
                                         SourceKey = sd.Key.Value,
                                         PolicyKey = o
                                     }));
+                                    this.m_dataCache.Remove(sd.Key.Value);
+
                                     break;
                                 }
                             case Entity entity:
@@ -200,6 +216,8 @@ namespace SanteDB.Persistence.Data.Services
                                         PolicyKey = o,
                                         SourceKey = entity.Key.Value
                                     }));
+                                    this.m_dataCache.Remove(entity.Key.Value);
+
                                     break;
                                 }
                             case Act act:
@@ -212,6 +230,8 @@ namespace SanteDB.Persistence.Data.Services
                                         EffectiveVersionSequenceId = act.VersionSequence.Value,
                                         PolicyKey = o
                                     }));
+                                    this.m_dataCache.Remove(act.Key.Value);
+
                                     break;
                                 }
                             default:
@@ -636,12 +656,15 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
+            this.m_policyEnforcement.Demand(PermissionPolicyIdentifiers.AssignPolicy, principal);
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
                 {
                     context.Open(initializeExtensions: false);
+                    context.EstablishProvenance(principal, null);
+
                     using (var tx = context.BeginTransaction())
                     {
                         var policies = context.Query<DbSecurityPolicy>(o => oid.Contains(o.Oid)).Select(o => o.Key).ToArray();
@@ -651,22 +674,33 @@ namespace SanteDB.Persistence.Data.Services
                         if (securable is SecurityRole sr)
                         {
                             context.DeleteAll<DbSecurityRolePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sr.Key);
+                            this.m_dataCache.Remove(sr.Key.Value);
+
                         }
                         else if (securable is SecurityApplication sa)
                         {
                             context.DeleteAll<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sa.Key);
+                            this.m_dataCache.Remove(sa.Key.Value);
+
                         }
                         else if (securable is SecurityDevice sd)
                         {
                             context.DeleteAll<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sd.Key);
+                            this.m_dataCache.Remove(sd.Key.Value);
                         }
                         else if (securable is Entity entity)
                         {
                             context.DeleteAll<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && policies.Contains(o.PolicyKey));
+                            this.m_dataCache.Remove(entity.Key.Value);
+                            entity = this.m_entityPersistence.Touch(context, entity.Key.Value);
+
                         }
                         else if (securable is Act act)
                         {
                             context.DeleteAll<DbActSecurityPolicy>(o => o.SourceKey == act.Key && policies.Contains(o.PolicyKey));
+                            this.m_dataCache.Remove(act.Key.Value);
+                            act = this.m_actPersistence.Touch(context, act.Key.Value);
+
                         }
                         else
                         {
@@ -753,7 +787,7 @@ namespace SanteDB.Persistence.Data.Services
                             }
 
                             existingPolicy.CanOverride = policy.CanOverride;
-                            existingPolicy.IsPublic = true;
+                            existingPolicy.IsPublic = policy.IsPublic;
                             existingPolicy.Name = policy.Name;
                             existingPolicy.Oid = policy.Oid;
                             existingPolicy.CreatedByKey = context.ContextId;

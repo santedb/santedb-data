@@ -555,7 +555,10 @@ namespace SanteDB.Persistence.Data.Services
                         //var signedRefresh = refreshToken.ToByteArray().Concat(m_dataSigningService.SignData(refreshToken.ToByteArray())).ToArray();
                         var session = new AdoSecuritySession(dbSession.Key.ToByteArray(), refreshToken, dbSession, dbClaims);
 
-                        this.m_adhocCacheService?.Add(this.CreateCacheKey(session.Key), session, dbSession.RefreshExpiration.Subtract(DateTimeOffset.Now));
+                        if (!isOverride)
+                        {
+                            this.m_adhocCacheService?.Add(this.CreateCacheKey(session.Key), session, dbSession.RefreshExpiration.Subtract(DateTimeOffset.Now));
+                        }
 
                         this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true, isOverride, purpose, scope));
 
