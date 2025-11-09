@@ -142,7 +142,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// After the object is persisted
         /// </summary>
-        protected override TModel AfterPersisted(DataContext context, TModel data) => data;
+        protected override TModel AfterPersisted(DataContext context, TModel data)
+        {
+            this.m_dataCacheService.Remove(data.Key.Value); // force the next load to use the database
+            return data;
+        }
 
         /// <summary>
         /// The object <paramref name="key"/> is being purged - delete all references for the object
