@@ -368,6 +368,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 data.StatusConceptKey = StatusKeys.New;
             }
+            else if (data.Tags?.Any(t => t.TagKey == SystemTagNames.PrivacyMaskingTag) == true)
+            {
+                throw new InvalidOperationException(ErrorMessages.CANNOT_SAVE_MASKED_ITEM);
+            }
 
             data.ClassConceptKey = this.EnsureExists(context, data.ClassConcept)?.Key ?? data.ClassConceptKey;
             data.CreationActKey = this.EnsureExists(context, data.CreationAct)?.Key ?? data.CreationActKey;

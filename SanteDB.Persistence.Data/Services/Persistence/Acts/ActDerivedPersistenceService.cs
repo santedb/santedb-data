@@ -359,8 +359,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             {
                 data.StatusConceptKey = StatusKeys.New;
             }
+            else if(data.ReasonConceptKey == NullReasonKeys.Masked ||
+                data.Tags?.Any(t=>t.TagKey == SystemTagNames.PrivacyMaskingTag) == true)
+            {
+                throw new InvalidOperationException(ErrorMessages.CANNOT_SAVE_MASKED_ITEM);
+            }
 
-            data.ClassConceptKey = this.EnsureExists(context, data.ClassConcept)?.Key ?? data.ClassConceptKey;
+                data.ClassConceptKey = this.EnsureExists(context, data.ClassConcept)?.Key ?? data.ClassConceptKey;
             data.MoodConceptKey = this.EnsureExists(context, data.MoodConcept)?.Key ?? data.MoodConceptKey;
             data.StatusConceptKey = this.EnsureExists(context, data.StatusConcept)?.Key ?? data.StatusConceptKey;
             data.TemplateKey = this.EnsureExists(context, data.Template)?.Key ?? data.TemplateKey;
