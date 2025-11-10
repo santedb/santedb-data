@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using DocumentFormat.OpenXml.Office2016.Drawing.Charts;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
@@ -88,6 +89,7 @@ namespace SanteDB.Persistence.Data.Services
 
         // Localization service
         private readonly ILocalizationService m_localizationService;
+        private readonly IDataCachingService m_dataCaching;
 
         // Hasher
         private readonly IPasswordHashingService m_hasher;
@@ -99,7 +101,8 @@ namespace SanteDB.Persistence.Data.Services
             ILocalizationService localizationService,
             IPasswordHashingService hashingService,
             IPolicyEnforcementService pepService,
-            ISymmetricCryptographicProvider symmetricCryptographicProvider)
+            ISymmetricCryptographicProvider symmetricCryptographicProvider,
+            IDataCachingService dataCaching = null)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_securityConfiguration = configurationManager.GetSection<SecurityConfigurationSection>();
@@ -107,6 +110,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_pepService = pepService;
             this.m_symmetricCryptographicProvider = symmetricCryptographicProvider;
             this.m_localizationService = localizationService;
+            this.m_dataCaching = dataCaching;
         }
 
         /// <summary>
@@ -540,6 +544,8 @@ namespace SanteDB.Persistence.Data.Services
                     }
 
                     app = context.Update(app);
+                    this.m_dataCaching?.Remove(app.Key);
+
                 }
                 catch (Exception e)
                 {

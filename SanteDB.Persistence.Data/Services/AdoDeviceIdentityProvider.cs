@@ -100,6 +100,7 @@ namespace SanteDB.Persistence.Data.Services
 
         // Localization service
         private readonly ILocalizationService m_localizationService;
+        private readonly IDataCachingService m_dataCaching;
 
         // Hasher
         private IPasswordHashingService m_hasher;
@@ -110,13 +111,15 @@ namespace SanteDB.Persistence.Data.Services
         public AdoDeviceIdentityProvider(IConfigurationManager configurationManager,
             IPasswordHashingService hashingService,
             ILocalizationService localizationService,
-            IPolicyEnforcementService pepService)
+            IPolicyEnforcementService pepService,
+            IDataCachingService dataCaching = null)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_securityConfiguration = configurationManager.GetSection<SecurityConfigurationSection>();
             this.m_hasher = hashingService;
             this.m_pepService = pepService;
             this.m_localizationService = localizationService;
+            this.m_dataCaching = dataCaching;
         }
 
         /// <summary>
@@ -384,6 +387,8 @@ namespace SanteDB.Persistence.Data.Services
                     }
 
                     dev = context.Update(dev);
+
+                    this.m_dataCaching?.Remove(dev.Key);
                     if (lockoutState)
                     {
                         this.Locked?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dev), principal));
