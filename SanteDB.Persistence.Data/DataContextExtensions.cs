@@ -150,7 +150,7 @@ namespace SanteDB.Persistence.Data
         /// </summary>
         public static Exception TranslateDbException(this DbException e)
         {
-            s_tracer.TraceError("Will Translate DBException: {0} - {1}", e.Data["SqlState"] ?? e.ErrorCode, e.Message);
+            s_tracer.TraceError("Will Translate DBException: {0} - {1}", e.Data["SqlState"] ?? e.ErrorCode, e);
             if (e.Data["SqlState"] != null)
             {
                 switch (e.Data["SqlState"].ToString())

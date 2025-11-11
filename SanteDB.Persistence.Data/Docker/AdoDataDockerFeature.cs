@@ -88,7 +88,8 @@ namespace SanteDB.Persistence.Data.Docker
                     LoadStrategy = Core.Services.LoadMode.SyncLoad,
                     CachingPolicy = new AdoPersistenceCachingPolicy()
                     {
-                        DataObjectExpiry = new TimeSpan(0, 0, 30)
+                        DataObjectExpiry = new TimeSpan(0, 0, 30),
+                        Targets = AdoDataCachingPolicyTarget.ModelObjects
                     },
                     DeleteStrategy = Core.Services.DeleteMode.LogicalDelete,
                     StrictKeyAgreement = true,
