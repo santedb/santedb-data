@@ -195,7 +195,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected virtual IEnumerable<DetectedIssue> VerifyEntity<TToVerify>(DataContext context, TToVerify objectToVerify)
             where TToVerify : TModel, IHasIdentifiers
         {
-            if(objectToVerify?.ShouldDisablePersistenceValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.BusinessContstraints) == true ||  context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.BusinessContstraints))
+            if (objectToVerify?.ShouldDisablePersistenceValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.BusinessContstraints) == true || context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.BusinessContstraints))
             {
                 yield break;
             }
@@ -490,7 +490,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     dbModel.Key = Guid.NewGuid();
                 }
-                var dbKeyTable = context.Insert(new TDbKeyModel() { Key = dbModel.Key });
+
+                // Auto-update? - some versioned entities may have 0 versions - we want to ignore duplicate insert
+                if (!(DataPersistenceControlContext.Current?.AutoUpdate ?? this.m_configuration.AutoUpdateExisting) ||
+                    !context.Any<TDbKeyModel>(o => o.Key == dbModel.Key))
+                {
+                    context.Insert(new TDbKeyModel() { Key = dbModel.Key });
+                }
 
                 // Next we want to insert the version key
                 if (dbModel.VersionKey == Guid.Empty)
@@ -544,12 +550,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
 
                 // Are we creating a new verison? or no?
-                if (!this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
+                if (!this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning) && existing.Count() > 1)
                 {
-                    if (existing.Count() > 1) // We only keep recent and last
+                    var lastVersionSequence = existing[0].VersionSequenceId;
+                    foreach (var itm in context.Query<TDbModel>(o => o.Key == model.Key).OrderByDescending(o => o.VersionSequenceId).Skip(1))
                     {
-                        var lastVersionSequence = existing[0].VersionSequenceId;
-                        context.DeleteAll<TDbModel>(o => o.Key == model.Key && o.VersionSequenceId < lastVersionSequence);
+                        context.Delete(itm);
+                        this.DoDeleteReferencesInternal(context, itm.VersionKey);
                     }
                 }
                 else
@@ -820,7 +827,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             //}
 
             // Is there any class concept key
-            
+
             if (m_classKeyMap != null && !query.ContainsPropertyReference(nameof(IHasClassConcept.ClassConceptKey)))
             {
                 var classKeyProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IHasClassConcept.ClassConceptKey)));
@@ -883,7 +890,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
 
-            associations = associations.Where(a => a.BatchOperation != BatchOperationType.Ignore) ;
+            associations = associations.Where(a => a.BatchOperation != BatchOperationType.Ignore);
 
             context.PushData(DataConstants.NoTouchSourceContextKey, true);
 
@@ -903,7 +910,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     {
                         a.SourceEntityKey = data.Key;
                     }
-                    else if (target.SourceEntityKey.HasValue && !target.TargetEntityKey.HasValue && 
+                    else if (target.SourceEntityKey.HasValue && !target.TargetEntityKey.HasValue &&
                         target.SourceEntityKey != data.Key) // Reverse relationship
                     {
                         target.TargetEntityKey = data.Key;
