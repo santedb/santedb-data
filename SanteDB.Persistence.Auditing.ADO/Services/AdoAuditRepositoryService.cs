@@ -233,7 +233,8 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
             var cacheKey = $"{codeSystem}:{code}";
 
-            if(this.m_adhocCache?.TryGet(cacheKey, out AuditCode retVal) == true)
+            AuditCode retVal = null;
+            if(this.m_adhocCache?.TryGet(cacheKey, out retVal) == true)
             {
                 return retVal;
             }
