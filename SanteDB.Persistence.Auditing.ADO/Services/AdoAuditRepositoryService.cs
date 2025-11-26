@@ -231,6 +231,14 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 return null;
             }
 
+            var cacheKey = $"{codeSystem}:{code}";
+
+            AuditCode retVal = null;
+            if(this.m_adhocCache?.TryGet(cacheKey, out retVal) == true)
+            {
+                return retVal;
+            }
+
             var cacheItem = this.m_dataCachingService.GetCacheItem<Concept>(key);
             if (cacheItem == null)
             {
@@ -249,10 +257,14 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     this.m_dataCachingService.Add(cacheItem);
                 }
             }
-            return new AuditCode(code, codeSystem)
+            
+            retVal = new AuditCode(code, codeSystem)
             {
                 DisplayName = cacheItem?.ConceptNames?.FirstOrDefault()?.Name
             };
+
+            this.m_adhocCache?.Add(cacheKey, retVal);
+            return retVal;
         }
 
         /// <summary>
