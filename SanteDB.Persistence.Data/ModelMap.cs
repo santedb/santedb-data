@@ -8,7 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SanteDB.Persistence.Data.ModelMap {
+namespace SanteDB.Persistence.Data.ModelMap
+{
     
     
     public sealed class RelationshipValidationRuleToDbRelationshipValidationRuleModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.RelationshipValidationRule, SanteDB.Persistence.Data.Model.Sys.DbRelationshipValidationRule> {
@@ -4565,6 +4566,9 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
             }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
+            }
             return retVal;
         }
         
@@ -4657,6 +4661,9 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
+            }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
             }
             return retVal;
         }
@@ -5318,9 +5325,6 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.MultipleBirthOrder.HasValue) {
                 retVal.MultipleBirthOrder = instance.MultipleBirthOrder.Value;
             }
-            if (instance.MaritalStatusKey.HasValue) {
-                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
-            }
             if (instance.EducationLevelKey.HasValue) {
                 retVal.EducationLevelKey = instance.EducationLevelKey.Value;
             }
@@ -5344,9 +5348,6 @@ namespace SanteDB.Persistence.Data.ModelMap {
             retVal.VersionKey = instance.ParentKey;
             if (instance.MultipleBirthOrder.HasValue) {
                 retVal.MultipleBirthOrder = instance.MultipleBirthOrder.Value;
-            }
-            if (instance.MaritalStatusKey.HasValue) {
-                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
             }
             if (instance.EducationLevelKey.HasValue) {
                 retVal.EducationLevelKey = instance.EducationLevelKey.Value;
@@ -5551,6 +5552,9 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
             }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
+            }
             return retVal;
         }
         
@@ -5643,6 +5647,9 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
+            }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
             }
             return retVal;
         }
@@ -6292,6 +6299,9 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
             }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
+            }
             return retVal;
         }
         
@@ -6384,6 +6394,9 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
+            }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
             }
             return retVal;
         }
@@ -7410,6 +7423,9 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
             }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
+            }
             return retVal;
         }
         
@@ -7502,6 +7518,9 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
+            }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
             }
             return retVal;
         }

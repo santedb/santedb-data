@@ -62,12 +62,6 @@ namespace SanteDB.Persistence.Data.Model.Roles
         }
 
         /// <summary>
-        /// Gets or sets the marital status code
-        /// </summary>
-        [Column("mrtl_sts_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-        public Guid? MaritalStatusKey { get; set; }
-
-        /// <summary>
         /// Gets or sets the education level key
         /// </summary>
         [Column("edu_lvl_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]

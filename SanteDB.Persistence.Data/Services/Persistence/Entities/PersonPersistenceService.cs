@@ -22,7 +22,10 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.Exceptions;
 using SanteDB.Persistence.Data.Model.Entities;
+using SanteDB.Persistence.Data.Model.Roles;
+using System;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
@@ -33,18 +36,31 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// </summary>
     public class PersonPersistenceService : EntityDerivedPersistenceService<Person, DbPerson>
     {
+        private readonly bool m_allowMaritalStatus;
+
         /// <inheritdoc/>
         public PersonPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
+            _ = Boolean.TryParse(configurationManager.GetAppSetting(FieldRestrictionSettings.AllowMaritalStatus), out m_allowMaritalStatus);
+
         }
 
         /// <inheritdoc />
         protected override Person BeforePersisting(DataContext context, Person data)
         {
-            data.OccupationKey = this.EnsureExists(context, data.Occupation)?.Key ?? data.OccupationKey;
-            data.GenderConceptKey = this.EnsureExists(context, data.GenderConcept)?.Key ?? data.GenderConceptKey;
-            data.NationalityKey = this.EnsureExists(context, data.Nationality)?.Key ?? data.NationalityKey;
-            data.VipStatusKey = this.EnsureExists(context, data.VipStatus)?.Key ?? data.VipStatusKey;
+            if (!data.ShouldDisablePersistenceValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.BusinessContstraints) && !context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.BusinessContstraints))
+            {
+                data.OccupationKey = this.EnsureExists(context, data.Occupation)?.Key ?? data.OccupationKey;
+                data.GenderConceptKey = this.EnsureExists(context, data.GenderConcept)?.Key ?? data.GenderConceptKey;
+                data.NationalityKey = this.EnsureExists(context, data.Nationality)?.Key ?? data.NationalityKey;
+                data.VipStatusKey = this.EnsureExists(context, data.VipStatus)?.Key ?? data.VipStatusKey;
+
+                data.MaritalStatusKey = this.EnsureExists(context, data.MaritalStatus)?.Key ?? data.MaritalStatusKey;
+                if (data.MaritalStatusKey.HasValue && !m_allowMaritalStatus)
+                {
+                    throw new FieldRestrictionException(nameof(Patient.MaritalStatus));
+                }
+            }
             return base.BeforePersisting(context, data);
         }
 
@@ -122,6 +138,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                             modelData.SetLoaded(o => o.Nationality);
                             modelData.VipStatus = conceptLoader.Get(context, personData.VipStatusKey.GetValueOrDefault());
                             modelData.SetLoaded(o => o.VipStatus);
+                            modelData.MaritalStatus = conceptLoader.Get(context, personData.MaritalStatusKey.GetValueOrDefault());
+                            modelData.SetLoaded(o => o.MaritalStatus);
                         }
                         goto case LoadMode.SyncLoad;
                     case LoadMode.SyncLoad:

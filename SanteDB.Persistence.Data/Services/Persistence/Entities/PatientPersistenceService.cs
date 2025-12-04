@@ -44,24 +44,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         private readonly bool m_allowReligion;
         private readonly bool m_allowEthnicity;
         private readonly bool m_allowLivingArrangement;
-        private readonly bool m_allowMaritalStatus;
         private readonly bool m_allowEducationLevel;
 
-        // Fields which are permitted by default
-        private readonly Guid[] m_forbiddenComponents;
-        private readonly Dictionary<String, Guid> m_fobiddenComponentSettings = new Dictionary<string, Guid>()
-        {
-            { FieldRestrictionSettings.ForbidAddressCity, AddressComponentKeys.City },
-            { FieldRestrictionSettings.ForbidAddressCounty, AddressComponentKeys.County },
-            { FieldRestrictionSettings.ForbidAddressPostal, AddressComponentKeys.PostalCode },
-            { FieldRestrictionSettings.ForbidAddressPrecinct, AddressComponentKeys.Precinct },
-            { FieldRestrictionSettings.ForbidAddressState, AddressComponentKeys.State },
-            { FieldRestrictionSettings.ForbidAddressStreet, AddressComponentKeys.StreetAddressLine },
-            { FieldRestrictionSettings.ForbidNameGiven, NameComponentKeys.Given },
-            { FieldRestrictionSettings.ForbidNameFamily, NameComponentKeys.Family },
-            { FieldRestrictionSettings.ForbidNamePrefix, NameComponentKeys.Prefix },
-            { FieldRestrictionSettings.ForbidNameSuffix, NameComponentKeys.Suffix }
-        };
+        
 
         /// <summary>
         /// DI Constructor
@@ -71,11 +56,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             _ = Boolean.TryParse(configurationManager.GetAppSetting(FieldRestrictionSettings.AllowReligion), out m_allowReligion);
             _ = Boolean.TryParse(configurationManager.GetAppSetting(FieldRestrictionSettings.AllowLivingArrangement), out m_allowLivingArrangement);
             _ = Boolean.TryParse(configurationManager.GetAppSetting(FieldRestrictionSettings.AllowEthnicity), out m_allowEthnicity);
-            _ = Boolean.TryParse(configurationManager.GetAppSetting(FieldRestrictionSettings.AllowMaritalStatus), out m_allowMaritalStatus);
             _ = Boolean.TryParse(configurationManager.GetAppSetting(FieldRestrictionSettings.AllowEducationLevel), out m_allowEducationLevel);
-
-            this.m_forbiddenComponents = this.m_fobiddenComponentSettings.Select(o => Boolean.TryParse(configurationManager.GetAppSetting(o.Key), out var forbid) && forbid ? o.Value : Guid.Empty)
-                .Where(g => g != Guid.Empty).ToArray();
+           
         }
 
         /// <inheritdoc />
@@ -95,11 +77,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     throw new FieldRestrictionException(nameof(Patient.EthnicGroup));
                 }
 
-                data.MaritalStatusKey = this.EnsureExists(context, data.MaritalStatus)?.Key ?? data.MaritalStatusKey;
-                if (data.MaritalStatusKey.HasValue && !m_allowMaritalStatus)
-                {
-                    throw new FieldRestrictionException(nameof(Patient.MaritalStatus));
-                }
 
                 data.LivingArrangementKey = this.EnsureExists(context, data.LivingArrangement)?.Key ?? data.LivingArrangementKey;
                 if (data.LivingArrangementKey.HasValue && !m_allowLivingArrangement)
@@ -113,21 +90,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     throw new FieldRestrictionException(nameof(Patient.ReligiousAffiliation));
                 }
 
-                // Addresses and names containing forbidden fields?
-                data.Addresses?.ForEach(a =>
-                {
-                    if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
-                    {
-                        throw new FieldRestrictionException(nameof(EntityAddress.Component));
-                    }
-                });
-                data.Names?.ForEach(a =>
-                {
-                    if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
-                    {
-                        throw new FieldRestrictionException(nameof(EntityName.Component));
-                    }
-                });
             }
 
             return base.BeforePersisting(context, data);
@@ -159,8 +121,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                             modelData.SetLoaded(o => o.EthnicGroup);
                             modelData.LivingArrangement = conceptPersister.Get(context, dbPatient.LivingArrangementKey.GetValueOrDefault());
                             modelData.SetLoaded(o => o.LivingArrangement);
-                            modelData.MaritalStatus = conceptPersister.Get(context, dbPatient.MaritalStatusKey.GetValueOrDefault());
-                            modelData.SetLoaded(o => o.MaritalStatus);
                             modelData.ReligiousAffiliation = conceptPersister.Get(context, dbPatient.ReligiousAffiliationKey.GetValueOrDefault());
                             modelData.SetLoaded(o => o.ReligiousAffiliation);
                         }
