@@ -5,6 +5,7 @@
  * </feature>
  */
  
+ DROP VIEW IF EXISTS org_santedb_emr_bi_query_patient_details;
 
  CREATE TABLE PSN_TBL_NEW (
 	ENT_VRSN_ID BLOB NOT NULL,
