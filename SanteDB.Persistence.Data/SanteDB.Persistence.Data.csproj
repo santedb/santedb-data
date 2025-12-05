@@ -120,6 +120,8 @@
     <None Remove="SQL\PSQL\Updates\20250127.sql" />
     <None Remove="SQL\PSQL\Updates\20250407-PSQL.sql" />
     <None Remove="SQL\PSQL\Updates\20250508-PSQL.sql" />
+    <None Remove="SQL\PSQL\Updates\20251127.sql" />
+    <None Remove="SQL\PSQL\Updates\20251203.sql" />
     <None Remove="SQL\SQLITE\20221003.SQL" />
     <None Remove="SQL\SQLITE\20221027.sql" />
     <None Remove="SQL\SQLITE\20221130.sql" />
@@ -311,6 +313,8 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SQL\PSQL\Updates\20250407-PSQL.sql" />
 	<EmbeddedResource Include="SQL\PSQL\Updates\20250508-PSQL.sql" />
+	<EmbeddedResource Include="SQL\PSQL\Updates\20251127.sql" />
+	<EmbeddedResource Include="SQL\PSQL\Updates\20251203.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20221003.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20221027.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20221130.sql" />
