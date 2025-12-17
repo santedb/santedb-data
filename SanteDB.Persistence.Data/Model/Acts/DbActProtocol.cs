@@ -56,6 +56,18 @@ namespace SanteDB.Persistence.Data.Model.Acts
         public byte[] State { get; set; }
 
         /// <summary>
+        /// Do not perform the action before this date
+        /// </summary>
+        [Column("nbf")]
+        public DateTime? NotBefore { get; set; }
+
+        /// <summary>
+        /// Not after
+        /// </summary>
+        [Column("naf")]
+        public DateTime? NotAfter { get; set; }
+
+        /// <summary>
         /// Sequence
         /// </summary>
         [Column("seq"), NotNull]
