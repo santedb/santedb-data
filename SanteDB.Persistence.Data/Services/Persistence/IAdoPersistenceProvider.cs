@@ -37,8 +37,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Get the provider that this instance of the provider uses
         /// </summary>
-        IDbProvider Provider { get; set; }
+        IDbProvider Provider { get; set;  }
 
+        /// <summary>
+        /// Gets the database type
+        /// </summary>
+        Type DbType { get; }
+
+        /// <summary>
+        /// Gets the model type
+        /// </summary>
+        Type ModelType { get; }
 
         /// <summary>
         /// Insert the specified object into the database
