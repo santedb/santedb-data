@@ -8,29 +8,35 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SanteDB.Persistence.Data.ModelMap {
+namespace SanteDB.Persistence.Data.ModelMap { 
     
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.RelationshipValidationRule, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Sys.DbRelationshipValidationRule, SanteDB.Persistence.Data</summary>
     public sealed class RelationshipValidationRuleToDbRelationshipValidationRuleModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.RelationshipValidationRule, SanteDB.Persistence.Data.Model.Sys.DbRelationshipValidationRule> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public RelationshipValidationRuleToDbRelationshipValidationRuleModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.RelationshipValidationRule);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Sys.DbRelationshipValidationRule);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -45,6 +51,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -59,6 +66,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Sys.DbRelationshipValidationRule MapToTarget(SanteDB.Core.Model.DataTypes.RelationshipValidationRule instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Sys.DbRelationshipValidationRule);
@@ -88,6 +96,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.RelationshipValidationRule MapToSource(SanteDB.Persistence.Data.Model.Sys.DbRelationshipValidationRule instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.RelationshipValidationRule);
@@ -114,26 +123,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.BI.Model.BiDefinition, SanteDB.BI and persistence class SanteDB.Persistence.Data.Model.Sys.DbBiQueryResult, SanteDB.Persistence.Data</summary>
     public sealed class BiDefinitionToDbBiQueryResultModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.BI.Model.BiDefinition, SanteDB.Persistence.Data.Model.Sys.DbBiQueryResult> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public BiDefinitionToDbBiQueryResultModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.BI.Model.BiDefinition);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Sys.DbBiQueryResult);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -148,6 +163,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -162,6 +178,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Sys.DbBiQueryResult MapToTarget(SanteDB.BI.Model.BiDefinition instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Sys.DbBiQueryResult);
@@ -173,6 +190,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.BI.Model.BiDefinition MapToSource(SanteDB.Persistence.Data.Model.Sys.DbBiQueryResult instance) {
             if ((instance == null)) {
                 return default(SanteDB.BI.Model.BiDefinition);
@@ -185,26 +203,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Mail.MailMessage, SanteDB.Core.Api and persistence class SanteDB.Persistence.Data.Model.Mail.DbMailMessage, SanteDB.Persistence.Data</summary>
     public sealed class MailMessageToDbMailMessageModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Mail.MailMessage, SanteDB.Persistence.Data.Model.Mail.DbMailMessage> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public MailMessageToDbMailMessageModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Mail.MailMessage);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Mail.DbMailMessage);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -219,6 +243,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -233,6 +258,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Mail.DbMailMessage MapToTarget(SanteDB.Core.Mail.MailMessage instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Mail.DbMailMessage);
@@ -266,6 +292,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Mail.MailMessage MapToSource(SanteDB.Persistence.Data.Model.Mail.DbMailMessage instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Mail.MailMessage);
@@ -296,26 +323,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Mail.Mailbox, SanteDB.Core.Api and persistence class SanteDB.Persistence.Data.Model.Mail.DbMailbox, SanteDB.Persistence.Data</summary>
     public sealed class MailboxToDbMailboxModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Mail.Mailbox, SanteDB.Persistence.Data.Model.Mail.DbMailbox> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public MailboxToDbMailboxModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Mail.Mailbox);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Mail.DbMailbox);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -330,6 +363,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -344,6 +378,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Mail.DbMailbox MapToTarget(SanteDB.Core.Mail.Mailbox instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Mail.DbMailbox);
@@ -367,6 +402,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Mail.Mailbox MapToSource(SanteDB.Persistence.Data.Model.Mail.DbMailbox instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Mail.Mailbox);
@@ -387,26 +423,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Mail.MailboxMailMessage, SanteDB.Core.Api and persistence class SanteDB.Persistence.Data.Model.Mail.DbMailboxMessageAssociation, SanteDB.Persistence.Data</summary>
     public sealed class MailboxMailMessageToDbMailboxMessageAssociationModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Mail.MailboxMailMessage, SanteDB.Persistence.Data.Model.Mail.DbMailboxMessageAssociation> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public MailboxMailMessageToDbMailboxMessageAssociationModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Mail.MailboxMailMessage);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Mail.DbMailboxMessageAssociation);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -421,6 +463,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -435,6 +478,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Mail.DbMailboxMessageAssociation MapToTarget(SanteDB.Core.Mail.MailboxMailMessage instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Mail.DbMailboxMessageAssociation);
@@ -451,6 +495,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Mail.MailboxMailMessage MapToSource(SanteDB.Persistence.Data.Model.Mail.DbMailboxMessageAssociation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Mail.MailboxMailMessage);
@@ -464,26 +509,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Security.SecurityUser, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Security.DbSecurityUser, SanteDB.Persistence.Data</summary>
     public sealed class SecurityUserToDbSecurityUserModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityUser, SanteDB.Persistence.Data.Model.Security.DbSecurityUser> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public SecurityUserToDbSecurityUserModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Security.SecurityUser);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Security.DbSecurityUser);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -498,6 +549,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -512,6 +564,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Security.DbSecurityUser MapToTarget(SanteDB.Core.Model.Security.SecurityUser instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityUser);
@@ -561,6 +614,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Security.SecurityUser MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityUser instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityUser);
@@ -609,26 +663,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Security.SecurityChallenge, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Security.DbSecurityChallenge, SanteDB.Persistence.Data</summary>
     public sealed class SecurityChallengeToDbSecurityChallengeModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityChallenge, SanteDB.Persistence.Data.Model.Security.DbSecurityChallenge> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public SecurityChallengeToDbSecurityChallengeModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Security.SecurityChallenge);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Security.DbSecurityChallenge);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -643,6 +703,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -657,6 +718,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Security.DbSecurityChallenge MapToTarget(SanteDB.Core.Model.Security.SecurityChallenge instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityChallenge);
@@ -685,6 +747,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Security.SecurityChallenge MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityChallenge instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityChallenge);
@@ -710,26 +773,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Security.SecurityApplication, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Security.DbSecurityApplication, SanteDB.Persistence.Data</summary>
     public sealed class SecurityApplicationToDbSecurityApplicationModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityApplication, SanteDB.Persistence.Data.Model.Security.DbSecurityApplication> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public SecurityApplicationToDbSecurityApplicationModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Security.SecurityApplication);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Security.DbSecurityApplication);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -744,6 +813,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -758,6 +828,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Security.DbSecurityApplication MapToTarget(SanteDB.Core.Model.Security.SecurityApplication instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityApplication);
@@ -796,6 +867,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Security.SecurityApplication MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityApplication instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityApplication);
@@ -831,26 +903,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Security.SecurityDevice, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Security.DbSecurityDevice, SanteDB.Persistence.Data</summary>
     public sealed class SecurityDeviceToDbSecurityDeviceModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityDevice, SanteDB.Persistence.Data.Model.Security.DbSecurityDevice> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public SecurityDeviceToDbSecurityDeviceModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Security.SecurityDevice);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Security.DbSecurityDevice);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -865,6 +943,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -879,6 +958,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Security.DbSecurityDevice MapToTarget(SanteDB.Core.Model.Security.SecurityDevice instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityDevice);
@@ -917,6 +997,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Security.SecurityDevice MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityDevice instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityDevice);
@@ -952,26 +1033,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Security.SecurityRole, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Security.DbSecurityRole, SanteDB.Persistence.Data</summary>
     public sealed class SecurityRoleToDbSecurityRoleModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityRole, SanteDB.Persistence.Data.Model.Security.DbSecurityRole> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public SecurityRoleToDbSecurityRoleModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Security.SecurityRole);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Security.DbSecurityRole);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -986,6 +1073,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1000,6 +1088,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Security.DbSecurityRole MapToTarget(SanteDB.Core.Model.Security.SecurityRole instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityRole);
@@ -1029,6 +1118,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Security.SecurityRole MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityRole instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityRole);
@@ -1055,26 +1145,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Security.SecurityProvenance, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Security.DbSecurityProvenance, SanteDB.Persistence.Data</summary>
     public sealed class SecurityProvenanceToDbSecurityProvenanceModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityProvenance, SanteDB.Persistence.Data.Model.Security.DbSecurityProvenance> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public SecurityProvenanceToDbSecurityProvenanceModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Security.SecurityProvenance);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Security.DbSecurityProvenance);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1089,6 +1185,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1103,6 +1200,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Security.DbSecurityProvenance MapToTarget(SanteDB.Core.Model.Security.SecurityProvenance instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityProvenance);
@@ -1131,6 +1229,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Security.SecurityProvenance MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityProvenance instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityProvenance);
@@ -1158,26 +1257,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy, SanteDB.Persistence.Data</summary>
     public sealed class SecurityPolicyInstanceToDbSecurityRolePolicyModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public SecurityPolicyInstanceToDbSecurityRolePolicyModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Security.SecurityPolicyInstance);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1192,6 +1297,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1206,6 +1312,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy MapToTarget(SanteDB.Core.Model.Security.SecurityPolicyInstance instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy);
@@ -1224,6 +1331,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Security.SecurityPolicyInstance MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityPolicyInstance);
@@ -1236,6 +1344,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy>.MapToTarget(SanteDB.Core.Model.Security.SecurityPolicyInstance instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy);
@@ -1254,6 +1363,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Security.SecurityPolicyInstance SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy>.MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityPolicyInstance);
@@ -1266,6 +1376,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy>.MapToTarget(SanteDB.Core.Model.Security.SecurityPolicyInstance instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy);
@@ -1284,6 +1395,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Security.SecurityPolicyInstance SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy>.MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityPolicyInstance);
@@ -1297,26 +1409,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy, SanteDB.Persistence.Data</summary>
     public sealed class SecurityPolicyInstanceToDbSecurityDevicePolicyModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public SecurityPolicyInstanceToDbSecurityDevicePolicyModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Security.SecurityPolicyInstance);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1331,6 +1449,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1345,6 +1464,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy MapToTarget(SanteDB.Core.Model.Security.SecurityPolicyInstance instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy);
@@ -1363,6 +1483,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Security.SecurityPolicyInstance MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityPolicyInstance);
@@ -1375,6 +1496,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy>.MapToTarget(SanteDB.Core.Model.Security.SecurityPolicyInstance instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy);
@@ -1393,6 +1515,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Security.SecurityPolicyInstance SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy>.MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityPolicyInstance);
@@ -1405,6 +1528,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy>.MapToTarget(SanteDB.Core.Model.Security.SecurityPolicyInstance instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy);
@@ -1423,6 +1547,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Security.SecurityPolicyInstance SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy>.MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityPolicyInstance);
@@ -1436,26 +1561,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy, SanteDB.Persistence.Data</summary>
     public sealed class SecurityPolicyInstanceToDbSecurityApplicationPolicyModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public SecurityPolicyInstanceToDbSecurityApplicationPolicyModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Security.SecurityPolicyInstance);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1470,6 +1601,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1484,6 +1616,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy MapToTarget(SanteDB.Core.Model.Security.SecurityPolicyInstance instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy);
@@ -1502,6 +1635,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Security.SecurityPolicyInstance MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityPolicyInstance);
@@ -1514,6 +1648,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy>.MapToTarget(SanteDB.Core.Model.Security.SecurityPolicyInstance instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy);
@@ -1532,6 +1667,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Security.SecurityPolicyInstance SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy>.MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityPolicyInstance);
@@ -1544,6 +1680,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy>.MapToTarget(SanteDB.Core.Model.Security.SecurityPolicyInstance instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy);
@@ -1562,6 +1699,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Security.SecurityPolicyInstance SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy>.MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityPolicyInstance);
@@ -1575,26 +1713,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Security.SecurityPolicy, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Security.DbSecurityPolicy, SanteDB.Persistence.Data</summary>
     public sealed class SecurityPolicyToDbSecurityPolicyModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Security.SecurityPolicy, SanteDB.Persistence.Data.Model.Security.DbSecurityPolicy> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public SecurityPolicyToDbSecurityPolicyModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Security.SecurityPolicy);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Security.DbSecurityPolicy);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1609,6 +1753,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1623,6 +1768,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Security.DbSecurityPolicy MapToTarget(SanteDB.Core.Model.Security.SecurityPolicy instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Security.DbSecurityPolicy);
@@ -1649,22 +1795,23 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Security.SecurityPolicy MapToSource(SanteDB.Persistence.Data.Model.Security.DbSecurityPolicy instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Security.SecurityPolicy);
             }
             SanteDB.Core.Model.Security.SecurityPolicy retVal = new SanteDB.Core.Model.Security.SecurityPolicy();
-            retVal.CreationTime = instance.CreationTime;
-            retVal.Key = instance.Key;
             retVal.Handler = instance.Handler;
             retVal.Name = instance.Name;
             retVal.IsPublic = instance.IsPublic;
             retVal.CanOverride = instance.CanOverride;
             retVal.Oid = instance.Oid;
+            retVal.Key = instance.Key;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -1672,26 +1819,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ConceptSet, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Concepts.DbConceptSet, SanteDB.Persistence.Data</summary>
     public sealed class ConceptSetToDbConceptSetModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ConceptSet, SanteDB.Persistence.Data.Model.Concepts.DbConceptSet> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ConceptSetToDbConceptSetModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ConceptSet);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Concepts.DbConceptSet);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1706,6 +1859,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1720,6 +1874,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Concepts.DbConceptSet MapToTarget(SanteDB.Core.Model.DataTypes.ConceptSet instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Concepts.DbConceptSet);
@@ -1751,21 +1906,22 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ConceptSet MapToSource(SanteDB.Persistence.Data.Model.Concepts.DbConceptSet instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ConceptSet);
             }
             SanteDB.Core.Model.DataTypes.ConceptSet retVal = new SanteDB.Core.Model.DataTypes.ConceptSet();
-            if (instance.UpdatedTime.HasValue) {
-                retVal.UpdatedTime = instance.UpdatedTime.Value;
-            }
-            retVal.Key = instance.Key;
             retVal.Name = instance.Name;
             retVal.Mnemonic = instance.Mnemonic;
             retVal.Oid = instance.Oid;
             retVal.Url = instance.Url;
+            retVal.Key = instance.Key;
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
+            }
+            if (instance.UpdatedTime.HasValue) {
+                retVal.UpdatedTime = instance.UpdatedTime.Value;
             }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
@@ -1779,26 +1935,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ConceptSetComposition, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Concepts.DbConceptSetComposition, SanteDB.Persistence.Data</summary>
     public sealed class ConceptSetCompositionToDbConceptSetCompositionModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ConceptSetComposition, SanteDB.Persistence.Data.Model.Concepts.DbConceptSetComposition> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ConceptSetCompositionToDbConceptSetCompositionModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ConceptSetComposition);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Concepts.DbConceptSetComposition);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1813,6 +1975,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1827,6 +1990,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Concepts.DbConceptSetComposition MapToTarget(SanteDB.Core.Model.DataTypes.ConceptSetComposition instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Concepts.DbConceptSetComposition);
@@ -1845,6 +2009,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ConceptSetComposition MapToSource(SanteDB.Persistence.Data.Model.Concepts.DbConceptSetComposition instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ConceptSetComposition);
@@ -1858,26 +2023,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.Concept, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Concepts.DbConceptVersion, SanteDB.Persistence.Data</summary>
     public sealed class ConceptToDbConceptVersionModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.Concept, SanteDB.Persistence.Data.Model.Concepts.DbConceptVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ConceptToDbConceptVersionModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.Concept);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Concepts.DbConceptVersion);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1892,6 +2063,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -1906,6 +2078,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Concepts.DbConceptVersion MapToTarget(SanteDB.Core.Model.DataTypes.Concept instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Concepts.DbConceptVersion);
@@ -1944,28 +2117,29 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.Concept MapToSource(SanteDB.Persistence.Data.Model.Concepts.DbConceptVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.Concept);
             }
             SanteDB.Core.Model.DataTypes.Concept retVal = new SanteDB.Core.Model.DataTypes.Concept();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Mnemonic = instance.Mnemonic;
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.ClassKey = instance.ClassKey;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -1973,26 +2147,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ConceptClass, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Concepts.DbConceptClass, SanteDB.Persistence.Data</summary>
     public sealed class ConceptClassToDbConceptClassModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ConceptClass, SanteDB.Persistence.Data.Model.Concepts.DbConceptClass> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ConceptClassToDbConceptClassModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ConceptClass);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Concepts.DbConceptClass);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2007,6 +2187,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2021,6 +2202,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Concepts.DbConceptClass MapToTarget(SanteDB.Core.Model.DataTypes.ConceptClass instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Concepts.DbConceptClass);
@@ -2050,19 +2232,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ConceptClass MapToSource(SanteDB.Persistence.Data.Model.Concepts.DbConceptClass instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ConceptClass);
             }
             SanteDB.Core.Model.DataTypes.ConceptClass retVal = new SanteDB.Core.Model.DataTypes.ConceptClass();
-            if (instance.UpdatedTime.HasValue) {
-                retVal.UpdatedTime = instance.UpdatedTime.Value;
-            }
-            retVal.Key = instance.Key;
             retVal.Name = instance.Name;
             retVal.Mnemonic = instance.Mnemonic;
+            retVal.Key = instance.Key;
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
+            }
+            if (instance.UpdatedTime.HasValue) {
+                retVal.UpdatedTime = instance.UpdatedTime.Value;
             }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
@@ -2076,26 +2259,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.CodeSystem, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Concepts.DbCodeSystem, SanteDB.Persistence.Data</summary>
     public sealed class CodeSystemToDbCodeSystemModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.CodeSystem, SanteDB.Persistence.Data.Model.Concepts.DbCodeSystem> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public CodeSystemToDbCodeSystemModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.CodeSystem);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Concepts.DbCodeSystem);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2110,6 +2299,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2124,6 +2314,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Concepts.DbCodeSystem MapToTarget(SanteDB.Core.Model.DataTypes.CodeSystem instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Concepts.DbCodeSystem);
@@ -2157,14 +2348,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.CodeSystem MapToSource(SanteDB.Persistence.Data.Model.Concepts.DbCodeSystem instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.CodeSystem);
             }
             SanteDB.Core.Model.DataTypes.CodeSystem retVal = new SanteDB.Core.Model.DataTypes.CodeSystem();
-            if (instance.UpdatedTime.HasValue) {
-                retVal.UpdatedTime = instance.UpdatedTime.Value;
-            }
             retVal.Key = instance.Key;
             retVal.Name = instance.Name;
             retVal.Oid = instance.Oid;
@@ -2174,6 +2363,9 @@ namespace SanteDB.Persistence.Data.ModelMap {
             retVal.Description = instance.Description;
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
+            }
+            if (instance.UpdatedTime.HasValue) {
+                retVal.UpdatedTime = instance.UpdatedTime.Value;
             }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
@@ -2187,26 +2379,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ConceptRelationshipType, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Concepts.DbConceptRelationshipType, SanteDB.Persistence.Data</summary>
     public sealed class ConceptRelationshipTypeToDbConceptRelationshipTypeModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ConceptRelationshipType, SanteDB.Persistence.Data.Model.Concepts.DbConceptRelationshipType> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ConceptRelationshipTypeToDbConceptRelationshipTypeModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ConceptRelationshipType);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Concepts.DbConceptRelationshipType);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2221,6 +2419,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2235,6 +2434,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Concepts.DbConceptRelationshipType MapToTarget(SanteDB.Core.Model.DataTypes.ConceptRelationshipType instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Concepts.DbConceptRelationshipType);
@@ -2264,14 +2464,15 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ConceptRelationshipType MapToSource(SanteDB.Persistence.Data.Model.Concepts.DbConceptRelationshipType instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ConceptRelationshipType);
             }
             SanteDB.Core.Model.DataTypes.ConceptRelationshipType retVal = new SanteDB.Core.Model.DataTypes.ConceptRelationshipType();
-            retVal.Key = instance.Key;
             retVal.Name = instance.Name;
             retVal.Mnemonic = instance.Mnemonic;
+            retVal.Key = instance.Key;
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
             }
@@ -2290,26 +2491,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ConceptRelationship, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Concepts.DbConceptRelationship, SanteDB.Persistence.Data</summary>
     public sealed class ConceptRelationshipToDbConceptRelationshipModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ConceptRelationship, SanteDB.Persistence.Data.Model.Concepts.DbConceptRelationship> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ConceptRelationshipToDbConceptRelationshipModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ConceptRelationship);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Concepts.DbConceptRelationship);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2324,6 +2531,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2338,6 +2546,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Concepts.DbConceptRelationship MapToTarget(SanteDB.Core.Model.DataTypes.ConceptRelationship instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Concepts.DbConceptRelationship);
@@ -2364,15 +2573,16 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ConceptRelationship MapToSource(SanteDB.Persistence.Data.Model.Concepts.DbConceptRelationship instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ConceptRelationship);
             }
             SanteDB.Core.Model.DataTypes.ConceptRelationship retVal = new SanteDB.Core.Model.DataTypes.ConceptRelationship();
-            retVal.SourceEntityKey = instance.SourceKey;
-            retVal.TargetConceptKey = instance.TargetKey;
             retVal.Key = instance.Key;
             retVal.RelationshipTypeKey = instance.RelationshipTypeKey;
+            retVal.SourceEntityKey = instance.SourceKey;
+            retVal.TargetConceptKey = instance.TargetKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -2381,26 +2591,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ReferenceTerm, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Concepts.DbReferenceTerm, SanteDB.Persistence.Data</summary>
     public sealed class ReferenceTermToDbReferenceTermModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ReferenceTerm, SanteDB.Persistence.Data.Model.Concepts.DbReferenceTerm> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ReferenceTermToDbReferenceTermModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ReferenceTerm);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Concepts.DbReferenceTerm);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2415,6 +2631,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2429,6 +2646,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Concepts.DbReferenceTerm MapToTarget(SanteDB.Core.Model.DataTypes.ReferenceTerm instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Concepts.DbReferenceTerm);
@@ -2460,19 +2678,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ReferenceTerm MapToSource(SanteDB.Persistence.Data.Model.Concepts.DbReferenceTerm instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ReferenceTerm);
             }
             SanteDB.Core.Model.DataTypes.ReferenceTerm retVal = new SanteDB.Core.Model.DataTypes.ReferenceTerm();
-            if (instance.UpdatedTime.HasValue) {
-                retVal.UpdatedTime = instance.UpdatedTime.Value;
-            }
             retVal.Key = instance.Key;
             retVal.CodeSystemKey = instance.CodeSystemKey;
             retVal.Mnemonic = instance.Mnemonic;
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
+            }
+            if (instance.UpdatedTime.HasValue) {
+                retVal.UpdatedTime = instance.UpdatedTime.Value;
             }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
@@ -2486,26 +2705,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ReferenceTermName, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Concepts.DbReferenceTermName, SanteDB.Persistence.Data</summary>
     public sealed class ReferenceTermNameToDbReferenceTermNameModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ReferenceTermName, SanteDB.Persistence.Data.Model.Concepts.DbReferenceTermName> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ReferenceTermNameToDbReferenceTermNameModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ReferenceTermName);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Concepts.DbReferenceTermName);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2520,6 +2745,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2534,6 +2760,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Concepts.DbReferenceTermName MapToTarget(SanteDB.Core.Model.DataTypes.ReferenceTermName instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Concepts.DbReferenceTermName);
@@ -2560,15 +2787,14 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ReferenceTermName MapToSource(SanteDB.Persistence.Data.Model.Concepts.DbReferenceTermName instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ReferenceTermName);
             }
             SanteDB.Core.Model.DataTypes.ReferenceTermName retVal = new SanteDB.Core.Model.DataTypes.ReferenceTermName();
-            retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Language = instance.LanguageCode;
-            retVal.Name = instance.Value;
             retVal.Key = instance.Key;
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.CreatedByKey = instance.CreatedByKey;
             retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletedByKey.HasValue) {
@@ -2577,30 +2803,38 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
+            retVal.Language = instance.LanguageCode;
+            retVal.Name = instance.Value;
             return retVal;
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ConceptReferenceTerm, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Concepts.DbConceptReferenceTerm, SanteDB.Persistence.Data</summary>
     public sealed class ConceptReferenceTermToDbConceptReferenceTermModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ConceptReferenceTerm, SanteDB.Persistence.Data.Model.Concepts.DbConceptReferenceTerm> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ConceptReferenceTermToDbConceptReferenceTermModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ConceptReferenceTerm);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Concepts.DbConceptReferenceTerm);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2615,6 +2849,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2629,6 +2864,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Concepts.DbConceptReferenceTerm MapToTarget(SanteDB.Core.Model.DataTypes.ConceptReferenceTerm instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Concepts.DbConceptReferenceTerm);
@@ -2655,15 +2891,16 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ConceptReferenceTerm MapToSource(SanteDB.Persistence.Data.Model.Concepts.DbConceptReferenceTerm instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ConceptReferenceTerm);
             }
             SanteDB.Core.Model.DataTypes.ConceptReferenceTerm retVal = new SanteDB.Core.Model.DataTypes.ConceptReferenceTerm();
-            retVal.SourceEntityKey = instance.SourceKey;
-            retVal.ReferenceTermKey = instance.TargetKey;
             retVal.Key = instance.Key;
+            retVal.ReferenceTermKey = instance.TargetKey;
             retVal.RelationshipTypeKey = instance.RelationshipTypeKey;
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -2672,26 +2909,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ConceptName, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Concepts.DbConceptName, SanteDB.Persistence.Data</summary>
     public sealed class ConceptNameToDbConceptNameModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ConceptName, SanteDB.Persistence.Data.Model.Concepts.DbConceptName> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ConceptNameToDbConceptNameModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ConceptName);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Concepts.DbConceptName);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2706,6 +2949,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2720,6 +2964,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Concepts.DbConceptName MapToTarget(SanteDB.Core.Model.DataTypes.ConceptName instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Concepts.DbConceptName);
@@ -2742,15 +2987,16 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ConceptName MapToSource(SanteDB.Persistence.Data.Model.Concepts.DbConceptName instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ConceptName);
             }
             SanteDB.Core.Model.DataTypes.ConceptName retVal = new SanteDB.Core.Model.DataTypes.ConceptName();
-            retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Key = instance.Key;
             retVal.Language = instance.Language;
             retVal.Name = instance.Name;
+            retVal.Key = instance.Key;
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -2759,26 +3005,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.Entity, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbEntityVersion, SanteDB.Persistence.Data</summary>
     public sealed class EntityToDbEntityVersionModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Entity, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public EntityToDbEntityVersionModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.Entity);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2793,6 +3045,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2807,6 +3060,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbEntityVersion MapToTarget(SanteDB.Core.Model.Entities.Entity instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
@@ -2859,19 +3113,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.Entity MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.Entity);
             }
             SanteDB.Core.Model.Entities.Entity retVal = new SanteDB.Core.Model.Entities.Entity();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -2882,17 +3129,25 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -2900,26 +3155,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.EntityName, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbEntityName, SanteDB.Persistence.Data</summary>
     public sealed class EntityNameToDbEntityNameModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.EntityName, SanteDB.Persistence.Data.Model.Entities.DbEntityName> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public EntityNameToDbEntityNameModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.EntityName);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbEntityName);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2934,6 +3195,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -2948,6 +3210,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbEntityName MapToTarget(SanteDB.Core.Model.Entities.EntityName instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityName);
@@ -2972,15 +3235,16 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.EntityName MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityName instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.EntityName);
             }
             SanteDB.Core.Model.Entities.EntityName retVal = new SanteDB.Core.Model.Entities.EntityName();
-            retVal.NameUseKey = instance.UseConceptKey;
-            retVal.SourceEntityKey = instance.SourceKey;
             retVal.Key = instance.Key;
+            retVal.NameUseKey = instance.UseConceptKey;
             retVal.ExternalKey = instance.ExternalKey;
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -2989,26 +3253,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.EntityNameComponent, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbEntityNameComponent, SanteDB.Persistence.Data</summary>
     public sealed class EntityNameComponentToDbEntityNameComponentModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.EntityNameComponent, SanteDB.Persistence.Data.Model.Entities.DbEntityNameComponent> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public EntityNameComponentToDbEntityNameComponentModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.EntityNameComponent);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbEntityNameComponent);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3023,6 +3293,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3037,6 +3308,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbEntityNameComponent MapToTarget(SanteDB.Core.Model.Entities.EntityNameComponent instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityNameComponent);
@@ -3056,14 +3328,15 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.EntityNameComponent MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityNameComponent instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.EntityNameComponent);
             }
             SanteDB.Core.Model.Entities.EntityNameComponent retVal = new SanteDB.Core.Model.Entities.EntityNameComponent();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Key = instance.Key;
             retVal.Value = instance.Value;
+            retVal.Key = instance.Key;
             if (instance.ComponentTypeKey.HasValue) {
                 retVal.ComponentTypeKey = instance.ComponentTypeKey.Value;
             }
@@ -3072,26 +3345,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.EntityAddress, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbEntityAddress, SanteDB.Persistence.Data</summary>
     public sealed class EntityAddressToDbEntityAddressModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.EntityAddress, SanteDB.Persistence.Data.Model.Entities.DbEntityAddress> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public EntityAddressToDbEntityAddressModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.EntityAddress);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbEntityAddress);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3106,6 +3385,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3120,6 +3400,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbEntityAddress MapToTarget(SanteDB.Core.Model.Entities.EntityAddress instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityAddress);
@@ -3144,15 +3425,16 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.EntityAddress MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityAddress instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.EntityAddress);
             }
             SanteDB.Core.Model.Entities.EntityAddress retVal = new SanteDB.Core.Model.Entities.EntityAddress();
-            retVal.AddressUseKey = instance.UseConceptKey;
-            retVal.SourceEntityKey = instance.SourceKey;
             retVal.Key = instance.Key;
+            retVal.AddressUseKey = instance.UseConceptKey;
             retVal.ExternalKey = instance.ExternalKey;
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -3161,26 +3443,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.EntityAddressComponent, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbEntityAddressComponent, SanteDB.Persistence.Data</summary>
     public sealed class EntityAddressComponentToDbEntityAddressComponentModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.EntityAddressComponent, SanteDB.Persistence.Data.Model.Entities.DbEntityAddressComponent> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public EntityAddressComponentToDbEntityAddressComponentModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.EntityAddressComponent);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbEntityAddressComponent);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3195,6 +3483,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3209,6 +3498,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbEntityAddressComponent MapToTarget(SanteDB.Core.Model.Entities.EntityAddressComponent instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityAddressComponent);
@@ -3228,14 +3518,15 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.EntityAddressComponent MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityAddressComponent instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.EntityAddressComponent);
             }
             SanteDB.Core.Model.Entities.EntityAddressComponent retVal = new SanteDB.Core.Model.Entities.EntityAddressComponent();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Key = instance.Key;
             retVal.Value = instance.Value;
+            retVal.Key = instance.Key;
             if (instance.ComponentTypeKey.HasValue) {
                 retVal.ComponentTypeKey = instance.ComponentTypeKey.Value;
             }
@@ -3244,26 +3535,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.EntityRelationship, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbEntityRelationship, SanteDB.Persistence.Data</summary>
     public sealed class EntityRelationshipToDbEntityRelationshipModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.EntityRelationship, SanteDB.Persistence.Data.Model.Entities.DbEntityRelationship> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public EntityRelationshipToDbEntityRelationshipModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.EntityRelationship);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbEntityRelationship);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3278,6 +3575,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3292,6 +3590,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbEntityRelationship MapToTarget(SanteDB.Core.Model.Entities.EntityRelationship instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityRelationship);
@@ -3334,18 +3633,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.EntityRelationship MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityRelationship instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.EntityRelationship);
             }
             SanteDB.Core.Model.Entities.EntityRelationship retVal = new SanteDB.Core.Model.Entities.EntityRelationship();
-            retVal.SourceEntityKey = instance.SourceKey;
-            retVal.TargetEntityKey = instance.TargetKey;
-            retVal.Key = instance.Key;
             retVal.RelationshipTypeKey = instance.RelationshipTypeKey;
             if (instance.Quantity.HasValue) {
                 retVal.Quantity = instance.Quantity.Value;
             }
+            retVal.SourceEntityKey = instance.SourceKey;
+            retVal.TargetEntityKey = instance.TargetKey;
+            retVal.Key = instance.Key;
             if (instance.ClassificationKey.HasValue) {
                 retVal.ClassificationKey = instance.ClassificationKey.Value;
             }
@@ -3365,26 +3665,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.EntityIdentifier, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.DataType.DbEntityIdentifier, SanteDB.Persistence.Data</summary>
     public sealed class EntityIdentifierToDbEntityIdentifierModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.EntityIdentifier, SanteDB.Persistence.Data.Model.DataType.DbEntityIdentifier> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public EntityIdentifierToDbEntityIdentifierModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.EntityIdentifier);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.DataType.DbEntityIdentifier);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3399,6 +3705,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3413,6 +3720,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.DataType.DbEntityIdentifier MapToTarget(SanteDB.Core.Model.DataTypes.EntityIdentifier instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.DataType.DbEntityIdentifier);
@@ -3448,17 +3756,18 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.EntityIdentifier MapToSource(SanteDB.Persistence.Data.Model.DataType.DbEntityIdentifier instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.EntityIdentifier);
             }
             SanteDB.Core.Model.DataTypes.EntityIdentifier retVal = new SanteDB.Core.Model.DataTypes.EntityIdentifier();
+            retVal.Key = instance.Key;
+            retVal.SourceEntityKey = instance.SourceKey;
+            retVal.Value = instance.Value;
             if (instance.TypeKey.HasValue) {
                 retVal.IdentifierTypeKey = instance.TypeKey.Value;
             }
-            retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Key = instance.Key;
-            retVal.Value = instance.Value;
             retVal.IdentityDomainKey = instance.IdentityDomainKey;
             if (instance.IssueDate.HasValue) {
                 retVal.IssueDate = ((System.DateTimeOffset)(instance.IssueDate.Value));
@@ -3476,26 +3785,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.GeoTag, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.DataType.DbGeoTag, SanteDB.Persistence.Data</summary>
     public sealed class GeoTagToDbGeoTagModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.GeoTag, SanteDB.Persistence.Data.Model.DataType.DbGeoTag> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public GeoTagToDbGeoTagModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.GeoTag);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.DataType.DbGeoTag);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3510,6 +3825,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3524,6 +3840,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.DataType.DbGeoTag MapToTarget(SanteDB.Core.Model.DataTypes.GeoTag instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.DataType.DbGeoTag);
@@ -3541,6 +3858,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.GeoTag MapToSource(SanteDB.Persistence.Data.Model.DataType.DbGeoTag instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.GeoTag);
@@ -3553,26 +3871,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.IdentityDomain, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.DataType.DbIdentityDomain, SanteDB.Persistence.Data</summary>
     public sealed class IdentityDomainToDbIdentityDomainModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.IdentityDomain, SanteDB.Persistence.Data.Model.DataType.DbIdentityDomain> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public IdentityDomainToDbIdentityDomainModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.IdentityDomain);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.DataType.DbIdentityDomain);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3587,6 +3911,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3601,6 +3926,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.DataType.DbIdentityDomain MapToTarget(SanteDB.Core.Model.DataTypes.IdentityDomain instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.DataType.DbIdentityDomain);
@@ -3643,15 +3969,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.IdentityDomain MapToSource(SanteDB.Persistence.Data.Model.DataType.DbIdentityDomain instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.IdentityDomain);
             }
             SanteDB.Core.Model.DataTypes.IdentityDomain retVal = new SanteDB.Core.Model.DataTypes.IdentityDomain();
-            if (instance.UpdatedTime.HasValue) {
-                retVal.UpdatedTime = instance.UpdatedTime.Value;
-            }
-            retVal.Key = instance.Key;
             retVal.Name = instance.Name;
             retVal.DomainName = instance.DomainName;
             retVal.Oid = instance.Oid;
@@ -3663,12 +3986,16 @@ namespace SanteDB.Persistence.Data.ModelMap {
             retVal.ValidationRegex = instance.ValidationRegex;
             retVal.CustomValidator = instance.CustomValidator;
             retVal.CheckDigitAlgorithm = instance.CheckDigitAlgorithm;
+            retVal.Key = instance.Key;
             retVal.IsUnique = instance.IsUnique;
             if (instance.IdentifierClassificationKey.HasValue) {
                 retVal.IdentifierClassificationKey = instance.IdentifierClassificationKey.Value;
             }
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
+            }
+            if (instance.UpdatedTime.HasValue) {
+                retVal.UpdatedTime = instance.UpdatedTime.Value;
             }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
@@ -3682,26 +4009,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.AssigningAuthority, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.DataType.DbAssigningAuthority, SanteDB.Persistence.Data</summary>
     public sealed class AssigningAuthorityToDbAssigningAuthorityModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.AssigningAuthority, SanteDB.Persistence.Data.Model.DataType.DbAssigningAuthority> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public AssigningAuthorityToDbAssigningAuthorityModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.AssigningAuthority);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.DataType.DbAssigningAuthority);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3716,6 +4049,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3730,6 +4064,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.DataType.DbAssigningAuthority MapToTarget(SanteDB.Core.Model.DataTypes.AssigningAuthority instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.DataType.DbAssigningAuthority);
@@ -3758,20 +4093,21 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.AssigningAuthority MapToSource(SanteDB.Persistence.Data.Model.DataType.DbAssigningAuthority instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.AssigningAuthority);
             }
             SanteDB.Core.Model.DataTypes.AssigningAuthority retVal = new SanteDB.Core.Model.DataTypes.AssigningAuthority();
-            retVal.CreationTime = instance.CreationTime;
-            retVal.SourceEntityKey = instance.SourceKey;
             retVal.Key = instance.Key;
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.AssigningApplicationKey = instance.AssigningApplicationKey;
             retVal.Reliability = instance.Reliability;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -3779,26 +4115,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.EntityTelecomAddress, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbTelecomAddress, SanteDB.Persistence.Data</summary>
     public sealed class EntityTelecomAddressToDbTelecomAddressModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.EntityTelecomAddress, SanteDB.Persistence.Data.Model.Entities.DbTelecomAddress> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public EntityTelecomAddressToDbTelecomAddressModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.EntityTelecomAddress);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbTelecomAddress);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3813,6 +4155,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3827,6 +4170,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbTelecomAddress MapToTarget(SanteDB.Core.Model.Entities.EntityTelecomAddress instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbTelecomAddress);
@@ -3855,19 +4199,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.EntityTelecomAddress MapToSource(SanteDB.Persistence.Data.Model.Entities.DbTelecomAddress instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.EntityTelecomAddress);
             }
             SanteDB.Core.Model.Entities.EntityTelecomAddress retVal = new SanteDB.Core.Model.Entities.EntityTelecomAddress();
-            retVal.AddressUseKey = instance.TelecomUseKey;
-            retVal.SourceEntityKey = instance.SourceKey;
             retVal.Key = instance.Key;
+            retVal.AddressUseKey = instance.TelecomUseKey;
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
             retVal.Value = instance.Value;
             retVal.ExternalKey = instance.ExternalKey;
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -3876,26 +4221,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.EntityExtension, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Extensibility.DbEntityExtension, SanteDB.Persistence.Data</summary>
     public sealed class EntityExtensionToDbEntityExtensionModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.EntityExtension, SanteDB.Persistence.Data.Model.Extensibility.DbEntityExtension> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public EntityExtensionToDbEntityExtensionModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.EntityExtension);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Extensibility.DbEntityExtension);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3910,6 +4261,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3924,6 +4276,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Extensibility.DbEntityExtension MapToTarget(SanteDB.Core.Model.DataTypes.EntityExtension instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Extensibility.DbEntityExtension);
@@ -3948,15 +4301,16 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.EntityExtension MapToSource(SanteDB.Persistence.Data.Model.Extensibility.DbEntityExtension instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.EntityExtension);
             }
             SanteDB.Core.Model.DataTypes.EntityExtension retVal = new SanteDB.Core.Model.DataTypes.EntityExtension();
-            retVal.SourceEntityKey = instance.SourceKey;
-            retVal.ExtensionValueData = instance.Value;
             retVal.Key = instance.Key;
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.ExtensionTypeKey = instance.ExtensionTypeKey;
+            retVal.ExtensionValueData = instance.Value;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -3965,26 +4319,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.EntityNote, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Extensibility.DbEntityNote, SanteDB.Persistence.Data</summary>
     public sealed class EntityNoteToDbEntityNoteModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.EntityNote, SanteDB.Persistence.Data.Model.Extensibility.DbEntityNote> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public EntityNoteToDbEntityNoteModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.EntityNote);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Extensibility.DbEntityNote);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -3999,6 +4359,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -4013,6 +4374,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Extensibility.DbEntityNote MapToTarget(SanteDB.Core.Model.DataTypes.EntityNote instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Extensibility.DbEntityNote);
@@ -4037,14 +4399,15 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.EntityNote MapToSource(SanteDB.Persistence.Data.Model.Extensibility.DbEntityNote instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.EntityNote);
             }
             SanteDB.Core.Model.DataTypes.EntityNote retVal = new SanteDB.Core.Model.DataTypes.EntityNote();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Key = instance.Key;
             retVal.Text = instance.Text;
+            retVal.Key = instance.Key;
             retVal.AuthorKey = instance.AuthorKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
@@ -4054,26 +4417,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.EntityTag, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Extensibility.DbEntityTag, SanteDB.Persistence.Data</summary>
     public sealed class EntityTagToDbEntityTagModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.EntityTag, SanteDB.Persistence.Data.Model.Extensibility.DbEntityTag> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public EntityTagToDbEntityTagModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.EntityTag);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Extensibility.DbEntityTag);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -4088,6 +4457,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -4102,6 +4472,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Extensibility.DbEntityTag MapToTarget(SanteDB.Core.Model.DataTypes.EntityTag instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Extensibility.DbEntityTag);
@@ -4128,6 +4499,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.EntityTag MapToSource(SanteDB.Persistence.Data.Model.Extensibility.DbEntityTag instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.EntityTag);
@@ -4149,26 +4521,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ExtensionType, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Extensibility.DbExtensionType, SanteDB.Persistence.Data</summary>
     public sealed class ExtensionTypeToDbExtensionTypeModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ExtensionType, SanteDB.Persistence.Data.Model.Extensibility.DbExtensionType> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ExtensionTypeToDbExtensionTypeModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ExtensionType);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Extensibility.DbExtensionType);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -4183,6 +4561,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -4197,6 +4576,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Extensibility.DbExtensionType MapToTarget(SanteDB.Core.Model.DataTypes.ExtensionType instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Extensibility.DbExtensionType);
@@ -4227,16 +4607,16 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ExtensionType MapToSource(SanteDB.Persistence.Data.Model.Extensibility.DbExtensionType instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ExtensionType);
             }
             SanteDB.Core.Model.DataTypes.ExtensionType retVal = new SanteDB.Core.Model.DataTypes.ExtensionType();
-            retVal.CreationTime = instance.CreationTime;
-            retVal.Key = instance.Key;
             retVal.Name = instance.Name;
             retVal.Uri = instance.Uri;
             retVal.ExtensionHandler = System.Type.GetType(instance.ExtensionHandler);
+            retVal.Key = instance.Key;
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
             }
@@ -4247,6 +4627,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -4254,26 +4635,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.NonPersonLivingSubject, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbNonPersonLivingSubject, SanteDB.Persistence.Data</summary>
     public sealed class NonPersonLivingSubjectToDbNonPersonLivingSubjectModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.NonPersonLivingSubject, SanteDB.Persistence.Data.Model.Entities.DbNonPersonLivingSubject>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.NonPersonLivingSubject, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public NonPersonLivingSubjectToDbNonPersonLivingSubjectModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.NonPersonLivingSubject);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbNonPersonLivingSubject);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -4288,6 +4675,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -4302,6 +4690,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbNonPersonLivingSubject MapToTarget(SanteDB.Core.Model.Entities.NonPersonLivingSubject instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbNonPersonLivingSubject);
@@ -4316,33 +4705,25 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.NonPersonLivingSubject MapToSource(SanteDB.Persistence.Data.Model.Entities.DbNonPersonLivingSubject instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.NonPersonLivingSubject);
             }
             SanteDB.Core.Model.Entities.NonPersonLivingSubject retVal = new SanteDB.Core.Model.Entities.NonPersonLivingSubject();
-            retVal.VersionKey = instance.ParentKey;
             if (instance.StrainKey.HasValue) {
                 retVal.StrainKey = instance.StrainKey.Value;
             }
+            retVal.VersionKey = instance.ParentKey;
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbEntityVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.NonPersonLivingSubject, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToTarget(SanteDB.Core.Model.Entities.NonPersonLivingSubject instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -4361,11 +4742,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -4374,25 +4764,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Entities.NonPersonLivingSubject SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.NonPersonLivingSubject, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.NonPersonLivingSubject);
             }
             SanteDB.Core.Model.Entities.NonPersonLivingSubject retVal = new SanteDB.Core.Model.Entities.NonPersonLivingSubject();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -4403,17 +4787,25 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -4421,26 +4813,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.Person, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbPerson, SanteDB.Persistence.Data</summary>
     public sealed class PersonToDbPersonModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Person, SanteDB.Persistence.Data.Model.Entities.DbPerson>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Person, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public PersonToDbPersonModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.Person);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbPerson);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -4455,6 +4853,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -4469,6 +4868,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbPerson MapToTarget(SanteDB.Core.Model.Entities.Person instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbPerson);
@@ -4565,9 +4965,13 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
             }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
+            }
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.Person MapToSource(SanteDB.Persistence.Data.Model.Entities.DbPerson instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.Person);
@@ -4658,24 +5062,18 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
             }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
+            }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbEntityVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Person, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToTarget(SanteDB.Core.Model.Entities.Person instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -4694,11 +5092,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -4707,25 +5114,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Entities.Person SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Person, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.Person);
             }
             SanteDB.Core.Model.Entities.Person retVal = new SanteDB.Core.Model.Entities.Person();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -4736,17 +5137,25 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -4754,26 +5163,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.Container, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbContainer, SanteDB.Persistence.Data</summary>
     public sealed class ContainerToDbContainerModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Container, SanteDB.Persistence.Data.Model.Entities.DbContainer>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Container, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Container, SanteDB.Persistence.Data.Model.Entities.DbMaterial> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ContainerToDbContainerModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.Container);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbContainer);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -4788,6 +5203,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -4802,6 +5218,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbContainer MapToTarget(SanteDB.Core.Model.Entities.Container instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbContainer);
@@ -4823,6 +5240,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.Container MapToSource(SanteDB.Persistence.Data.Model.Entities.DbContainer instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.Container);
@@ -4842,21 +5260,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbEntityVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Container, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToTarget(SanteDB.Core.Model.Entities.Container instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -4875,11 +5284,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -4888,25 +5306,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Entities.Container SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Container, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.Container);
             }
             SanteDB.Core.Model.Entities.Container retVal = new SanteDB.Core.Model.Entities.Container();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -4917,23 +5329,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbMaterial SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Container, SanteDB.Persistence.Data.Model.Entities.DbMaterial>.MapToTarget(SanteDB.Core.Model.Entities.Container instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbMaterial);
@@ -4958,6 +5379,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Entities.Container SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Container, SanteDB.Persistence.Data.Model.Entities.DbMaterial>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbMaterial instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.Container);
@@ -4975,26 +5397,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.PersonLanguageCommunication, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbPersonLanguageCommunication, SanteDB.Persistence.Data</summary>
     public sealed class PersonLanguageCommunicationToDbPersonLanguageCommunicationModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.PersonLanguageCommunication, SanteDB.Persistence.Data.Model.Entities.DbPersonLanguageCommunication> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public PersonLanguageCommunicationToDbPersonLanguageCommunicationModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.PersonLanguageCommunication);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbPersonLanguageCommunication);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -5009,6 +5437,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -5023,6 +5452,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbPersonLanguageCommunication MapToTarget(SanteDB.Core.Model.Entities.PersonLanguageCommunication instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbPersonLanguageCommunication);
@@ -5046,16 +5476,17 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.PersonLanguageCommunication MapToSource(SanteDB.Persistence.Data.Model.Entities.DbPersonLanguageCommunication instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.PersonLanguageCommunication);
             }
             SanteDB.Core.Model.Entities.PersonLanguageCommunication retVal = new SanteDB.Core.Model.Entities.PersonLanguageCommunication();
-            retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Key = instance.Key;
             retVal.LanguageCode = instance.LanguageCode;
             retVal.IsPreferred = instance.IsPreferred;
+            retVal.Key = instance.Key;
             retVal.ExternalKey = instance.ExternalKey;
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -5064,26 +5495,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.Narrative, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbNarrative, SanteDB.Persistence.Data</summary>
     public sealed class NarrativeToDbNarrativeModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.Narrative, SanteDB.Persistence.Data.Model.Acts.DbNarrative>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.Narrative, SanteDB.Persistence.Data.Model.Acts.DbActVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public NarrativeToDbNarrativeModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.Narrative);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbNarrative);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -5098,6 +5535,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -5112,6 +5550,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbNarrative MapToTarget(SanteDB.Core.Model.Acts.Narrative instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbNarrative);
@@ -5128,6 +5567,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.Narrative MapToSource(SanteDB.Persistence.Data.Model.Acts.DbNarrative instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.Narrative);
@@ -5142,6 +5582,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbActVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.Narrative, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToTarget(SanteDB.Core.Model.Acts.Narrative instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
@@ -5207,19 +5648,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.Narrative SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.Narrative, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.Narrative);
             }
             SanteDB.Core.Model.Acts.Narrative retVal = new SanteDB.Core.Model.Acts.Narrative();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -5243,15 +5677,23 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -5259,26 +5701,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Roles.Patient, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Roles.DbPatient, SanteDB.Persistence.Data</summary>
     public sealed class PatientToDbPatientModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Roles.Patient, SanteDB.Persistence.Data.Model.Roles.DbPatient>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Roles.Patient, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Roles.Patient, SanteDB.Persistence.Data.Model.Entities.DbPerson> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public PatientToDbPatientModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Roles.Patient);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Roles.DbPatient);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -5293,6 +5741,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -5307,6 +5756,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Roles.DbPatient MapToTarget(SanteDB.Core.Model.Roles.Patient instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Roles.DbPatient);
@@ -5318,9 +5768,6 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.MultipleBirthOrder.HasValue) {
                 retVal.MultipleBirthOrder = instance.MultipleBirthOrder.Value;
             }
-            if (instance.MaritalStatusKey.HasValue) {
-                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
-            }
             if (instance.EducationLevelKey.HasValue) {
                 retVal.EducationLevelKey = instance.EducationLevelKey.Value;
             }
@@ -5336,6 +5783,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Roles.Patient MapToSource(SanteDB.Persistence.Data.Model.Roles.DbPatient instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Roles.Patient);
@@ -5345,9 +5793,6 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.MultipleBirthOrder.HasValue) {
                 retVal.MultipleBirthOrder = instance.MultipleBirthOrder.Value;
             }
-            if (instance.MaritalStatusKey.HasValue) {
-                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
-            }
             if (instance.EducationLevelKey.HasValue) {
                 retVal.EducationLevelKey = instance.EducationLevelKey.Value;
             }
@@ -5363,21 +5808,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbEntityVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Roles.Patient, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToTarget(SanteDB.Core.Model.Roles.Patient instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -5396,11 +5832,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -5409,25 +5854,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Roles.Patient SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Roles.Patient, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Roles.Patient);
             }
             SanteDB.Core.Model.Roles.Patient retVal = new SanteDB.Core.Model.Roles.Patient();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -5438,23 +5877,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbPerson SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Roles.Patient, SanteDB.Persistence.Data.Model.Entities.DbPerson>.MapToTarget(SanteDB.Core.Model.Roles.Patient instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbPerson);
@@ -5551,9 +5999,13 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
             }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
+            }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Roles.Patient SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Roles.Patient, SanteDB.Persistence.Data.Model.Entities.DbPerson>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbPerson instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Roles.Patient);
@@ -5644,30 +6096,39 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
             }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
+            }
             return retVal;
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.Material, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbMaterial, SanteDB.Persistence.Data</summary>
     public sealed class MaterialToDbMaterialModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Material, SanteDB.Persistence.Data.Model.Entities.DbMaterial>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Material, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public MaterialToDbMaterialModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.Material);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbMaterial);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -5682,6 +6143,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -5696,6 +6158,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbMaterial MapToTarget(SanteDB.Core.Model.Entities.Material instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbMaterial);
@@ -5720,6 +6183,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.Material MapToSource(SanteDB.Persistence.Data.Model.Entities.DbMaterial instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.Material);
@@ -5736,21 +6200,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbEntityVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Material, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToTarget(SanteDB.Core.Model.Entities.Material instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -5769,11 +6224,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -5782,25 +6246,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Entities.Material SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Material, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.Material);
             }
             SanteDB.Core.Model.Entities.Material retVal = new SanteDB.Core.Model.Entities.Material();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -5811,17 +6269,25 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -5829,26 +6295,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.ManufacturedMaterial, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbManufacturedMaterial, SanteDB.Persistence.Data</summary>
     public sealed class ManufacturedMaterialToDbManufacturedMaterialModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.ManufacturedMaterial, SanteDB.Persistence.Data.Model.Entities.DbManufacturedMaterial>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.ManufacturedMaterial, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.ManufacturedMaterial, SanteDB.Persistence.Data.Model.Entities.DbMaterial> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ManufacturedMaterialToDbManufacturedMaterialModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.ManufacturedMaterial);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbManufacturedMaterial);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -5863,6 +6335,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -5877,6 +6350,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbManufacturedMaterial MapToTarget(SanteDB.Core.Model.Entities.ManufacturedMaterial instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbManufacturedMaterial);
@@ -5889,6 +6363,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.ManufacturedMaterial MapToSource(SanteDB.Persistence.Data.Model.Entities.DbManufacturedMaterial instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.ManufacturedMaterial);
@@ -5899,21 +6374,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbEntityVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.ManufacturedMaterial, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToTarget(SanteDB.Core.Model.Entities.ManufacturedMaterial instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -5932,11 +6398,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -5945,25 +6420,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Entities.ManufacturedMaterial SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.ManufacturedMaterial, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.ManufacturedMaterial);
             }
             SanteDB.Core.Model.Entities.ManufacturedMaterial retVal = new SanteDB.Core.Model.Entities.ManufacturedMaterial();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -5974,23 +6443,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbMaterial SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.ManufacturedMaterial, SanteDB.Persistence.Data.Model.Entities.DbMaterial>.MapToTarget(SanteDB.Core.Model.Entities.ManufacturedMaterial instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbMaterial);
@@ -6015,6 +6493,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Entities.ManufacturedMaterial SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.ManufacturedMaterial, SanteDB.Persistence.Data.Model.Entities.DbMaterial>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbMaterial instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.ManufacturedMaterial);
@@ -6032,26 +6511,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Roles.Provider, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Roles.DbProvider, SanteDB.Persistence.Data</summary>
     public sealed class ProviderToDbProviderModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Roles.Provider, SanteDB.Persistence.Data.Model.Roles.DbProvider>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Roles.Provider, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Roles.Provider, SanteDB.Persistence.Data.Model.Entities.DbPerson> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ProviderToDbProviderModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Roles.Provider);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Roles.DbProvider);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -6066,6 +6551,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -6080,6 +6566,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Roles.DbProvider MapToTarget(SanteDB.Core.Model.Roles.Provider instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Roles.DbProvider);
@@ -6094,6 +6581,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Roles.Provider MapToSource(SanteDB.Persistence.Data.Model.Roles.DbProvider instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Roles.Provider);
@@ -6104,21 +6592,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbEntityVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Roles.Provider, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToTarget(SanteDB.Core.Model.Roles.Provider instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -6137,11 +6616,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -6150,25 +6638,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Roles.Provider SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Roles.Provider, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Roles.Provider);
             }
             SanteDB.Core.Model.Roles.Provider retVal = new SanteDB.Core.Model.Roles.Provider();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -6179,23 +6661,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbPerson SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Roles.Provider, SanteDB.Persistence.Data.Model.Entities.DbPerson>.MapToTarget(SanteDB.Core.Model.Roles.Provider instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbPerson);
@@ -6292,9 +6783,13 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
             }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
+            }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Roles.Provider SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Roles.Provider, SanteDB.Persistence.Data.Model.Entities.DbPerson>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbPerson instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Roles.Provider);
@@ -6385,30 +6880,39 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
             }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
+            }
             return retVal;
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.Organization, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbOrganization, SanteDB.Persistence.Data</summary>
     public sealed class OrganizationToDbOrganizationModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Organization, SanteDB.Persistence.Data.Model.Entities.DbOrganization>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Organization, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public OrganizationToDbOrganizationModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.Organization);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbOrganization);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -6423,6 +6927,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -6437,6 +6942,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbOrganization MapToTarget(SanteDB.Core.Model.Entities.Organization instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbOrganization);
@@ -6451,31 +6957,23 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.Organization MapToSource(SanteDB.Persistence.Data.Model.Entities.DbOrganization instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.Organization);
             }
             SanteDB.Core.Model.Entities.Organization retVal = new SanteDB.Core.Model.Entities.Organization();
-            retVal.VersionKey = instance.ParentKey;
             retVal.IndustryConceptKey = instance.IndustryConceptKey;
+            retVal.VersionKey = instance.ParentKey;
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbEntityVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Organization, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToTarget(SanteDB.Core.Model.Entities.Organization instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -6494,11 +6992,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -6507,25 +7014,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Entities.Organization SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Organization, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.Organization);
             }
             SanteDB.Core.Model.Entities.Organization retVal = new SanteDB.Core.Model.Entities.Organization();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -6536,17 +7037,25 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -6554,26 +7063,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.Place, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbPlace, SanteDB.Persistence.Data</summary>
     public sealed class PlaceToDbPlaceModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Place, SanteDB.Persistence.Data.Model.Entities.DbPlace>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Place, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public PlaceToDbPlaceModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.Place);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbPlace);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -6588,6 +7103,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -6602,6 +7118,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbPlace MapToTarget(SanteDB.Core.Model.Entities.Place instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbPlace);
@@ -6614,6 +7131,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.Place MapToSource(SanteDB.Persistence.Data.Model.Entities.DbPlace instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.Place);
@@ -6624,21 +7142,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbEntityVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Place, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToTarget(SanteDB.Core.Model.Entities.Place instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -6657,11 +7166,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -6670,25 +7188,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Entities.Place SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.Place, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.Place);
             }
             SanteDB.Core.Model.Entities.Place retVal = new SanteDB.Core.Model.Entities.Place();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -6699,17 +7211,25 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -6717,26 +7237,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.PlaceService, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbPlaceService, SanteDB.Persistence.Data</summary>
     public sealed class PlaceServiceToDbPlaceServiceModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.PlaceService, SanteDB.Persistence.Data.Model.Entities.DbPlaceService> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public PlaceServiceToDbPlaceServiceModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.PlaceService);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbPlaceService);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -6751,6 +7277,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -6765,6 +7292,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbPlaceService MapToTarget(SanteDB.Core.Model.Entities.PlaceService instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbPlaceService);
@@ -6790,16 +7318,17 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.PlaceService MapToSource(SanteDB.Persistence.Data.Model.Entities.DbPlaceService instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.PlaceService);
             }
             SanteDB.Core.Model.Entities.PlaceService retVal = new SanteDB.Core.Model.Entities.PlaceService();
-            retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Key = instance.Key;
             retVal.ServiceSchedule = instance.ServiceSchedule;
             retVal.ServiceConceptKey = instance.ServiceConceptKey;
+            retVal.Key = instance.Key;
             retVal.ExternalKey = instance.ExternalKey;
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -6808,26 +7337,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.ApplicationEntity, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbApplicationEntity, SanteDB.Persistence.Data</summary>
     public sealed class ApplicationEntityToDbApplicationEntityModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.ApplicationEntity, SanteDB.Persistence.Data.Model.Entities.DbApplicationEntity>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.ApplicationEntity, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ApplicationEntityToDbApplicationEntityModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.ApplicationEntity);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbApplicationEntity);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -6842,6 +7377,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -6856,6 +7392,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbApplicationEntity MapToTarget(SanteDB.Core.Model.Entities.ApplicationEntity instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbApplicationEntity);
@@ -6873,34 +7410,26 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.ApplicationEntity MapToSource(SanteDB.Persistence.Data.Model.Entities.DbApplicationEntity instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.ApplicationEntity);
             }
             SanteDB.Core.Model.Entities.ApplicationEntity retVal = new SanteDB.Core.Model.Entities.ApplicationEntity();
-            retVal.VersionKey = instance.ParentKey;
             retVal.SecurityApplicationKey = instance.SecurityApplicationKey;
             retVal.SoftwareName = instance.SoftwareName;
             retVal.VersionName = instance.VersionName;
             retVal.VendorName = instance.VendorName;
+            retVal.VersionKey = instance.ParentKey;
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbEntityVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.ApplicationEntity, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToTarget(SanteDB.Core.Model.Entities.ApplicationEntity instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -6919,11 +7448,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -6932,25 +7470,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Entities.ApplicationEntity SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.ApplicationEntity, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.ApplicationEntity);
             }
             SanteDB.Core.Model.Entities.ApplicationEntity retVal = new SanteDB.Core.Model.Entities.ApplicationEntity();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -6961,17 +7493,25 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -6979,26 +7519,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.DeviceEntity, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbDeviceEntity, SanteDB.Persistence.Data</summary>
     public sealed class DeviceEntityToDbDeviceEntityModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.DeviceEntity, SanteDB.Persistence.Data.Model.Entities.DbDeviceEntity>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.DeviceEntity, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public DeviceEntityToDbDeviceEntityModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.DeviceEntity);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbDeviceEntity);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -7013,6 +7559,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -7027,6 +7574,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbDeviceEntity MapToTarget(SanteDB.Core.Model.Entities.DeviceEntity instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbDeviceEntity);
@@ -7043,33 +7591,25 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.DeviceEntity MapToSource(SanteDB.Persistence.Data.Model.Entities.DbDeviceEntity instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.DeviceEntity);
             }
             SanteDB.Core.Model.Entities.DeviceEntity retVal = new SanteDB.Core.Model.Entities.DeviceEntity();
-            retVal.VersionKey = instance.ParentKey;
             retVal.SecurityDeviceKey = instance.SecurityDeviceKey;
             retVal.ManufacturerModelName = instance.ManufacturerModelName;
             retVal.OperatingSystemName = instance.OperatingSystemName;
+            retVal.VersionKey = instance.ParentKey;
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbEntityVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.DeviceEntity, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToTarget(SanteDB.Core.Model.Entities.DeviceEntity instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -7088,11 +7628,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -7101,25 +7650,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Entities.DeviceEntity SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.DeviceEntity, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.DeviceEntity);
             }
             SanteDB.Core.Model.Entities.DeviceEntity retVal = new SanteDB.Core.Model.Entities.DeviceEntity();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -7130,17 +7673,25 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -7148,26 +7699,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Entities.UserEntity, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Entities.DbUserEntity, SanteDB.Persistence.Data</summary>
     public sealed class UserEntityToDbUserEntityModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.UserEntity, SanteDB.Persistence.Data.Model.Entities.DbUserEntity>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.UserEntity, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.UserEntity, SanteDB.Persistence.Data.Model.Entities.DbPerson> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public UserEntityToDbUserEntityModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Entities.UserEntity);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Entities.DbUserEntity);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -7182,6 +7739,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -7196,6 +7754,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Entities.DbUserEntity MapToTarget(SanteDB.Core.Model.Entities.UserEntity instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbUserEntity);
@@ -7210,6 +7769,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Entities.UserEntity MapToSource(SanteDB.Persistence.Data.Model.Entities.DbUserEntity instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.UserEntity);
@@ -7222,21 +7782,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbEntityVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.UserEntity, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToTarget(SanteDB.Core.Model.Entities.UserEntity instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -7255,11 +7806,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -7268,25 +7828,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Entities.UserEntity SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.UserEntity, SanteDB.Persistence.Data.Model.Entities.DbEntityVersion>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.UserEntity);
             }
             SanteDB.Core.Model.Entities.UserEntity retVal = new SanteDB.Core.Model.Entities.UserEntity();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -7297,23 +7851,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Entities.DbPerson SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.UserEntity, SanteDB.Persistence.Data.Model.Entities.DbPerson>.MapToTarget(SanteDB.Core.Model.Entities.UserEntity instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Entities.DbPerson);
@@ -7410,9 +7973,13 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
             }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
+            }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Entities.UserEntity SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Entities.UserEntity, SanteDB.Persistence.Data.Model.Entities.DbPerson>.MapToSource(SanteDB.Persistence.Data.Model.Entities.DbPerson instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Entities.UserEntity);
@@ -7503,30 +8070,39 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.GenderConceptKey.HasValue) {
                 retVal.GenderConceptKey = instance.GenderConceptKey.Value;
             }
+            if (instance.MaritalStatusKey.HasValue) {
+                retVal.MaritalStatusKey = instance.MaritalStatusKey.Value;
+            }
             return retVal;
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.Act, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbActVersion, SanteDB.Persistence.Data</summary>
     public sealed class ActToDbActVersionModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.Act, SanteDB.Persistence.Data.Model.Acts.DbActVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ActToDbActVersionModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.Act);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -7541,6 +8117,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -7555,21 +8132,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbActVersion MapToTarget(SanteDB.Core.Model.Acts.Act instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -7601,11 +8169,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -7614,25 +8191,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.Act MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.Act);
             }
             SanteDB.Core.Model.Acts.Act retVal = new SanteDB.Core.Model.Acts.Act();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -7656,15 +8227,23 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -7672,26 +8251,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.CarePlan, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbCarePlan, SanteDB.Persistence.Data</summary>
     public sealed class CarePlanToDbCarePlanModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.CarePlan, SanteDB.Persistence.Data.Model.Acts.DbCarePlan>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.CarePlan, SanteDB.Persistence.Data.Model.Acts.DbActVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public CarePlanToDbCarePlanModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.CarePlan);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbCarePlan);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -7706,6 +8291,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -7720,6 +8306,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbCarePlan MapToTarget(SanteDB.Core.Model.Acts.CarePlan instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbCarePlan);
@@ -7732,6 +8319,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.CarePlan MapToSource(SanteDB.Persistence.Data.Model.Acts.DbCarePlan instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.CarePlan);
@@ -7744,21 +8332,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbActVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.CarePlan, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToTarget(SanteDB.Core.Model.Acts.CarePlan instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -7790,11 +8369,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -7803,25 +8391,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.CarePlan SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.CarePlan, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.CarePlan);
             }
             SanteDB.Core.Model.Acts.CarePlan retVal = new SanteDB.Core.Model.Acts.CarePlan();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -7845,15 +8427,23 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -7861,26 +8451,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.CarePathwayDefinition, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbCarePathwayDefinition, SanteDB.Persistence.Data</summary>
     public sealed class CarePathwayDefinitionToDbCarePathwayDefinitionModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.CarePathwayDefinition, SanteDB.Persistence.Data.Model.Acts.DbCarePathwayDefinition> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public CarePathwayDefinitionToDbCarePathwayDefinitionModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.CarePathwayDefinition);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbCarePathwayDefinition);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -7895,6 +8491,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -7909,6 +8506,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbCarePathwayDefinition MapToTarget(SanteDB.Core.Model.Acts.CarePathwayDefinition instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbCarePathwayDefinition);
@@ -7944,6 +8542,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.CarePathwayDefinition MapToSource(SanteDB.Persistence.Data.Model.Acts.DbCarePathwayDefinition instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.CarePathwayDefinition);
@@ -7976,26 +8575,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ActExtension, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Extensibility.DbActExtension, SanteDB.Persistence.Data</summary>
     public sealed class ActExtensionToDbActExtensionModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ActExtension, SanteDB.Persistence.Data.Model.Extensibility.DbActExtension> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ActExtensionToDbActExtensionModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ActExtension);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Extensibility.DbActExtension);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8010,6 +8615,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8024,6 +8630,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Extensibility.DbActExtension MapToTarget(SanteDB.Core.Model.DataTypes.ActExtension instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Extensibility.DbActExtension);
@@ -8048,15 +8655,16 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ActExtension MapToSource(SanteDB.Persistence.Data.Model.Extensibility.DbActExtension instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ActExtension);
             }
             SanteDB.Core.Model.DataTypes.ActExtension retVal = new SanteDB.Core.Model.DataTypes.ActExtension();
-            retVal.SourceEntityKey = instance.SourceKey;
-            retVal.ExtensionValueData = instance.Value;
             retVal.Key = instance.Key;
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.ExtensionTypeKey = instance.ExtensionTypeKey;
+            retVal.ExtensionValueData = instance.Value;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -8065,26 +8673,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ActNote, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Extensibility.DbActNote, SanteDB.Persistence.Data</summary>
     public sealed class ActNoteToDbActNoteModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ActNote, SanteDB.Persistence.Data.Model.Extensibility.DbActNote> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ActNoteToDbActNoteModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ActNote);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Extensibility.DbActNote);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8099,6 +8713,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8113,6 +8728,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Extensibility.DbActNote MapToTarget(SanteDB.Core.Model.DataTypes.ActNote instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Extensibility.DbActNote);
@@ -8137,14 +8753,15 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ActNote MapToSource(SanteDB.Persistence.Data.Model.Extensibility.DbActNote instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ActNote);
             }
             SanteDB.Core.Model.DataTypes.ActNote retVal = new SanteDB.Core.Model.DataTypes.ActNote();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Key = instance.Key;
             retVal.Text = instance.Text;
+            retVal.Key = instance.Key;
             retVal.AuthorKey = instance.AuthorKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
@@ -8154,26 +8771,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ActTag, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Extensibility.DbActTag, SanteDB.Persistence.Data</summary>
     public sealed class ActTagToDbActTagModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ActTag, SanteDB.Persistence.Data.Model.Extensibility.DbActTag> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ActTagToDbActTagModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ActTag);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Extensibility.DbActTag);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8188,6 +8811,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8202,6 +8826,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Extensibility.DbActTag MapToTarget(SanteDB.Core.Model.DataTypes.ActTag instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Extensibility.DbActTag);
@@ -8228,6 +8853,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ActTag MapToSource(SanteDB.Persistence.Data.Model.Extensibility.DbActTag instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ActTag);
@@ -8249,26 +8875,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.ActRelationship, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbActRelationship, SanteDB.Persistence.Data</summary>
     public sealed class ActRelationshipToDbActRelationshipModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.ActRelationship, SanteDB.Persistence.Data.Model.Acts.DbActRelationship> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ActRelationshipToDbActRelationshipModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.ActRelationship);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbActRelationship);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8283,6 +8915,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8297,6 +8930,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbActRelationship MapToTarget(SanteDB.Core.Model.Acts.ActRelationship instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActRelationship);
@@ -8330,6 +8964,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.ActRelationship MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActRelationship instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.ActRelationship);
@@ -8337,8 +8972,8 @@ namespace SanteDB.Persistence.Data.ModelMap {
             SanteDB.Core.Model.Acts.ActRelationship retVal = new SanteDB.Core.Model.Acts.ActRelationship();
             retVal.SourceEntityKey = instance.SourceKey;
             retVal.TargetActKey = instance.TargetKey;
-            retVal.Key = instance.Key;
             retVal.RelationshipTypeKey = instance.RelationshipTypeKey;
+            retVal.Key = instance.Key;
             if (instance.ClassificationKey.HasValue) {
                 retVal.ClassificationKey = instance.ClassificationKey.Value;
             }
@@ -8352,26 +8987,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ActIdentifier, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.DataType.DbActIdentifier, SanteDB.Persistence.Data</summary>
     public sealed class ActIdentifierToDbActIdentifierModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ActIdentifier, SanteDB.Persistence.Data.Model.DataType.DbActIdentifier> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ActIdentifierToDbActIdentifierModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ActIdentifier);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.DataType.DbActIdentifier);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8386,6 +9027,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8400,6 +9042,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.DataType.DbActIdentifier MapToTarget(SanteDB.Core.Model.DataTypes.ActIdentifier instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.DataType.DbActIdentifier);
@@ -8435,17 +9078,18 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ActIdentifier MapToSource(SanteDB.Persistence.Data.Model.DataType.DbActIdentifier instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ActIdentifier);
             }
             SanteDB.Core.Model.DataTypes.ActIdentifier retVal = new SanteDB.Core.Model.DataTypes.ActIdentifier();
+            retVal.Key = instance.Key;
+            retVal.SourceEntityKey = instance.SourceKey;
+            retVal.Value = instance.Value;
             if (instance.TypeKey.HasValue) {
                 retVal.IdentifierTypeKey = instance.TypeKey.Value;
             }
-            retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Key = instance.Key;
-            retVal.Value = instance.Value;
             retVal.IdentityDomainKey = instance.IdentityDomainKey;
             if (instance.IssueDate.HasValue) {
                 retVal.IssueDate = ((System.DateTimeOffset)(instance.IssueDate.Value));
@@ -8463,26 +9107,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.ActParticipation, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbActParticipation, SanteDB.Persistence.Data</summary>
     public sealed class ActParticipationToDbActParticipationModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.ActParticipation, SanteDB.Persistence.Data.Model.Acts.DbActParticipation> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ActParticipationToDbActParticipationModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.ActParticipation);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbActParticipation);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8497,6 +9147,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8511,6 +9162,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbActParticipation MapToTarget(SanteDB.Core.Model.Acts.ActParticipation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActParticipation);
@@ -8544,22 +9196,23 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.ActParticipation MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActParticipation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.ActParticipation);
             }
             SanteDB.Core.Model.Acts.ActParticipation retVal = new SanteDB.Core.Model.Acts.ActParticipation();
-            retVal.PlayerEntityKey = instance.TargetKey;
-            retVal.SourceEntityKey = instance.SourceKey;
             retVal.Key = instance.Key;
             retVal.ParticipationRoleKey = instance.ParticipationRoleKey;
             if (instance.Quantity.HasValue) {
                 retVal.Quantity = instance.Quantity.Value;
             }
+            retVal.PlayerEntityKey = instance.TargetKey;
             if (instance.ClassificationKey.HasValue) {
                 retVal.ClassificationKey = instance.ClassificationKey.Value;
             }
             retVal.ExternalKey = instance.ExternalKey;
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -8568,26 +9221,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.SubstanceAdministration, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbSubstanceAdministration, SanteDB.Persistence.Data</summary>
     public sealed class SubstanceAdministrationToDbSubstanceAdministrationModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.SubstanceAdministration, SanteDB.Persistence.Data.Model.Acts.DbSubstanceAdministration>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.SubstanceAdministration, SanteDB.Persistence.Data.Model.Acts.DbActVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public SubstanceAdministrationToDbSubstanceAdministrationModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.SubstanceAdministration);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbSubstanceAdministration);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8602,6 +9261,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8616,6 +9276,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbSubstanceAdministration MapToTarget(SanteDB.Core.Model.Acts.SubstanceAdministration instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbSubstanceAdministration);
@@ -8640,15 +9301,16 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.SubstanceAdministration MapToSource(SanteDB.Persistence.Data.Model.Acts.DbSubstanceAdministration instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.SubstanceAdministration);
             }
             SanteDB.Core.Model.Acts.SubstanceAdministration retVal = new SanteDB.Core.Model.Acts.SubstanceAdministration();
-            retVal.RouteKey = instance.RouteConceptKey;
-            retVal.SiteKey = instance.SiteConceptKey;
-            retVal.DoseUnitKey = instance.DoseUnitConceptKey;
             retVal.VersionKey = instance.ParentKey;
+            retVal.RouteKey = instance.RouteConceptKey;
+            retVal.DoseUnitKey = instance.DoseUnitConceptKey;
+            retVal.SiteKey = instance.SiteConceptKey;
             if (instance.DoseQuantity.HasValue) {
                 retVal.DoseQuantity = instance.DoseQuantity.Value;
             }
@@ -8658,21 +9320,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbActVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.SubstanceAdministration, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToTarget(SanteDB.Core.Model.Acts.SubstanceAdministration instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -8704,11 +9357,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -8717,25 +9379,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.SubstanceAdministration SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.SubstanceAdministration, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.SubstanceAdministration);
             }
             SanteDB.Core.Model.Acts.SubstanceAdministration retVal = new SanteDB.Core.Model.Acts.SubstanceAdministration();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -8759,15 +9415,23 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -8775,26 +9439,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.Procedure, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbProcedure, SanteDB.Persistence.Data</summary>
     public sealed class ProcedureToDbProcedureModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.Procedure, SanteDB.Persistence.Data.Model.Acts.DbProcedure>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.Procedure, SanteDB.Persistence.Data.Model.Acts.DbActVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ProcedureToDbProcedureModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.Procedure);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbProcedure);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8809,6 +9479,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -8823,6 +9494,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbProcedure MapToTarget(SanteDB.Core.Model.Acts.Procedure instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbProcedure);
@@ -8843,11 +9515,13 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.Procedure MapToSource(SanteDB.Persistence.Data.Model.Acts.DbProcedure instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.Procedure);
             }
             SanteDB.Core.Model.Acts.Procedure retVal = new SanteDB.Core.Model.Acts.Procedure();
+            retVal.VersionKey = instance.ParentKey;
             if (instance.MethodConceptKey.HasValue) {
                 retVal.MethodKey = instance.MethodConceptKey.Value;
             }
@@ -8857,25 +9531,15 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TargetSiteConceptKey.HasValue) {
                 retVal.TargetSiteKey = instance.TargetSiteConceptKey.Value;
             }
-            retVal.VersionKey = instance.ParentKey;
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbActVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.Procedure, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToTarget(SanteDB.Core.Model.Acts.Procedure instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -8907,11 +9571,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -8920,25 +9593,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.Procedure SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.Procedure, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.Procedure);
             }
             SanteDB.Core.Model.Acts.Procedure retVal = new SanteDB.Core.Model.Acts.Procedure();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -8962,15 +9629,23 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -8978,26 +9653,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.PatientEncounter, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbPatientEncounter, SanteDB.Persistence.Data</summary>
     public sealed class PatientEncounterToDbPatientEncounterModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.PatientEncounter, SanteDB.Persistence.Data.Model.Acts.DbPatientEncounter>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.PatientEncounter, SanteDB.Persistence.Data.Model.Acts.DbActVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public PatientEncounterToDbPatientEncounterModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.PatientEncounter);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbPatientEncounter);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -9012,6 +9693,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -9026,6 +9708,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbPatientEncounter MapToTarget(SanteDB.Core.Model.Acts.PatientEncounter instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbPatientEncounter);
@@ -9043,6 +9726,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.PatientEncounter MapToSource(SanteDB.Persistence.Data.Model.Acts.DbPatientEncounter instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.PatientEncounter);
@@ -9054,21 +9738,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbActVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.PatientEncounter, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToTarget(SanteDB.Core.Model.Acts.PatientEncounter instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -9100,11 +9775,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -9113,25 +9797,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.PatientEncounter SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.PatientEncounter, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.PatientEncounter);
             }
             SanteDB.Core.Model.Acts.PatientEncounter retVal = new SanteDB.Core.Model.Acts.PatientEncounter();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -9155,15 +9833,23 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -9171,26 +9857,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.PatientEncounterArrangement, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbPatientEncounterArrangement, SanteDB.Persistence.Data</summary>
     public sealed class PatientEncounterArrangementToDbPatientEncounterArrangementModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.PatientEncounterArrangement, SanteDB.Persistence.Data.Model.Acts.DbPatientEncounterArrangement> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public PatientEncounterArrangementToDbPatientEncounterArrangementModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.PatientEncounterArrangement);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbPatientEncounterArrangement);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -9205,6 +9897,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -9219,6 +9912,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbPatientEncounterArrangement MapToTarget(SanteDB.Core.Model.Acts.PatientEncounterArrangement instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbPatientEncounterArrangement);
@@ -9248,12 +9942,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.PatientEncounterArrangement MapToSource(SanteDB.Persistence.Data.Model.Acts.DbPatientEncounterArrangement instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.PatientEncounterArrangement);
             }
             SanteDB.Core.Model.Acts.PatientEncounterArrangement retVal = new SanteDB.Core.Model.Acts.PatientEncounterArrangement();
-            retVal.SourceEntityKey = instance.SourceKey;
             retVal.Key = instance.Key;
             retVal.ArrangementTypeKey = instance.ArrangementTypeKey;
             if (instance.StartTime.HasValue) {
@@ -9262,6 +9956,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.StopTime.HasValue) {
                 retVal.StopTime = instance.StopTime.Value;
             }
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -9270,26 +9965,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.Observation, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbObservation, SanteDB.Persistence.Data</summary>
     public sealed class ObservationToDbObservationModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.Observation, SanteDB.Persistence.Data.Model.Acts.DbObservation>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.Observation, SanteDB.Persistence.Data.Model.Acts.DbActVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ObservationToDbObservationModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.Observation);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbObservation);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -9304,6 +10005,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -9318,6 +10020,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbObservation MapToTarget(SanteDB.Core.Model.Acts.Observation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbObservation);
@@ -9333,6 +10036,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.Observation MapToSource(SanteDB.Persistence.Data.Model.Acts.DbObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.Observation);
@@ -9344,21 +10048,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbActVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.Observation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToTarget(SanteDB.Core.Model.Acts.Observation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -9390,11 +10085,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -9403,25 +10107,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.Observation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.Observation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.Observation);
             }
             SanteDB.Core.Model.Acts.Observation retVal = new SanteDB.Core.Model.Acts.Observation();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -9445,15 +10143,23 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -9461,26 +10167,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.QuantityObservation, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbQuantityObservation, SanteDB.Persistence.Data</summary>
     public sealed class QuantityObservationToDbQuantityObservationModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.QuantityObservation, SanteDB.Persistence.Data.Model.Acts.DbQuantityObservation>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.QuantityObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.QuantityObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public QuantityObservationToDbQuantityObservationModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.QuantityObservation);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbQuantityObservation);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -9495,6 +10207,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -9509,6 +10222,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbQuantityObservation MapToTarget(SanteDB.Core.Model.Acts.QuantityObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbQuantityObservation);
@@ -9526,32 +10240,24 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.QuantityObservation MapToSource(SanteDB.Persistence.Data.Model.Acts.DbQuantityObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.QuantityObservation);
             }
             SanteDB.Core.Model.Acts.QuantityObservation retVal = new SanteDB.Core.Model.Acts.QuantityObservation();
-            retVal.VersionKey = instance.ParentKey;
             retVal.UnitOfMeasureKey = instance.UnitOfMeasureKey;
             retVal.Value = instance.Value;
+            retVal.VersionKey = instance.ParentKey;
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbActVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.QuantityObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToTarget(SanteDB.Core.Model.Acts.QuantityObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -9583,11 +10289,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -9596,25 +10311,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.QuantityObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.QuantityObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.QuantityObservation);
             }
             SanteDB.Core.Model.Acts.QuantityObservation retVal = new SanteDB.Core.Model.Acts.QuantityObservation();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -9638,21 +10347,30 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.QuantityObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation>.MapToTarget(SanteDB.Core.Model.Acts.QuantityObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbObservation);
@@ -9668,6 +10386,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.QuantityObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.QuantityObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.QuantityObservation);
@@ -9680,26 +10399,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.DateObservation, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbDateObservation, SanteDB.Persistence.Data</summary>
     public sealed class DateObservationToDbDateObservationModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.DateObservation, SanteDB.Persistence.Data.Model.Acts.DbDateObservation>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.DateObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.DateObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public DateObservationToDbDateObservationModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.DateObservation);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbDateObservation);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -9714,6 +10439,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -9728,6 +10454,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbDateObservation MapToTarget(SanteDB.Core.Model.Acts.DateObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbDateObservation);
@@ -9777,12 +10504,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.DateObservation MapToSource(SanteDB.Persistence.Data.Model.Acts.DbDateObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.DateObservation);
             }
             SanteDB.Core.Model.Acts.DateObservation retVal = new SanteDB.Core.Model.Acts.DateObservation();
-            retVal.VersionKey = instance.ParentKey;
             retVal.Value = instance.Value;
             if ("S".Equals(instance.ValuePrecision)) {
                 retVal.ValuePrecision = SanteDB.Core.Model.DataTypes.DatePrecision.Second;
@@ -9817,24 +10544,16 @@ namespace SanteDB.Persistence.Data.ModelMap {
                     }
                 }
             }
+            retVal.VersionKey = instance.ParentKey;
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbActVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.DateObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToTarget(SanteDB.Core.Model.Acts.DateObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -9866,11 +10585,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -9879,25 +10607,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.DateObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.DateObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.DateObservation);
             }
             SanteDB.Core.Model.Acts.DateObservation retVal = new SanteDB.Core.Model.Acts.DateObservation();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -9921,21 +10643,30 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.DateObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation>.MapToTarget(SanteDB.Core.Model.Acts.DateObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbObservation);
@@ -9951,6 +10682,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.DateObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.DateObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.DateObservation);
@@ -9963,26 +10695,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.CodedObservation, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbCodedObservation, SanteDB.Persistence.Data</summary>
     public sealed class CodedObservationToDbCodedObservationModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.CodedObservation, SanteDB.Persistence.Data.Model.Acts.DbCodedObservation>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.CodedObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.CodedObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public CodedObservationToDbCodedObservationModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.CodedObservation);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbCodedObservation);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -9997,6 +10735,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10011,6 +10750,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbCodedObservation MapToTarget(SanteDB.Core.Model.Acts.CodedObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbCodedObservation);
@@ -10025,6 +10765,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.CodedObservation MapToSource(SanteDB.Persistence.Data.Model.Acts.DbCodedObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.CodedObservation);
@@ -10035,21 +10776,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbActVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.CodedObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToTarget(SanteDB.Core.Model.Acts.CodedObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -10081,11 +10813,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -10094,25 +10835,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.CodedObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.CodedObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.CodedObservation);
             }
             SanteDB.Core.Model.Acts.CodedObservation retVal = new SanteDB.Core.Model.Acts.CodedObservation();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -10136,21 +10871,30 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.CodedObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation>.MapToTarget(SanteDB.Core.Model.Acts.CodedObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbObservation);
@@ -10166,6 +10910,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.CodedObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.CodedObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.CodedObservation);
@@ -10178,26 +10923,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.TextObservation, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbTextObservation, SanteDB.Persistence.Data</summary>
     public sealed class TextObservationToDbTextObservationModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.TextObservation, SanteDB.Persistence.Data.Model.Acts.DbTextObservation>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.TextObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.TextObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public TextObservationToDbTextObservationModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.TextObservation);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbTextObservation);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10212,6 +10963,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10226,6 +10978,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbTextObservation MapToTarget(SanteDB.Core.Model.Acts.TextObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbTextObservation);
@@ -10238,6 +10991,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.TextObservation MapToSource(SanteDB.Persistence.Data.Model.Acts.DbTextObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.TextObservation);
@@ -10248,21 +11002,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbActVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.TextObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToTarget(SanteDB.Core.Model.Acts.TextObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -10294,11 +11039,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -10307,25 +11061,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.TextObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.TextObservation, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.TextObservation);
             }
             SanteDB.Core.Model.Acts.TextObservation retVal = new SanteDB.Core.Model.Acts.TextObservation();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -10349,21 +11097,30 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.TextObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation>.MapToTarget(SanteDB.Core.Model.Acts.TextObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbObservation);
@@ -10379,6 +11136,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.TextObservation SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.TextObservation, SanteDB.Persistence.Data.Model.Acts.DbObservation>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbObservation instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.TextObservation);
@@ -10391,26 +11149,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.TemplateDefinition, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Extensibility.DbTemplateDefinition, SanteDB.Persistence.Data</summary>
     public sealed class TemplateDefinitionToDbTemplateDefinitionModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.TemplateDefinition, SanteDB.Persistence.Data.Model.Extensibility.DbTemplateDefinition> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public TemplateDefinitionToDbTemplateDefinitionModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.TemplateDefinition);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Extensibility.DbTemplateDefinition);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10425,6 +11189,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10439,6 +11204,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Extensibility.DbTemplateDefinition MapToTarget(SanteDB.Core.Model.DataTypes.TemplateDefinition instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Extensibility.DbTemplateDefinition);
@@ -10470,6 +11236,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.TemplateDefinition MapToSource(SanteDB.Persistence.Data.Model.Extensibility.DbTemplateDefinition instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.TemplateDefinition);
@@ -10498,26 +11265,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.Protocol, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbProtocol, SanteDB.Persistence.Data</summary>
     public sealed class ProtocolToDbProtocolModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.Protocol, SanteDB.Persistence.Data.Model.Acts.DbProtocol> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ProtocolToDbProtocolModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.Protocol);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbProtocol);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10532,6 +11305,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10546,6 +11320,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbProtocol MapToTarget(SanteDB.Core.Model.Acts.Protocol instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbProtocol);
@@ -10569,6 +11344,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.Protocol MapToSource(SanteDB.Persistence.Data.Model.Acts.DbProtocol instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.Protocol);
@@ -10589,26 +11365,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.ControlAct, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbControlAct, SanteDB.Persistence.Data</summary>
     public sealed class ControlActToDbControlActModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.ControlAct, SanteDB.Persistence.Data.Model.Acts.DbControlAct>, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.ControlAct, SanteDB.Persistence.Data.Model.Acts.DbActVersion> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ControlActToDbControlActModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.ControlAct);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbControlAct);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10623,6 +11405,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10637,6 +11420,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbControlAct MapToTarget(SanteDB.Core.Model.Acts.ControlAct instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbControlAct);
@@ -10645,6 +11429,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.ControlAct MapToSource(SanteDB.Persistence.Data.Model.Acts.DbControlAct instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.ControlAct);
@@ -10653,21 +11438,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Persistence.Data.Model.Acts.DbActVersion SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.ControlAct, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToTarget(SanteDB.Core.Model.Acts.ControlAct instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -10699,11 +11475,20 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -10712,25 +11497,19 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
             return retVal;
         }
         
+        /// <inheritdoc/>
         SanteDB.Core.Model.Acts.ControlAct SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.ControlAct, SanteDB.Persistence.Data.Model.Acts.DbActVersion>.MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActVersion instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.ControlAct);
             }
             SanteDB.Core.Model.Acts.ControlAct retVal = new SanteDB.Core.Model.Acts.ControlAct();
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            retVal.CreationTime = instance.CreationTime;
-            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -10754,15 +11533,23 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
+            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -10770,26 +11557,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.Acts.ActProtocol, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Acts.DbActProtocol, SanteDB.Persistence.Data</summary>
     public sealed class ActProtocolToDbActProtocolModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.Acts.ActProtocol, SanteDB.Persistence.Data.Model.Acts.DbActProtocol> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ActProtocolToDbActProtocolModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.Acts.ActProtocol);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Acts.DbActProtocol);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10804,6 +11597,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10818,6 +11612,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Acts.DbActProtocol MapToTarget(SanteDB.Core.Model.Acts.ActProtocol instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActProtocol);
@@ -10838,6 +11633,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.Acts.ActProtocol MapToSource(SanteDB.Persistence.Data.Model.Acts.DbActProtocol instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.Acts.ActProtocol);
@@ -10853,26 +11649,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ConceptExtension, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Extensibility.DbConceptExtension, SanteDB.Persistence.Data</summary>
     public sealed class ConceptExtensionToDbConceptExtensionModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ConceptExtension, SanteDB.Persistence.Data.Model.Extensibility.DbConceptExtension> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ConceptExtensionToDbConceptExtensionModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ConceptExtension);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Extensibility.DbConceptExtension);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10887,6 +11689,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10901,6 +11704,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Extensibility.DbConceptExtension MapToTarget(SanteDB.Core.Model.DataTypes.ConceptExtension instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Extensibility.DbConceptExtension);
@@ -10925,6 +11729,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ConceptExtension MapToSource(SanteDB.Persistence.Data.Model.Extensibility.DbConceptExtension instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ConceptExtension);
@@ -10942,26 +11747,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.ConceptTag, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Extensibility.DbConceptTag, SanteDB.Persistence.Data</summary>
     public sealed class ConceptTagToDbConceptTagModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.ConceptTag, SanteDB.Persistence.Data.Model.Extensibility.DbConceptTag> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public ConceptTagToDbConceptTagModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Model.DataTypes.ConceptTag);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Extensibility.DbConceptTag);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10976,6 +11787,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -10990,6 +11802,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Extensibility.DbConceptTag MapToTarget(SanteDB.Core.Model.DataTypes.ConceptTag instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Extensibility.DbConceptTag);
@@ -11016,6 +11829,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Model.DataTypes.ConceptTag MapToSource(SanteDB.Persistence.Data.Model.Extensibility.DbConceptTag instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Model.DataTypes.ConceptTag);
@@ -11037,26 +11851,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Notifications.NotificationTemplate, SanteDB.Core.Api and persistence class SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplate, SanteDB.Persistence.Data</summary>
     public sealed class NotificationTemplateToDbNotificationTemplateModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Notifications.NotificationTemplate, SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplate> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public NotificationTemplateToDbNotificationTemplateModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Notifications.NotificationTemplate);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplate);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -11071,6 +11891,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -11085,6 +11906,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplate MapToTarget(SanteDB.Core.Notifications.NotificationTemplate instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplate);
@@ -11116,6 +11938,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Notifications.NotificationTemplate MapToSource(SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplate instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Notifications.NotificationTemplate);
@@ -11144,26 +11967,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Notifications.NotificationInstance, SanteDB.Core.Api and persistence class SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstance, SanteDB.Persistence.Data</summary>
     public sealed class NotificationInstanceToDbNotificationInstanceModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Notifications.NotificationInstance, SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstance> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public NotificationInstanceToDbNotificationInstanceModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Notifications.NotificationInstance);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstance);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -11178,6 +12007,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -11192,6 +12022,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstance MapToTarget(SanteDB.Core.Notifications.NotificationInstance instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstance);
@@ -11231,6 +12062,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Notifications.NotificationInstance MapToSource(SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstance instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Notifications.NotificationInstance);
@@ -11267,26 +12099,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Notifications.NotificationTemplateContents, SanteDB.Core.Api and persistence class SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateContents, SanteDB.Persistence.Data</summary>
     public sealed class NotificationTemplateContentsToDbNotificationTemplateContentsModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Notifications.NotificationTemplateContents, SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateContents> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public NotificationTemplateContentsToDbNotificationTemplateContentsModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Notifications.NotificationTemplateContents);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateContents);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -11301,6 +12139,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -11315,6 +12154,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateContents MapToTarget(SanteDB.Core.Notifications.NotificationTemplateContents instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateContents);
@@ -11332,6 +12172,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Notifications.NotificationTemplateContents MapToSource(SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateContents instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Notifications.NotificationTemplateContents);
@@ -11346,26 +12187,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Notifications.NotificationTemplateParameter, SanteDB.Core.Api and persistence class SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateParameter, SanteDB.Persistence.Data</summary>
     public sealed class NotificationTemplateParameterToDbNotificationTemplateParameterModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Notifications.NotificationTemplateParameter, SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateParameter> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public NotificationTemplateParameterToDbNotificationTemplateParameterModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Notifications.NotificationTemplateParameter);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateParameter);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -11380,6 +12227,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -11394,6 +12242,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateParameter MapToTarget(SanteDB.Core.Notifications.NotificationTemplateParameter instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateParameter);
@@ -11410,6 +12259,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Notifications.NotificationTemplateParameter MapToSource(SanteDB.Persistence.Data.Model.Notifications.DbNotificationTemplateParameter instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Notifications.NotificationTemplateParameter);
@@ -11423,26 +12273,32 @@ namespace SanteDB.Persistence.Data.ModelMap {
         }
     }
     
+    /// <summary>Transforms between model class SanteDB.Core.Notifications.NotificationInstanceParameter, SanteDB.Core.Api and persistence class SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstanceParameter, SanteDB.Persistence.Data</summary>
     public sealed class NotificationInstanceParameterToDbNotificationInstanceParameterModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Notifications.NotificationInstanceParameter, SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstanceParameter> {
         
+        /// <inheritdoc/>
         private SanteDB.Core.Model.Map.ModelMapper m_mapper;
         
+        /// <inheritdoc/>
         public NotificationInstanceParameterToDbNotificationInstanceParameterModelMapper(SanteDB.Core.Model.Map.ModelMapper mapper) {
             this.m_mapper = mapper;
         }
         
+        /// <inheritdoc/>
         public System.Type SourceType {
             get {
                 return typeof(SanteDB.Core.Notifications.NotificationInstanceParameter);
             }
         }
         
+        /// <inheritdoc/>
         public System.Type TargetType {
             get {
                 return typeof(SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstanceParameter);
             }
         }
         
+        /// <inheritdoc/>
         public object MapToSource(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -11457,6 +12313,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToSource(instance);
         }
         
+        /// <inheritdoc/>
         public object MapToTarget(object o) {
             if ((o == null)) {
                 throw new System.ArgumentNullException("o");
@@ -11471,6 +12328,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return this.MapToTarget(instance);
         }
         
+        /// <inheritdoc/>
         public SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstanceParameter MapToTarget(SanteDB.Core.Notifications.NotificationInstanceParameter instance) {
             if ((instance == null)) {
                 return default(SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstanceParameter);
@@ -11487,6 +12345,7 @@ namespace SanteDB.Persistence.Data.ModelMap {
             return retVal;
         }
         
+        /// <inheritdoc/>
         public SanteDB.Core.Notifications.NotificationInstanceParameter MapToSource(SanteDB.Persistence.Data.Model.Notifications.DbNotificationInstanceParameter instance) {
             if ((instance == null)) {
                 return default(SanteDB.Core.Notifications.NotificationInstanceParameter);

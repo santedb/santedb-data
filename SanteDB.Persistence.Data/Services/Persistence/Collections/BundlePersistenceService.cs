@@ -84,6 +84,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
         }
 
+        /// <inheritdoc/>
+        public Type ModelType => typeof(Bundle);
+
+        /// <inheritdoc/>
+        public Type DbType => null;
+
         /// <summary>
         /// Gets the service name
         /// </summary>

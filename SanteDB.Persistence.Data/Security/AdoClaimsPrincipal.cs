@@ -32,31 +32,32 @@ namespace SanteDB.Persistence.Data.Security
     internal class AdoClaimsPrincipal : IClaimsPrincipal
     {
         // The identity of the principal
-        private AdoIdentity m_identity;
+        private readonly IClaimsIdentity[] m_identities;
 
         /// <summary>
         /// Create a claims principal
         /// </summary>
         /// <param name="focalIdentity">The focal identity (the primary identity)</param>
-        internal AdoClaimsPrincipal(AdoIdentity focalIdentity)
+        /// <param name="onBehalfOfIdentity">The identity on behalf of which the focal is authetnicated</param>
+        internal AdoClaimsPrincipal(AdoIdentity focalIdentity, IClaimsIdentity onBehalfOfIdentity = null)
         {
-            this.m_identity = focalIdentity;
+            this.m_identities = new IClaimsIdentity[] { focalIdentity, onBehalfOfIdentity }.OfType<IClaimsIdentity>().ToArray();
         }
 
         /// <summary>
         /// Get claims
         /// </summary>
-        public IEnumerable<IClaim> Claims => this.m_identity.Claims;
+        public IEnumerable<IClaim> Claims => this.m_identities[0].Claims;
 
         /// <summary>
         /// Get all identities
         /// </summary>
-        public IClaimsIdentity[] Identities => new IClaimsIdentity[] { this.m_identity };
+        public IClaimsIdentity[] Identities => this.m_identities;
 
         /// <summary>
         /// Get the primary identity
         /// </summary>
-        public IIdentity Identity => this.m_identity;
+        public IIdentity Identity => this.m_identities[0];
 
         /// <summary>
         /// Add an identity to this principal

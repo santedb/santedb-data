@@ -1,0 +1,23 @@
+/** 
+ * <feature scope="SanteDB.Persistence.Data" id="20251203-01" name="Update:20251203-01"   invariantName="npgsql" >
+ *	<summary>Update: Migrates marital status to person table</summary>
+ *	<isInstalled>select ck_patch('20251203-01')</isInstalled>
+ * </feature>
+ */
+ 
+
+ALTER TABLE PSN_TBL ADD MRTL_STS_CD_ID UUID;
+ALTER TABLE PSN_TBL ADD CONSTRAINT CK_PSN_MRTL_STS_CD CHECK (((MRTL_STS_CD_ID IS NULL) OR IS_CD_SET_MEM(MRTL_STS_CD_ID, 'MaritalStatus')));
+ALTER TABLE PSN_TBL ADD CONSTRAINT FK_PSN_MRTL_STS_CD_ID FOREIGN KEY (MRTL_STS_CD_ID) REFERENCES CD_TBL(CD_ID);
+
+UPDATE PSN_TBL
+SET
+	MRTL_STS_CD_ID = PAT_TBL.MRTL_STS_CD_ID
+FROM 
+	PAT_TBL
+WHERE 
+	PAT_TBL.ENT_VRSN_ID = PSN_TBL.ENT_VRSN_ID;
+
+ALTER TABLE PAT_TBL DROP COLUMN MRTL_STS_CD_ID CASCADE;
+
+SELECT REG_PATCH('20251203-01');

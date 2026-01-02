@@ -939,6 +939,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 .Union(existing.Where(e => !associationKeys.Contains(e)));
 
             toDelete = toDelete.Except(contextKeys).ToArray();
+
+            if(typeof(IClassifiedRelationship).IsAssignableFrom(persistenceService.ModelType))
+            {
+                // Get all classification keys from the persister
+                var tableMap = TableMapping.Get(persistenceService.DbType);
+                var classKeyColumn = tableMap.GetColumn(nameof(IClassifiedRelationship.ClassificationKey));
+                var sourceEntityColumn = tableMap.GetColumn(nameof(DbAssociation.SourceKey));
+                var keyColumn = tableMap.GetColumn(nameof(DbAssociation.Key));
+                var sqlStatement = new SqlStatementBuilder(persistenceService.Provider.StatementFactory)
+                    .SelectFrom(persistenceService.DbType, keyColumn)
+                    .Where($"{classKeyColumn.Name} = ? AND {sourceEntityColumn.Name} = ?", RelationshipClassKeys.PermanentLink, data.Key);
+                // Build SQL 
+                toDelete = toDelete.Except(context.Query(typeof(Guid?), sqlStatement.Statement).OfType<Guid?>()).ToArray(); // exclude the sticky relationships
+            }
+
             // Anything to remove?
             if (toDelete.Any())
             {

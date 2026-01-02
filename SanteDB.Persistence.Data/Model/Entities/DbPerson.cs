@@ -120,5 +120,12 @@ namespace SanteDB.Persistence.Data.Model.Entities
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets the marital status code
+        /// </summary>
+        [Column("mrtl_sts_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid? MaritalStatusKey { get; set; }
+
     }
 }

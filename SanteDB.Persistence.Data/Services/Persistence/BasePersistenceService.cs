@@ -127,6 +127,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public IDbProvider Provider { get; set; }
 
+        /// <inheritdoc/>
+        public Type DbType => typeof(TDbModel);
+
+        /// <inheritdoc/>
+        public Type ModelType => typeof(TModel);
+
         /// <summary>
         /// Get the query persistence service
         /// </summary>

@@ -341,7 +341,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     // Construct an identity and login
                     var identity = new AdoApplicationIdentity(app, "ONBEHALFOF");
-                    var retVal = new AdoClaimsPrincipal(identity);
+                    var retVal = new AdoClaimsPrincipal(identity, authenticationContext.Identity as IClaimsIdentity);
 
                     var dbClaims = context.Query<DbApplicationClaim>(o => o.SourceKey == app.Key &&
                            (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now));

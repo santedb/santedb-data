@@ -1,0 +1,22 @@
+/** 
+ * <feature scope="SanteDB.Persistence.Data" id="20251203-01" name="Update:20251203-01"   invariantName="FirebirdSQL" >
+ *	<summary>Update: Move marital status to PSN TBL</summary>
+ *	<isInstalled>select ck_patch('20251203-01') from rdb$database</isInstalled>
+ * </feature>
+ */
+ 
+ 
+ALTER TABLE PSN_TBL ADD MRTL_STS_CD_ID UUID;
+--#!
+ALTER TABLE PAT_TBL DROP CONSTRAINT FK_PSN_MRTL_STS_CD_ID;
+--#!
+ALTER TABLE PSN_TBL ADD CONSTRAINT FK_PSN_MRTL_STS_CD_ID FOREIGN KEY (MRTL_STS_CD_ID) REFERENCES CD_TBL(CD_ID);
+--#!
+UPDATE PSN_TBL
+SET
+	MRTL_STS_CD_ID = (SELECT FIRST 1 PAT_TBL.MRTL_STS_CD_ID FROM PAT_TBL WHERE  PAT_TBL.ENT_VRSN_ID = PSN_TBL.ENT_VRSN_ID);
+--#!
+ALTER TABLE PAT_TBL DROP MRTL_STS_CD_ID;
+--#!
+ 
+ SELECT REG_PATCH('20251203-01') FROM RDB$DATABASE;

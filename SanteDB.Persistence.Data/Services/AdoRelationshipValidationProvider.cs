@@ -84,6 +84,11 @@ namespace SanteDB.Persistence.Data.Services
             return retVal;
         }
 
+        /// <inheritdoc/>
+        public Type DbType => typeof(DbRelationshipValidationRule);
+
+        /// <inheritdoc/>
+        public Type ModelType => typeof(RelationshipValidationRule);
         /// <summary>
         /// Gets the service name
         /// </summary>

@@ -5,10 +5,10 @@
     <None Include="$(MSBuildThisFileDirectory)\santedb_test.sqlite" >
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-	  <None Include="$(MSBuildThisFileDirectory)\santedb_test.sqlite-shm" >
+	  <None Include="$(MSBuildThisFileDirectory)\santedb_test.sqlite-shm" Condition="Exists('$(MSBuildThisFileDirectory)\santedb_test.sqlite-shm')" >
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Include="$(MSBuildThisFileDirectory)\santedb_test.sqlite-wal" >
+	  <None Include="$(MSBuildThisFileDirectory)\santedb_test.sqlite-wal" Condition="Exists('$(MSBuildThisFileDirectory)\santedb_test.sqlite-wal')" >
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 
