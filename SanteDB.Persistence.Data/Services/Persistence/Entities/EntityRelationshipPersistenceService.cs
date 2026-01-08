@@ -27,6 +27,7 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
 using System;
 using System.Data.Common;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
@@ -61,7 +62,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             data.TargetEntityKey = this.EnsureExists(context, data.TargetEntity)?.Key ?? data.TargetEntityKey;
             data.HolderKey = this.EnsureExists(context, data.Holder)?.Key ?? data.HolderKey;
 
-            return base.BeforePersisting(context, data);
+            bool noTouchSource = EntityRelationshipTypeKeys.ReverseRelationshipTypes.Contains(data.RelationshipTypeKey.Value);
+            try
+            {
+                if (noTouchSource)
+                {
+                    context.PushData(DataConstants.NoTouchSourceContextKey, true);
+                }
+                return base.BeforePersisting(context, data);
+            }
+            finally
+            {
+                if (noTouchSource)
+                {
+                    context.PopData(DataConstants.NoTouchSourceContextKey, out _);
+                }
+            }
         }
 
         /// <inheritdoc/>
