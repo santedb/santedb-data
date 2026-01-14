@@ -126,9 +126,9 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// DI constructor
         /// </summary>
-        public AdoCdssLibraryRepository(IConfigurationManager configurationManager, 
-            IPolicyEnforcementService pepService, 
-            ILocalizationService localizationService, 
+        public AdoCdssLibraryRepository(IConfigurationManager configurationManager,
+            IPolicyEnforcementService pepService,
+            ILocalizationService localizationService,
             IAdoPersistenceProvider<Protocol> protocolProvider,
             IQueryPersistenceService queryPersistenceService = null)
         {
@@ -334,12 +334,8 @@ namespace SanteDB.Persistence.Data.Services
 
                         using (var ms = new MemoryStream())
                         {
-                            using (var cs = CompressionUtil.GetCompressionScheme(Core.Http.Description.HttpCompressionAlgorithm.Gzip).CreateCompressionStream(ms))
-                            {
-                                libraryToInsert.Save(cs);
-                            }
+                            libraryToInsert.Save(ms);
                             newVersion.Definition = ms.ToArray();
-
                         }
 
                         // Is there a current version?
@@ -360,10 +356,10 @@ namespace SanteDB.Persistence.Data.Services
                         context.Insert(newVersion);
 
                         // Insert protocol definitions
-                        foreach(var protocolDefinition in libraryToInsert.GetProtocolDefinitions())
+                        foreach (var protocolDefinition in libraryToInsert.GetProtocolDefinitions())
                         {
                             var existing = this.m_protocolPersistence.Get(context, protocolDefinition.Key.Value);
-                            if(existing == null)
+                            if (existing == null)
                             {
                                 this.m_protocolPersistence.Insert(context, protocolDefinition);
                             }
@@ -395,12 +391,12 @@ namespace SanteDB.Persistence.Data.Services
         public LambdaExpression MapExpression<TReturn>(Expression<Func<ICdssLibrary, TReturn>> sortExpression)
         {
             var sortQuery = this.m_modelMapper.MapModelExpression<ICdssLibrary, DbCdssLibraryVersion, TReturn>(sortExpression, false);
-            if(sortQuery == null && sortExpression.ToString().Contains("Storage"))
+            if (sortQuery == null && sortExpression.ToString().Contains("Storage"))
             {
                 var propertySelector = QueryExpressionBuilder.BuildPropertySelector(sortExpression).Replace("storage.", ""); // HACK:
                 var parameter = Expression.Parameter(typeof(DbCdssLibraryVersion));
                 Expression selector = null;
-                switch(propertySelector)
+                switch (propertySelector)
                 {
                     case "creationTime":
                     case "modifiedOn":
@@ -475,9 +471,26 @@ namespace SanteDB.Persistence.Data.Services
                 libraryInstance.StorageMetadata = new AdoCdssLibraryEntry(cdssResult.Object1, cdssResult.Object2);
                 using (var ms = new MemoryStream(cdssResult.Object2.Definition))
                 {
-                    using (var cs = CompressionUtil.GetCompressionScheme(Core.Http.Description.HttpCompressionAlgorithm.Gzip).CreateDecompressionStream(ms))
+                    try
                     {
-                        libraryInstance.Load(cs);
+                        libraryInstance.Load(ms); // New 
+                    }
+                    catch // Fallback to compressed (old)
+                    {
+                        this.m_tracer.TraceWarning("Will upgrade storage of CDSS rule {0} to uncompressed format", cdssResult.Object2.Name);
+                        ms.Seek(0, SeekOrigin.Begin);
+                        using(var cs = CompressionUtil.GetCompressionScheme(Core.Http.Description.HttpCompressionAlgorithm.Gzip).CreateDecompressionStream(ms))
+                        {
+                            libraryInstance.Load(cs); // Upgrade
+                        }
+
+                        // We want to save uncompressed
+                        using (var ums = new MemoryStream())
+                        {
+                            libraryInstance.Save(ums);
+                            cdssResult.Object2.Definition = ums.ToArray();
+                            context.Update(cdssResult.Object2);
+                        }
                     }
                 }
                 return libraryInstance;
