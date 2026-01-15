@@ -42,10 +42,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <None Remove="C:\Users\fyfej\source\repos\santedb-v3\santedb-server\santedb-data\SanteDB.Core.TestFramework.Sqlite\\santedb_test.sqlite-shm" />
-    <None Remove="C:\Users\fyfej\source\repos\santedb-v3\santedb-server\santedb-data\SanteDB.Core.TestFramework.Sqlite\\santedb_test.sqlite-wal" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="9.0.0" />
     <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.1.10" />
     <PackageReference Include="SQLiteSpellfix.lib.e_sqlite3mc" Version="2.2.1" />
@@ -58,7 +54,6 @@
 
 	<ItemGroup>
 		<EmbeddedResource Include="SanteDB.Core.TestFramework.Sqlite.targets" Pack="true" PackagePath="build" />
-		<None Include="santedb_test.sqlite" Pack="true" PackagePath="build" />
 	</ItemGroup>
  
 
