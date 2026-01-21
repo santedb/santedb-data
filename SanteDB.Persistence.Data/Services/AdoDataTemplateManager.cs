@@ -145,8 +145,13 @@ namespace SanteDB.Persistence.Data.Services
                             var existingView = context.Query<DbDataTemplateDefinition>(o => o.Key == definition.Key).FirstOrDefault();
                             
                             // Ensure version is newer
-                            if(definition.Version != 0 && existingView?.Version > definition.Version ||
-                                !definition.Readonly && existingView?.Readonly == false)
+                            if(existingView != null && (
+                                definition.Version != 0 && 
+                                existingView?.Version > definition.Version ||
+                                !definition.Readonly && 
+                                existingView?.Readonly != true
+                                )
+                            )
                             {
                                 this.m_tracer.TraceInfo("Skipping the insert or update of {0} since version in the database is newer than the provided version", definition.Mnemonic);
                                 return definition;
