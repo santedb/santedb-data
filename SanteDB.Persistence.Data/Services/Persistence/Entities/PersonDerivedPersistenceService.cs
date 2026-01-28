@@ -81,23 +81,25 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 {
                     throw new FieldRestrictionException(nameof(Patient.MaritalStatus));
                 }
+
+
+                // Addresses and names containing forbidden fields?
+                data.Addresses?.ForEach(a =>
+                {
+                    if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
+                    {
+                        throw new FieldRestrictionException(nameof(EntityAddress.Component));
+                    }
+                });
+                data.Names?.ForEach(a =>
+                {
+                    if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
+                    {
+                        throw new FieldRestrictionException(nameof(EntityName.Component));
+                    }
+                });
             }
 
-            // Addresses and names containing forbidden fields?
-            data.Addresses?.ForEach(a =>
-            {
-                if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
-                {
-                    throw new FieldRestrictionException(nameof(EntityAddress.Component));
-                }
-            });
-            data.Names?.ForEach(a =>
-            {
-                if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
-                {
-                    throw new FieldRestrictionException(nameof(EntityName.Component));
-                }
-            });
             return base.BeforePersisting(context, data);
         }
 
