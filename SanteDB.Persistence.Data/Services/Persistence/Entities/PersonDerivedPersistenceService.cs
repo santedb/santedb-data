@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2025, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2026, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -81,23 +81,25 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 {
                     throw new FieldRestrictionException(nameof(Patient.MaritalStatus));
                 }
+
+
+                // Addresses and names containing forbidden fields?
+                data.Addresses?.ForEach(a =>
+                {
+                    if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
+                    {
+                        throw new FieldRestrictionException(nameof(EntityAddress.Component));
+                    }
+                });
+                data.Names?.ForEach(a =>
+                {
+                    if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
+                    {
+                        throw new FieldRestrictionException(nameof(EntityName.Component));
+                    }
+                });
             }
 
-            // Addresses and names containing forbidden fields?
-            data.Addresses?.ForEach(a =>
-            {
-                if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
-                {
-                    throw new FieldRestrictionException(nameof(EntityAddress.Component));
-                }
-            });
-            data.Names?.ForEach(a =>
-            {
-                if (a.Component?.Any(c => this.m_forbiddenComponents.Contains(c.ComponentTypeKey.GetValueOrDefault())) == true)
-                {
-                    throw new FieldRestrictionException(nameof(EntityName.Component));
-                }
-            });
             return base.BeforePersisting(context, data);
         }
 
