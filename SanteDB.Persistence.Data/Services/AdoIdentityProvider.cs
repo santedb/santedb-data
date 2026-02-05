@@ -522,11 +522,11 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         // Abandon all sessions for this user
-                        if (this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AbandonSessionAfterPasswordReset, false))
+                        if (this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AbandonSessionAfterPasswordReset, true))
                         {
                             foreach (var ses in context.Query<DbSession>(o => o.UserKey == dbUser.Key && o.NotAfter >= DateTimeOffset.Now).ToArray())
                             {
-                                ses.NotAfter = DateTimeOffset.Now;
+                                ses.RefreshExpiration = ses.NotAfter = DateTimeOffset.Now;
                                 context.Update(ses);
                             }
                         }
@@ -918,20 +918,33 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open(initializeExtensions: false);
 
-                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
-                    if (dbUser == null)
+                    using (var tx = context.BeginTransaction())
                     {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = userName }));
+                        var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
+                        if (dbUser == null)
+                        {
+                            throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = userName }));
+                        }
+
+                        dbUser.UpdatedByKey = context.EstablishProvenance(principal, null);
+                        dbUser.UpdatedTime = DateTimeOffset.Now;
+                        dbUser.Lockout = lockout ? (DateTimeOffset?)DateTimeOffset.MaxValue.ToLocalTime() : null;
+                        dbUser.LockoutSpecified = true;
+
+                        // Abandon all sessions for this user
+                        if (lockout && this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AbandonSessionAfterLockout, true))
+                        {
+                            foreach (var ses in context.Query<DbSession>(o => o.UserKey == dbUser.Key && o.NotAfter >= DateTimeOffset.Now).ToArray())
+                            {
+                                ses.RefreshExpiration = ses.NotAfter = DateTimeOffset.Now;
+                                context.Update(ses);
+                            }
+                        }
+
+                        context.Update(dbUser);
+                        this.m_dataCachingService?.Remove(dbUser.Key);
+                        tx.Commit();
                     }
-
-                    dbUser.UpdatedByKey = context.EstablishProvenance(principal, null);
-                    dbUser.UpdatedTime = DateTimeOffset.Now;
-                    dbUser.Lockout = lockout ? (DateTimeOffset?)DateTimeOffset.MaxValue.ToLocalTime() : null;
-                    dbUser.LockoutSpecified = true;
-                    
-                    context.Update(dbUser);
-                    this.m_dataCachingService?.Remove(dbUser.Key);
-
                 }
                 catch (Exception e)
                 {

@@ -263,18 +263,32 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open(initializeExtensions: false);
 
-                    var dev = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
-                    if (dev == null)
+                    using (var tx = context.BeginTransaction())
                     {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
+                        var dev = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
+                        if (dev == null)
+                        {
+                            throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
+                        }
+
+                        dev.DeviceSecret = this.m_hasher.ComputeHash(this.m_configuration.AddPepper(deviceSecret));
+                        dev.UpdatedByKey = context.EstablishProvenance(principal, null);
+                        dev.UpdatedTime = DateTimeOffset.Now;
+
+                        // Invalidate all sessions this device is attached to
+                        if (this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AbandonSessionAfterPasswordReset, true))
+                        {
+                            foreach (var ses in context.Query<DbSession>(o => o.DeviceKey == dev.Key && o.NotAfter >= DateTimeOffset.Now).ToArray())
+                            {
+                                ses.RefreshExpiration = ses.NotAfter = DateTimeOffset.Now;
+                                context.Update(ses);
+                            }
+                        }
+
+                        context.Update(dev);
+                        tx.Commit();
+                        this.Changed?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dev), principal));
                     }
-
-                    dev.DeviceSecret = this.m_hasher.ComputeHash(this.m_configuration.AddPepper(deviceSecret));
-                    dev.UpdatedByKey = context.EstablishProvenance(principal, null);
-                    dev.UpdatedTime = DateTimeOffset.Now;
-                    context.Update(dev);
-
-                    this.Changed?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dev), principal));
                 }
                 catch (Exception e)
                 {
@@ -370,32 +384,48 @@ namespace SanteDB.Persistence.Data.Services
                 try
                 {
                     context.Open(initializeExtensions: false);
-                    var dev = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
-                    if (dev == null)
+                    using (var tx = context.BeginTransaction())
                     {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
-                    }
+                        var dev = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
+                        if (dev == null)
+                        {
+                            throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
+                        }
 
-                    if (lockoutState)
-                    {
-                        dev.Lockout = DateTimeOffset.MaxValue.ToLocalTime();
-                    }
-                    else
-                    {
-                        dev.Lockout = null;
-                        dev.LockoutSpecified = true;
-                    }
+                        if (lockoutState)
+                        {
+                            dev.Lockout = DateTimeOffset.MaxValue.ToLocalTime();
+                        }
+                        else
+                        {
+                            dev.Lockout = null;
+                            dev.LockoutSpecified = true;
+                        }
 
-                    dev = context.Update(dev);
 
-                    this.m_dataCaching?.Remove(dev.Key);
-                    if (lockoutState)
-                    {
-                        this.Locked?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dev), principal));
-                    }
-                    else
-                    {
-                        this.Unlocked?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dev), principal));
+                        // Invalidate all sessions this device is attached to
+                        if (lockoutState && this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AbandonSessionAfterLockout, true))
+                        {
+                            foreach (var ses in context.Query<DbSession>(o => o.DeviceKey == dev.Key && o.NotAfter >= DateTimeOffset.Now).ToArray())
+                            {
+                                ses.RefreshExpiration = ses.NotAfter = DateTimeOffset.Now;
+                                context.Update(ses);
+                            }
+                        }
+
+                        dev = context.Update(dev);
+
+                        tx.Commit();
+
+                        this.m_dataCaching?.Remove(dev.Key);
+                        if (lockoutState)
+                        {
+                            this.Locked?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dev), principal));
+                        }
+                        else
+                        {
+                            this.Unlocked?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dev), principal));
+                        }
                     }
 
                 }
