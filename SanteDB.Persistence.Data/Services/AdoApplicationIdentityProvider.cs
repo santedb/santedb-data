@@ -412,17 +412,32 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open(initializeExtensions: false);
 
-                    var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
-                    if (app == null)
+                    using (var tx = context.BeginTransaction())
                     {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
+                        var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
+                        if (app == null)
+                        {
+                            throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
+                        }
+
+                        app.Secret = this.m_hasher.ComputeHash(this.m_configuration.AddPepper(secret));
+                        app.UpdatedByKey = context.EstablishProvenance(principal, null);
+                        app.UpdatedTime = DateTimeOffset.Now;
+
+                        // Invalidate all sessions this device is attached to
+                        if (this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AbandonSessionAfterPasswordReset, true))
+                        {
+                            foreach (var ses in context.Query<DbSession>(o => o.ApplicationKey == app.Key && o.NotAfter >= DateTimeOffset.Now).ToArray())
+                            {
+                                ses.RefreshExpiration = ses.NotAfter = DateTimeOffset.Now;
+                                context.Update(ses);
+                            }
+                        }
+
+                        context.Update(app);
+                        tx.Commit();
                     }
 
-                    app.Secret = this.m_hasher.ComputeHash(this.m_configuration.AddPepper(secret));
-                    app.UpdatedByKey = context.EstablishProvenance(principal, null);
-                    app.UpdatedTime = DateTimeOffset.Now;
-
-                    context.Update(app);
                 }
                 catch (Exception e)
                 {
@@ -527,24 +542,39 @@ namespace SanteDB.Persistence.Data.Services
                 try
                 {
                     context.Open(initializeExtensions: false);
-                    var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
-                    if (app == null)
+                    using (var tx = context.BeginTransaction())
                     {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
-                    }
+                        var app = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
+                        if (app == null)
+                        {
+                            throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND));
+                        }
 
-                    if (lockoutState)
-                    {
-                        app.Lockout = DateTimeOffset.MaxValue.ToLocalTime();
-                    }
-                    else
-                    {
-                        app.Lockout = null;
-                        app.LockoutSpecified = true;
-                    }
+                        if (lockoutState)
+                        {
+                            app.Lockout = DateTimeOffset.MaxValue.ToLocalTime();
+                        }
+                        else
+                        {
+                            app.Lockout = null;
+                            app.LockoutSpecified = true;
+                        }
 
-                    app = context.Update(app);
-                    this.m_dataCaching?.Remove(app.Key);
+                        // Invalidate all sessions this device is attached to
+                        if (lockoutState && this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AbandonSessionAfterLockout, true))
+                        {
+                            foreach (var ses in context.Query<DbSession>(o => o.ApplicationKey == app.Key && o.NotAfter >= DateTimeOffset.Now).ToArray())
+                            {
+                                ses.RefreshExpiration = ses.NotAfter = DateTimeOffset.Now;
+                                context.Update(ses);
+                            }
+                        }
+
+                        app = context.Update(app);
+                        tx.Commit();
+
+                        this.m_dataCaching?.Remove(app.Key);
+                    }
 
                 }
                 catch (Exception e)
