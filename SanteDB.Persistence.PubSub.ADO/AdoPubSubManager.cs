@@ -21,6 +21,9 @@
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.i18n;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Audit;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.PubSub;
@@ -45,7 +48,7 @@ namespace SanteDB.Persistence.PubSub.ADO
     /// Represents a pub/sub manager which stores definitions in a database
     /// </summary>
     [ServiceProvider("ADO.NET Pub/Sub Subscription Manager", Configuration = typeof(AdoPubSubConfigurationSection))]
-    public class AdoPubSubManager : IPubSubManagerService, IMappedQueryProvider<PubSubChannelDefinition>, IMappedQueryProvider<PubSubSubscriptionDefinition>, IReportProgressChanged
+    public class AdoPubSubManager : IPubSubManagerService, IPubSubLogService, IMappedQueryProvider<PubSubChannelDefinition>, IMappedQueryProvider<PubSubSubscriptionDefinition>, IReportProgressChanged
     {
         /// <summary>
         /// Gets the service name for this service
@@ -883,5 +886,87 @@ namespace SanteDB.Persistence.PubSub.ADO
             return new SqlStatement($"{tableAlias ?? tableMap.TableName}.{obsltCol.Name} IS NULL");
         }
 
+        /// <inheritdoc/>
+        public PubSubDispatchLog LogDispatch(string subscriptionName, IdentifiedData dispachedEntity, PubSubEventType eventType, OutcomeIndicator outcome)
+        {
+            if (String.IsNullOrEmpty(subscriptionName))
+            {
+                throw new ArgumentNullException(nameof(subscriptionName));
+            }
+            else if (dispachedEntity == null)
+            {
+                throw new ArgumentNullException(nameof(dispachedEntity));
+            }
+
+            try
+            {
+                using (var conn = this.m_configuration.Provider.GetWriteConnection())
+                {
+                    conn.Open();
+
+                    var subscription = conn.FirstOrDefault<DbSubscription>(o => o.IsActive && o.Name.ToLowerInvariant() == subscriptionName.ToLowerInvariant() && o.ObsoletionTime == null);
+                    if (subscription == null)
+                    {
+                        throw new KeyNotFoundException(String.Format(ErrorMessages.OBJECT_NOT_FOUND, subscriptionName));
+                    }
+
+                    var persisted = conn.Insert(new DbSubscriptionProcessLog()
+                    {
+                        Key = Guid.NewGuid(),
+                        DispatchTime = DateTime.Now,
+                        ObjectKey = dispachedEntity.Key.GetValueOrDefault(),
+                        VersionSequence = (dispachedEntity as IVersionedData)?.VersionSequence ?? 0,
+                        Outcome = outcome,
+                        SubscriptionKey = subscription.Key.Value,
+                        EventType = eventType
+                    });
+
+                    return new PubSubDispatchLog()
+                    {
+                        DispatchTime = persisted.DispatchTime,
+                        Key = persisted.Key,
+                        ObjectKey = persisted.ObjectKey,
+                        Outcome = persisted.Outcome,
+                        VersionSequence = persisted.VersionSequence,
+                        Event = persisted.EventType
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Could not persist log dispatch record", ex);
+            }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<PubSubDispatchLog> GetDispatches(string subscriptionName, Guid objectKey)
+        {
+            using (var conn = this.m_configuration.Provider.GetWriteConnection())
+            {
+                conn.Open();
+
+                var subscription = conn.FirstOrDefault<DbSubscription>(o => o.IsActive && o.Name.ToLowerInvariant() == subscriptionName.ToLowerInvariant() && o.ObsoletionTime == null);
+                if (subscription == null)
+                {
+                    throw new KeyNotFoundException(String.Format(ErrorMessages.OBJECT_NOT_FOUND, subscriptionName));
+                }
+
+                foreach (var log in conn.Query<DbSubscriptionProcessLog>(o => o.SubscriptionKey == subscription.Key && o.ObjectKey == objectKey).OrderByDescending(o => o.DispatchTime))
+                {
+                    yield return new PubSubDispatchLog()
+                    {
+                        DispatchTime = log.DispatchTime,
+                        Key = log.Key,
+                        ObjectKey = log.ObjectKey,
+                        Outcome = log.Outcome,
+                        VersionSequence = log.VersionSequence,
+                        Event = log.EventType
+                    };
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public PubSubDispatchLog GetLastDispatch(string subscriptionName, Guid objectKey) => this.GetDispatches(subscriptionName, objectKey).FirstOrDefault();
     }
 }

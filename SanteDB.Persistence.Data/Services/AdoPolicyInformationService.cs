@@ -25,6 +25,7 @@ using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
@@ -243,6 +244,11 @@ namespace SanteDB.Persistence.Data.Services
 
                         this.m_adhocCache?.RemoveAll("pdp.*");
                         this.m_adhocCache?.RemoveAll("pip.*");
+
+                        if(securable is IIdentifiedResource idr)
+                        {
+                            this.m_dataCache.Remove(idr.Key.GetValueOrDefault());
+                        }
                     }
                 }
                 catch (Exception e)
@@ -711,6 +717,10 @@ namespace SanteDB.Persistence.Data.Services
                         this.m_adhocCache?.RemoveAll("pdp.*");
                         this.m_adhocCache?.RemoveAll("pip.*");
 
+                        if (securable is IIdentifiedResource idr)
+                        {
+                            this.m_dataCache.Remove(idr.Key.GetValueOrDefault());
+                        }
                     }
                 }
                 catch (Exception e)

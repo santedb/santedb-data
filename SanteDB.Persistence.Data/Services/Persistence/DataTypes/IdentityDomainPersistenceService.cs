@@ -45,20 +45,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         }
 
         /// <inheritdoc/>
-        protected override IdentityDomain BeforePersisting(DataContext context, IdentityDomain data)
-        {
-            // The data may be synchronized from an upstream - if so we want to ensure our security user actually exists
-            // TODO: This data will need to be downloaded when the user logs in
-            if (data.GetAnnotations<String>().Contains(SystemTagNames.UpstreamDataTag))
-            {
-                data.AssigningAuthority
-                    .Where(a => !context.Any<DbSecurityApplication>(o => o.Key == a.AssigningApplicationKey))
-                    .ToList()
-                    .ForEach(o => o.AssigningApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid));
-            }
+        //protected override IdentityDomain BeforePersisting(DataContext context, IdentityDomain data)
+        //{
+        //    // The data may be synchronized from an upstream - if so we want to ensure our security user actually exists
+        //    // TODO: This data will need to be downloaded when the user logs in
+        //    //if (data.GetAnnotations<String>().Contains(SystemTagNames.UpstreamDataTag))
+        //    //{
+        //    //    data.AssigningAuthority
+        //    //        .Where(a => !context.Any<DbSecurityApplication>(o => o.Key == a.AssigningApplicationKey))
+        //    //        .ToList()
+        //    //        .ForEach(o => o.AssigningApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid));
+        //    //}
 
-            return base.BeforePersisting(context, data);
-        }
+        //    return base.BeforePersisting(context, data);
+        //}
         /// <inheritdoc/>
         protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
         {

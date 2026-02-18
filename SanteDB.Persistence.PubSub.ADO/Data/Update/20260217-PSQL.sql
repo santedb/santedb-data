@@ -1,0 +1,24 @@
+﻿/** 
+ * <feature scope="SanteDB.Persistence.PubSub.ADO" id="20260217-01" name="Update:20260217-01"   invariantName="npgsql">
+ *	<summary>Update: Adds Pub/Sub table for object tracing (for reprocess)</summary>
+ *  <isInstalled mustSucceed="true">SELECT to_regclass('public.sub_log_tbl') IS NOT NULL;</isInstalled>
+ * </feature>
+ */
+
+BEGIN TRANSACTION ;
+
+CREATE TABLE SUB_LOG_TBL (
+	SUB_LOG_ID UUID NOT NULL DEFAULT UUID_GENERATE_V1(),
+	SUB_ID UUID NOT NULL,
+	OBJ_ID UUID NOT NULL,
+	VRSN_SEQ_ID BIGINT NOT NULL,
+	DSPTCH_UTC TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	OUTC INT NOT NULL,
+	EVT INT NOT NULL,
+	CONSTRAINT PK_SUB_LOG_TBL PRIMARY KEY (SUB_LOG_ID),
+	CONSTRAINT FK_SUB_LOG_SUB_TBL FOREIGN KEY (SUB_ID) REFERENCES SUB_TBL(SUB_ID)
+);
+
+CREATE INDEX IX_SUB_LOG_OBJ ON SUB_LOG_TBL(OBJ_ID);
+
+COMMIT;
