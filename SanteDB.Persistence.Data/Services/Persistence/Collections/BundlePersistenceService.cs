@@ -143,8 +143,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             {
                 retVal.AddRange(input.Item.Where(o => o.BatchOperation != BatchOperationType.Delete).ReorganizeForInsert());
             }
-            catch (InvalidOperationException) // fallback
+            catch (InvalidOperationException ex) // fallback
             {
+                this.m_tracer.TraceWarning("Could not reorganize bundle for insert - due to {0}", ex);
                 var resolved = input.Item.Where(e => !retVal.Item.Contains(e)).ToArray();
                 // Process each object in our queue of to be processed
                 bool swapped = true;

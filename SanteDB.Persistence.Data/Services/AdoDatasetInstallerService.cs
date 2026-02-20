@@ -205,6 +205,7 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open(initializeExtensions: false);
                     context.AddOrUpdateData(DataConstants.DisableObjectValidation, DataContextExtensions.DisablePersistenceValidationFlags.All);
+                    context.AddOrUpdateData(DataConstants.PreserveConceptSetMembership, true);
 
                     var patchId = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(dataset.Id)).HexEncode();
 
@@ -218,8 +219,6 @@ namespace SanteDB.Persistence.Data.Services
 
                     using (var tx = context.BeginTransaction())
                     {
-
-
                         context.ContextId = context.EstablishProvenance(AuthenticationContext.Current.Principal, null);
 
                         // Insert the post install trigger
