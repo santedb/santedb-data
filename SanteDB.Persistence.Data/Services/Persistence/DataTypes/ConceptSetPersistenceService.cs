@@ -72,7 +72,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override ConceptSet DoUpdateModel(DataContext context, ConceptSet data)
         {
             var retVal = base.DoUpdateModel(context, data);
-            if (data.ConceptsXml != null)
+            if (data.ConceptsXml != null && !context.Data.TryGetValue(DataConstants.PreserveConceptSetMembership, out _))
             {
                 retVal.ConceptsXml = base.UpdateInternalAssociations(context, retVal.Key.Value, data.ConceptsXml.Select(o => new DbConceptSetConceptAssociation()
                 {

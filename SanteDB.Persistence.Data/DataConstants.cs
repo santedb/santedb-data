@@ -122,5 +122,10 @@ namespace SanteDB.Persistence.Data
         /// Convert to information model stack
         /// </summary>
         public const string DoConvertToInformationModelStack = "ConvertToInformationModelStack";
+
+        /// <summary>
+        /// When true - indicates that the concept set persistence should ignore any &lt;concept> relationships
+        /// </summary>
+        public const string PreserveConceptSetMembership = "PreserveConceptSetMembership";
     }
 }
