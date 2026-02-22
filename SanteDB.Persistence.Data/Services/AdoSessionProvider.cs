@@ -350,7 +350,7 @@ namespace SanteDB.Persistence.Data.Services
                             }
 
                             var dbn = context.Query<CompositeResult<DbEntityName, DbEntityNameComponent>>(sqlStatement.Statement);
-                            exception.Data.Add(SecuritySessionException.DATA_CLAIM_VALUE_KEY, String.Join(",", dbn.ToArray().Select(o=>$"{o.Object1.SourceKey}={o.Object2.Value}")));
+                            exception.Data.Add(SecuritySessionException.DATA_CLAIM_VALUE_KEY, String.Join(",", dbn.ToArray().Select(o=>$"{o.Object1.SourceKey}={o.Object2.Value}").Distinct()));
                             throw exception;
                         }
                         if (assignedFacility.HasValue &&
