@@ -59,6 +59,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         where TDbKeyModel : DbIdentified, new()
     {
 
+        // Timeout for the vavhe settings for timeouts
+        private readonly TimeSpan VALIDATION_CACHE_TIMEOUT = new TimeSpan(0, 1, 0);
+
         // Validation configuration
         private readonly IDictionary<Type, AdoValidationPolicy> m_validationConfigurationCache = new ConcurrentDictionary<Type, AdoValidationPolicy>();
 
@@ -279,8 +282,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
                 else
                 {
-                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityKey}{domainKey}", dbAuth, new TimeSpan(0, 5, 0));
-                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityKey}{dbAuth.DomainName}", dbAuth, new TimeSpan(0, 5, 0));
+                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityKey}{domainKey}", dbAuth, VALIDATION_CACHE_TIMEOUT);
+                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityKey}{dbAuth.DomainName}", dbAuth, VALIDATION_CACHE_TIMEOUT);
                 }
 
                 // Is there a check digit algorithm indicated?
@@ -346,7 +349,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 if (scopes == null)
                 {
                     scopes = context.Query<DbIdentityDomainScope>(o => o.SourceKey == dbAuth.Key);
-                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityScopeKey}{dbAuth.Key}", scopes.ToArray());
+                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityScopeKey}{dbAuth.Key}", scopes.ToArray(), VALIDATION_CACHE_TIMEOUT);
                 }
 
                 if (objectToVerify is IHasClassConcept classObject &&
@@ -368,7 +371,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 if (asgnAppKeys == null)
                 {
                     asgnAppKeys = context.Query<DbAssigningAuthority>(o => o.SourceKey == dbAuth.Key && o.ObsoletionTime == null).ToDictionary(o => o.AssigningApplicationKey, o => o.Reliability);
-                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityAssignerKey}{dbAuth.Key}", asgnAppKeys);
+                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityAssignerKey}{dbAuth.Key}", asgnAppKeys, VALIDATION_CACHE_TIMEOUT);
                 }
                 if (asgnAppKeys.Any()) // Must have permission
                 {
