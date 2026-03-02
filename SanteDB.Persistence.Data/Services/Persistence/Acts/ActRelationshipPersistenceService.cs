@@ -69,6 +69,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         {
             try
             {
+                if (this.m_configuration.AutoUpdateExisting)
+                {
+                    var existingKey = context.Query<DbActRelationship>(o => o.SourceKey == dbModel.SourceKey && o.RelationshipTypeKey == dbModel.RelationshipTypeKey && o.TargetKey == dbModel.TargetKey && o.ObsoleteVersionSequenceId == null).Select(o => o.Key).FirstOrDefault();
+                    if (existingKey != Guid.Empty)
+                    {
+                        this.m_tracer.TraceInfo("Auto-obsoleting {0} existing relationships due to implicit replaces - {1}>{2}", nameof(ActRelationship), existingKey, dbModel.Key);
+                        context.UpdateAll<DbActRelationship>(o => o.Key == existingKey, o => o.ObsoleteVersionSequenceId == dbModel.EffectiveVersionSequenceId);
+                    }
+                }
                 return base.DoInsertInternal(context, dbModel);
             }
             catch (DbException e) when (e.Message.Contains("ACT RELATIONSHIP FAILED VALIDATION") || e.Message.Contains("Validation error: Relationship"))
@@ -82,6 +91,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         {
             try
             {
+                // Get the existing key of the object
+                var existingKey = context.Query<DbActRelationship>(o => o.SourceKey == dbModel.SourceKey && o.RelationshipTypeKey == dbModel.RelationshipTypeKey && o.TargetKey == dbModel.TargetKey && o.ObsoleteVersionSequenceId == null).Select(o => o.Key).FirstOrDefault();
+                if (existingKey != Guid.Empty && existingKey != dbModel.Key) // changing the key so we want to remove the old relationship between the source/target/type 
+                {
+                    this.m_tracer.TraceInfo("Auto-obsoleting {0} existing relationships due to implicit replaces - {1}>{2}", nameof(ActRelationship), existingKey, dbModel.Key);
+                    context.UpdateAll<DbActRelationship>(o => o.Key == existingKey, o => o.ObsoleteVersionSequenceId == dbModel.EffectiveVersionSequenceId);
+                }
                 return base.DoUpdateInternal(context, dbModel);
             }
             catch (DbException e) when (e.Message.Contains("ACT RELATIONSHIP FAILED VALIDATION") || e.Message.Contains("Validation error: Relationship"))

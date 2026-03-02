@@ -37,6 +37,7 @@ using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Sys;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Reflection;
@@ -115,8 +116,8 @@ namespace SanteDB.Persistence.Data.Services
                             break;
                         case ITargetedAssociation ta:
                             dependencies = new int[] {
-                                    Array.FindIndex(resolved, i => i.Element.Key == ta.TargetEntityKey), 
-                                Array.FindIndex(resolved, i => i.Element.Key == ta.SourceEntityKey) 
+                                    Array.FindIndex(resolved, i => i.Element.Key == ta.TargetEntityKey),
+                                Array.FindIndex(resolved, i => i.Element.Key == ta.SourceEntityKey)
                             };
                             break;
 
@@ -204,8 +205,8 @@ namespace SanteDB.Persistence.Data.Services
                 try
                 {
                     context.Open(initializeExtensions: false);
-                    context.AddOrUpdateData(DataConstants.DisableObjectValidation, DataContextExtensions.DisablePersistenceValidationFlags.All);
-                    context.AddOrUpdateData(DataConstants.PreserveConceptSetMembership, true);
+                    context.AddOrUpdateData(DataConstants.DisableObjectValidation, !dataset.DatasetProcessingFlags.HasFlag(DatasetProcessingFlags.ValidateDataBeforeInsert));
+                    context.AddOrUpdateData(DataConstants.PreserveConceptSetMembership, !dataset.DatasetProcessingFlags.HasFlag(DatasetProcessingFlags.OverwriteRelationships));
 
                     var patchId = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(dataset.Id)).HexEncode();
 
@@ -217,8 +218,14 @@ namespace SanteDB.Persistence.Data.Services
                     }
                     this.m_tracer.TraceInfo("Installing dataset {0}...", dataset.Id);
 
-                    using (var tx = context.BeginTransaction())
+                    IDbTransaction tx = null;
+                    try
                     {
+                        if (!dataset.DatasetProcessingFlags.HasFlag(DatasetProcessingFlags.NoTransaction))
+                        {
+                            tx = context.BeginTransaction();
+                        }
+
                         context.ContextId = context.EstablishProvenance(AuthenticationContext.Current.Principal, null);
 
                         // Insert the post install trigger
@@ -344,10 +351,14 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         context.Insert(new DbPatch() { ApplyDate = DateTimeOffset.Now, PatchId = patchId, Description = dataset.Id });
-                        tx.Commit();
+                        tx?.Commit();
 
                         this.Installed?.Invoke(this, new DataPersistedEventArgs<Dataset>(dataset, TransactionMode.Commit, AuthenticationContext.Current.Principal));
                         return true;
+                    }
+                    finally
+                    {
+                        tx?.Dispose();
                     }
                 }
                 catch (Exception e)

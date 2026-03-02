@@ -534,6 +534,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             if (data.Relationships != null)
             {
                 retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
+                // Evict any relationships that are reversed 
+                retVal.Relationships.Where(k => k.SourceEntityKey != retVal.Key).ForEach(k => this.m_dataCacheService.Remove(k.SourceEntityKey.GetValueOrDefault()));
             }
 
             if (data.Tags != null)
@@ -602,6 +604,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             if (data.Relationships != null)
             {
                 retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
+                // Evict any relationships that are reversed 
+                retVal.Relationships.Where(k => k.SourceEntityKey != retVal.Key).ForEach(k => this.m_dataCacheService.Remove(k.SourceEntityKey.GetValueOrDefault()));
             }
 
             if (data.Tags != null)

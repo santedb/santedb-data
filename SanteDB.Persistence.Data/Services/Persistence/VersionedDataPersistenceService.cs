@@ -164,6 +164,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 context.Insert(newVersion);
                 this.DoCopyVersionSubTableInternal(context, newVersion);
 
+                // Evict from cache 
+                this.m_dataCacheService.Remove(key);
                 return this.DoConvertToInformationModel(context, newVersion);
 #if DEBUG
             }
