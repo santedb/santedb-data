@@ -72,6 +72,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                 existing = context.Update(existing);
 
+                // Evict from cache 
+                this.m_dataCacheService.Remove(key);
                 return this.DoConvertToInformationModel(context, existing);
 #if DEBUG
             }
