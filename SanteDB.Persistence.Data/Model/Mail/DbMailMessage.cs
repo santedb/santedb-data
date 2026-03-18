@@ -18,7 +18,9 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using SanteDB.Core.Mail;
 using SanteDB.OrmLite.Attributes;
+using SanteDB.Persistence.Data.Model.Security;
 using System;
 
 namespace SanteDB.Persistence.Data.Model.Mail
@@ -29,7 +31,7 @@ namespace SanteDB.Persistence.Data.Model.Mail
     [Table("mail_msg_tbl")]
     [AssociativeTable(typeof(DbMailbox), typeof(DbMailboxMessageAssociation))]
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-    public class DbMailMessage : DbNonVersionedBaseData
+    public class DbMailMessage : DbBaseData
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DbMailMessage"/> class.
@@ -49,13 +51,13 @@ namespace SanteDB.Persistence.Data.Model.Mail
         /// Gets or sets the alert message flags.
         /// </summary>
         [Column("flags"), NotNull]
-        public int Flags { get; set; }
+        public MailMessageFlags Flags { get; set; }
 
         /// <summary>
         /// Gets or sets the from info of the alert message.
         /// </summary>
-        [Column("from_info")]
-        public string FromInfo { get; set; }
+        [Column("frm"), ForeignKey(typeof(DbSecurityUser), nameof(DbSecurityUser.Key))]
+        public Guid FromKey { get; set; }
 
         /// <summary>
         /// Gets or sets the key of the alert message.
@@ -64,21 +66,22 @@ namespace SanteDB.Persistence.Data.Model.Mail
         public override Guid Key { get; set; }
 
         /// <summary>
-        /// Gets or sets creation time of the alert message.
-        /// </summary>
-        [Column("msg_utc")]
-        public DateTimeOffset MessageUtc { get; set; }
-
-        /// <summary>
         /// Gets or sets the subject of the message.
         /// </summary>
         [Column("subj")]
         public string Subject { get; set; }
 
         /// <summary>
-        /// Gets or sets the to info of the message.
+        /// From informational text
         /// </summary>
-        [Column("to_info")]
+        [Column("frm_txt")]
+        public string FromInfo { get; set; }
+
+        /// <summary>
+        /// To informational text
+        /// </summary>
+        [Column("to_txt")]
         public string ToInfo { get; set; }
+
     }
 }

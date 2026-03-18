@@ -37,13 +37,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Mail
         }
 
         /// <inheritdoc/>
-        protected override Mailbox BeforePersisting(DataContext context, Mailbox data)
-        {
-            data.OwnerKey = this.EnsureExists(context, data.Owner)?.Key ?? data.OwnerKey;
-            return base.BeforePersisting(context, data);
-        }
-
-        /// <inheritdoc/>
         protected override Mailbox DoConvertToInformationModel(DataContext context, DbMailbox dbModel, params object[] referenceObjects)
         {
             using (context.CreateInformationModelGuard(dbModel.Key))
@@ -58,8 +51,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Mail
                             retVal.Owner = retVal.Owner.GetRelatedPersistenceService().Get(context, dbModel.OwnerKey);
                             retVal.SetLoaded(o => o.Owner);
                         }
-                        goto case LoadMode.SyncLoad;
-                    case LoadMode.SyncLoad:
                         retVal.Messages = retVal.Messages.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
                         retVal.SetLoaded(o => o.Messages);
                         break;

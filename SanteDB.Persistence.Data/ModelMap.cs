@@ -8,7 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SanteDB.Persistence.Data.ModelMap { 
+namespace SanteDB.Persistence.Data.ModelMap
+{
     
     
     /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.RelationshipValidationRule, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Sys.DbRelationshipValidationRule, SanteDB.Persistence.Data</summary>
@@ -265,20 +266,14 @@ namespace SanteDB.Persistence.Data.ModelMap {
             }
             SanteDB.Persistence.Data.Model.Mail.DbMailMessage retVal = new SanteDB.Persistence.Data.Model.Mail.DbMailMessage();
             retVal.Body = instance.Body;
-            retVal.Flags = ((int)(instance.Flags));
-            retVal.FromInfo = instance.From;
+            retVal.Flags = instance.Flags;
+            retVal.FromKey = instance.FromKey;
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
-            retVal.MessageUtc = instance.TimeStamp;
             retVal.Subject = instance.Subject;
-            retVal.ToInfo = instance.To;
-            if (instance.UpdatedByKey.HasValue) {
-                retVal.UpdatedByKey = instance.UpdatedByKey.Value;
-            }
-            if (instance.UpdatedTime.HasValue) {
-                retVal.UpdatedTime = instance.UpdatedTime.Value;
-            }
+            retVal.FromInfo = instance.FromInfo;
+            retVal.ToInfo = instance.ToInfo;
             if (instance.CreatedByKey.HasValue) {
                 retVal.CreatedByKey = instance.CreatedByKey.Value;
             }
@@ -298,24 +293,18 @@ namespace SanteDB.Persistence.Data.ModelMap {
                 return default(SanteDB.Core.Mail.MailMessage);
             }
             SanteDB.Core.Mail.MailMessage retVal = new SanteDB.Core.Mail.MailMessage();
-            if (instance.UpdatedTime.HasValue) {
-                retVal.UpdatedTime = instance.UpdatedTime.Value;
-            }
-            retVal.From = instance.FromInfo;
-            retVal.TimeStamp = instance.MessageUtc;
-            retVal.To = instance.ToInfo;
+            retVal.CreationTime = instance.CreationTime;
             retVal.Key = instance.Key;
             retVal.Body = instance.Body;
-            retVal.Flags = ((SanteDB.Core.Mail.MailMessageFlags)(instance.Flags));
+            retVal.Flags = instance.Flags;
+            retVal.FromKey = instance.FromKey;
             retVal.Subject = instance.Subject;
-            if (instance.UpdatedByKey.HasValue) {
-                retVal.UpdatedByKey = instance.UpdatedByKey.Value;
-            }
+            retVal.FromInfo = instance.FromInfo;
+            retVal.ToInfo = instance.ToInfo;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -490,8 +479,11 @@ namespace SanteDB.Persistence.Data.ModelMap {
             if (instance.SourceEntityKey.HasValue) {
                 retVal.SourceKey = instance.SourceEntityKey.Value;
             }
-            retVal.TargetKey = instance.TargetKey;
-            retVal.MailStatusFlag = ((int)(instance.MailStatusFlag));
+            if (instance.TargetEntityKey.HasValue) {
+                retVal.TargetEntityKey = instance.TargetEntityKey.Value;
+            }
+            retVal.MailStatusFlag = instance.MailStatusFlag;
+            retVal.DeliveredTime = instance.DeliveredTime;
             return retVal;
         }
         
@@ -503,8 +495,11 @@ namespace SanteDB.Persistence.Data.ModelMap {
             SanteDB.Core.Mail.MailboxMailMessage retVal = new SanteDB.Core.Mail.MailboxMailMessage();
             retVal.SourceEntityKey = instance.SourceKey;
             retVal.Key = instance.Key;
-            retVal.TargetKey = instance.TargetKey;
-            retVal.MailStatusFlag = ((SanteDB.Core.Mail.MailStatusFlags)(instance.MailStatusFlag));
+            if (instance.TargetEntityKey.HasValue) {
+                retVal.TargetEntityKey = instance.TargetEntityKey.Value;
+            }
+            retVal.MailStatusFlag = instance.MailStatusFlag;
+            retVal.DeliveredTime = instance.DeliveredTime;
             return retVal;
         }
     }
@@ -11628,6 +11623,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
                 retVal.SourceKey = instance.SourceEntityKey.Value;
             }
             retVal.State = instance.StateData;
+            if (instance.NotBefore.HasValue) {
+                retVal.NotBefore = instance.NotBefore.Value;
+            }
+            if (instance.NotAfter.HasValue) {
+                retVal.NotAfter = instance.NotAfter.Value;
+            }
             retVal.Sequence = instance.Sequence;
             retVal.Version = instance.Version;
             return retVal;
@@ -11643,6 +11644,12 @@ namespace SanteDB.Persistence.Data.ModelMap {
             retVal.ProtocolKey = instance.ProtocolKey;
             retVal.SourceEntityKey = instance.SourceKey;
             retVal.StateData = instance.State;
+            if (instance.NotBefore.HasValue) {
+                retVal.NotBefore = instance.NotBefore.Value;
+            }
+            if (instance.NotAfter.HasValue) {
+                retVal.NotAfter = instance.NotAfter.Value;
+            }
             retVal.Sequence = instance.Sequence;
             retVal.Version = instance.Version;
             return retVal;

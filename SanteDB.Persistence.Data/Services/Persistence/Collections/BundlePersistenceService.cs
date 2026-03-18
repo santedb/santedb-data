@@ -322,7 +322,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             }
 
             // The bundle is un-correlated so don't check
-            if (!data.CorrelationKey.HasValue)
+            if (data.CorrelationKey.GetValueOrDefault() == Guid.Empty)
             {
                 return true;
             }

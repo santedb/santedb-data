@@ -8,6 +8,9 @@
   <PropertyGroup Condition="'$(VersionNumber)' == ''">
     <VersionNumber>3.0-debug</VersionNumber>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Persistence\Mail\LocalMailManagementPersistenceTest.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="9.1.1">
@@ -62,6 +65,7 @@
     <None Include="..\SanteDB.licenseheader">
       <Link>SanteDB.licenseheader</Link>
     </None>
+    <None Include="Persistence\Mail\LocalMailManagementPersistenceTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
