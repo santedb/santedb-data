@@ -270,7 +270,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Convert a db audit to model
         /// </summary>
-        private AuditEventData ToModelInstance(DataContext context, CompositeResult<DbAuditEventData, DbAuditCode> res, bool summary = true)
+        private AuditEventData ToModelInstance(DataContext context, CompositeResult<DbAuditEventData, DbAuditCode> res, bool summary = false)
         {
             var retVal = this.m_dataCachingService.GetCacheItem<AuditEventData>(res.Object1.Key);
             if (retVal == null ||
@@ -290,28 +290,29 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     retVal.EventTypeCode = this.ResolveCode(res.Object1.EventTypeCode, res.Object2.Code, res.Object2.CodeSystem);
                 }
 
+                // Actors
+                var sql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbAuditActorAssociation), typeof(DbAuditActor), typeof(DbAuditCode))
+                        .InnerJoin<DbAuditActorAssociation, DbAuditActor>(o => o.TargetKey, o => o.Key)
+                        .Join<DbAuditActor, DbAuditCode>("LEFT", o => o.ActorRoleCode, o => o.Key)
+                        .Where<DbAuditActorAssociation>(o => o.SourceKey == res.Object1.Key)
+                        .Statement;
+
+                foreach (var itm in context.Query<CompositeResult<DbAuditActorAssociation, DbAuditActor, DbAuditCode>>(sql))
+                {
+                    retVal.Actors.Add(new AuditActorData()
+                    {
+                        UserName = itm.Object2.UserName,
+                        UserIsRequestor = itm.Object1.UserIsRequestor,
+                        UserIdentifier = itm.Object2.UserIdentifier,
+                        NetworkAccessPointId = itm.Object1.AccessPoint,
+                        ActorRoleCode = new List<AuditCode>() { this.ResolveCode(itm.Object2.ActorRoleCode, itm.Object3.Code, itm.Object3.CodeSystem) }.OfType<AuditCode>().ToList()
+                    });
+                }
+
                 // Get actors and objects
                 if (!summary)
                 {
-                    // Actors
-                    var sql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbAuditActorAssociation), typeof(DbAuditActor), typeof(DbAuditCode))
-                            .InnerJoin<DbAuditActorAssociation, DbAuditActor>(o => o.TargetKey, o => o.Key)
-                            .Join<DbAuditActor, DbAuditCode>("LEFT", o => o.ActorRoleCode, o => o.Key)
-                            .Where<DbAuditActorAssociation>(o => o.SourceKey == res.Object1.Key)
-                            .Statement;
-
-                    foreach (var itm in context.Query<CompositeResult<DbAuditActorAssociation, DbAuditActor, DbAuditCode>>(sql))
-                    {
-                        retVal.Actors.Add(new AuditActorData()
-                        {
-                            UserName = itm.Object2.UserName,
-                            UserIsRequestor = itm.Object1.UserIsRequestor,
-                            UserIdentifier = itm.Object2.UserIdentifier,
-                            NetworkAccessPointId = itm.Object1.AccessPoint,
-                            ActorRoleCode = new List<AuditCode>() { this.ResolveCode(itm.Object2.ActorRoleCode, itm.Object3.Code, itm.Object3.CodeSystem) }.OfType<AuditCode>().ToList()
-                        });
-                    }
-
+                    
                     // Objects
                     sql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbAuditObject), typeof(DbAuditCode))
                         .Join<DbAuditObject, DbAuditCode>("LEFT", o => o.CustomIdType, o => o.Key)
@@ -353,29 +354,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                         retVal.AddMetadata((AuditMetadataKey)itm.Object1.MetadataKey, itm.Object2.Value);
                     }
                 }
-                else
-                {
-                    // Actors
-                    // Actors
-                    var sql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbAuditActorAssociation), typeof(DbAuditActor), typeof(DbAuditCode))
-                            .InnerJoin<DbAuditActorAssociation, DbAuditActor>(o => o.TargetKey, o => o.Key)
-                            .Join<DbAuditActor, DbAuditCode>("LEFT", o => o.ActorRoleCode, o => o.Key)
-                            .Where<DbAuditActorAssociation>(o => o.SourceKey == res.Object1.Key)
-                            .Statement;
-
-                    foreach (var itm in context.Query<CompositeResult<DbAuditActorAssociation, DbAuditActor, DbAuditCode>>(sql))
-                    {
-                        retVal.Actors.Add(new AuditActorData()
-                        {
-                            UserName = itm.Object2.UserName,
-                            UserIsRequestor = itm.Object1.UserIsRequestor,
-                            UserIdentifier = itm.Object2.UserIdentifier,
-                            NetworkAccessPointId = itm.Object1.AccessPoint,
-                            ActorRoleCode = new List<AuditCode>() { this.ResolveCode(itm.Object2.ActorRoleCode, itm.Object3.Code, itm.Object3.CodeSystem) }.OfType<AuditCode>().ToList()
-                        });
-                    }
-                }
-
+                
                 this.m_dataCachingService.Add(retVal);
             }
             return retVal;

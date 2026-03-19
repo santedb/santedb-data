@@ -41,10 +41,7 @@
   <!-- Mail -->
   <class modelClass="SanteDB.Core.Mail.MailMessage, SanteDB.Core.Api"
   domainClass="SanteDB.Persistence.Data.Model.Mail.DbMailMessage, SanteDB.Persistence.Data">
-    <property modelName="ModifiedOn" domainName="UpdatedTime" />
-    <property modelName="From" domainName="FromInfo" />
-    <property modelName="TimeStamp" domainName="MessageUtc" />
-    <property modelName="To" domainName="ToInfo" />
+    <property modelName="ModifiedOn" domainName="CreationTime" />
      <property modelName="Tag" queryOnly="true" domainName="Key" /> 
   </class>
 
@@ -56,7 +53,8 @@
 
   <class modelClass="SanteDB.Core.Mail.MailboxMailMessage, SanteDB.Core.Api"
     domainClass="SanteDB.Persistence.Data.Model.Mail.DbMailboxMessageAssociation, SanteDB.Persistence.Data">
-    <property modelName="SourceEntityKey" domainName="SourceKey" />
+	  <property modelName="ModifiedOn" domainName="CreationTime" />
+	  <property modelName="SourceEntityKey" domainName="SourceKey" />
      <property modelName="Tag" queryOnly="true" domainName="Key" /> 
 
   </class>

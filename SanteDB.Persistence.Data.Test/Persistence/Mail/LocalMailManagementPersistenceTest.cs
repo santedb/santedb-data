@@ -30,6 +30,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
+// TODO: Re-Enable these tests
 namespace SanteDB.Persistence.Data.Test.Persistence.Mail
 {
     /// <summary>
@@ -66,13 +67,13 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
                 Assert.IsNotNull(toUser);
 
 
-                var mailMessage = new MailMessage("SYSTEM", "TEST_MAIL_TO1", "This is a test", "This is a test message / alert sent within SanteDB", MailMessageFlags.HighPriority);
+                var mailMessage = new MailMessage(Guid.Parse(AuthenticationContext.SystemUserSid), new Guid[] { toUser.Key.Value }, "This is a test", "This is a test message / alert sent within SanteDB", MailMessageFlags.HighPriority);
                 var afterSent = mailService.Send(mailMessage);
                 Assert.IsTrue(mailMessage.RcptToXml.Contains(toUser.Key.Value), "Message does not contain RCPT TO");
                 Assert.AreEqual(mailMessage.Subject, afterSent.Subject);
                 Assert.AreEqual(mailMessage.Body, afterSent.Body);
 
-                mailMessage = new MailMessage("SYSTEM", "TEST_MAIL_TO1", "This is another test", "This is another test message / alert sent within SanteDB", MailMessageFlags.LowPriority);
+                mailMessage = new MailMessage(Guid.Parse(AuthenticationContext.SystemUserSid), new Guid[] { toUser.Key.Value }, "This is another test", "This is another test message / alert sent within SanteDB", MailMessageFlags.LowPriority);
                 afterSent = mailService.Send(mailMessage);
 
                 // Should have created an inbox
@@ -89,7 +90,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
                 var inbox = mailService.GetMailboxes().Where(o => o.Name == Mailbox.INBOX_NAME).FirstOrDefault();
                 Assert.IsNotNull(inbox);
                 Assert.AreEqual(2, inbox.LoadProperty(o => o.Messages).Count);
-                var messages = mailService.GetMessages(Mailbox.INBOX_NAME);
+                var messages = mailService.GetMessages(inbox.Key.Value);
                 Assert.AreEqual(2, messages.Count());
 
                 // Now we want to test the sorting and search of the mailbox
@@ -135,7 +136,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
                 // SYSTEM can read mailbox for user
                 mailService.GetMailboxes(toUser.Key);
                 // SYSTEM can read mail messages for user
-                Assert.AreEqual(0, mailService.GetMessages(Mailbox.INBOX_NAME).Count());
+                Assert.AreEqual(0, mailService.GetMessages(inbox.Key.Value).Count());
 
             }
 
@@ -152,7 +153,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
                 Assert.AreEqual(2, mailService.GetMailboxes().Count());
 
                 // User can send mail to SYSTEM
-                var mail = mailService.Send(new MailMessage(String.Empty, "SYSTEM;TEST_MAIL_TO2", "Test from FOO", "This is a test!"));
+                var mail = mailService.Send(new MailMessage(Guid.Parse, "SYSTEM;TEST_MAIL_TO2", "Test from FOO", "This is a test!"));
                 Assert.AreEqual("TEST_MAIL_TO2", mail.From);
                 Assert.AreEqual(3, mailService.GetMailboxes().Count()); // Will not have a SENT folder
 
