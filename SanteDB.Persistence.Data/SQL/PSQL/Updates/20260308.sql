@@ -69,23 +69,4 @@ CREATE INDEX ix_mail_box_msg_assoc_mail_box ON mail_box_msg_assoc_tbl(mail_box_i
 CREATE UNIQUE INDEX uq_ix_mail_box_msg_assoc_mail_box ON mail_box_msg_assoc_tbl(mail_box_id, mail_msg_id);
 
 
--- CREATE MAILBOXES FOR EXISTING USERS
-INSERT INTO mail_box_tbl (own_id, name, crt_prov_id)
-SELECT usr_id, 'Inbox', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8'
-FROM sec_usr_tbl
-ON CONFLICT DO NOTHING;
-INSERT INTO mail_box_tbl (own_id, name, crt_prov_id)
-SELECT usr_id, 'Deleted', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8'
-FROM sec_usr_tbl
-ON CONFLICT DO NOTHING;
-INSERT INTO mail_box_tbl (own_id, name, crt_prov_id)
-SELECT usr_id, 'Sent', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8'
-FROM sec_usr_tbl
-ON CONFLICT DO NOTHING;
-INSERT INTO mail_box_tbl (own_id, name, crt_prov_id)
-SELECT dev_id, 'Inbox', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8'
-FROM sec_dev_tbl
-WHERE dev_pub_id NOT IN ('SYSTEM','ANONYMOUS')
-ON CONFLICT DO NOTHING;
-
  SELECT REG_PATCH('20260308-02');
