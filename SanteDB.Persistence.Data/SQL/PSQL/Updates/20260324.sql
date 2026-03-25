@@ -1,5 +1,5 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20260324-01" name="Update:20260324-02"   invariantName="npgsql" environment="Server">
+ * <feature scope="SanteDB.Persistence.Data" id="20260324-01" name="Update:20260324-02"   invariantName="npgsql" >
  *	<summary>Update: Add sequence to relationships on Act</summary>
  *	<isInstalled>select ck_patch('20260324-02')</isInstalled>
  * </feature>
