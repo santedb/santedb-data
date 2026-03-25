@@ -684,8 +684,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             }
             var retVal = base.DoDeleteModel(context, key, deleteMode, preserveContained);
 
-            // HACK: Delete the outbound and inbound relationships (prevent traversal to this object)
-            foreach(var er in context.Query<DbEntityRelationship>(o => (o.SourceKey == key) && o.ObsoleteVersionSequenceId == null).ToArray())
+            // HACK: Delete the outbound and inbound relationships (prevent traversal)
+            foreach(var er in context.Query<DbEntityRelationship>(o => (o.TargetKey == key || o.SourceKey == key) && o.ObsoleteVersionSequenceId == null).ToArray())
             {
                 if ((DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy) == DeleteMode.LogicalDelete)
                 {
