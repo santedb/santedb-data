@@ -68,21 +68,4 @@ CREATE TABLE MAIL_BOX_MSG_ASSOC_TBL (
 CREATE INDEX IX_MAIL_BOX_MSG_ASSOC_MAIL_BOX ON MAIL_BOX_MSG_ASSOC_TBL(MAIL_BOX_ID);
 CREATE UNIQUE INDEX uq_ix_mail_box_msg_assoc_mail_box ON mail_box_msg_assoc_tbl(mail_box_id, mail_msg_id);
 
-INSERT OR IGNORE INTO mail_box_tbl (own_id, name, crt_prov_id)
-SELECT usr_id, 'Inbox', x'76A0DCFA90366E4AAF9EF1CD68E8C7E8'
-FROM sec_usr_tbl
-WHERE usr_name NOT IN ('SYSTEM','ANONYMOUS');
-INSERT OR IGNORE INTO mail_box_tbl (own_id, name, crt_prov_id)
-SELECT usr_id, 'Deleted', x'76A0DCFA90366E4AAF9EF1CD68E8C7E8'
-FROM sec_usr_tbl
-WHERE usr_name NOT IN ('SYSTEM','ANONYMOUS');
-INSERT OR IGNORE INTO mail_box_tbl (own_id, name, crt_prov_id)
-SELECT usr_id, 'Sent', x'76A0DCFA90366E4AAF9EF1CD68E8C7E8'
-FROM sec_usr_tbl
-WHERE usr_name NOT IN ('SYSTEM','ANONYMOUS');
-INSERT OR IGNORE INTO mail_box_tbl (own_id, name, crt_prov_id)
-SELECT dev_id, 'Inbox', x'76A0DCFA90366E4AAF9EF1CD68E8C7E8'
-FROM sec_dev_tbl
-WHERE dev_pub_id NOT IN ('SYSTEM','ANONYMOUS');
-
 INSERT INTO PATCH_DB_SYSTBL (PATCH_ID, APPLY_DATE, INFO_NAME) VALUES ('20260308-02', UNIXEPOCH(), 'UPDATE: ADD TIME BOUNDS TO PROTOCOL');--#!

@@ -647,7 +647,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             return retVal;
         }
 
-
         /// <inheritdoc/>
         protected override TEntity DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained)
         {
@@ -655,19 +654,38 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             // Cascade the deletion of data down 
             if (!preserveContained)
             {
-                foreach (var ar in context.Query<DbEntityRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToArray())
+                var rps = typeof(Entity).GetRelatedPersistenceService();
+                foreach (var er in context.Query<DbEntityRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToArray())
                 {
-                    var rps = typeof(Act).GetRelatedPersistenceService();
-                    if (rps.Exists(context, ar.TargetKey))
+                    if (rps.Exists(context, er.TargetKey))
                     {
-                        rps.Delete(context, ar.TargetKey, deleteMode, preserveContained);
+                        rps.Delete(context, er.TargetKey, deleteMode, preserveContained);
+                    }
+                }
+                // Delete the outbound ACTS in which this object participates
+                rps = typeof(Act).GetRelatedPersistenceService();
+                foreach (var ap in context.Query<DbActParticipation>(o => o.TargetKey == key && o.ParticipationRoleKey == ActParticipationKeys.RecordTarget && o.ObsoleteVersionSequenceId == null).ToArray())
+                {
+                    // If this is the only participant on the act delete it
+                    if (rps.Exists(context, ap.SourceKey) && !context.Any<DbActParticipation>(o=>o.SourceKey == ap.SourceKey && o.TargetKey != key && o.ParticipationRoleKey == ActParticipationKeys.RecordTarget))
+                    {
+                        rps.Delete(context, ap.SourceKey, deleteMode, preserveContained);
+                    }
+                    else if ((DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy) == DeleteMode.LogicalDelete)
+                    {
+                        ap.ObsoleteVersionSequenceId = context.Query<DbActVersion>(o=>o.Key == ap.SourceKey && o.IsHeadVersion == true).Select(o=>o.VersionSequenceId).FirstOrDefault() ?? 1;
+                        context.Update(ap);
+                    }
+                    else if ((DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy) == DeleteMode.PermanentDelete)
+                    {
+                        context.Delete(ap);
                     }
                 }
             }
             var retVal = base.DoDeleteModel(context, key, deleteMode, preserveContained);
 
             // HACK: Delete the outbound and inbound relationships (prevent traversal)
-            foreach(var er in context.Query<DbEntityRelationship>(o => (o.SourceKey == key) && o.ObsoleteVersionSequenceId == null).ToArray())
+            foreach(var er in context.Query<DbEntityRelationship>(o => o.SourceKey == key && o.ObsoleteVersionSequenceId == null).ToArray())
             {
                 if ((DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy) == DeleteMode.LogicalDelete)
                 {
@@ -679,6 +697,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     context.Delete(er);
                 }
             }
+           
             return retVal;
         }
 

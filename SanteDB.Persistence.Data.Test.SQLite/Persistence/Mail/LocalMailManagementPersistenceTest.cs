@@ -68,7 +68,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Mail
                 });
                 Assert.IsNotNull(toUser);
 
-                Thread.Sleep(250);
+                Thread.Sleep(1000);
 
                 var mailMessage = new MailMessage("SYSTEM", "TEST_MAIL_TO1", "This is a test", "This is a test message / alert sent within SanteDB", MailMessageFlags.HighPriority);
                 var afterSent = mailService.Send(mailMessage);
@@ -143,7 +143,7 @@ namespace SanteDB.Persistence.Data.Test.SQLite.Persistence.Mail
             }
 
             // We want a delay so the welcome message is before our messages in test
-            Thread.Sleep(250);
+            Thread.Sleep(1000);
             // As user
             using (AuthenticationContext.EnterContext(identityService.Authenticate("TEST_MAIL_TO2", "@Foo123!!")))
             {

@@ -1684,10 +1684,10 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.SourceEntityKey.HasValue) {
                 retVal.SourceKey = instance.SourceEntityKey.Value;
             }
+            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
-            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.PolicyKey.HasValue) {
                 retVal.PolicyKey = instance.PolicyKey.Value;
             }
@@ -1701,8 +1701,8 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             SanteDB.Core.Model.Security.SecurityPolicyInstance retVal = new SanteDB.Core.Model.Security.SecurityPolicyInstance();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Key = instance.Key;
             retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
+            retVal.Key = instance.Key;
             retVal.PolicyKey = instance.PolicyKey;
             return retVal;
         }
@@ -8950,6 +8950,9 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.NegationIndicator.HasValue) {
                 retVal.NegationIndicator = instance.NegationIndicator.Value;
             }
+            if (instance.Sequence.HasValue) {
+                retVal.Sequence = instance.Sequence.Value;
+            }
             if (instance.EffectiveVersionSequenceId.HasValue) {
                 retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId.Value;
             }
@@ -8974,6 +8977,9 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             retVal.ExternalKey = instance.ExternalKey;
             retVal.NegationIndicator = instance.NegationIndicator;
+            if (instance.Sequence.HasValue) {
+                retVal.Sequence = instance.Sequence.Value;
+            }
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
