@@ -103,7 +103,8 @@ namespace SanteDB.Persistence.Data
             Exists = 0x1,
             BusinessContstraints = 0x2,
             Relationships = 0x4,
-            All = Exists | BusinessContstraints | Relationships
+            StickyRelationships = 0x8,
+            All = Exists | BusinessContstraints | Relationships | StickyRelationships
         }
 
 
