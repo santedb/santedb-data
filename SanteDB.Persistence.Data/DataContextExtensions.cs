@@ -99,11 +99,29 @@ namespace SanteDB.Persistence.Data
         [Flags]
         public enum DisablePersistenceValidationFlags : byte
         {
+            /// <summary>
+            /// No disable
+            /// </summary>
             None = 0x0,
+            /// <summary>
+            /// Disables the EXISTS check
+            /// </summary>
             Exists = 0x1,
+            /// <summary>
+            /// Disables the business contraints check
+            /// </summary>
             BusinessContstraints = 0x2,
+            /// <summary>
+            /// Disables the relationship persistence check
+            /// </summary>
             Relationships = 0x4,
+            /// <summary>
+            /// Disables the adherence to sticky relationship
+            /// </summary>
             StickyRelationships = 0x8,
+            /// <summary>
+            /// Disable all validation flags
+            /// </summary>
             All = Exists | BusinessContstraints | Relationships | StickyRelationships
         }
 

@@ -301,6 +301,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             {
                 throw e.TranslateDbException();
             }
+            catch (PreconditionFailedException)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
