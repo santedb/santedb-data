@@ -150,6 +150,9 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
 
 #pragma warning restore CS0067
+        
+        /// <inheritdoc/>
+        public uint BackupPriority => uint.MinValue;
 
         /// <summary>
         /// Create new audit repository service
