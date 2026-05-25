@@ -36,7 +36,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// </summary>
         /// <value>The security device identifier.</value>
         [Column("sec_dev_id"), ForeignKey(typeof(DbSecurityDevice), nameof(DbSecurityDevice.Key))]
-        public Guid SecurityDeviceKey
+        public Guid? SecurityDeviceKey
         {
             get;
             set;

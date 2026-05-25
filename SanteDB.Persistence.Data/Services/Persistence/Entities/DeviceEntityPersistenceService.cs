@@ -24,6 +24,7 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Security;
+using System;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
@@ -53,6 +54,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 data.SecurityDeviceKey = null;
             }
+            else if (!data.SecurityDeviceKey.HasValue && data.Key.HasValue)
+            {
+                var myVersionNumber = context.Query<DbEntityVersion>(e => e.Key == data.Key.Value && e.IsHeadVersion).Select(o => o.VersionKey).FirstOrDefault();
+                if (myVersionNumber != null && myVersionNumber != Guid.Empty)
+                {
+                    data.SecurityDeviceKey = context.Query<DbDeviceEntity>(e => e.ParentKey == myVersionNumber).Select(o => o.SecurityDeviceKey).FirstOrDefault();
+                }
+            }
 
             return base.BeforePersisting(context, data);
         }
@@ -75,7 +84,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     case LoadMode.FullLoad:
                         if (context.ValidateMaximumStackDepth())
                         {
-                            modelData.SecurityDevice = modelData.SecurityDevice.GetRelatedPersistenceService().Get(context, dbDevice.SecurityDeviceKey);
+                            modelData.SecurityDevice = modelData.SecurityDevice.GetRelatedPersistenceService().Get(context, dbDevice.SecurityDeviceKey.GetValueOrDefault());
                             modelData.SetLoaded(o => o.SecurityDevice);
                         }
                         break;
