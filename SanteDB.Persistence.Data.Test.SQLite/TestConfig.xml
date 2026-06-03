@@ -103,7 +103,7 @@
            readWriteConnectionString="TEST_CONNECTION"
            readOnlyConnectionString="TEST_CONNECTION"
            traceSql="false"
-           providerType="sqlite+wb"
+           providerType="sqlite"
            versioning="default"
            staOnly="false"
            autoUpdateExisting="true"

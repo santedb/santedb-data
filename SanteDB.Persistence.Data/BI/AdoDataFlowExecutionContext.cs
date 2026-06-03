@@ -192,13 +192,14 @@ namespace SanteDB.Persistence.Data.BI
             else if (String.IsNullOrEmpty(dataSource.ConnectionString))
             {
                 // TODO: Move this to a configuration variable in the Ado
-                connectionString = this.m_configurationManager.GetConnectionString(this.m_configuration.WarehouseConnectionStringSkel ?? "bi.marts") ??
+                connectionString = this.m_configurationManager.GetConnectionString("bi.marts") ??
                      new ConnectionString(this.m_configuration.Provider.Invariant, this.m_configuration.Provider.ConnectionString); // Allow the administrator to change or manually set this data to another server in config
 
                 // We have to create a connection string?
                 var dataConfigurationProvider = this.m_configuration.Provider.GetDataConfigurationProvider();
                 // Does the database exist?
-                connectionString.SetComponent(dataConfigurationProvider.Capabilities.NameSetting, dataSource.Name);
+                // Is there a name provided in the skeleton connection string
+                connectionString.SetComponent(dataConfigurationProvider.Capabilities.NameSetting, $"{this.m_configuration.WarehouseConnectionStringSkel}{dataSource.Name}");
                 connectionString = dataConfigurationProvider.CreateConnectionString(connectionString.ToDictionary());
                 this.m_configurationManager.SetTransientConnectionString(dataSource.Id, connectionString);
             }

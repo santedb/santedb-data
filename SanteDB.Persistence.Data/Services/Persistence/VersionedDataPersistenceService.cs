@@ -164,6 +164,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 context.Insert(newVersion);
                 this.DoCopyVersionSubTableInternal(context, newVersion);
 
+                // Evict from cache 
+                this.m_dataCacheService.Remove(key);
                 return this.DoConvertToInformationModel(context, newVersion);
 #if DEBUG
             }
@@ -943,7 +945,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             toDelete = toDelete.Except(contextKeys).ToArray();
 
-            if(typeof(IClassifiedRelationship).IsAssignableFrom(persistenceService.ModelType))
+            if(typeof(IClassifiedRelationship).IsAssignableFrom(persistenceService.ModelType) &&
+                !context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.StickyRelationships)) //Not part of a synchronization operation (i.e. the server is telling us we should delete)
             {
                 // Get all classification keys from the persister
                 var tableMap = TableMapping.Get(persistenceService.DbType);

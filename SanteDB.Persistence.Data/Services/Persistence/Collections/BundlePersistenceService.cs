@@ -301,6 +301,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             {
                 throw e.TranslateDbException();
             }
+            catch (PreconditionFailedException)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
@@ -322,7 +326,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             }
 
             // The bundle is un-correlated so don't check
-            if (!data.CorrelationKey.HasValue)
+            if (data.CorrelationKey.GetValueOrDefault() == Guid.Empty)
             {
                 return true;
             }

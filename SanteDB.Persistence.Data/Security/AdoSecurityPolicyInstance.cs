@@ -49,6 +49,16 @@ namespace SanteDB.Persistence.Data.Security
         }
 
         /// <summary>
+        /// Create a policy instance from the db policy
+        /// </summary>
+        public AdoSecurityPolicyInstance(DbSecurityPolicy securityPolicy, PolicyGrantType grantType, object securable)
+        {
+            this.Policy = new AdoSecurityPolicy(securityPolicy);
+            this.Rule = grantType;
+            this.Securable = securable;
+        }
+
+        /// <summary>
         /// Local security policy instance
         /// </summary>
         public AdoSecurityPolicyInstance(DbSecurityPolicyActionableInstance policyInstance, DbSecurityPolicy policy, object securable)

@@ -22,6 +22,7 @@ using SanteDB.Core.Mail;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Mail;
+using System;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Mail
 {
@@ -38,8 +39,29 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Mail
         /// <inheritdoc/>
         protected override MailboxMailMessage BeforePersisting(DataContext context, MailboxMailMessage data)
         {
-            data.TargetKey = this.EnsureExists(context, data.Target)?.Key ?? data.TargetKey;
+            var existingKey = context.Query<DbMailboxMessageAssociation>(o => o.SourceKey == data.SourceEntityKey && o.TargetEntityKey == data.TargetEntityKey).Select(o => o.Key).FirstOrDefault();
+            if(existingKey != Guid.Empty)
+            {
+                data.Key = existingKey;
+                data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Ignore;
+            }
+            data.TargetEntityKey = this.EnsureExists(context, data.TargetEntity)?.Key ?? data.TargetEntityKey;
             return base.BeforePersisting(context, data);
+        }
+
+        /// <inheritdoc/>
+        protected override MailboxMailMessage DoInsertModel(DataContext context, MailboxMailMessage data)
+        {
+            // Is there already a copy of this delivery with a different key?
+            if (data.BatchOperation == Core.Model.DataTypes.BatchOperationType.Ignore)
+            {
+                this.m_tracer.TraceWarning("Mail message {0} has already been delivered to {1}", data.TargetEntityKey, data.SourceEntityKey);
+                return data;
+            }
+            else
+            {
+                return base.DoInsertModel(context, data);
+            }
         }
 
         /// <inheritdoc/>
@@ -50,8 +72,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Mail
                 var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
                 if ((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad && !context.ValidateMaximumStackDepth())
                 {
-                    retVal.Target = retVal.Target.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
-                    retVal.SetLoaded(o => o.Target);
+                    retVal.TargetEntity = retVal.TargetEntity.GetRelatedPersistenceService().Get(context, dbModel.TargetEntityKey.GetValueOrDefault());
+                    retVal.SetLoaded(o => o.TargetEntity);
                 }
                 return retVal;
             }

@@ -397,7 +397,7 @@ namespace SanteDB.Persistence.Data.Services
                 using (var ms = new MemoryStream(dte.Definition))
                 {
                     var retVal = DataTemplateDefinition.Load(ms);
-                    retVal.LastUpdated = (dte.UpdatedTime ?? dte.CreationTime).DateTime;
+                    retVal.LastUpdated = dte.UpdatedTime ?? dte.CreationTime;
                     retVal.IsActive = dte.ObsoletionTime.HasValue ? true : dte.IsActive;
                     retVal.Oid = dte.Oid;
                     retVal.Name = dte.Name;

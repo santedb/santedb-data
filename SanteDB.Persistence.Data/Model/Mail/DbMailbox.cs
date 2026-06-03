@@ -39,7 +39,9 @@ namespace SanteDB.Persistence.Data.Model.Mail
         /// <summary>
         /// Owner which owns this key
         /// </summary>
-        [Column("own_id"), ForeignKey(typeof(DbSecurityUser), nameof(DbSecurityUser.Key)), NotNull]
+        [Column("own_id"), NotNull]
+        [WeakReferenceHintAttribute(typeof(DbSecurityUser), nameof(DbSecurityUser.Key))]
+        [WeakReferenceHintAttribute(typeof(DbSecurityDevice), nameof(DbSecurityDevice.Key))]
         public Guid OwnerKey { get; set; }
 
         /// <summary>
@@ -47,5 +49,6 @@ namespace SanteDB.Persistence.Data.Model.Mail
         /// </summary>
         [Column("name"), NotNull]
         public string Name { get; set; }
+
     }
 }

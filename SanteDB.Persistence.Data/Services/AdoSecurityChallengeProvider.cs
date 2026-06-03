@@ -192,7 +192,6 @@ namespace SanteDB.Persistence.Data.Services
                             isChallengeResponseValid = context.Any<DbSecurityUserChallengeAssoc>(c => pepperResponses.Contains(c.ChallengeResponse) && c.ChallengeKey == challengeKey && c.ExpiryTime > DateTimeOffset.Now);
                         }
 
-
                         if (challengeIsMfa && this.m_tfaRelay?.ValidateSecret(challengeKey, identity, response) == true ||
                             !challengeIsMfa && !isChallengeResponseValid) // Increment invalid
                         {

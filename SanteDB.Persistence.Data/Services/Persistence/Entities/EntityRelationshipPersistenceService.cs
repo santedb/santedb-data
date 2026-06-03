@@ -20,10 +20,12 @@
  */
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.Model.Acts;
 using SanteDB.Persistence.Data.Model.Entities;
 using System;
 using System.Data.Common;
@@ -90,6 +92,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     var existingKey = context.Query<DbEntityRelationship>(o => o.SourceKey == dbModel.SourceKey && o.RelationshipTypeKey == dbModel.RelationshipTypeKey && o.TargetKey == dbModel.TargetKey && o.ObsoleteVersionSequenceId == null).Select(o => o.Key).FirstOrDefault();
                     if (existingKey != Guid.Empty)
                     {
+                        this.m_tracer.TraceInfo("Auto-obsoleting {0} existing relationships due to implicit replaces - {1}>{2}", nameof(EntityRelationship), existingKey, dbModel.Key);
                         context.UpdateAll<DbEntityRelationship>(o => o.Key == existingKey, o => o.ObsoleteVersionSequenceId == dbModel.EffectiveVersionSequenceId);
                     }
                 }
@@ -108,9 +111,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 // Get the existing key of the object
                 var existingKey = context.Query<DbEntityRelationship>(o => o.SourceKey == dbModel.SourceKey && o.RelationshipTypeKey == dbModel.RelationshipTypeKey && o.TargetKey == dbModel.TargetKey && o.ObsoleteVersionSequenceId == null).Select(o => o.Key).FirstOrDefault();
-                if (existingKey != Guid.Empty && existingKey != dbModel.Key)
+                if (existingKey != Guid.Empty && existingKey != dbModel.Key) // changing the key so we want to remove the old relationship between the source/target/type 
                 {
-                    dbModel.Key = existingKey;
+                    this.m_tracer.TraceInfo("Auto-obsoleting {0} existing relationships due to implicit replaces - {1}>{2}", nameof(EntityRelationship), existingKey, dbModel.Key);
+                    context.UpdateAll<DbEntityRelationship>(o => o.Key == existingKey, o => o.ObsoleteVersionSequenceId == dbModel.EffectiveVersionSequenceId);
                 }
                 return base.DoUpdateInternal(context, dbModel);
             }

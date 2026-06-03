@@ -915,7 +915,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                         Key = Guid.NewGuid(),
                         DispatchTime = DateTime.Now,
                         ObjectKey = dispachedEntity.Key.GetValueOrDefault(),
-                        VersionSequence = (dispachedEntity as IVersionedData)?.VersionSequence ?? 0,
+                        VersionSequence = (dispachedEntity as IVersionedData)?.VersionSequence ?? 1,
                         Outcome = outcome,
                         SubscriptionKey = subscription.Key.Value,
                         EventType = eventType

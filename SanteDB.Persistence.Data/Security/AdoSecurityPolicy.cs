@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using SanteDB.Core;
 using SanteDB.Core.Security;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
@@ -64,16 +65,10 @@ namespace SanteDB.Persistence.Data.Security
                 Type handlerType = Type.GetType(policy.Handler);
                 if (handlerType == null)
                 {
-                    throw new InvalidOperationException("Cannot find policy handler");
+                    throw new InvalidOperationException($"Cannot find policy handler {policy.Handler}");
                 }
 
-                var ci = handlerType.GetConstructor(Type.EmptyTypes);
-                if (ci == null)
-                {
-                    throw new InvalidOperationException("Cannot find parameterless constructor");
-                }
-
-                this.m_handler = ci.Invoke(null) as IPolicyHandler;
+                this.m_handler = handlerType.CreateInjected() as IPolicyHandler;
                 if (this.m_handler == null)
                 {
                     throw new InvalidOperationException("Policy handler does not implement IPolicyHandler");

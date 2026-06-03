@@ -18,6 +18,8 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using DocumentFormat.OpenXml.Office2010.Excel;
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
@@ -116,6 +118,11 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
             this.m_policyEnforcement.Demand(PermissionPolicyIdentifiers.AssignPolicy, principal);
+
+            if (securable is IdentifiedData id)
+            {
+                this.m_adhocCache?.Remove($"pip.{id.Type}.{id.Key}.{id.Tag}");
+            }
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
@@ -511,12 +518,18 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                         }
 
+                        if(securable is IHasPolicies ihp && ihp.Policies?.Any() == true)
+                        {
+                            results = results.Union(
+                                ihp.Policies.Select(o => new AdoSecurityPolicyInstance(context.FirstOrDefault<DbSecurityPolicy>(p=>p.Key == o.PolicyKey), o.GrantType, securable))
+                            ).ToArray();
+                        }
                         // Most-restrictive apply
                         results = results.GroupBy(o => o.Policy.Oid).Select(o => o.OrderBy(r => r.Rule).First()).ToArray();
                         if (securable is IdentifiedData id1)
                         {
                             results = results.ToArray();
-                            this.m_adhocCache?.Add($"pip.{id1.Type}.{id1.Key}.{id1.Tag}", results, new TimeSpan(0, 5, 0));
+                            this.m_adhocCache?.Add($"pip.{id1.Type}.{id1.Key}.{id1.Tag}", results, new TimeSpan(0, 1, 0));
                         }
                     }
                     catch (Exception e)

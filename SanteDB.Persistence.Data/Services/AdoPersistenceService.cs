@@ -89,6 +89,9 @@ namespace SanteDB.Persistence.Data.Services
         /// Progress has changed
         /// </summary>
         public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
+        
+        /// <inheritdoc/>
+        public uint BackupPriority => uint.MinValue;
 
         /// <summary>
         /// ADO Persistence service

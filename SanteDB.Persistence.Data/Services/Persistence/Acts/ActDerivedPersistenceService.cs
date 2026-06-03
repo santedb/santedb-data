@@ -534,6 +534,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             if (data.Relationships != null)
             {
                 retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
+                // Evict any relationships that are reversed 
+                retVal.Relationships.Where(k => k.SourceEntityKey != retVal.Key).ForEach(k => this.m_dataCacheService.Remove(k.SourceEntityKey.GetValueOrDefault()));
             }
 
             if (data.Tags != null)
@@ -602,6 +604,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             if (data.Relationships != null)
             {
                 retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
+                // Evict any relationships that are reversed 
+                retVal.Relationships.Where(k => k.SourceEntityKey != retVal.Key).ForEach(k => this.m_dataCacheService.Remove(k.SourceEntityKey.GetValueOrDefault()));
             }
 
             if (data.Tags != null)
@@ -668,7 +672,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
             }
 
-            return base.DoDeleteModel(context, key, deleteMode, preserveContained);
+            var retVal = base.DoDeleteModel(context, key, deleteMode, preserveContained);
+
+            // Any relationships that reference this act should be invalidated as well if they are a reference
+            foreach(var ar in context.Query<DbActRelationship>(o => (o.TargetKey == key || o.SourceKey == key) && o.ObsoleteVersionSequenceId == null).ToArray())
+            {
+                if ((DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy) == DeleteMode.LogicalDelete)
+                {
+                    ar.ObsoleteVersionSequenceId = retVal.VersionSequence;
+                    context.Update(ar);
+                }
+                else if ((DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy) == DeleteMode.PermanentDelete)
+                {
+                    context.Delete(ar);
+                }
+            }
+
+            return retVal;
         }
 
         /// <summary>

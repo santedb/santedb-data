@@ -495,9 +495,16 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         // Password reuse policy?
-                        if (!isSynchronizationOperation && this.m_securityConfiguration.GetSecurityPolicy<bool>(SecurityPolicyIdentification.PasswordHistory) && this.m_configuration.GetPepperCombos(newPassword).Any(o => this.m_passwordHashingService.ComputeHash(o) == dbUser.Password))
+                        if (!isSynchronizationOperation && this.m_securityConfiguration.GetSecurityPolicy<bool>(SecurityPolicyIdentification.PasswordHistory))
                         {
-                            throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "password.history", this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_HISTORY), DetectedIssueKeys.SecurityIssue, null);
+                            //Password is a secret field which means it will never be selected in a query. We must do a separate query for the password.
+
+                            var newpasswordpermutations = this.m_configuration.GetPepperCombos(newPassword).Select(p => this.m_passwordHashingService.ComputeHash(p)).ToArray();
+
+                            bool isPasswordReused = context.Any<DbSecurityUser>(user => user.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && user.ObsoletionTime == null && newpasswordpermutations.Contains(user.Password));
+
+                            if (isPasswordReused)
+                                throw new DetectedIssueException(Core.BusinessRules.DetectedIssuePriorityType.Error, "password.history", this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_HISTORY), DetectedIssueKeys.SecurityIssue, null);
                         }
 
                         if (isSynchronizationOperation) // the password is changing to synchronize 

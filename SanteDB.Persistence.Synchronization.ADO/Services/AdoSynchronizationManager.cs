@@ -54,6 +54,9 @@ namespace SanteDB.Persistence.Synchronization.ADO.Services
         private readonly IDbProvider _Provider;
         private readonly IReadOnlyCollection<AdoSynchronizationQueue> _RegisteredQueues;
 
+        /// <inheritdoc/>
+        public uint BackupPriority => uint.MinValue;
+
         //private ModelMapper _Mapper;
         //private QueryBuilder _QueryBuilder;
         /// <summary>

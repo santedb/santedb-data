@@ -114,7 +114,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// Gets the value of the observation as a string
         /// </summary>
-        [Column("obs_val")]
+        [Column("obs_val"), ApplicationEncrypt("textObservation.value")]
         public String Value { get; set; }
     }
 

@@ -321,25 +321,27 @@ namespace SanteDB.Persistence.Data.Services
                         !(principal.Identity is IDeviceIdentity || principal.Identity is IApplicationIdentity) &&
                         !this.m_pepService.SoftDemand(PermissionPolicyIdentifiers.LoginAnywhere, principal))
                     {
-                        // What is the restricted facility identifier?
+                        // What is the restricted facility identifier the assigned facility - and the system not acting as a gateway?
                         var assignedFacility = this.m_securityConfiguration.GetSecurityPolicy<Guid?>(SecurityPolicyIdentification.AssignedFacilityUuid, null);
+                        var permittedFacilities = assignedFacility.HasValue ? this.m_securityConfiguration.GetSecurityPolicy<List<String>>(SecurityPolicyIdentification.PermittedFacilities, new List<String>() { assignedFacility.ToString() }).Select(o => Guid.Parse(o)).ToArray() : null;
+
                         var facilityClaims = claimsPrincipal.FindAll(SanteDBClaimTypes.XspaFacilityClaim);
                         // TODO: Allow login up hierarchy
-                        if (!facilityClaims.Any() || !assignedFacility.HasValue && facilityClaims.Count() != 1) // The user has no facility claim nor do they have a "default" we can select
+                        if (!facilityClaims.Any() ||
+                            facilityClaims.Count() != 1
+                        ) // The user has no facility claim nor do they have a "default" we can select
                         {
-                            var exception = new SecuritySessionException(SessionExceptionType.MissingRequiredClaim, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_REQUIRE_FACILITY), null);
-                            exception.Data.Add(SecuritySessionException.DATA_CLAIM_TYPE_KEY, SanteDBClaimTypes.XspaFacilityClaim);
-
+                            
                             // Fetch the allowed values for the facility selection
                             var sqlStatement = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityName), typeof(DbEntityNameComponent))
                                 .InnerJoin<DbEntityName, DbEntityNameComponent>(o => o.Key, o => o.SourceKey)
                                 .Where<DbEntityName>(o => o.ObsoleteVersionSequenceId == null && o.UseConceptKey == NameUseKeys.OfficialRecord);
 
-                            if(assignedFacility.HasValue)
+                            if(permittedFacilities != null) // restricted facilities
                             {
-                                sqlStatement = sqlStatement.And<DbEntityName>(o => o.SourceKey == assignedFacility.Value);
+                                sqlStatement = sqlStatement.And<DbEntityName>(o => permittedFacilities.Contains(o.SourceKey));
                             }
-                            else if(facilityClaims.Any())
+                            if(facilityClaims.Any())
                             {
                                 var userAssignedFacs = facilityClaims.Select(o => Guid.Parse(o.Value)).ToArray();
                                 sqlStatement = sqlStatement.And<DbEntityName>(o => userAssignedFacs.Contains(o.SourceKey));
@@ -350,16 +352,27 @@ namespace SanteDB.Persistence.Data.Services
                             }
 
                             var dbn = context.Query<CompositeResult<DbEntityName, DbEntityNameComponent>>(sqlStatement.Statement);
-                            exception.Data.Add(SecuritySessionException.DATA_CLAIM_VALUE_KEY, String.Join(",", dbn.ToArray().Select(o=>$"{o.Object1.SourceKey}={o.Object2.Value}").Distinct()));
-                            throw exception;
+                            var availableFacilities = dbn.ToArray().Select(o => $"{o.Object1.SourceKey}={o.Object2.Value}").Distinct();
+                            if (!availableFacilities.Any())
+                            {
+                                throw new SecuritySessionException(SessionExceptionType.NotEstablished, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_ASSIGNED_FACILITY_MISMATCH, new { allowed = String.Join(" or ", permittedFacilities), assigned = String.Join(" or ", facilityClaims.Select(o => o.Value)) }), null);
+                            }
+                            else
+                            {
+                                var exception = new SecuritySessionException(SessionExceptionType.MissingRequiredClaim, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_REQUIRE_FACILITY), null);
+                                exception.Data.Add(SecuritySessionException.DATA_CLAIM_TYPE_KEY, SanteDBClaimTypes.XspaFacilityClaim);
+                                exception.Data.Add(SecuritySessionException.DATA_CLAIM_VALUE_KEY, String.Join(",", availableFacilities));
+                                throw exception;
+                            }
                         }
-                        if (assignedFacility.HasValue &&
-                            !facilityClaims.Any(c => c.Value == assignedFacility.ToString()))
+                        
+                        if (permittedFacilities != null &&
+                            !facilityClaims.Any(c => permittedFacilities.Contains(Guid.Parse(c.Value))))
                         {
-                            throw new SecuritySessionException(SessionExceptionType.NotEstablished, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_ASSIGNED_FACILITY_MISMATCH, new { allowed = assignedFacility, assigned = String.Join(" or ", facilityClaims.Select(o => o.Value)) }), null);
+                            throw new SecuritySessionException(SessionExceptionType.NotEstablished, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_ASSIGNED_FACILITY_MISMATCH, new { allowed = String.Join(" or ", permittedFacilities), assigned = String.Join(" or ", facilityClaims.Select(o => o.Value)) }), null);
                         }
+                        
                     }
-
 
                     using (var tx = context.BeginTransaction())
                     {

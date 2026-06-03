@@ -55,7 +55,7 @@ namespace SanteDB.Persistence.Data.Query.Hax
             if (typeof(SecurityUser) == tmodel && property.Name == nameof(SecurityUser.UserEntity))
             {
                 var userkey = TableMapping.Get(typeof(DbUserEntity)).GetColumn(nameof(DbUserEntity.SecurityUserKey), false);
-                var personSubSelect = builder.CreateQuery(typeof(UserEntity), queryFilter.ToDictionary(p => p.Key.Replace("userEntity.", ""), p => p.Value), null, userkey);
+                var personSubSelect = builder.CreateQuery(typeof(UserEntity), queryFilter.ToDictionary(p => p.Key.Replace("userEntity.", ""), p => p.Value), userkey);
                 var userIdKey = TableMapping.Get(typeof(DbSecurityUser)).PrimaryKey.FirstOrDefault();
                 whereClause.And($"{userIdKey.Name} IN (").Append(personSubSelect).Append(")");
                 return true;

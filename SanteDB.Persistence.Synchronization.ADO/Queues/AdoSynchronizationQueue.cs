@@ -191,6 +191,7 @@ namespace SanteDB.Persistence.Synchronization.ADO.Queues
                         using (var tx = context.BeginTransaction())
                         {
 
+                            context.DeleteAll<DbSynchronizationDeadLetterQueueEntry>(o => o.Id == id);
                             // Delete the record 
                             context.Delete(queueEntry);
 

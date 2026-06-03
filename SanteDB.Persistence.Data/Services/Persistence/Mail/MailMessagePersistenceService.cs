@@ -18,10 +18,13 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using SanteDB.Core.Data.Quality;
 using SanteDB.Core.Mail;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Mail;
+using System;
+using System.Data;
 using System.Linq;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Mail
@@ -38,24 +41,45 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Mail
         }
 
         /// <inheritdoc/>
+        protected override MailMessage DoInsertModel(DataContext context, MailMessage data)
+        {
+            var retVal = base.DoInsertModel(context, data);
+
+            // Persist the RCPT to
+            if(data.RcptToXml?.Any() == true)
+            {
+                retVal.RcptToXml = context.InsertAll(data.RcptToXml.Select(o => new DbMailMessageRcptTo()
+                {
+                    SourceKey = retVal.Key.Value,
+                    RecipientKey = o
+                })).Select(o=>o.RecipientKey).ToList();
+            }
+
+            return retVal;
+        }
+
+        /// <inheritdoc/>
+        /// <remarks>Not supported - once sent a mail message cannot be changed</remarks>
+        protected override MailMessage DoUpdateModel(DataContext context, MailMessage data)
+        {
+            if (context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.Exists))
+            {
+                this.m_tracer.TraceWarning("Mail message {0} cannot be updated since it already exists", data);
+                return data;
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+        /// <inheritdoc/>
         protected override MailMessage DoConvertToInformationModel(DataContext context, DbMailMessage dbModel, params object[] referenceObjects)
         {
-            using (context.CreateInformationModelGuard(dbModel.Key))
-            {
-                var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
-                switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
-                {
-                    case LoadMode.FullLoad:
-                        if (context.ValidateMaximumStackDepth())
-                        {
-                            retVal.Mailboxes = retVal.Mailboxes.GetRelatedPersistenceService().Query(context, o => o.TargetKey == dbModel.Key).ToList();
-                            retVal.SetLoaded(o => o.Mailboxes);
-                        }
-                        break;
-                }
-                return retVal;
-            }
+            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+            retVal.RcptToXml = context.Query<DbMailMessageRcptTo>(o => o.SourceKey == dbModel.Key).Select(o => o.RecipientKey).ToList();
+            retVal.SetLoaded(o => o.RcptToXml);
+            return retVal;
         }
     }
 }
