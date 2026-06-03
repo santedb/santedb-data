@@ -20,7 +20,6 @@
  */
 using SanteDB.OrmLite.Attributes;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Persistence.Data.Model.Acts
 {
@@ -28,7 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
     /// Represents a link between act and protocol
     /// </summary>
     [Table("act_proto_assoc_tbl")]
-    [ExcludeFromCodeCoverage]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbActProtocol : DbAssociation
     {
 

@@ -3,7 +3,7 @@
     <VersionNumber>3.0-debug</VersionNumber>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net10.0;net48;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>SanteDB.Persistence.Data.Synchronization</PackageId>
@@ -18,13 +18,11 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <IncludeSymbols>true</IncludeSymbols>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Product>SanteDB</Product>
     <Copyright>Copyright (C) 2015-2026 SanteSuite Contributors (See: NOTICES)</Copyright>
     <Company>SanteSuite Contributors</Company>
     <PackageIconUrl>http://santesuite.org/assets/img/logo.png</PackageIconUrl>
     <PackageProjectUrl>http://santesuite.org</PackageProjectUrl>
-    <BaseOutputPath>..\bin\</BaseOutputPath>
   </PropertyGroup>
   <Choose>
     <When Condition="$(SolutionName.Contains('-nuget'))">
@@ -74,12 +72,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Map\ModelMap.xml" />
   </ItemGroup>
-  <!--<ItemGroup>
-    <ProjectReference Include="..\..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj">
-      <Project>{ca7b81dc-b789-4af6-a079-ec84259c101a}</Project>
-      <Name>SanteDB.Core.i18n</Name>
-    </ProjectReference>
-  </ItemGroup>-->
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader">
       <Link>SanteDB.licenseheader</Link>

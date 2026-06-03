@@ -5,7 +5,7 @@
     <VersionNumber>3.0-debug</VersionNumber>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net10.0;net48;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   
   <PropertyGroup>
@@ -21,7 +21,6 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <IncludeSymbols>true</IncludeSymbols>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Product>SanteDB</Product>
     <Copyright>Copyright (C) 2015-2026 SanteSuite Contributors (See: NOTICES)</Copyright>
     <Company>SanteSuite Contributors</Company>
@@ -47,7 +46,13 @@
     <EmbeddedResource Include="Data\SQL\AuditDB\SQLITE\audit_repo.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-  </ItemGroup>
+		<EmbeddedResource Include="Data\SQL\AuditDB\FBSQL\20210130-FBSQL.sql">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Data\SQL\AuditDB\PSQL\20210124-PSQL.sql">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
   <Choose>
     <When Condition="$(SolutionName.Contains('-nuget'))">
       <ItemGroup>
@@ -59,6 +64,7 @@
         <PackageReference Include="SanteDB.OrmLite" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.BI" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.Docker.Core" Version="$(VersionNumber)" />
+				<PackageReference Include="SanteDB.Core.i18n" Version="$(VersionNumber)" />
       </ItemGroup>
     </When>
     <Otherwise>
@@ -71,24 +77,14 @@
         <ProjectReference Include="..\..\santedb-orm\SanteDB.OrmLite\SanteDB.OrmLite.csproj" />
         <ProjectReference Include="..\..\santedb-bis\SanteDB.BI\SanteDB.BI.csproj" />
         <ProjectReference Include="..\..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj" />
+				<ProjectReference Include="..\..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj" />
       </ItemGroup>
     </Otherwise>
   </Choose>
-  <ItemGroup>
-    <ProjectReference Include="..\..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj">
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader">
       <Link>SanteDB.licenseheader</Link>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Data\SQL\AuditDB\FBSQL\20210130-FBSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</EmbeddedResource>
-    <EmbeddedResource Include="Data\SQL\AuditDB\PSQL\20210124-PSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
+  
 </Project>
