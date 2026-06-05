@@ -500,7 +500,7 @@ namespace SanteDB.Persistence.Data.Services
                             //Password is a secret field which means it will never be selected in a query. We must do a separate query for the password.
 
                             var newpasswordpermutations = this.m_configuration.GetPepperCombos(newPassword).Select(p => this.m_passwordHashingService.ComputeHash(p)).ToArray();
-
+                            
                             bool isPasswordReused = context.Any<DbSecurityUser>(user => user.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && user.ObsoletionTime == null && newpasswordpermutations.Contains(user.Password));
 
                             if (isPasswordReused)

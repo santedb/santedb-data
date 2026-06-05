@@ -149,7 +149,7 @@ namespace SanteDB.Persistence.Data.Services
                                 definition.Version != 0 && 
                                 existingView?.Version > definition.Version ||
                                 !definition.Readonly && 
-                                existingView?.Readonly != true
+                                !existingView.Readonly
                                 )
                             )
                             {
