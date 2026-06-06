@@ -314,6 +314,12 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open(initializeExtensions: false);
 
+                    // Convert POU from Guid (which it should be) to a MNEMONIC
+                    if (Guid.TryParse(purpose, out var purposeId))
+                    {
+                        purpose = context.Query<DbConceptVersion>(o => o.Key == purposeId && o.ObsoletionTime == null).Select(o => o.Mnemonic).First();
+                    }
+
                     // When the system is configured only for one facility login then we want an XSPA facility ID to be set
                     // TODO: Determine whether this is the best place to perform this type of check
                     if (!isOverride &&
@@ -526,11 +532,6 @@ namespace SanteDB.Persistence.Data.Services
                         // POU?
                         if (!String.IsNullOrEmpty(purpose))
                         {
-                            // Convert POU from Guid (which it should be) to a MNEMONIC
-                            if (Guid.TryParse(purpose, out var purposeId))
-                            {
-                                purpose = context.Query<DbConceptVersion>(o => o.Key == purposeId && o.ObsoletionTime == null).Select(o => o.Mnemonic).First();
-                            }
                             claims.Add(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, purpose));
                         }
 
