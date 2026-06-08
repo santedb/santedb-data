@@ -173,7 +173,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// Create cache key
         /// </summary>
-        private string CreateCacheKey(Guid sessionKey)
+        private string CreateSessionCacheKey(Guid sessionKey)
         {
             return $"ado.ses.{this.m_passwordHashingService.ComputeHash(sessionKey.ToString())}";
         }
@@ -212,8 +212,8 @@ namespace SanteDB.Persistence.Data.Services
                         context.Update(dbSession);
                         tx.Commit();
 
-                        this.m_adhocCacheService?.Remove(this.CreateCacheKey(sessionId));
-                        this.m_adhocCacheService?.Remove($"{this.CreateCacheKey(sessionId)}.idt");
+                        this.m_adhocCacheService?.Remove(this.CreateSessionCacheKey(sessionId));
+                        this.m_adhocCacheService?.Remove($"{this.CreateSessionCacheKey(sessionId)}.idt");
 
                         this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(AuthenticationContext.Current.Principal, session, true, false, null, null));
                     }
@@ -571,7 +571,7 @@ namespace SanteDB.Persistence.Data.Services
 
                         if (!isOverride)
                         {
-                            this.m_adhocCacheService?.Add(this.CreateCacheKey(session.Key), session, dbSession.RefreshExpiration.Subtract(DateTimeOffset.Now));
+                            this.m_adhocCacheService?.Add(this.CreateSessionCacheKey(session.Key), session, dbSession.RefreshExpiration.Subtract(DateTimeOffset.Now));
                         }
 
                         this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true, isOverride, purpose, scope));
@@ -678,7 +678,7 @@ namespace SanteDB.Persistence.Data.Services
                             session.FindFirst(SanteDBClaimTypes.PurposeOfUse)?.Value,
                             session.Find(SanteDBClaimTypes.SanteDBScopeClaim)?.Select(o => o.Value).ToArray()));
 
-                        this.m_adhocCacheService?.Add(this.CreateCacheKey(session.Key), session, dbSession.RefreshExpiration.Subtract(DateTimeOffset.Now));
+                        this.m_adhocCacheService?.Add(this.CreateSessionCacheKey(session.Key), session, dbSession.RefreshExpiration.Subtract(DateTimeOffset.Now));
                         return session;
                     }
                 }
@@ -740,7 +740,7 @@ namespace SanteDB.Persistence.Data.Services
             var sessionguid = new Guid(sessionId);
 
             AdoSecuritySession sessionInfo = null;
-            if (this.m_adhocCacheService.TryGet<AdoSecuritySession>(this.CreateCacheKey(sessionguid), out sessionInfo))
+            if (this.m_adhocCacheService.TryGet<AdoSecuritySession>(this.CreateSessionCacheKey(sessionguid), out sessionInfo))
             {
                 if (!allowExpired && sessionInfo.NotAfter < DateTimeOffset.Now)
                 {
@@ -800,8 +800,8 @@ namespace SanteDB.Persistence.Data.Services
 
             var sessionId = new Guid(session.Id);
 
-            adoSession = this.m_adhocCacheService?.Get<AdoSecuritySession>(this.CreateCacheKey(sessionId));
-            var identities = this.m_adhocCacheService?.Get<IIdentity[]>($"{this.CreateCacheKey(sessionId)}.idt");
+            adoSession = this.m_adhocCacheService?.Get<AdoSecuritySession>(this.CreateSessionCacheKey(sessionId));
+            var identities = this.m_adhocCacheService?.Get<IIdentity[]>($"{this.CreateSessionCacheKey(sessionId)}.idt");
             if (adoSession != null && identities != null)
             {
                 adoSession = new AdoSecuritySession(adoSession);
@@ -873,7 +873,7 @@ namespace SanteDB.Persistence.Data.Services
                             }
                         }
 
-                        this.m_adhocCacheService?.Add($"{this.CreateCacheKey(sessionId)}.idt", identities);
+                        this.m_adhocCacheService?.Add($"{this.CreateSessionCacheKey(sessionId)}.idt", identities);
 
                         return identities.OfType<IIdentity>().ToArray();
                     }
