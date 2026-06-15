@@ -41,10 +41,10 @@ BEGIN
 		), terms AS (
 			SELECT 
 				ent_id, 
-				STRING_AGG(DISTINCT tel_val, ' ') AS tel, 
-				STRING_AGG(DISTINCT name, ' ') AS name,
-				STRING_AGG(DISTINCT addr, ' ') AS addr,
-				STRING_AGG(DISTINCT id_val, ' ') AS id
+				COALESCE(STRING_AGG(DISTINCT tel_val, ' '), '') AS tel, 
+				COALESCE(STRING_AGG(DISTINCT name, ' '), '') AS name,
+				COALESCE(STRING_AGG(DISTINCT addr, ' '), '') AS addr,
+				COALESCE(STRING_AGG(DISTINCT id_val, ' '), '') AS id
 			FROM ent_tbl 
 				LEFT JOIN tels USING(ent_id)
 				LEFT JOIN names USING (ent_id)
@@ -121,10 +121,10 @@ BEGIN
 		), terms AS (
 			SELECT 
 				ent_id, 
-				STRING_AGG(DISTINCT tel_val, ' ') AS tel, 
-				STRING_AGG(DISTINCT name, ' ') AS name,
-				STRING_AGG(DISTINCT addr, ' ') AS addr,
-				STRING_AGG(DISTINCT id_val, ' ') AS id
+				COALESCE(STRING_AGG(DISTINCT tel_val, ' '), '') AS tel, 
+				COALESCE(STRING_AGG(DISTINCT name, ' '), '') AS name,
+				COALESCE(STRING_AGG(DISTINCT addr, ' '), '') AS addr,
+				COALESCE(STRING_AGG(DISTINCT id_val, ' '), '') AS id
 			FROM ent_tbl 
 				LEFT JOIN tels USING(ent_id)
 				LEFT JOIN names USING (ent_id)
