@@ -137,7 +137,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             var retVal = new Bundle(input.Item.Where(o => o.BatchOperation == BatchOperationType.Delete))
             {
                 CorrelationKey = input.CorrelationKey,
-                CorrelationSequence = input.CorrelationSequence
+                CorrelationSequence = input.CorrelationSequence,
+                FocalObjects = input.FocalObjects,
             };
             try // Use newer version of the reordering function
             {

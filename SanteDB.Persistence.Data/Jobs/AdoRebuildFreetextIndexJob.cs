@@ -108,36 +108,40 @@ namespace SanteDB.Persistence.Data.Jobs
                         {
                             ctxw.Open();
 
-                            // Truncate 
-                            try
+                            using (var tx = ctxw.BeginTransaction())
                             {
-                                ctxw.ExecuteProcedure<object>("reset_fti_ent");
-                            }
-                            catch (Exception ex) when (ex.Message.Contains("CALL")) // HACK: PostgreSQL < 11 does not support procedures
-                            {
-                                ctxw.ExecuteNonQuery("SELECT reset_fti_ent()");
-                            }
-
-                            var entitySet = ctxr.Query<DbEntityVersion>(o => o.IsHeadVersion == true && o.ObsoletionTime == null).Select(o => o.Key);
-                            var nEntities = entitySet.Count();
-                            int entities = 0;
-                            foreach (var itm in entitySet)
-                            {
-                                this.m_jobStateManager.SetProgress(this, $"Creating freetext index {++entities}/{nEntities}", (float)entities / (float)nEntities);
                                 // Truncate 
                                 try
                                 {
-                                    ctxw.ExecuteProcedure<object>("reindex_fti_ent", itm);
+                                    ctxw.ExecuteProcedure<object>("reset_fti_ent");
                                 }
                                 catch (Exception ex) when (ex.Message.Contains("CALL")) // HACK: PostgreSQL < 11 does not support procedures
                                 {
-                                    ctxw.ExecuteNonQuery("SELECT reset_fti_ent(?)", itm);
+                                    ctxw.ExecuteNonQuery("SELECT reset_fti_ent()");
                                 }
-                                catch(Exception ex)
+
+                                var entitySet = ctxr.Query<DbEntityVersion>(o => o.IsHeadVersion == true && o.ObsoletionTime == null).Select(o => o.Key);
+                                var nEntities = entitySet.Count();
+                                int entities = 0;
+                                foreach (var itm in entitySet)
                                 {
-                                    throw new Exception($"Error indexing {itm}", ex);
+                                    this.m_jobStateManager.SetProgress(this, $"Creating freetext index {++entities}/{nEntities}", (float)entities / (float)nEntities);
+                                    // Truncate 
+                                    try
+                                    {
+                                        ctxw.ExecuteProcedure<object>("reindex_fti_ent", itm);
+                                    }
+                                    catch (Exception ex) when (ex.Message.Contains("CALL")) // HACK: PostgreSQL < 11 does not support procedures
+                                    {
+                                        ctxw.ExecuteNonQuery("SELECT reset_fti_ent(?)", itm);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        throw new Exception($"Error indexing {itm}", ex);
+                                    }
                                 }
                             }
+
                         }
                     }
 
