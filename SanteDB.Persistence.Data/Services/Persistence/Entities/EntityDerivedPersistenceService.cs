@@ -682,6 +682,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     }
                 }
             }
+
             var retVal = base.DoDeleteModel(context, key, deleteMode, preserveContained);
 
             // HACK: Delete the outbound and inbound relationships (prevent traversal)
