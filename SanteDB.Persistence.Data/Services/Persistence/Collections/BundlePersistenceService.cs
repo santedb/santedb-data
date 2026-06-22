@@ -137,7 +137,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             var retVal = new Bundle(input.Item.Where(o => o.BatchOperation == BatchOperationType.Delete))
             {
                 CorrelationKey = input.CorrelationKey,
-                CorrelationSequence = input.CorrelationSequence
+                CorrelationSequence = input.CorrelationSequence,
+                FocalObjects = input.FocalObjects,
             };
             try // Use newer version of the reordering function
             {
@@ -462,8 +463,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                             data.Item[i] = persistenceService.Update(context, data.Item[i]);
                             data.Item[i].BatchOperation = BatchOperationType.Update;
                             break;
-                        case BatchOperationType.InsertOrUpdate:
                         case BatchOperationType.Auto:
+                            if (data.Item.Any(o => o.Key == data.Item[i].Key && o.BatchOperation == BatchOperationType.Delete)) // Deleted
+                            { // There is another entry that might be better suited
+                                continue;
+                            }
+                            goto case BatchOperationType.InsertOrUpdate;
+                        case BatchOperationType.InsertOrUpdate:
 
                             // Ensure that the object exists
                             if (data.Item[i].Key.HasValue && persistenceService.Exists(context, data.Item[i].Key.Value))

@@ -145,11 +145,10 @@ namespace SanteDB.Persistence.Data.Services
                             var existingView = context.Query<DbDataTemplateDefinition>(o => o.Key == definition.Key).FirstOrDefault();
                             
                             // Ensure version is newer
-                            if(existingView != null && (
+                            if(!definition.Readonly &&
+                                existingView != null && (
                                 definition.Version != 0 && 
-                                existingView?.Version > definition.Version ||
-                                !definition.Readonly && 
-                                !existingView.Readonly
+                                existingView?.Version > definition.Version
                                 )
                             )
                             {
