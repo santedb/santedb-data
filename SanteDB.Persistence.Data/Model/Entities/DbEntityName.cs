@@ -67,7 +67,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
         public override Guid SourceKey { get; set; }
 
         /// <inheritdoc/>
-        [ApplicationEncrypt("name.component")]
+        [ApplicationEncrypt(ApplicationEncryptionFieldNames.NameComponent)]
         public override String Value { get; set; }
     }
 }

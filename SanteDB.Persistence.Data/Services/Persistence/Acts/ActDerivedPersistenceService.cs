@@ -44,6 +44,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using static SanteDB.Core.Model.IdentifiedData;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
@@ -374,6 +375,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
             // Geo-tagging
             data.GeoTagKey = this.EnsureExists(context, data.GeoTag)?.Key ?? data.GeoTagKey;
+
+            // Ensure uniqueness of identifiers - i.e. no duplicate IDs in the same domain
+            data.Identifiers = data.Identifiers?.Distinct(new IdentifierEqualityComparer<ActIdentifier>())?.ToList();
 
             // Verify the act
             var issues = this.VerifyEntity(context, data).ToArray();

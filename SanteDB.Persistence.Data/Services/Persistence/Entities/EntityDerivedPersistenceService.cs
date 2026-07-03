@@ -47,6 +47,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using static SanteDB.Core.Model.IdentifiedData;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
@@ -379,6 +380,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             data.StatusConceptKey = this.EnsureExists(context, data.StatusConcept)?.Key ?? data.StatusConceptKey;
             data.TemplateKey = this.EnsureExists(context, data.Template)?.Key ?? data.TemplateKey;
             data.TypeConceptKey = this.EnsureExists(context, data.TypeConcept)?.Key ?? data.TypeConceptKey;
+
+            // Ensure uniqueness of identifiers - i.e. no duplicate IDs in the same domain
+            data.Identifiers = data.Identifiers?.Distinct(new IdentifierEqualityComparer<EntityIdentifier>())?.ToList();
 
             // Geo-tagging
             data.GeoTagKey = this.EnsureExists(context, data.GeoTag)?.Key ?? data.GeoTagKey;

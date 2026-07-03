@@ -64,7 +64,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
-        [Column("tel_val"), ApplicationEncrypt("telecom.value")]
+        [Column("tel_val"), ApplicationEncrypt(ApplicationEncryptionFieldNames.TelecomValue)]
         public String Value
         {
             get;
