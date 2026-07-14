@@ -894,8 +894,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(IdentifiedData.Key), ErrorMessages.ARGUMENT_NULL);
             }
 
-
-            associations = associations.Where(a => a.BatchOperation != BatchOperationType.Ignore);
+            //associations = associations.Where(a => a.BatchOperation != BatchOperationType.Ignore);
 
             context.PushData(DataConstants.NoTouchSourceContextKey, true);
 
@@ -978,7 +977,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
             }
 
-            var addedRelationships = associations.Where(o => !o.IsEmpty() && o.BatchOperation != BatchOperationType.Delete && (!o.Key.HasValue || !existing.Contains(o.Key))).Select(a =>
+            var addedRelationships = associations.Where(o => o.BatchOperation != BatchOperationType.Ignore && !o.IsEmpty() && o.BatchOperation != BatchOperationType.Delete && (!o.Key.HasValue || !existing.Contains(o.Key))).Select(a =>
            {
                a.EffectiveVersionSequenceId = data.VersionSequence;
                a = persistenceService.Insert(context, a);
@@ -986,7 +985,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                return a;
            }).ToArray();
 
-            var updatedRelationships = associations.Where(o => !o.IsEmpty() && o.BatchOperation != BatchOperationType.Delete && o.Key.HasValue && existing.Contains(o.Key)).Select(a =>
+            var updatedRelationships = associations.Where(o => o.BatchOperation != BatchOperationType.Ignore && !o.IsEmpty() && o.BatchOperation != BatchOperationType.Delete && o.Key.HasValue && existing.Contains(o.Key)).Select(a =>
             {
                 a = persistenceService.Update(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
