@@ -992,7 +992,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return a;
             });
 
-            var retVal = updatedRelationships.Union(addedRelationships).ToArray();
+            var retVal = updatedRelationships.Union(addedRelationships).Union(associations.Where(o=>o.BatchOperation == BatchOperationType.Ignore)).ToArray();
             context.PopData(DataConstants.NoTouchSourceContextKey, out _);
             return retVal;
         }

@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Jobs;
@@ -140,7 +141,11 @@ namespace SanteDB.Persistence.Data.Jobs
                                         throw new Exception($"Error indexing {itm}", ex);
                                     }
                                 }
+
+                                tx.Commit();
+
                             }
+
 
                         }
                     }

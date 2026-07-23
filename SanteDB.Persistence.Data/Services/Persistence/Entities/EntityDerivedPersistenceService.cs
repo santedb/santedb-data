@@ -19,6 +19,7 @@
  * Date: 2023-6-21
  */
 using DocumentFormat.OpenXml.EMMA;
+using DocumentFormat.OpenXml.Wordprocessing;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Extensions;
@@ -315,7 +316,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             context.DeleteAll<DbOrganization>(o => o.ParentKey == key);
             context.DeleteAll<DbPlaceService>(o => o.SourceKey == key);
             context.DeleteAll<DbPlace>(o => o.ParentKey == key);
-
             base.DoDeleteReferencesInternal(context, key);
         }
 
@@ -400,15 +400,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
             // Check for changes to the address, telecoms, etc.
             if (data.Names?.Any() == true) {
-                foreach (var name in data.Names.Where(o => o.Key.HasValue))
+                foreach (var name in data.Names.Where(o => o.Key.HasValue && o.Component?.Any() == true))
                 {
                     var existingName = context.Query<DbEntityNameComponent>(o => o.SourceKey == name.Key).OrderBy(o => o.OrderSequence).ToList().Select(o => $"{o.ComponentTypeKey}{o.Value}");
                     if (!name.Component.OrderBy(o => o.OrderSequence).Select(o => $"{o.ComponentTypeKey}{o.Value}").SequenceEqual(existingName))
                     {
                         name.BatchOperation = BatchOperationType.Insert;
                         name.Key = null;
+                        name.Component.ForEach(c =>
+                        {
+                            c.Key = null;
+                            c.SourceEntityKey = null;
+                        });
                     }
-                    else
+                    else if(name.BatchOperation != BatchOperationType.Delete)
                     {
                         name.BatchOperation = BatchOperationType.Ignore;
                     }
@@ -416,15 +421,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             }
             if (data.Addresses?.Any() == true)
             {
-                foreach (var addr in data.Addresses.Where(o => o.Key.HasValue))
+                foreach (var addr in data.Addresses.Where(o => o.Key.HasValue && o.Component?.Any() == true))
                 {
                     var existingAddress = context.Query<DbEntityAddressComponent>(o => o.SourceKey == addr.Key).OrderBy(o => o.OrderSequence).ToList().Select(o => $"{o.ComponentTypeKey}{o.Value}");
                     if (!addr.Component.OrderBy(o => o.OrderSequence).Select(o => $"{o.ComponentTypeKey}{o.Value}").SequenceEqual(existingAddress))
                     {
                         addr.BatchOperation = BatchOperationType.Insert;
                         addr.Key = null;
+                        addr.Component.ForEach(c =>
+                        {
+                            c.Key = null;
+                            c.SourceEntityKey = null;
+                        });
+
                     }
-                    else
+                    else if(addr.BatchOperation != BatchOperationType.Delete)
                     {
                         addr.BatchOperation = BatchOperationType.Ignore;
                     }
@@ -442,7 +453,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                         tel.BatchOperation = BatchOperationType.Insert;
                         tel.Key = null;
                     }
-                    else
+                    else if(tel.BatchOperation != BatchOperationType.Delete)
                     {
                         tel.BatchOperation = BatchOperationType.Ignore;
                     }
@@ -460,7 +471,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                         ident.BatchOperation = BatchOperationType.Insert;
                         ident.Key = null;
                     }
-                    else
+                    else if(ident.BatchOperation != BatchOperationType.Delete)
                     {
                         ident.BatchOperation = BatchOperationType.Ignore;
                     }

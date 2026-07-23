@@ -402,8 +402,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                         ident.BatchOperation = BatchOperationType.Insert;
                         ident.Key = null;
                     }
-                    else
-                    {
+                    else if(ident.BatchOperation != BatchOperationType.Delete)
+                            {
                         ident.BatchOperation = BatchOperationType.Ignore;
                     }
                 }
