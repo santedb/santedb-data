@@ -389,7 +389,26 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             {
                 data.AddAnnotation(issues);
             }
-            
+
+            if (data.Identifiers?.Any() == true)
+            {
+                foreach (var ident in data.Identifiers.Where(o => o.Key.HasValue))
+                {
+                    var existingIdent = context.FirstOrDefault<DbActIdentifier>(o => o.Key == ident.Key);
+                    if (ident.IdentityDomainKey != existingIdent.IdentityDomainKey ||
+                        ident.Value != existingIdent.Value ||
+                        ident.IdentifierTypeKey != existingIdent.TypeKey)
+                    {
+                        ident.BatchOperation = BatchOperationType.Insert;
+                        ident.Key = null;
+                    }
+                    else
+                    {
+                        ident.BatchOperation = BatchOperationType.Ignore;
+                    }
+                }
+            }
+
             return base.BeforePersisting(context, data);
         }
 
