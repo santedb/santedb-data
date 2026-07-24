@@ -18,9 +18,7 @@
  * User: fyfej
  * Date: 2023-6-21
  */
-using DocumentFormat.OpenXml.Wordprocessing;
 using SanteDB.Core.Configuration;
-using SanteDB.Core.Data.Quality;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
@@ -38,7 +36,6 @@ using SanteDB.Persistence.Data.Model.Concepts;
 using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
-using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Linq;
