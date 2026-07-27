@@ -446,6 +446,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 foreach (var tel in data.Telecoms.Where(o => o.Key.HasValue))
                 {
                     var existingTel = context.FirstOrDefault<DbTelecomAddress>(o => o.Key == tel.Key);
+                    if(existingTel == null)
+                    {
+                        continue;
+                    }
+
                     if (tel.AddressUseKey != existingTel.TelecomUseKey ||
                         tel.Value != existingTel.Value ||
                         tel.TypeConceptKey != existingTel.TypeConceptKey)
@@ -464,6 +469,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 foreach (var ident in data.Identifiers.Where(o => o.Key.HasValue))
                 {
                     var existingIdent = context.FirstOrDefault<DbEntityIdentifier>(o => o.Key == ident.Key);
+                    if (existingIdent == null)
+                    {
+                        continue;
+                    }
+
                     if (ident.IdentityDomainKey != existingIdent.IdentityDomainKey ||
                         ident.Value != existingIdent.Value ||
                         ident.IdentifierTypeKey != existingIdent.TypeKey)
