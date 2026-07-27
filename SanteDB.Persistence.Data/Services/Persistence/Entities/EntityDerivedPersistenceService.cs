@@ -19,6 +19,7 @@
  * Date: 2023-6-21
  */
 using DocumentFormat.OpenXml.EMMA;
+using DocumentFormat.OpenXml.Wordprocessing;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Extensions;
@@ -315,7 +316,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             context.DeleteAll<DbOrganization>(o => o.ParentKey == key);
             context.DeleteAll<DbPlaceService>(o => o.SourceKey == key);
             context.DeleteAll<DbPlace>(o => o.ParentKey == key);
-
             base.DoDeleteReferencesInternal(context, key);
         }
 
@@ -397,7 +397,86 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 data.AddAnnotation(issues);
             }
-            
+
+            // Check for changes to the address, telecoms, etc.
+            if (data.Names?.Any() == true) {
+                foreach (var name in data.Names.Where(o => o.Key.HasValue && o.Component?.Any() == true))
+                {
+                    var existingName = context.Query<DbEntityNameComponent>(o => o.SourceKey == name.Key).OrderBy(o => o.OrderSequence).ToList().Select(o => $"{o.ComponentTypeKey}{o.Value}");
+                    if (!name.Component.OrderBy(o => o.OrderSequence).Select(o => $"{o.ComponentTypeKey}{o.Value}").SequenceEqual(existingName))
+                    {
+                        name.BatchOperation = BatchOperationType.Insert;
+                        name.Key = null;
+                        name.Component.ForEach(c =>
+                        {
+                            c.Key = null;
+                            c.SourceEntityKey = null;
+                        });
+                    }
+                    else if(name.BatchOperation != BatchOperationType.Delete)
+                    {
+                        name.BatchOperation = BatchOperationType.Ignore;
+                    }
+                }
+            }
+            if (data.Addresses?.Any() == true)
+            {
+                foreach (var addr in data.Addresses.Where(o => o.Key.HasValue && o.Component?.Any() == true))
+                {
+                    var existingAddress = context.Query<DbEntityAddressComponent>(o => o.SourceKey == addr.Key).OrderBy(o => o.OrderSequence).ToList().Select(o => $"{o.ComponentTypeKey}{o.Value}");
+                    if (!addr.Component.OrderBy(o => o.OrderSequence).Select(o => $"{o.ComponentTypeKey}{o.Value}").SequenceEqual(existingAddress))
+                    {
+                        addr.BatchOperation = BatchOperationType.Insert;
+                        addr.Key = null;
+                        addr.Component.ForEach(c =>
+                        {
+                            c.Key = null;
+                            c.SourceEntityKey = null;
+                        });
+
+                    }
+                    else if(addr.BatchOperation != BatchOperationType.Delete)
+                    {
+                        addr.BatchOperation = BatchOperationType.Ignore;
+                    }
+                }
+            }
+            if(data.Telecoms?.Any() == true)
+            {
+                foreach (var tel in data.Telecoms.Where(o => o.Key.HasValue))
+                {
+                    var existingTel = context.FirstOrDefault<DbTelecomAddress>(o => o.Key == tel.Key);
+                    if (tel.AddressUseKey != existingTel.TelecomUseKey ||
+                        tel.Value != existingTel.Value ||
+                        tel.TypeConceptKey != existingTel.TypeConceptKey)
+                    {
+                        tel.BatchOperation = BatchOperationType.Insert;
+                        tel.Key = null;
+                    }
+                    else if(tel.BatchOperation != BatchOperationType.Delete)
+                    {
+                        tel.BatchOperation = BatchOperationType.Ignore;
+                    }
+                }
+            }
+            if (data.Identifiers?.Any() == true)
+            {
+                foreach (var ident in data.Identifiers.Where(o => o.Key.HasValue))
+                {
+                    var existingIdent = context.FirstOrDefault<DbEntityIdentifier>(o => o.Key == ident.Key);
+                    if (ident.IdentityDomainKey != existingIdent.IdentityDomainKey ||
+                        ident.Value != existingIdent.Value ||
+                        ident.IdentifierTypeKey != existingIdent.TypeKey)
+                    {
+                        ident.BatchOperation = BatchOperationType.Insert;
+                        ident.Key = null;
+                    }
+                    else if(ident.BatchOperation != BatchOperationType.Delete)
+                    {
+                        ident.BatchOperation = BatchOperationType.Ignore;
+                    }
+                }
+            }
             return base.BeforePersisting(context, data);
         }
 

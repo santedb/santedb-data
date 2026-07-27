@@ -325,6 +325,7 @@
 	<EmbeddedResource Include="SQL\PSQL\Updates\20251216.sql" />
 	<EmbeddedResource Include="SQL\PSQL\Updates\20251203.sql" />
 	<EmbeddedResource Include="SQL\PSQL\Updates\20260320.sql" />
+	<EmbeddedResource Include="SQL\PSQL\Updates\20260720.sql" />
 	<EmbeddedResource Include="SQL\PSQL\Updates\20260630.sql" />
 	<EmbeddedResource Include="SQL\PSQL\Updates\20260629.sql" />
 	<EmbeddedResource Include="SQL\PSQL\Updates\20260615.sql" />
@@ -379,6 +380,7 @@
     <EmbeddedResource Include="SQL\SQLITE\20240120.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20260308.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20260320.sql" />
+    <EmbeddedResource Include="SQL\SQLITE\20260720.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20260630.sql" />
     <EmbeddedResource Include="SQL\SQLITE\20260324.sql" />
     <EmbeddedResource Include="SQL\SQLITE\santedb-codes.sql" />

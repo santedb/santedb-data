@@ -29,7 +29,6 @@ using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Services.Persistence;
-using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Linq;
