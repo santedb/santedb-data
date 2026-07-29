@@ -672,8 +672,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override TAct DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained)
         {
             // Cascade the deletion of data down 
-            if (!preserveContained)
+            if (!preserveContained &&
+                (!context.Data.TryGetValue(nameof(preserveContained), out var pcStack) || 
+                pcStack is Stack<Object> stk && !stk.Contains(key)))
             {
+                context.PushData(nameof(preserveContained), key);
+
                 foreach (var ar in context.Query<DbActRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToArray())
                 {
                     var rps = typeof(Act).GetRelatedPersistenceService();
@@ -692,6 +696,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                         rps.Delete(context, ap.TargetKey, deleteMode, preserveContained);
                     }
                 }
+                context.PopData(nameof(preserveContained), out _);
 
             }
 
