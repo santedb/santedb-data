@@ -395,6 +395,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 foreach (var ident in data.Identifiers.Where(o => o.Key.HasValue))
                 {
                     var existingIdent = context.FirstOrDefault<DbActIdentifier>(o => o.Key == ident.Key);
+                    if (existingIdent == null)
+                    {
+                        continue;
+                    }
+
                     if (ident.IdentityDomainKey != existingIdent.IdentityDomainKey ||
                         ident.Value != existingIdent.Value ||
                         ident.IdentifierTypeKey != existingIdent.TypeKey)
