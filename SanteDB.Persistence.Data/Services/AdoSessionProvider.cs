@@ -338,7 +338,9 @@ namespace SanteDB.Persistence.Data.Services
                             // Fetch the allowed values for the facility selection
                             var sqlStatement = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityName), typeof(DbEntityNameComponent))
                                 .InnerJoin<DbEntityName, DbEntityNameComponent>(o => o.Key, o => o.SourceKey)
-                                .Where<DbEntityName>(o => o.ObsoleteVersionSequenceId == null && o.UseConceptKey == NameUseKeys.OfficialRecord);
+                                .InnerJoin<DbEntityName, DbEntityVersion>(o=>o.SourceKey, o=>o.Key)
+                                .Where<DbEntityName>(o => o.ObsoleteVersionSequenceId == null && o.UseConceptKey == NameUseKeys.OfficialRecord)
+                                .And<DbEntityVersion>(o=>StatusKeys.ActiveStates.Contains(o.StatusConceptKey) && o.IsHeadVersion && o.ObsoletionTime == null && o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation);
 
                             if(permittedFacilities != null) // restricted facilities
                             {

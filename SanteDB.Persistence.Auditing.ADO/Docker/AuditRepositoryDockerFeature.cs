@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Docker.Core;
+using SanteDB.OrmLite.Providers.Postgres;
 using SanteDB.Persistence.Auditing.ADO.Configuration;
 using SanteDB.Persistence.Auditing.ADO.Services;
 using System;
@@ -61,7 +62,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Docker
             {
                 configSection = new AdoAuditConfigurationSection()
                 {
-                    ProviderType = "Npgsql",
+                    ProviderType = PostgreSQLProvider.InvariantName,
                     ReadonlyConnectionString = "AUDIT",
                     ReadWriteConnectionString = "AUDIT"
                 };

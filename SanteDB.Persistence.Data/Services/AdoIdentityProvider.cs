@@ -331,7 +331,18 @@ namespace SanteDB.Persistence.Data.Services
                             var mfaMechanism = dbUser.TwoFactorMechnaismKey ?? this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.DefaultMfaMethod, (Guid?)null) ?? TfaEmailMechanism.MechanismId;
                             if (useMfa && String.IsNullOrEmpty(tfaSecret))
                             {
-                                var secretString = this.m_tfaRelay.SendSecret(mfaMechanism, new AdoUserIdentity(dbUser));
+                                string secretString;
+
+                                try
+                                {
+                                    secretString = this.m_tfaRelay.SendSecret(mfaMechanism, new AdoUserIdentity(dbUser));
+                                }
+                                catch (Exception ex) when (!(ex is OutOfMemoryException || ex is StackOverflowException))
+                                {
+                                    //Throw an error message which prompts the affected user to contact the administrator for troubleshooting.
+                                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_ERROR), ex);
+                                }
+
                                 throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ, new { message = this.m_localizationService.GetString(secretString) }));
                             }
 

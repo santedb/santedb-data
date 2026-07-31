@@ -21,6 +21,7 @@
 using SanteDB.Core.Configuration;
 using SanteDB.Core.PubSub.Broker;
 using SanteDB.Docker.Core;
+using SanteDB.OrmLite.Providers.Postgres;
 using SanteDB.Persistence.PubSub.ADO.Configuration;
 using System;
 using System.Collections.Generic;
@@ -61,7 +62,7 @@ namespace SanteDB.Persistence.PubSub.ADO.Docker
             {
                 configSection = new AdoPubSubConfigurationSection()
                 {
-                    ProviderType = "Npgsql",
+                    ProviderType = PostgreSQLProvider.InvariantName,
                     ReadonlyConnectionString = "MAIN",
                     ReadWriteConnectionString = "MAIN"
                 };

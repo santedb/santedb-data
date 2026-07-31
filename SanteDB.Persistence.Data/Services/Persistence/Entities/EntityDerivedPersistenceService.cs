@@ -745,8 +745,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
 
             // Cascade the deletion of data down 
-            if (!preserveContained)
+            if (!preserveContained &&
+                (!context.Data.TryGetValue(nameof(preserveContained), out var pcStack) ||
+                pcStack is Stack<Object> stk && !stk.Contains(key)))
             {
+                context.PushData(nameof(preserveContained), key);
                 var rps = typeof(Entity).GetRelatedPersistenceService();
                 foreach (var er in context.Query<DbEntityRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToArray())
                 {
@@ -774,6 +777,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                         context.Delete(ap);
                     }
                 }
+                context.PopData(nameof(preserveContained), out _);
+
             }
 
             var retVal = base.DoDeleteModel(context, key, deleteMode, preserveContained);
