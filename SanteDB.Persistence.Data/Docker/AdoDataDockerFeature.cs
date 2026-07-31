@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Docker.Core;
+using SanteDB.OrmLite.Providers.Postgres;
 using SanteDB.Persistence.Data.Configuration;
 using System;
 using System.Collections.Generic;
@@ -82,7 +83,7 @@ namespace SanteDB.Persistence.Data.Docker
                 {
                     AutoInsertChildren = true,
                     AutoUpdateExisting = true,
-                    ProviderType = "Npgsql",
+                    ProviderType = PostgreSQLProvider.InvariantName,
                     ReadonlyConnectionString = "MAIN",
                     ReadWriteConnectionString = "MAIN",
                     LoadStrategy = Core.Services.LoadMode.SyncLoad,
