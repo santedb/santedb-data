@@ -415,7 +415,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     }
                     else if(name.BatchOperation != BatchOperationType.Delete)
                     {
-                        name.BatchOperation = BatchOperationType.Ignore;
+                        if (context.Any<DbEntityName>(o => o.Key == name.Key && o.ObsoleteVersionSequenceId != null)) // Submitted stale data - we need to version this 
+                        {
+                            name.Key = Guid.NewGuid();
+                        }
+                        else
+                        {
+                            name.BatchOperation = BatchOperationType.Ignore;
+                        }
                     }
                 }
             }
@@ -423,6 +430,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 foreach (var addr in data.Addresses.Where(o => o.Key.HasValue && o.Component?.Any() == true))
                 {
+                    // Is the address key provided by 
                     var existingAddress = context.Query<DbEntityAddressComponent>(o => o.SourceKey == addr.Key).OrderBy(o => o.OrderSequence).ToList().Select(o => $"{o.ComponentTypeKey}{o.Value}");
                     if (!addr.Component.OrderBy(o => o.OrderSequence).Select(o => $"{o.ComponentTypeKey}{o.Value}").SequenceEqual(existingAddress))
                     {
@@ -437,7 +445,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     }
                     else if(addr.BatchOperation != BatchOperationType.Delete)
                     {
-                        addr.BatchOperation = BatchOperationType.Ignore;
+                        if (context.Any<DbEntityAddress>(o => o.Key == addr.Key && o.ObsoleteVersionSequenceId != null)) // Submitted stale data - we need to version this 
+                        {
+                            addr.Key = Guid.NewGuid();
+                        }
+                        else
+                        {
+                            addr.BatchOperation = BatchOperationType.Ignore;
+                        }
                     }
                 }
             }
@@ -446,7 +461,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 foreach (var tel in data.Telecoms.Where(o => o.Key.HasValue))
                 {
                     var existingTel = context.FirstOrDefault<DbTelecomAddress>(o => o.Key == tel.Key);
-                    if(existingTel == null)
+                    if(existingTel == null) // The UI has provided us with an older identifier that is deleted
                     {
                         continue;
                     }
@@ -460,7 +475,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     }
                     else if(tel.BatchOperation != BatchOperationType.Delete)
                     {
-                        tel.BatchOperation = BatchOperationType.Ignore;
+                        if (existingTel.ObsoleteVersionSequenceId.HasValue) // The client submitted stale data - we need to rekey it to ensure versioning is maintained
+                        {
+                            tel.Key = Guid.NewGuid();
+                        }
+                        else // Literally no change
+                        {
+                            tel.BatchOperation = BatchOperationType.Ignore;
+                        }
                     }
                 }
             }
@@ -469,7 +491,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 foreach (var ident in data.Identifiers.Where(o => o.Key.HasValue))
                 {
                     var existingIdent = context.FirstOrDefault<DbEntityIdentifier>(o => o.Key == ident.Key);
-                    if (existingIdent == null)
+                    if (existingIdent == null) // The UI has provided us with an older identifier that is deleted
                     {
                         continue;
                     }
@@ -481,9 +503,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                         ident.BatchOperation = BatchOperationType.Insert;
                         ident.Key = null;
                     }
-                    else if(ident.BatchOperation != BatchOperationType.Delete)
+                    else if (ident.BatchOperation != BatchOperationType.Delete)
                     {
-                        ident.BatchOperation = BatchOperationType.Ignore;
+                        if (existingIdent.ObsoleteVersionSequenceId.HasValue) // The client submitted stale data - we need to rekey it to ensure versioning is maintained
+                        {
+                            ident.Key = Guid.NewGuid();
+                        }
+                        else // Literally no change
+                        {
+                            ident.BatchOperation = BatchOperationType.Ignore;
+                        }
                     }
                 }
             }
@@ -609,27 +638,27 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             var retVal = base.DoInsertModel(context, data);
             context.AddOrUpdateData($"Entity{retVal.Key}Version", retVal.VersionSequence);
 
-            if (data.Addresses != null)
+            if (data.Addresses?.Any(o=>o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Addresses = this.UpdateModelVersionedAssociations(context, retVal, data.Addresses).ToList();
             }
 
-            if (data.Extensions != null)
+            if (data.Extensions?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
             }
 
-            if (data.Identifiers != null)
+            if (data.Identifiers?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Identifiers = this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
             }
 
-            if (data.Names != null)
+            if (data.Names?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Names = this.UpdateModelVersionedAssociations(context, retVal, data.Names).ToList();
             }
 
-            if (data.Notes != null)
+            if (data.Notes?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Notes = this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
             }
@@ -642,19 +671,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 })).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
             }
 
-            if (data.Relationships != null)
+            if (data.Relationships?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
                 // Evict any relationships that are reversed 
                 retVal.Relationships.Where(k => k.SourceEntityKey != retVal.Key).ForEach(k => this.m_dataCacheService.Remove(k.SourceEntityKey.GetValueOrDefault()));
             }
 
-            if (data.Tags != null)
+            if (data.Tags?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
             }
 
-            if (data.Telecoms != null)
+            if (data.Telecoms?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Telecoms = this.UpdateModelVersionedAssociations(context, retVal, data.Telecoms).ToList();
             }
@@ -675,27 +704,27 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             var retVal = base.DoUpdateModel(context, data);
             context.AddOrUpdateData($"Entity{retVal.Key}Version", retVal.VersionSequence);
 
-            if (data.Addresses != null)
+            if (data.Addresses?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Addresses = this.UpdateModelVersionedAssociations(context, retVal, data.Addresses).ToList();
             }
 
-            if (data.Extensions != null)
+            if (data.Extensions?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
             }
 
-            if (data.Identifiers != null)
+            if (data.Identifiers?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Identifiers = this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
             }
 
-            if (data.Names != null)
+            if (data.Names?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Names = this.UpdateModelVersionedAssociations(context, retVal, data.Names).ToList();
             }
 
-            if (data.Notes != null)
+            if (data.Notes?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Notes = this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
             }
@@ -708,19 +737,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 })).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
             }
 
-            if (data.Relationships != null)
+            if (data.Relationships?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
                 // Evict any relationships that are reversed 
                 retVal.Relationships.Where(k => k.SourceEntityKey != retVal.Key).ForEach(k => this.m_dataCacheService.Remove(k.SourceEntityKey.GetValueOrDefault()));
             }
 
-            if (data.Tags != null)
+            if (data.Tags?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
             }
 
-            if (data.Telecoms != null)
+            if (data.Telecoms?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
             {
                 retVal.Telecoms = this.UpdateModelVersionedAssociations(context, retVal, data.Telecoms).ToList();
             }
