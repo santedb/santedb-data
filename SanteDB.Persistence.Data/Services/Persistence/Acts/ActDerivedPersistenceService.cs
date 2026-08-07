@@ -25,18 +25,22 @@ using SanteDB.Core.Extensions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Attributes;
+using SanteDB.Core.Model.Audit;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Acts;
 using SanteDB.Persistence.Data.Model.DataType;
+using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Extensibility;
+using SanteDB.Persistence.Data.Model.Roles;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
@@ -407,17 +411,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                         ident.BatchOperation = BatchOperationType.Insert;
                         ident.Key = null;
                     }
-                    else if(ident.BatchOperation != BatchOperationType.Delete)
-                    {
-                        if (existingIdent.ObsoleteVersionSequenceId.HasValue) // Stale version submitted
-                        {
-                            ident.Key = Guid.NewGuid();
-                        }
-                        else
-                        {
-                            ident.BatchOperation = BatchOperationType.Ignore;
-                        }
-                    }
                 }
             }
 
@@ -543,17 +536,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             var retVal = base.DoInsertModel(context, data);
             context.AddOrUpdateData($"Act{retVal.Key}Version", retVal.VersionSequence);
 
-            if (data.Extensions?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
+            if (data.Extensions != null)
             {
                 retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
             }
 
-            if (data.Identifiers?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
+            if (data.Identifiers != null)
             {
                 retVal.Identifiers = this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
             }
 
-            if (data.Notes?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
+            if (data.Notes != null)
             {
                 retVal.Notes = this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
             }
@@ -566,24 +559,24 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 })).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
             }
 
-            if (data.Relationships?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
+            if (data.Relationships != null)
             {
                 retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
                 // Evict any relationships that are reversed 
                 retVal.Relationships.Where(k => k.SourceEntityKey != retVal.Key).ForEach(k => this.m_dataCacheService.Remove(k.SourceEntityKey.GetValueOrDefault()));
             }
 
-            if (data.Tags?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
+            if (data.Tags != null)
             {
                 retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
             }
 
-            if (data.Participations?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
+            if (data.Participations != null)
             {
                 retVal.Participations = this.UpdateModelVersionedAssociations(context, retVal, data.Participations).ToList();
             }
 
-            if (data.Protocols?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
+            if (data.Protocols != null)
             {
                 // This is a special case since the dbactprotocol <> acts are not specifically identified (they are combination)
                 retVal.Protocols = data.Protocols.Select(p =>
@@ -613,17 +606,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             var retVal = base.DoUpdateModel(context, data);
             context.AddOrUpdateData($"Act{retVal.Key}Version", retVal.VersionSequence);
 
-            if (data.Extensions?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
+            if (data.Extensions != null)
             {
                 retVal.Extensions = this.UpdateModelVersionedAssociations(context, retVal, data.Extensions).ToList();
             }
 
-            if (data.Identifiers?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
+            if (data.Identifiers != null)
             {
                 retVal.Identifiers = this.UpdateModelVersionedAssociations(context, retVal, data.Identifiers).ToList();
             }
 
-            if (data.Notes?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
+            if (data.Notes != null)
             {
                 retVal.Notes = this.UpdateModelVersionedAssociations(context, retVal, data.Notes).ToList();
             }
@@ -636,24 +629,24 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 })).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
             }
 
-            if (data.Relationships?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
+            if (data.Relationships != null)
             {
                 retVal.Relationships = this.UpdateModelVersionedAssociations(context, retVal, data.Relationships).ToList();
                 // Evict any relationships that are reversed 
                 retVal.Relationships.Where(k => k.SourceEntityKey != retVal.Key).ForEach(k => this.m_dataCacheService.Remove(k.SourceEntityKey.GetValueOrDefault()));
             }
 
-            if (data.Tags?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
+            if (data.Tags != null)
             {
                 retVal.Tags = this.UpdateModelAssociations(context, retVal, data.Tags).ToList();
             }
 
-            if (data.Participations?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
+            if (data.Participations != null)
             {
                 retVal.Participations = this.UpdateModelVersionedAssociations(context, retVal, data.Participations).ToList();
             }
 
-            if (data.Protocols?.Any(o => o.BatchOperation != BatchOperationType.Ignore) == true)
+            if (data.Protocols != null)
             {
                 // This is a special case since the dbactprotocol <> acts are not specifically identified (they are combination)
                 context.DeleteAll<DbActProtocol>(o => o.SourceKey == retVal.Key);

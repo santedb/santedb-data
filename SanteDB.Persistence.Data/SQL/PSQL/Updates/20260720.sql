@@ -2,7 +2,6 @@
  * <feature scope="SanteDB.Persistence.Data" id="20260720-01" name="Update:20260720-01"   invariantName="npgsql" >
  *	<summary>Update: Updates the relationships for family members</summary>
  *	<isInstalled>select ck_patch('20260720-01')</isInstalled>
- *	<initializer>SanteDB.Persistence.Data.Migration.MigrateAleConfiguration, SanteDB.Persistence.Data</initializer>
  * </feature>
  */
 

@@ -64,7 +64,8 @@ namespace SanteDB.Persistence.Data.Services
             typeof(AdoCertificateIdentityProvider),
             typeof(AdoCdssLibraryRepository),
             typeof(AdoDataQualityConfigurationProvider),
-            typeof(AdoDataTemplateManager)
+            typeof(AdoDataTemplateManager),
+            typeof(AdoTrimService)
         };
 
         // Gets the configuration
@@ -124,6 +125,7 @@ namespace SanteDB.Persistence.Data.Services
                 serviceManager.AddServiceProvider(typeof(TagPersistenceService));
                 serviceManager.AddServiceProvider(typeof(AdoRelationshipValidationProvider));
                 serviceManager.AddServiceProvider(typeof(AdoDatasetInstallerService));
+                serviceManager.AddServiceProvider(typeof(AdoTrimService));
 
                 if (jobManager.GetJobInstance(OptimizeDatabaseJob.ID) == null)
                 {
