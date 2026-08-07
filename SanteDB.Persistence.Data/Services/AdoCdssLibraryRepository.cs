@@ -514,7 +514,6 @@ namespace SanteDB.Persistence.Data.Services
             foreach (var itm in context.Query<DbCdssLibraryVersion>(o => o.IsHeadVersion && o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff).ToArray())
             {
                 context.Delete(itm);
-                context.DeleteAll<DbCdssLibrary>(o => o.Key == itm.Key);
                 auditBuilder.WithAuditableObjects(new AuditableObject()
                 {
                     IDTypeCode = AuditableObjectIdType.ReportName,
