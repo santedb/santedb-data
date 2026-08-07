@@ -191,7 +191,7 @@ namespace SanteDB.Persistence.Data.Services
                 context.DeleteAll<DbSubstanceAdministration>(o => purgeKeys.Contains(o.ParentKey));
                 context.DeleteAll<DbCarePlan>(o => purgeKeys.Contains(o.ParentKey));
                 context.DeleteAll<DbControlAct>(o => purgeKeys.Contains(o.ParentKey));
-                context.DeleteAll<DbPatientEn>(o => purgeKeys.Contains(o.ParentKey));
+                context.DeleteAll<DbPatientEncounter>(o => purgeKeys.Contains(o.ParentKey));
                 context.DeleteAll<DbActVersion>(o => purgeKeys.Contains(o.VersionKey));
 
                 auditBuilder.WithAuditableObjects(new AuditableObject()
