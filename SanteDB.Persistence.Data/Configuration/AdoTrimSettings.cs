@@ -30,6 +30,7 @@ namespace SanteDB.Persistence.Data.Configuration
     [XmlType(nameof(AdoTrimSettings), Namespace = "http://santedb.org/configuration")]
     public class AdoTrimSettings
     {
+        
         /// <summary>
         /// Gets or sets the maximum session retention policy
         /// </summary>
