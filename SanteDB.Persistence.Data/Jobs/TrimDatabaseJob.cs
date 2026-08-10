@@ -135,10 +135,10 @@ namespace SanteDB.Persistence.Data.Jobs
                     var cutoff = parameters.Length == 0 ? DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxSessionRetention.Value) :
                         DateTime.Parse(parameters[0].ToString());
 
-                    this.m_tracer.TraceInfo("Pruning sessions before {0}", cutoff);
                     using (var tx = context.BeginTransaction())
                     {
                         var delSessions = context.Query<DbSession>(o => o.NotAfter < cutoff).Select(o => o.Key).ToArray();
+                        this.m_tracer.TraceInfo("Pruning {0} sessions before {1}...", delSessions.LongLength, cutoff);
                         // HACK: The IN() statement can only have a certain number of elements so we want to chunk our delete 
                         var c = 0;
                         while (c < delSessions.Length)

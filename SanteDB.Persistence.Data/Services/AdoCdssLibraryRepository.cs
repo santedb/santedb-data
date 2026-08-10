@@ -534,7 +534,8 @@ namespace SanteDB.Persistence.Data.Services
             // Trim out old versions of BI definitions & prune any deleted 
             var purgeKeys = context.Query<DbCdssLibraryVersion>(o => o.ObsoletionTime != null && o.ObsoletionTime < oldVersionCutoff && !o.IsHeadVersion).Select(o => o.VersionKey).ToArray();
             context.UpdateAll<DbCdssLibraryVersion>(o => purgeKeys.Contains(o.ReplacesVersionKey.Value), o => o.ReplacesVersionKey == null);
-            context.DeleteAll<DbCdssLibraryVersion>(o => purgeKeys.Contains(o.VersionKey));
+            var nrec = context.DeleteAll<DbCdssLibraryVersion>(o => purgeKeys.Contains(o.VersionKey));
+            this.m_tracer.TraceInfo("Pruned {0} old CDSS library versions", nrec);
         }
 
     }
