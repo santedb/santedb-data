@@ -9,8 +9,7 @@
 //------------------------------------------------------------------------------
 
 namespace SanteDB.Persistence.Data.ModelMap
-{
-    
+{ 
     
     /// <summary>Transforms between model class SanteDB.Core.Model.DataTypes.RelationshipValidationRule, SanteDB.Core.Model and persistence class SanteDB.Persistence.Data.Model.Sys.DbRelationshipValidationRule, SanteDB.Persistence.Data</summary>
     public sealed class RelationshipValidationRuleToDbRelationshipValidationRuleModelMapper : SanteDB.Core.Model.Map.Builder.IModelMapper, SanteDB.Core.Model.Map.Builder.IModelMapper<SanteDB.Core.Model.DataTypes.RelationshipValidationRule, SanteDB.Persistence.Data.Model.Sys.DbRelationshipValidationRule> {
@@ -1684,10 +1683,10 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.SourceEntityKey.HasValue) {
                 retVal.SourceKey = instance.SourceEntityKey.Value;
             }
-            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
+            retVal.GrantType = ((int)(instance.GrantType));
             if (instance.PolicyKey.HasValue) {
                 retVal.PolicyKey = instance.PolicyKey.Value;
             }
@@ -1701,8 +1700,8 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             SanteDB.Core.Model.Security.SecurityPolicyInstance retVal = new SanteDB.Core.Model.Security.SecurityPolicyInstance();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.Key = instance.Key;
+            retVal.GrantType = ((SanteDB.Core.Model.Security.PolicyGrantType)(instance.GrantType));
             retVal.PolicyKey = instance.PolicyKey;
             return retVal;
         }
@@ -1777,6 +1776,9 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
+            if (instance.ClassConceptKey.HasValue) {
+                retVal.ClassConceptKey = instance.ClassConceptKey.Value;
+            }
             if (instance.CreatedByKey.HasValue) {
                 retVal.CreatedByKey = instance.CreatedByKey.Value;
             }
@@ -1796,17 +1798,20 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Security.SecurityPolicy);
             }
             SanteDB.Core.Model.Security.SecurityPolicy retVal = new SanteDB.Core.Model.Security.SecurityPolicy();
+            retVal.CreationTime = instance.CreationTime;
+            retVal.Key = instance.Key;
             retVal.Handler = instance.Handler;
             retVal.Name = instance.Name;
             retVal.IsPublic = instance.IsPublic;
             retVal.CanOverride = instance.CanOverride;
             retVal.Oid = instance.Oid;
-            retVal.Key = instance.Key;
+            if (instance.ClassConceptKey.HasValue) {
+                retVal.ClassConceptKey = instance.ClassConceptKey.Value;
+            }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -1907,16 +1912,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.ConceptSet);
             }
             SanteDB.Core.Model.DataTypes.ConceptSet retVal = new SanteDB.Core.Model.DataTypes.ConceptSet();
+            if (instance.UpdatedTime.HasValue) {
+                retVal.UpdatedTime = instance.UpdatedTime.Value;
+            }
+            retVal.Key = instance.Key;
             retVal.Name = instance.Name;
             retVal.Mnemonic = instance.Mnemonic;
             retVal.Oid = instance.Oid;
             retVal.Url = instance.Url;
-            retVal.Key = instance.Key;
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
-            }
-            if (instance.UpdatedTime.HasValue) {
-                retVal.UpdatedTime = instance.UpdatedTime.Value;
             }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
@@ -2118,23 +2123,23 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.Concept);
             }
             SanteDB.Core.Model.DataTypes.Concept retVal = new SanteDB.Core.Model.DataTypes.Concept();
-            retVal.Mnemonic = instance.Mnemonic;
-            retVal.StatusConceptKey = instance.StatusConceptKey;
-            retVal.ClassKey = instance.ClassKey;
-            retVal.VersionKey = instance.VersionKey;
-            retVal.Key = instance.Key;
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
             if (instance.ReplacesVersionKey.HasValue) {
                 retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
+            retVal.Mnemonic = instance.Mnemonic;
+            retVal.StatusConceptKey = instance.StatusConceptKey;
+            retVal.ClassKey = instance.ClassKey;
+            retVal.Key = instance.Key;
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -2233,14 +2238,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.ConceptClass);
             }
             SanteDB.Core.Model.DataTypes.ConceptClass retVal = new SanteDB.Core.Model.DataTypes.ConceptClass();
-            retVal.Name = instance.Name;
-            retVal.Mnemonic = instance.Mnemonic;
-            retVal.Key = instance.Key;
-            if (instance.UpdatedByKey.HasValue) {
-                retVal.UpdatedByKey = instance.UpdatedByKey.Value;
-            }
             if (instance.UpdatedTime.HasValue) {
                 retVal.UpdatedTime = instance.UpdatedTime.Value;
+            }
+            retVal.Key = instance.Key;
+            retVal.Name = instance.Name;
+            retVal.Mnemonic = instance.Mnemonic;
+            if (instance.UpdatedByKey.HasValue) {
+                retVal.UpdatedByKey = instance.UpdatedByKey.Value;
             }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
@@ -2349,6 +2354,9 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.CodeSystem);
             }
             SanteDB.Core.Model.DataTypes.CodeSystem retVal = new SanteDB.Core.Model.DataTypes.CodeSystem();
+            if (instance.UpdatedTime.HasValue) {
+                retVal.UpdatedTime = instance.UpdatedTime.Value;
+            }
             retVal.Key = instance.Key;
             retVal.Name = instance.Name;
             retVal.Oid = instance.Oid;
@@ -2358,9 +2366,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             retVal.Description = instance.Description;
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
-            }
-            if (instance.UpdatedTime.HasValue) {
-                retVal.UpdatedTime = instance.UpdatedTime.Value;
             }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
@@ -2465,9 +2470,9 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.ConceptRelationshipType);
             }
             SanteDB.Core.Model.DataTypes.ConceptRelationshipType retVal = new SanteDB.Core.Model.DataTypes.ConceptRelationshipType();
+            retVal.Key = instance.Key;
             retVal.Name = instance.Name;
             retVal.Mnemonic = instance.Mnemonic;
-            retVal.Key = instance.Key;
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
             }
@@ -2574,10 +2579,10 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.ConceptRelationship);
             }
             SanteDB.Core.Model.DataTypes.ConceptRelationship retVal = new SanteDB.Core.Model.DataTypes.ConceptRelationship();
-            retVal.Key = instance.Key;
-            retVal.RelationshipTypeKey = instance.RelationshipTypeKey;
             retVal.SourceEntityKey = instance.SourceKey;
             retVal.TargetConceptKey = instance.TargetKey;
+            retVal.Key = instance.Key;
+            retVal.RelationshipTypeKey = instance.RelationshipTypeKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -2679,14 +2684,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.ReferenceTerm);
             }
             SanteDB.Core.Model.DataTypes.ReferenceTerm retVal = new SanteDB.Core.Model.DataTypes.ReferenceTerm();
+            if (instance.UpdatedTime.HasValue) {
+                retVal.UpdatedTime = instance.UpdatedTime.Value;
+            }
             retVal.Key = instance.Key;
             retVal.CodeSystemKey = instance.CodeSystemKey;
             retVal.Mnemonic = instance.Mnemonic;
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
-            }
-            if (instance.UpdatedTime.HasValue) {
-                retVal.UpdatedTime = instance.UpdatedTime.Value;
             }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
@@ -2788,8 +2793,10 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.ReferenceTermName);
             }
             SanteDB.Core.Model.DataTypes.ReferenceTermName retVal = new SanteDB.Core.Model.DataTypes.ReferenceTermName();
-            retVal.Key = instance.Key;
             retVal.SourceEntityKey = instance.SourceKey;
+            retVal.Language = instance.LanguageCode;
+            retVal.Name = instance.Value;
+            retVal.Key = instance.Key;
             retVal.CreatedByKey = instance.CreatedByKey;
             retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletedByKey.HasValue) {
@@ -2798,8 +2805,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
-            retVal.Language = instance.LanguageCode;
-            retVal.Name = instance.Value;
             return retVal;
         }
     }
@@ -2892,10 +2897,10 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.ConceptReferenceTerm);
             }
             SanteDB.Core.Model.DataTypes.ConceptReferenceTerm retVal = new SanteDB.Core.Model.DataTypes.ConceptReferenceTerm();
-            retVal.Key = instance.Key;
-            retVal.ReferenceTermKey = instance.TargetKey;
-            retVal.RelationshipTypeKey = instance.RelationshipTypeKey;
             retVal.SourceEntityKey = instance.SourceKey;
+            retVal.ReferenceTermKey = instance.TargetKey;
+            retVal.Key = instance.Key;
+            retVal.RelationshipTypeKey = instance.RelationshipTypeKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -2988,10 +2993,10 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.ConceptName);
             }
             SanteDB.Core.Model.DataTypes.ConceptName retVal = new SanteDB.Core.Model.DataTypes.ConceptName();
+            retVal.SourceEntityKey = instance.SourceKey;
+            retVal.Key = instance.Key;
             retVal.Language = instance.Language;
             retVal.Name = instance.Name;
-            retVal.Key = instance.Key;
-            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -3114,6 +3119,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.Entity);
             }
             SanteDB.Core.Model.Entities.Entity retVal = new SanteDB.Core.Model.Entities.Entity();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -3124,25 +3137,17 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -3236,10 +3241,10 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.EntityName);
             }
             SanteDB.Core.Model.Entities.EntityName retVal = new SanteDB.Core.Model.Entities.EntityName();
-            retVal.Key = instance.Key;
             retVal.NameUseKey = instance.UseConceptKey;
-            retVal.ExternalKey = instance.ExternalKey;
             retVal.SourceEntityKey = instance.SourceKey;
+            retVal.Key = instance.Key;
+            retVal.ExternalKey = instance.ExternalKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -3330,8 +3335,8 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             SanteDB.Core.Model.Entities.EntityNameComponent retVal = new SanteDB.Core.Model.Entities.EntityNameComponent();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Value = instance.Value;
             retVal.Key = instance.Key;
+            retVal.Value = instance.Value;
             if (instance.ComponentTypeKey.HasValue) {
                 retVal.ComponentTypeKey = instance.ComponentTypeKey.Value;
             }
@@ -3426,10 +3431,10 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.EntityAddress);
             }
             SanteDB.Core.Model.Entities.EntityAddress retVal = new SanteDB.Core.Model.Entities.EntityAddress();
-            retVal.Key = instance.Key;
             retVal.AddressUseKey = instance.UseConceptKey;
-            retVal.ExternalKey = instance.ExternalKey;
             retVal.SourceEntityKey = instance.SourceKey;
+            retVal.Key = instance.Key;
+            retVal.ExternalKey = instance.ExternalKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -3520,8 +3525,8 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             SanteDB.Core.Model.Entities.EntityAddressComponent retVal = new SanteDB.Core.Model.Entities.EntityAddressComponent();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Value = instance.Value;
             retVal.Key = instance.Key;
+            retVal.Value = instance.Value;
             if (instance.ComponentTypeKey.HasValue) {
                 retVal.ComponentTypeKey = instance.ComponentTypeKey.Value;
             }
@@ -3634,13 +3639,13 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.EntityRelationship);
             }
             SanteDB.Core.Model.Entities.EntityRelationship retVal = new SanteDB.Core.Model.Entities.EntityRelationship();
+            retVal.SourceEntityKey = instance.SourceKey;
+            retVal.TargetEntityKey = instance.TargetKey;
+            retVal.Key = instance.Key;
             retVal.RelationshipTypeKey = instance.RelationshipTypeKey;
             if (instance.Quantity.HasValue) {
                 retVal.Quantity = instance.Quantity.Value;
             }
-            retVal.SourceEntityKey = instance.SourceKey;
-            retVal.TargetEntityKey = instance.TargetKey;
-            retVal.Key = instance.Key;
             if (instance.ClassificationKey.HasValue) {
                 retVal.ClassificationKey = instance.ClassificationKey.Value;
             }
@@ -3757,12 +3762,12 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.EntityIdentifier);
             }
             SanteDB.Core.Model.DataTypes.EntityIdentifier retVal = new SanteDB.Core.Model.DataTypes.EntityIdentifier();
-            retVal.Key = instance.Key;
-            retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Value = instance.Value;
             if (instance.TypeKey.HasValue) {
                 retVal.IdentifierTypeKey = instance.TypeKey.Value;
             }
+            retVal.SourceEntityKey = instance.SourceKey;
+            retVal.Key = instance.Key;
+            retVal.Value = instance.Value;
             retVal.IdentityDomainKey = instance.IdentityDomainKey;
             if (instance.IssueDate.HasValue) {
                 retVal.IssueDate = ((System.DateTimeOffset)(instance.IssueDate.Value));
@@ -3970,6 +3975,10 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.IdentityDomain);
             }
             SanteDB.Core.Model.DataTypes.IdentityDomain retVal = new SanteDB.Core.Model.DataTypes.IdentityDomain();
+            if (instance.UpdatedTime.HasValue) {
+                retVal.UpdatedTime = instance.UpdatedTime.Value;
+            }
+            retVal.Key = instance.Key;
             retVal.Name = instance.Name;
             retVal.DomainName = instance.DomainName;
             retVal.Oid = instance.Oid;
@@ -3981,16 +3990,12 @@ namespace SanteDB.Persistence.Data.ModelMap
             retVal.ValidationRegex = instance.ValidationRegex;
             retVal.CustomValidator = instance.CustomValidator;
             retVal.CheckDigitAlgorithm = instance.CheckDigitAlgorithm;
-            retVal.Key = instance.Key;
             retVal.IsUnique = instance.IsUnique;
             if (instance.IdentifierClassificationKey.HasValue) {
                 retVal.IdentifierClassificationKey = instance.IdentifierClassificationKey.Value;
             }
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
-            }
-            if (instance.UpdatedTime.HasValue) {
-                retVal.UpdatedTime = instance.UpdatedTime.Value;
             }
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
@@ -4094,15 +4099,15 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.AssigningAuthority);
             }
             SanteDB.Core.Model.DataTypes.AssigningAuthority retVal = new SanteDB.Core.Model.DataTypes.AssigningAuthority();
-            retVal.Key = instance.Key;
+            retVal.CreationTime = instance.CreationTime;
             retVal.SourceEntityKey = instance.SourceKey;
+            retVal.Key = instance.Key;
             retVal.AssigningApplicationKey = instance.AssigningApplicationKey;
             retVal.Reliability = instance.Reliability;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -4200,14 +4205,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.EntityTelecomAddress);
             }
             SanteDB.Core.Model.Entities.EntityTelecomAddress retVal = new SanteDB.Core.Model.Entities.EntityTelecomAddress();
-            retVal.Key = instance.Key;
             retVal.AddressUseKey = instance.TelecomUseKey;
+            retVal.SourceEntityKey = instance.SourceKey;
+            retVal.Key = instance.Key;
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
             retVal.Value = instance.Value;
             retVal.ExternalKey = instance.ExternalKey;
-            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -4302,10 +4307,10 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.EntityExtension);
             }
             SanteDB.Core.Model.DataTypes.EntityExtension retVal = new SanteDB.Core.Model.DataTypes.EntityExtension();
-            retVal.Key = instance.Key;
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.ExtensionTypeKey = instance.ExtensionTypeKey;
             retVal.ExtensionValueData = instance.Value;
+            retVal.Key = instance.Key;
+            retVal.ExtensionTypeKey = instance.ExtensionTypeKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -4401,8 +4406,8 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             SanteDB.Core.Model.DataTypes.EntityNote retVal = new SanteDB.Core.Model.DataTypes.EntityNote();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Text = instance.Text;
             retVal.Key = instance.Key;
+            retVal.Text = instance.Text;
             retVal.AuthorKey = instance.AuthorKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
@@ -4608,10 +4613,11 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.ExtensionType);
             }
             SanteDB.Core.Model.DataTypes.ExtensionType retVal = new SanteDB.Core.Model.DataTypes.ExtensionType();
+            retVal.CreationTime = instance.CreationTime;
+            retVal.Key = instance.Key;
             retVal.Name = instance.Name;
             retVal.Uri = instance.Uri;
             retVal.ExtensionHandler = System.Type.GetType(instance.ExtensionHandler);
-            retVal.Key = instance.Key;
             if (instance.UpdatedByKey.HasValue) {
                 retVal.UpdatedByKey = instance.UpdatedByKey.Value;
             }
@@ -4622,7 +4628,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -4706,10 +4711,10 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.NonPersonLivingSubject);
             }
             SanteDB.Core.Model.Entities.NonPersonLivingSubject retVal = new SanteDB.Core.Model.Entities.NonPersonLivingSubject();
+            retVal.VersionKey = instance.ParentKey;
             if (instance.StrainKey.HasValue) {
                 retVal.StrainKey = instance.StrainKey.Value;
             }
-            retVal.VersionKey = instance.ParentKey;
             return retVal;
         }
         
@@ -4719,6 +4724,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -4737,20 +4752,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -4759,7 +4765,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -4772,6 +4777,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.NonPersonLivingSubject);
             }
             SanteDB.Core.Model.Entities.NonPersonLivingSubject retVal = new SanteDB.Core.Model.Entities.NonPersonLivingSubject();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -4782,25 +4795,17 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -5069,6 +5074,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -5087,20 +5102,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -5109,7 +5115,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -5122,6 +5127,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.Person);
             }
             SanteDB.Core.Model.Entities.Person retVal = new SanteDB.Core.Model.Entities.Person();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -5132,25 +5145,17 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -5261,6 +5266,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -5279,20 +5294,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -5301,7 +5307,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -5314,6 +5319,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.Container);
             }
             SanteDB.Core.Model.Entities.Container retVal = new SanteDB.Core.Model.Entities.Container();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -5324,25 +5337,17 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -5477,11 +5482,11 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.PersonLanguageCommunication);
             }
             SanteDB.Core.Model.Entities.PersonLanguageCommunication retVal = new SanteDB.Core.Model.Entities.PersonLanguageCommunication();
+            retVal.SourceEntityKey = instance.SourceKey;
+            retVal.Key = instance.Key;
             retVal.LanguageCode = instance.LanguageCode;
             retVal.IsPreferred = instance.IsPreferred;
-            retVal.Key = instance.Key;
             retVal.ExternalKey = instance.ExternalKey;
-            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -5649,6 +5654,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.Narrative);
             }
             SanteDB.Core.Model.Acts.Narrative retVal = new SanteDB.Core.Model.Acts.Narrative();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -5672,23 +5685,15 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -5809,6 +5814,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -5827,20 +5842,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -5849,7 +5855,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -5862,6 +5867,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Roles.Patient);
             }
             SanteDB.Core.Model.Roles.Patient retVal = new SanteDB.Core.Model.Roles.Patient();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -5872,25 +5885,17 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -6201,6 +6206,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -6219,20 +6234,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -6241,7 +6247,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -6254,6 +6259,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.Material);
             }
             SanteDB.Core.Model.Entities.Material retVal = new SanteDB.Core.Model.Entities.Material();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -6264,25 +6277,17 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -6375,6 +6380,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -6393,20 +6408,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -6415,7 +6421,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -6428,6 +6433,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.ManufacturedMaterial);
             }
             SanteDB.Core.Model.Entities.ManufacturedMaterial retVal = new SanteDB.Core.Model.Entities.ManufacturedMaterial();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -6438,25 +6451,17 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -6593,6 +6598,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -6611,20 +6626,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -6633,7 +6639,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -6646,6 +6651,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Roles.Provider);
             }
             SanteDB.Core.Model.Roles.Provider retVal = new SanteDB.Core.Model.Roles.Provider();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -6656,25 +6669,17 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -6958,8 +6963,8 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.Organization);
             }
             SanteDB.Core.Model.Entities.Organization retVal = new SanteDB.Core.Model.Entities.Organization();
-            retVal.IndustryConceptKey = instance.IndustryConceptKey;
             retVal.VersionKey = instance.ParentKey;
+            retVal.IndustryConceptKey = instance.IndustryConceptKey;
             return retVal;
         }
         
@@ -6969,6 +6974,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -6987,20 +7002,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -7009,7 +7015,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -7022,6 +7027,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.Organization);
             }
             SanteDB.Core.Model.Entities.Organization retVal = new SanteDB.Core.Model.Entities.Organization();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -7032,25 +7045,17 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -7143,6 +7148,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -7161,20 +7176,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -7183,7 +7189,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -7196,6 +7201,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.Place);
             }
             SanteDB.Core.Model.Entities.Place retVal = new SanteDB.Core.Model.Entities.Place();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -7206,25 +7219,17 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -7319,11 +7324,11 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.PlaceService);
             }
             SanteDB.Core.Model.Entities.PlaceService retVal = new SanteDB.Core.Model.Entities.PlaceService();
+            retVal.SourceEntityKey = instance.SourceKey;
+            retVal.Key = instance.Key;
             retVal.ServiceSchedule = instance.ServiceSchedule;
             retVal.ServiceConceptKey = instance.ServiceConceptKey;
-            retVal.Key = instance.Key;
             retVal.ExternalKey = instance.ExternalKey;
-            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -7411,11 +7416,11 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.ApplicationEntity);
             }
             SanteDB.Core.Model.Entities.ApplicationEntity retVal = new SanteDB.Core.Model.Entities.ApplicationEntity();
+            retVal.VersionKey = instance.ParentKey;
             retVal.SecurityApplicationKey = instance.SecurityApplicationKey;
             retVal.SoftwareName = instance.SoftwareName;
             retVal.VersionName = instance.VersionName;
             retVal.VendorName = instance.VendorName;
-            retVal.VersionKey = instance.ParentKey;
             return retVal;
         }
         
@@ -7425,6 +7430,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -7443,20 +7458,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -7465,7 +7471,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -7478,6 +7483,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.ApplicationEntity);
             }
             SanteDB.Core.Model.Entities.ApplicationEntity retVal = new SanteDB.Core.Model.Entities.ApplicationEntity();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -7488,25 +7501,17 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -7592,10 +7597,12 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.DeviceEntity);
             }
             SanteDB.Core.Model.Entities.DeviceEntity retVal = new SanteDB.Core.Model.Entities.DeviceEntity();
-            retVal.SecurityDeviceKey = instance.SecurityDeviceKey;
+            retVal.VersionKey = instance.ParentKey;
+            if (instance.SecurityDeviceKey.HasValue) {
+                retVal.SecurityDeviceKey = instance.SecurityDeviceKey.Value;
+            }
             retVal.ManufacturerModelName = instance.ManufacturerModelName;
             retVal.OperatingSystemName = instance.OperatingSystemName;
-            retVal.VersionKey = instance.ParentKey;
             return retVal;
         }
         
@@ -7605,6 +7612,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -7623,20 +7640,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -7645,7 +7653,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -7658,6 +7665,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.DeviceEntity);
             }
             SanteDB.Core.Model.Entities.DeviceEntity retVal = new SanteDB.Core.Model.Entities.DeviceEntity();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -7668,25 +7683,17 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -7783,6 +7790,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Entities.DbEntityVersion);
             }
             SanteDB.Persistence.Data.Model.Entities.DbEntityVersion retVal = new SanteDB.Persistence.Data.Model.Entities.DbEntityVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
@@ -7801,20 +7818,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -7823,7 +7831,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -7836,6 +7843,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Entities.UserEntity);
             }
             SanteDB.Core.Model.Entities.UserEntity retVal = new SanteDB.Core.Model.Entities.UserEntity();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
@@ -7846,25 +7861,17 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            retVal.VersionKey = instance.VersionKey;
             if (instance.CreationActKey.HasValue) {
                 retVal.CreationActKey = instance.CreationActKey.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
             }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
-            }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -8133,6 +8140,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -8164,20 +8181,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -8186,7 +8194,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -8199,6 +8206,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.Act);
             }
             SanteDB.Core.Model.Acts.Act retVal = new SanteDB.Core.Model.Acts.Act();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -8222,23 +8237,15 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -8333,6 +8340,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -8364,20 +8381,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -8386,7 +8394,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -8399,6 +8406,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.CarePlan);
             }
             SanteDB.Core.Model.Acts.CarePlan retVal = new SanteDB.Core.Model.Acts.CarePlan();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -8422,23 +8437,15 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -8656,10 +8663,10 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.ActExtension);
             }
             SanteDB.Core.Model.DataTypes.ActExtension retVal = new SanteDB.Core.Model.DataTypes.ActExtension();
-            retVal.Key = instance.Key;
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.ExtensionTypeKey = instance.ExtensionTypeKey;
             retVal.ExtensionValueData = instance.Value;
+            retVal.Key = instance.Key;
+            retVal.ExtensionTypeKey = instance.ExtensionTypeKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -8755,8 +8762,8 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             SanteDB.Core.Model.DataTypes.ActNote retVal = new SanteDB.Core.Model.DataTypes.ActNote();
             retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Text = instance.Text;
             retVal.Key = instance.Key;
+            retVal.Text = instance.Text;
             retVal.AuthorKey = instance.AuthorKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
@@ -8970,8 +8977,8 @@ namespace SanteDB.Persistence.Data.ModelMap
             SanteDB.Core.Model.Acts.ActRelationship retVal = new SanteDB.Core.Model.Acts.ActRelationship();
             retVal.SourceEntityKey = instance.SourceKey;
             retVal.TargetActKey = instance.TargetKey;
-            retVal.RelationshipTypeKey = instance.RelationshipTypeKey;
             retVal.Key = instance.Key;
+            retVal.RelationshipTypeKey = instance.RelationshipTypeKey;
             if (instance.ClassificationKey.HasValue) {
                 retVal.ClassificationKey = instance.ClassificationKey.Value;
             }
@@ -9085,12 +9092,12 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.DataTypes.ActIdentifier);
             }
             SanteDB.Core.Model.DataTypes.ActIdentifier retVal = new SanteDB.Core.Model.DataTypes.ActIdentifier();
-            retVal.Key = instance.Key;
-            retVal.SourceEntityKey = instance.SourceKey;
-            retVal.Value = instance.Value;
             if (instance.TypeKey.HasValue) {
                 retVal.IdentifierTypeKey = instance.TypeKey.Value;
             }
+            retVal.SourceEntityKey = instance.SourceKey;
+            retVal.Key = instance.Key;
+            retVal.Value = instance.Value;
             retVal.IdentityDomainKey = instance.IdentityDomainKey;
             if (instance.IssueDate.HasValue) {
                 retVal.IssueDate = ((System.DateTimeOffset)(instance.IssueDate.Value));
@@ -9203,17 +9210,17 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.ActParticipation);
             }
             SanteDB.Core.Model.Acts.ActParticipation retVal = new SanteDB.Core.Model.Acts.ActParticipation();
+            retVal.PlayerEntityKey = instance.TargetKey;
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.Key = instance.Key;
             retVal.ParticipationRoleKey = instance.ParticipationRoleKey;
             if (instance.Quantity.HasValue) {
                 retVal.Quantity = instance.Quantity.Value;
             }
-            retVal.PlayerEntityKey = instance.TargetKey;
             if (instance.ClassificationKey.HasValue) {
                 retVal.ClassificationKey = instance.ClassificationKey.Value;
             }
             retVal.ExternalKey = instance.ExternalKey;
-            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -9308,10 +9315,10 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.SubstanceAdministration);
             }
             SanteDB.Core.Model.Acts.SubstanceAdministration retVal = new SanteDB.Core.Model.Acts.SubstanceAdministration();
-            retVal.VersionKey = instance.ParentKey;
             retVal.RouteKey = instance.RouteConceptKey;
-            retVal.DoseUnitKey = instance.DoseUnitConceptKey;
             retVal.SiteKey = instance.SiteConceptKey;
+            retVal.DoseUnitKey = instance.DoseUnitConceptKey;
+            retVal.VersionKey = instance.ParentKey;
             if (instance.DoseQuantity.HasValue) {
                 retVal.DoseQuantity = instance.DoseQuantity.Value;
             }
@@ -9327,6 +9334,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -9358,20 +9375,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -9380,7 +9388,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -9393,6 +9400,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.SubstanceAdministration);
             }
             SanteDB.Core.Model.Acts.SubstanceAdministration retVal = new SanteDB.Core.Model.Acts.SubstanceAdministration();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -9416,23 +9431,15 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -9522,7 +9529,6 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.Procedure);
             }
             SanteDB.Core.Model.Acts.Procedure retVal = new SanteDB.Core.Model.Acts.Procedure();
-            retVal.VersionKey = instance.ParentKey;
             if (instance.MethodConceptKey.HasValue) {
                 retVal.MethodKey = instance.MethodConceptKey.Value;
             }
@@ -9532,6 +9538,7 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TargetSiteConceptKey.HasValue) {
                 retVal.TargetSiteKey = instance.TargetSiteConceptKey.Value;
             }
+            retVal.VersionKey = instance.ParentKey;
             return retVal;
         }
         
@@ -9541,6 +9548,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -9572,20 +9589,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -9594,7 +9602,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -9607,6 +9614,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.Procedure);
             }
             SanteDB.Core.Model.Acts.Procedure retVal = new SanteDB.Core.Model.Acts.Procedure();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -9630,23 +9645,15 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -9745,6 +9752,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -9776,20 +9793,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -9798,7 +9806,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -9811,6 +9818,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.PatientEncounter);
             }
             SanteDB.Core.Model.Acts.PatientEncounter retVal = new SanteDB.Core.Model.Acts.PatientEncounter();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -9834,23 +9849,15 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -9949,6 +9956,7 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.PatientEncounterArrangement);
             }
             SanteDB.Core.Model.Acts.PatientEncounterArrangement retVal = new SanteDB.Core.Model.Acts.PatientEncounterArrangement();
+            retVal.SourceEntityKey = instance.SourceKey;
             retVal.Key = instance.Key;
             retVal.ArrangementTypeKey = instance.ArrangementTypeKey;
             if (instance.StartTime.HasValue) {
@@ -9957,7 +9965,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.StopTime.HasValue) {
                 retVal.StopTime = instance.StopTime.Value;
             }
-            retVal.SourceEntityKey = instance.SourceKey;
             retVal.EffectiveVersionSequenceId = instance.EffectiveVersionSequenceId;
             if (instance.ObsoleteVersionSequenceId.HasValue) {
                 retVal.ObsoleteVersionSequenceId = instance.ObsoleteVersionSequenceId.Value;
@@ -10055,6 +10062,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -10086,20 +10103,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -10108,7 +10116,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -10121,6 +10128,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.Observation);
             }
             SanteDB.Core.Model.Acts.Observation retVal = new SanteDB.Core.Model.Acts.Observation();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -10144,23 +10159,15 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -10247,9 +10254,9 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.QuantityObservation);
             }
             SanteDB.Core.Model.Acts.QuantityObservation retVal = new SanteDB.Core.Model.Acts.QuantityObservation();
+            retVal.VersionKey = instance.ParentKey;
             retVal.UnitOfMeasureKey = instance.UnitOfMeasureKey;
             retVal.Value = instance.Value;
-            retVal.VersionKey = instance.ParentKey;
             return retVal;
         }
         
@@ -10259,6 +10266,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -10290,20 +10307,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -10312,7 +10320,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -10325,6 +10332,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.QuantityObservation);
             }
             SanteDB.Core.Model.Acts.QuantityObservation retVal = new SanteDB.Core.Model.Acts.QuantityObservation();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -10348,23 +10363,15 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -10555,6 +10562,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -10586,20 +10603,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -10608,7 +10616,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -10621,6 +10628,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.DateObservation);
             }
             SanteDB.Core.Model.Acts.DateObservation retVal = new SanteDB.Core.Model.Acts.DateObservation();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -10644,23 +10659,15 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -10783,6 +10790,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -10814,20 +10831,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -10836,7 +10844,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -10849,6 +10856,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.CodedObservation);
             }
             SanteDB.Core.Model.Acts.CodedObservation retVal = new SanteDB.Core.Model.Acts.CodedObservation();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -10872,23 +10887,15 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -11009,6 +11016,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -11040,20 +11057,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -11062,7 +11070,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -11075,6 +11082,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.TextObservation);
             }
             SanteDB.Core.Model.Acts.TextObservation retVal = new SanteDB.Core.Model.Acts.TextObservation();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -11098,23 +11113,15 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -11445,6 +11452,16 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Persistence.Data.Model.Acts.DbActVersion);
             }
             SanteDB.Persistence.Data.Model.Acts.DbActVersion retVal = new SanteDB.Persistence.Data.Model.Acts.DbActVersion();
+            if (instance.PreviousVersionKey.HasValue) {
+                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
+            }
+            if (instance.VersionSequence.HasValue) {
+                retVal.VersionSequenceId = instance.VersionSequence.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            if (instance.VersionKey.HasValue) {
+                retVal.VersionKey = instance.VersionKey.Value;
+            }
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -11476,20 +11493,11 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.TypeConceptKey.HasValue) {
                 retVal.TypeConceptKey = instance.TypeConceptKey.Value;
             }
-            if (instance.VersionKey.HasValue) {
-                retVal.VersionKey = instance.VersionKey.Value;
-            }
             if (instance.Key.HasValue) {
                 retVal.Key = instance.Key.Value;
             }
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequence.HasValue) {
-                retVal.VersionSequenceId = instance.VersionSequence.Value;
-            }
-            if (instance.PreviousVersionKey.HasValue) {
-                retVal.ReplacesVersionKey = instance.PreviousVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             if (instance.CreatedByKey.HasValue) {
@@ -11498,7 +11506,6 @@ namespace SanteDB.Persistence.Data.ModelMap
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
@@ -11511,6 +11518,14 @@ namespace SanteDB.Persistence.Data.ModelMap
                 return default(SanteDB.Core.Model.Acts.ControlAct);
             }
             SanteDB.Core.Model.Acts.ControlAct retVal = new SanteDB.Core.Model.Acts.ControlAct();
+            if (instance.ReplacesVersionKey.HasValue) {
+                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
+            }
+            if (instance.VersionSequenceId.HasValue) {
+                retVal.VersionSequence = instance.VersionSequenceId.Value;
+            }
+            retVal.CreationTime = instance.CreationTime;
+            retVal.VersionKey = instance.VersionKey;
             if (instance.TemplateKey.HasValue) {
                 retVal.TemplateKey = instance.TemplateKey.Value;
             }
@@ -11534,23 +11549,15 @@ namespace SanteDB.Persistence.Data.ModelMap
             }
             retVal.StatusConceptKey = instance.StatusConceptKey;
             retVal.TypeConceptKey = instance.TypeConceptKey;
-            retVal.VersionKey = instance.VersionKey;
             retVal.Key = instance.Key;
             if (instance.GeoTagKey.HasValue) {
                 retVal.GeoTagKey = instance.GeoTagKey.Value;
-            }
-            if (instance.VersionSequenceId.HasValue) {
-                retVal.VersionSequence = instance.VersionSequenceId.Value;
-            }
-            if (instance.ReplacesVersionKey.HasValue) {
-                retVal.PreviousVersionKey = instance.ReplacesVersionKey.Value;
             }
             retVal.IsHeadVersion = instance.IsHeadVersion;
             retVal.CreatedByKey = instance.CreatedByKey;
             if (instance.ObsoletedByKey.HasValue) {
                 retVal.ObsoletedByKey = instance.ObsoletedByKey.Value;
             }
-            retVal.CreationTime = instance.CreationTime;
             if (instance.ObsoletionTime.HasValue) {
                 retVal.ObsoletionTime = instance.ObsoletionTime.Value;
             }
