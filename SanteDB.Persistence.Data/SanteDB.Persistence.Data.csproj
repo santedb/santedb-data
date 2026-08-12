@@ -240,6 +240,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Map\CdssModelMap.xml" />
     <EmbeddedResource Include="Map\ModelMap.xml" />
+    <EmbeddedResource Include="SQL\FBSQL\Updates\20260812.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20260324.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20250210.sql" />
     <EmbeddedResource Include="SQL\FBSQL\Updates\20250127.sql" />
