@@ -252,7 +252,7 @@ namespace SanteDB.Persistence.Data.Services
                         this.m_adhocCache?.RemoveAll("pdp.*");
                         this.m_adhocCache?.RemoveAll("pip.*");
 
-                        if(securable is IIdentifiedResource idr)
+                        if (securable is IIdentifiedResource idr)
                         {
                             this.m_dataCache.Remove(idr.Key.GetValueOrDefault());
                         }
@@ -518,10 +518,10 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                         }
 
-                        if(securable is IHasPolicies ihp && ihp.Policies?.Any() == true)
+                        if (securable is IHasPolicies ihp && ihp.Policies?.Any() == true)
                         {
                             results = results.Union(
-                                ihp.Policies.Select(o => new AdoSecurityPolicyInstance(context.FirstOrDefault<DbSecurityPolicy>(p=>p.Key == o.PolicyKey), o.GrantType, securable))
+                                ihp.Policies.Select(o => new AdoSecurityPolicyInstance(context.FirstOrDefault<DbSecurityPolicy>(p => p.Key == o.PolicyKey), o.GrantType, securable))
                             ).ToArray();
                         }
                         // Most-restrictive apply
@@ -814,6 +814,7 @@ namespace SanteDB.Persistence.Data.Services
                             existingPolicy.Name = policy.Name;
                             existingPolicy.Oid = policy.Oid;
                             existingPolicy.CreatedByKey = context.ContextId;
+                            existingPolicy.ClassConceptKey = policy.Classification;
                             existingPolicy = context.Insert(existingPolicy);
                         }
 
@@ -824,6 +825,25 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     this.m_traceSource.TraceError("Error creating policies {0} : {1}", String.Join(",", policies.Select(o => o.Oid)), ex);
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SEC_POL_GEN), ex);
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<IPolicy> GetPoliciesByClassification(Guid classificationKey)
+        {
+            if (classificationKey == null)
+            {
+                throw new ArgumentNullException(nameof(classificationKey), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            {
+                context.Open(initializeExtensions: false);
+
+                foreach (var dbp in context.Query<DbSecurityPolicy>(o => o.ClassConceptKey == classificationKey))
+                {
+                    yield return new AdoSecurityPolicy(dbp);
                 }
             }
         }
