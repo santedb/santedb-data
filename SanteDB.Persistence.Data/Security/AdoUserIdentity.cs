@@ -129,6 +129,7 @@ namespace SanteDB.Persistence.Data.Security
 
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.CdrEntityId, cdrEntityId.ToString()));
 
+            
             if (this.FindFirst(SanteDBClaimTypes.XspaOrganizationIdClaim) == null)
             {
                 var organizationId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.Employee && o.ObsoleteVersionSequenceId == null).Select(o => o.TargetKey);

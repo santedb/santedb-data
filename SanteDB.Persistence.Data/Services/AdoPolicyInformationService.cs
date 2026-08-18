@@ -787,10 +787,7 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             // Find an existing policy which may have been created with a different key
                             var existingPolicy = context.FirstOrDefault<DbSecurityPolicy>(o => o.Oid == policy.Oid);
-                            if (existingPolicy != null && existingPolicy.Key == policy.Key)
-                            {
-                                continue; // ignore existing
-                            }
+                            bool isUpdate = false;
                             if (existingPolicy == null)
                             {
                                 existingPolicy = new DbSecurityPolicy()
@@ -808,6 +805,17 @@ namespace SanteDB.Persistence.Data.Services
                                     Key = policy.Key
                                 };
                             }
+                            else if (existingPolicy.Name != policy.Name ||
+                                existingPolicy.ClassConceptKey != policy.Classification ||
+                                existingPolicy.IsPublic != policy.IsPublic ||
+                                existingPolicy.CanOverride != policy.CanOverride)
+                            {
+                                isUpdate = true;
+                            }
+                            else
+                            {
+                                continue;
+                            }
 
                             existingPolicy.CanOverride = policy.CanOverride;
                             existingPolicy.IsPublic = policy.IsPublic;
@@ -815,7 +823,7 @@ namespace SanteDB.Persistence.Data.Services
                             existingPolicy.Oid = policy.Oid;
                             existingPolicy.CreatedByKey = context.ContextId;
                             existingPolicy.ClassConceptKey = policy.Classification;
-                            existingPolicy = context.Insert(existingPolicy);
+                            existingPolicy = isUpdate ? context.Update(existingPolicy) : context.Insert(existingPolicy);
                         }
 
                         transaction.Commit();
