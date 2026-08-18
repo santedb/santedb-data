@@ -1,13 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(VersionNumber)' == ''">
-    <VersionNumber>3.0-debug</VersionNumber>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net10.0;net48</TargetFrameworks>
+		<LangVersion>14.0</LangVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(VersionNumber)' == ''">
+		<VersionNumber>3.1-debug</VersionNumber>
+	</PropertyGroup>
 
   <Import Project="SanteDB.Core.TestFramework.Sqlite.targets" />
+	
   <PropertyGroup>
     <PackageId>SanteDB.Core.TestFramework.Sqlite</PackageId>
     <Title>SanteDB.Core.TestFramework.Sqlite</Title>
@@ -29,35 +32,37 @@
     <PackageProjectUrl>http://santesuite.org</PackageProjectUrl>
     <AssemblyName>SanteDB.Core.TestFramework.Sqlite</AssemblyName>
   </PropertyGroup>
+	
   <Choose>
-    <When Condition="$(SolutionName.Contains('-ext'))">
-      <ItemGroup>
-        <ProjectReference Include="..\..\santedb-api\SanteDB.Core.TestFramework\SanteDB.Core.TestFramework.csproj" />
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <PackageReference Include="SanteDB.Core.TestFramework" Version="$(VersionNumber)" />
-      </ItemGroup>
+    <When Condition="$(SolutionName.Contains('-nuget'))">
+			<ItemGroup>
+				<PackageReference Include="SanteDB.Core.TestFramework" Version="$(VersionNumber)" />
+			</ItemGroup>
+		</When>
+		<Otherwise>
+			<ItemGroup>
+				<ProjectReference Include="..\..\santedb-api\SanteDB.Core.TestFramework\SanteDB.Core.TestFramework.csproj" />
+			</ItemGroup>
     </Otherwise>
   </Choose>
+	
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="[9.0.0,10)" />
     <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.1.10" />
     <PackageReference Include="SQLiteSpellfix.lib.e_sqlite3mc" Version="2.2.1" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.4.2" />
+		<PackageReference Include="NUnit" Version="[4.5.0,5)" />
+		<PackageReference Include="NUnit3TestAdapter" Version="[6.1.0,7)" />
   </ItemGroup>
+	
   <ItemGroup>
     <None Include="..\..\SanteDB.licenseheader" Link="SanteDB.licenseheader" />
   </ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="SanteDB.Core.TestFramework.Sqlite.targets" Pack="true" PackagePath="build" />
+		<None Include="SanteDB.Core.TestFramework.Sqlite.targets" Pack="true" PackagePath="build" />
 		<None Include="santedb_test.sqlite" Pack="true" PackagePath="build" />
 		<None Include="$(MSBuildThisFileDirectory)\santedb_test.sqlite-shm" Pack="true" PackagePath="build"  Condition="Exists('$(MSBuildThisFileDirectory)\santedb_test.sqlite-shm')" />
 		<None Include="$(MSBuildThisFileDirectory)\santedb_test.sqlite-wal" Pack="true" PackagePath="build"  Condition="Exists('$(MSBuildThisFileDirectory)\santedb_test.sqlite-wal')" />
 	</ItemGroup>
  
-
 </Project>

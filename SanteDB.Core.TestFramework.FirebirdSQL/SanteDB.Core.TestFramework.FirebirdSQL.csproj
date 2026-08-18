@@ -1,13 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(VersionNumber)' == ''">
-    <VersionNumber>3.0-debug</VersionNumber>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net10.0;net48</TargetFrameworks>
+		<LangVersion>14.0</LangVersion>
+    <IsPackable>true</IsPackable>
+	</PropertyGroup>
 
-  <Import Project="SanteDB.Core.TestFramework.FirebirdSQL.targets" />
+	<PropertyGroup Condition="'$(VersionNumber)' == ''">
+		<VersionNumber>3.1-debug</VersionNumber>
+	</PropertyGroup>
+
   <PropertyGroup>
     <PackageId>SanteDB.Core.TestFramework.FirebirdSQL</PackageId>
     <Title>SanteDB.Core.TestFramework</Title>
@@ -29,27 +31,30 @@
     <PackageProjectUrl>http://santesuite.org</PackageProjectUrl>
     <AssemblyName>SanteDB.Core.TestFramework.FirebirdSQL</AssemblyName>
   </PropertyGroup>
+	
   <Choose>
-    <When Condition="$(SolutionName.Contains('-ext'))">
-      <ItemGroup>
-        <ProjectReference Include="..\..\santedb-api\SanteDB.Core.TestFramework\SanteDB.Core.TestFramework.csproj" />
-      </ItemGroup>
+    <When Condition="$(SolutionName.Contains('-nuget'))">
+			<ItemGroup>
+				<PackageReference Include="SanteDB.Core.TestFramework" Version="$(VersionNumber)" />
+			</ItemGroup>
     </When>
     <Otherwise>
-      <ItemGroup>
-        <PackageReference Include="SanteDB.Core.TestFramework" Version="$(VersionNumber)" />
-      </ItemGroup>
+			<ItemGroup>
+				<ProjectReference Include="..\..\santedb-api\SanteDB.Core.TestFramework\SanteDB.Core.TestFramework.csproj" />
+			</ItemGroup>
     </Otherwise>
   </Choose>
+	
   <ItemGroup>
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="9.1.1" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.4.2" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="[9.1.1,10)" />
+		<PackageReference Include="NUnit" Version="[4.5.0,5)" />
+		<PackageReference Include="NUnit3TestAdapter" Version="[6.1.0,7)" />
   </ItemGroup>
+	
   <ItemGroup>
     <EmbeddedResource Include="SanteDB.Core.TestFramework.FirebirdSQL.targets" Pack="true" PackagePath="build" />
     <None Include="..\..\SanteDB.licenseheader" Link="SanteDB.licenseheader" />
-    <None Include="firebird\fbclient.dll" Pack="true" PackagePath="build\firebird" />
+		<!--<None Include="firebird\fbclient.dll" Pack="true" PackagePath="build\firebird" />
     <None Include="firebird\firebird.conf" Pack="true" PackagePath="build\firebird" />
     <None Include="firebird\firebird.msg" Pack="true" PackagePath="build\firebird" />
     <None Include="firebird\ib_util.dll" Pack="true" PackagePath="build\firebird" />
@@ -60,6 +65,24 @@
     <None Include="firebird\IDPLicense.txt" Pack="true" PackagePath="build\firebird" />
     <None Include="firebird\IPLicense.txt" Pack="true" PackagePath="build\firebird" />
     <None Include="firebird\santedb_test.fdb" Pack="true" PackagePath="build\firebird" />
-    <None Include="firebird\plugins\engine12.dll" Pack="true" PackagePath="build\firebird\plugins" />
+    <None Include="firebird\plugins\engine12.dll" Pack="true" PackagePath="build\firebird\plugins" />-->
   </ItemGroup>
+
+	<ItemGroup>
+		<Content Include="$(MSBuildThisFileDirectory)\firebird\santedb_test.fdb" >
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+    <Content Include="firebird\*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>%(Filename)%(Extension)</TargetPath>
+      <Pack>true</Pack>
+      <PackagePath>build</PackagePath>
+		</Content>
+    <Content Include="firebird\plugins\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>plugins\%(Filename)%(Extension)</TargetPath>
+      <Pack>true</Pack>
+      <PackagePath>build</PackagePath>
+    </Content>
+	</ItemGroup>
 </Project>

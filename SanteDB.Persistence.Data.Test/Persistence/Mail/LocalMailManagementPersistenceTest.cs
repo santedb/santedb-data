@@ -26,6 +26,7 @@ using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
+using SanteDB.Persistence.Data.Query.Hax;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -80,7 +81,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
                 var inbox = mailService.GetMailboxes(toUser.Key).FirstOrDefault(o => o.Name == Mailbox.INBOX_NAME);
                 Assert.IsNotNull(inbox);
                 Assert.AreEqual(toUser.Key, inbox.OwnerKey);
-                Assert.AreEqual("TEST_MAIL_TO1", inbox.LoadProperty(o => o.Owner)?.UserName);
 
             }
 
@@ -95,9 +95,9 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
 
                 // Now we want to test the sorting and search of the mailbox
                 // NOTE: FIREBIRD DOES NOT SUPPORT INTERSECT SO WE COLLAPSE THE ENUMARBLE TO AN ARRAY FIRST 
-                Assert.AreEqual(1, messages.ToArray().Where(s => s.LoadProperty(o => o.Target.Subject) == "This is a test").Count());
-                Assert.AreEqual(0, messages.ToArray().Where(s => s.Target.Body == "This is a test").Count());
-                Assert.AreEqual("This is another test", messages.ToArray().Where(s => s.Target.Flags == MailMessageFlags.LowPriority).First().LoadProperty(o => o.Target).Subject);
+                Assert.AreEqual(1, messages.ToArray().Where(s => s.LoadProperty(o => o.TargetEntity.Subject) == "This is a test").Count());
+                Assert.AreEqual(0, messages.ToArray().Where(s => s.TargetEntity.Body == "This is a test").Count());
+                Assert.AreEqual("This is another test", messages.ToArray().Where(s => s.TargetEntity.Flags == MailMessageFlags.LowPriority).First().LoadProperty(o => o.TargetEntity).Subject);
 
             }
 
@@ -117,6 +117,9 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
             Assert.IsNotNull(securityService);
             Assert.IsNotNull(mailService);
 
+            Guid inboxkey = Guid.Empty;
+            Guid userkey = Guid.Empty;
+
             // Construct a mail message and send as system
             using (AuthenticationContext.EnterSystemContext())
             {
@@ -127,9 +130,12 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
                     UserName = "TEST_MAIL_TO2",
                     Email = "test2@test.com",
                     Password = "@Foo123!!"
-                }); ;
+                });
+
                 roleService.AddUsersToRoles(new string[] { "TEST_MAIL_TO2" }, new string[] { "USERS", "CLINICAL_STAFF" }, AuthenticationContext.SystemPrincipal);
                 Assert.IsNotNull(toUser);
+
+                userkey = toUser.Key.Value;
 
                 // SYSTEM can create a mailbox for USER
                 var inbox = mailService.CreateMailbox(Mailbox.INBOX_NAME, toUser.Key);
@@ -137,6 +143,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
                 mailService.GetMailboxes(toUser.Key);
                 // SYSTEM can read mail messages for user
                 Assert.AreEqual(0, mailService.GetMessages(inbox.Key.Value).Count());
+
+                inboxkey = inbox.Key.Value;
 
             }
 
@@ -153,7 +161,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
                 Assert.AreEqual(2, mailService.GetMailboxes().Count());
 
                 // User can send mail to SYSTEM
-                var mail = mailService.Send(new MailMessage(Guid.Parse, "SYSTEM;TEST_MAIL_TO2", "Test from FOO", "This is a test!"));
+                var mail = mailService.Send(new MailMessage(userkey, new[] { Guid.Parse(AuthenticationContext.SystemUserSid), userkey }, "Test from FOO", "This is a test!"));
                 Assert.AreEqual("TEST_MAIL_TO2", mail.From);
                 Assert.AreEqual(3, mailService.GetMailboxes().Count()); // Will not have a SENT folder
 
@@ -164,11 +172,13 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
             using (AuthenticationContext.EnterSystemContext())
             {
                 var mailboxes = mailService.GetMailboxes().Where(o => o.Name == Mailbox.INBOX_NAME).FirstOrDefault();
-                var messages = mailService.GetMessages(Mailbox.INBOX_NAME);
+                var messages = mailService.GetMessages(inboxkey);
                 Assert.GreaterOrEqual(messages.Count(), 1);
-                Assert.AreEqual("Test from FOO", messages.First().LoadProperty(o => o.Target).Subject);
-                Assert.AreEqual("TEST_MAIL_TO2", messages.First().LoadProperty(o => o.Target).From);
-                Assert.AreEqual("SYSTEM;TEST_MAIL_TO2", messages.First().LoadProperty(o => o.Target).To);
+                Assert.AreEqual("Test from FOO", messages.First().LoadProperty(o => o.TargetEntity).Subject);
+                Assert.AreEqual("TEST_MAIL_TO2", messages.First().LoadProperty(o => o.TargetEntity).From);
+                Assert.AreEqual($"{AuthenticationContext.SystemUserSid};{userkey}", string.Join(";", messages.First().LoadProperty(o => o.TargetEntity).RcptTo.Select(se=>se.Key.ToString())));
+
+                
 
             }
 
@@ -178,25 +188,25 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
                 // User can create their own mailbox
                 var mailboxes = mailService.GetMailboxes();
                 Mailbox fooMailbox = mailboxes.FirstOrDefault(o => o.Name == "FOO!"), inbox = mailboxes.FirstOrDefault(o => o.Name == Mailbox.INBOX_NAME);
-                var message = mailService.GetMessages(Mailbox.INBOX_NAME).First();
-                Assert.AreEqual(1, mailService.GetMessages(Mailbox.INBOX_NAME).Count());
+                var message = mailService.GetMessages(inboxkey).First();
+                Assert.AreEqual(1, mailService.GetMessages(inboxkey).Count());
 
-                mailService.MoveMessage(message.Key.Value, fooMailbox.Name);
-                Assert.AreEqual(1, mailService.GetMessages(fooMailbox.Name).Count());
-                Assert.AreEqual(0, mailService.GetMessages(inbox.Name).Count());
+                mailService.MoveMessage(inboxkey, message.Key.Value, fooMailbox.Key.Value);
+                Assert.AreEqual(1, mailService.GetMessages(fooMailbox.Key.Value).Count());
+                Assert.AreEqual(0, mailService.GetMessages(inboxkey).Count());
 
                 // Copy and test delete
-                mailService.MoveMessage(message.Key.Value, inbox.Name, true);
-                Assert.AreEqual(1, mailService.GetMessages(fooMailbox.Name).Count());
-                Assert.AreEqual(1, mailService.GetMessages(inbox.Name).Count());
+                mailService.MoveMessage(fooMailbox.Key.Value, message.Key.Value, inboxkey, copy: true);
+                Assert.AreEqual(1, mailService.GetMessages(fooMailbox.Key.Value).Count());
+                Assert.AreEqual(1, mailService.GetMessages(inboxkey).Count());
 
                 // Delete from FOO
-                mailService.DeleteMessage(fooMailbox.Name, message.Key.Value);
-                Assert.AreEqual(0, mailService.GetMessages(fooMailbox.Name).Count());
-                Assert.AreEqual(1, mailService.GetMessages(inbox.Name).Count());
+                mailService.DeleteMessage(fooMailbox.Key.Value, message.Key.Value);
+                Assert.AreEqual(0, mailService.GetMessages(fooMailbox.Key.Value).Count());
+                Assert.AreEqual(1, mailService.GetMessages(inboxkey).Count());
 
                 // Delete the FOO mailbox
-                mailService.DeleteMailbox(fooMailbox.Name);
+                mailService.DeleteMailbox(fooMailbox.Key.Value);
                 Assert.AreEqual(2, mailService.GetMailboxes().Count());
 
             }

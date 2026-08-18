@@ -67,14 +67,20 @@
 		<EmbeddedResource Include="SQL\SQLITE\Updates\*.sql" />
 	</ItemGroup>
 
+	
+
 	<ItemGroup>
 		<None Include="..\SanteDB.licenseheader" Link="SanteDB.licenseheader" />
+		<None Include="SQL\PSQL\santedb-drop.sql" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<EmbeddedResource Remove="SQL\PSQL\santedb-drop.sql" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<None Update="SQL\PSQL\santedb-drop.sql">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 </Project>
