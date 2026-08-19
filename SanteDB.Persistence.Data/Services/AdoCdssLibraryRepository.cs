@@ -514,7 +514,6 @@ namespace SanteDB.Persistence.Data.Services
             foreach (var itm in context.Query<DbCdssLibraryVersion>(o => o.IsHeadVersion && o.ObsoletionTime != null && o.ObsoletionTime < deletedCutoff).ToArray())
             {
                 context.Delete(itm);
-                context.DeleteAll<DbCdssLibrary>(o => o.Key == itm.Key);
                 auditBuilder.WithAuditableObjects(new AuditableObject()
                 {
                     IDTypeCode = AuditableObjectIdType.ReportName,
@@ -533,7 +532,10 @@ namespace SanteDB.Persistence.Data.Services
             }
 
             // Trim out old versions of BI definitions & prune any deleted 
-            context.DeleteAll<DbCdssLibraryVersion>(o => o.ObsoletionTime != null && o.ObsoletionTime < oldVersionCutoff && !o.IsHeadVersion);
+            var purgeKeys = context.Query<DbCdssLibraryVersion>(o => o.ObsoletionTime != null && o.ObsoletionTime < oldVersionCutoff && !o.IsHeadVersion).Select(o => o.VersionKey).ToArray();
+            context.UpdateAll<DbCdssLibraryVersion>(o => purgeKeys.Contains(o.ReplacesVersionKey.Value), o => o.ReplacesVersionKey == null);
+            var nrec = context.DeleteAll<DbCdssLibraryVersion>(o => purgeKeys.Contains(o.VersionKey));
+            this.m_tracer.TraceInfo("Pruned {0} old CDSS library versions", nrec);
         }
 
     }

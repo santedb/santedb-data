@@ -83,7 +83,7 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
         /// <summary>
         /// Gets or sets the text
         /// </summary>
-        [ApplicationEncrypt("entityNote.text")]
+        [ApplicationEncrypt(ApplicationEncryptionFieldNames.EntityNoteText)]
         public override string Text { get; set; }
 
     }
@@ -108,7 +108,7 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
         /// <summary>
         /// Gets or sets the text
         /// </summary>
-        [ApplicationEncrypt("actNote.text")]
+        [ApplicationEncrypt(ApplicationEncryptionFieldNames.ActNoteText)]
         public override string Text { get; set; }
 
 

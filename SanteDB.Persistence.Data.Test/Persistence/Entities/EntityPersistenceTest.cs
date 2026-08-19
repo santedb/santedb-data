@@ -150,7 +150,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 afterFetch = fetched.First();
                 Assert.AreEqual("Robert", afterFetch.LoadProperty(o => o.Names).FirstOrDefault(o => o.NameUseKey == NameUseKeys.Legal).LoadProperty(o => o.Component)[0].Value);
                 Assert.AreEqual("Bobby", afterFetch.Names.FirstOrDefault(o => o.NameUseKey == NameUseKeys.Assigned).LoadProperty(o => o.Component)[0].Value);
-                Assert.Greater(afterFetch.Names[0].Component[0].OrderSequence, 0);
+                Assert.Greater(afterFetch.LoadProperty(o=>o.Names)[0].LoadProperty(o => o.Component)[0].OrderSequence, 0);
                 // No more justin
                 fetched = base.TestQuery<Entity>(k => k.Names.Any(n => n.NameUseKey == NameUseKeys.Assigned && n.Component.Any(c => c.Value == "Justin")), 0).AsResultSet();
                 // But we have one Bob

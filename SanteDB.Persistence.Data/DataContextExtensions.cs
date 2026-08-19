@@ -297,7 +297,7 @@ namespace SanteDB.Persistence.Data
                 throw new InvalidOperationException(s_localizationService.GetString(ErrorMessageStrings.RELATED_OBJECT_NOT_FOUND));
             }
 
-            return new SecurityPolicyInstance(new SecurityPolicy(policy.Name, policy.Oid, policy.IsPublic, policy.CanOverride) { Key = me.PolicyKey }, PolicyGrantType.Grant);
+            return new SecurityPolicyInstance(new SecurityPolicy(policy.Name, policy.Oid, policy.IsPublic, policy.CanOverride, policy.ClassConceptKey) { Key = me.PolicyKey }, PolicyGrantType.Grant);
         }
 
         /// <summary>

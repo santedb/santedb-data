@@ -25,18 +25,22 @@ using SanteDB.Core.Extensions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Attributes;
+using SanteDB.Core.Model.Audit;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Acts;
 using SanteDB.Persistence.Data.Model.DataType;
+using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Extensibility;
+using SanteDB.Persistence.Data.Model.Roles;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
@@ -44,6 +48,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using static SanteDB.Core.Model.IdentifiedData;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
@@ -375,6 +380,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             // Geo-tagging
             data.GeoTagKey = this.EnsureExists(context, data.GeoTag)?.Key ?? data.GeoTagKey;
 
+            // Ensure uniqueness of identifiers - i.e. no duplicate IDs in the same domain
+            data.Identifiers = data.Identifiers?.Distinct(new IdentifierEqualityComparer<ActIdentifier>())?.ToList();
+
             // Verify the act
             var issues = this.VerifyEntity(context, data).ToArray();
             if (issues.Any(i => i.Priority == Core.BusinessRules.DetectedIssuePriorityType.Error))
@@ -385,7 +393,27 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             {
                 data.AddAnnotation(issues);
             }
-            
+
+            if (data.Identifiers?.Any() == true)
+            {
+                foreach (var ident in data.Identifiers.Where(o => o.Key.HasValue))
+                {
+                    var existingIdent = context.FirstOrDefault<DbActIdentifier>(o => o.Key == ident.Key);
+                    if (existingIdent == null)
+                    {
+                        continue;
+                    }
+
+                    if (ident.IdentityDomainKey != existingIdent.IdentityDomainKey ||
+                        ident.Value != existingIdent.Value ||
+                        ident.IdentifierTypeKey != existingIdent.TypeKey)
+                    {
+                        ident.BatchOperation = BatchOperationType.Insert;
+                        ident.Key = null;
+                    }
+                }
+            }
+
             return base.BeforePersisting(context, data);
         }
 
@@ -452,7 +480,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                            .Statement;
                         retVal.Policies = context.Query<CompositeResult<DbActSecurityPolicy, DbSecurityPolicy>>(query)
                             .ToList()
-                            .Select(o => new SecurityPolicyInstance(new SecurityPolicy(o.Object2.Name, o.Object2.Oid, o.Object2.IsPublic, o.Object2.CanOverride), PolicyGrantType.Grant)
+                            .Select(o => new SecurityPolicyInstance(new SecurityPolicy(o.Object2.Name, o.Object2.Oid, o.Object2.IsPublic, o.Object2.CanOverride, o.Object2.ClassConceptKey), PolicyGrantType.Grant)
                             {
                                 PolicyKey = o.Object2.Key
                             })
@@ -649,8 +677,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override TAct DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode, bool preserveContained)
         {
             // Cascade the deletion of data down 
-            if (!preserveContained)
+            if (!preserveContained &&
+                (!context.Data.TryGetValue(nameof(preserveContained), out var pcStack) || 
+                pcStack is Stack<Object> stk && !stk.Contains(key)))
             {
+                context.PushData(nameof(preserveContained), key);
+
                 foreach (var ar in context.Query<DbActRelationship>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToArray())
                 {
                     var rps = typeof(Act).GetRelatedPersistenceService();
@@ -669,6 +701,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                         rps.Delete(context, ap.TargetKey, deleteMode, preserveContained);
                     }
                 }
+                context.PopData(nameof(preserveContained), out _);
 
             }
 

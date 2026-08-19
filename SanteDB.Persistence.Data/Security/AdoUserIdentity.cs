@@ -18,7 +18,6 @@
  * User: fyfej
  * Date: 2023-6-21
  */
-using SanteDB.Core.Data.Quality;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security.Claims;
 using SanteDB.OrmLite;
@@ -27,7 +26,6 @@ using SanteDB.Persistence.Data.Model.Concepts;
 using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Roles;
 using SanteDB.Persistence.Data.Model.Security;
-using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -131,9 +129,13 @@ namespace SanteDB.Persistence.Data.Security
 
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.CdrEntityId, cdrEntityId.ToString()));
 
+            
             if (this.FindFirst(SanteDBClaimTypes.XspaOrganizationIdClaim) == null)
             {
                 var organizationId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.Employee && o.ObsoleteVersionSequenceId == null).Select(o => o.TargetKey);
+                // Remove any facilities that are deleted
+                organizationId = organizationId.Intersect(contextForReadingAdditionalData.Query<DbEntityVersion>(o => StatusKeys.ActiveStates.Contains(o.StatusConceptKey) && o.ClassConceptKey == EntityClassKeys.Organization && organizationId.Contains(o.Key) && o.ObsoletionTime == null && o.IsHeadVersion).Select(o => o.Key));
+
                 if (organizationId.Any())
                 {
                     organizationId.ForEach(o => this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaOrganizationIdClaim, o.ToString())));
@@ -151,7 +153,9 @@ namespace SanteDB.Persistence.Data.Security
 
             if (this.FindFirst(SanteDBClaimTypes.XspaFacilityClaim) == null)
             {
-                var facilityId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation && o.ObsoleteVersionSequenceId == null).Select(o => o.TargetKey);
+                var facilityId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation && o.ObsoleteVersionSequenceId == null).Select(o => o.TargetKey).ToArray();
+                // Remove any facilities that are deleted
+                facilityId = facilityId.Intersect(contextForReadingAdditionalData.Query<DbEntityVersion>(o => StatusKeys.ActiveStates.Contains(o.StatusConceptKey) && o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && facilityId.Contains(o.Key) && o.ObsoletionTime == null && o.IsHeadVersion).Select(o => o.Key)).ToArray();
                 if (facilityId.Any())
                 {
                     facilityId.ForEach(o => this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaFacilityClaim, o.ToString())));
@@ -162,6 +166,8 @@ namespace SanteDB.Persistence.Data.Security
                 // Validate the claim
                 var claimedFacIds = this.FindAll(SanteDBClaimTypes.XspaFacilityClaim).Select(o => Guid.Parse(o.Value)).ToArray();
                 var actualFacIds = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation && o.ObsoleteVersionSequenceId == null).Select(o => o.TargetKey).ToArray();
+                actualFacIds = actualFacIds.Intersect(contextForReadingAdditionalData.Query<DbEntityVersion>(o => StatusKeys.ActiveStates.Contains(o.StatusConceptKey) && o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && actualFacIds.Contains(o.Key) && o.ObsoletionTime == null && o.IsHeadVersion).Select(o => o.Key)).ToArray();
+
                 if (actualFacIds.Any() && !claimedFacIds.All(f=>actualFacIds.Contains(f)))
                 {
                     throw new ClaimAssertionException(SanteDBClaimTypes.XspaFacilityClaim, claimedFacIds.First().ToString(), String.Join(",", actualFacIds));

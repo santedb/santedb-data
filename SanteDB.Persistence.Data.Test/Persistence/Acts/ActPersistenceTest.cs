@@ -27,7 +27,6 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
-using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

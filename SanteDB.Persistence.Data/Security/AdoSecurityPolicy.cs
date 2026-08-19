@@ -59,7 +59,7 @@ namespace SanteDB.Persistence.Data.Security
             this.Oid = policy.Oid;
             this.IsPublic = policy.IsPublic;
             this.IsActive = policy.ObsoletionTime == null || policy.ObsoletionTime < DateTimeOffset.Now;
-
+            this.Classification = policy.ClassConceptKey;
             if (!String.IsNullOrEmpty(policy.Handler) && !s_handlers.TryGetValue(policy.Handler, out this.m_handler))
             {
                 Type handlerType = Type.GetType(policy.Handler);
@@ -112,6 +112,11 @@ namespace SanteDB.Persistence.Data.Security
         /// Is active?
         /// </summary>
         public bool IsActive { get; }
+
+        /// <summary>
+        /// Gets the classification
+        /// </summary>
+        public Guid? Classification { get; }
 
         /// <summary>
         /// Will never be null

@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Exceptions;
+using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite.Configuration;
 using System;
@@ -110,7 +111,7 @@ namespace SanteDB.Persistence.Data.Configuration
     /// </summary>
     [XmlType(nameof(AdoPersistenceConfigurationSection), Namespace = "http://santedb.org/configuration")]
     [ExcludeFromCodeCoverage]
-    public class AdoPersistenceConfigurationSection : OrmConfigurationBase, IConfigurationSection
+    public class AdoPersistenceConfigurationSection : OrmAleConfigurationBase, IConfigurationSection
     {
         // 
         private bool m_legacyPepper = false;
@@ -302,6 +303,21 @@ namespace SanteDB.Persistence.Data.Configuration
             var pepperSource = !String.IsNullOrEmpty(this.Pepper) ? this.Pepper : PEPPER_CHARS;
             var nextPepper = this.m_random.Next(pepperSource.Length);
             return secret.Insert(nextPepper % secret.Length, pepperSource[nextPepper].ToString());
+        }
+
+        /// <inheritdoc/>
+        public override IEnumerable<OrmFieldConfiguration> GetDefaultAleFields()
+        {
+            yield return new OrmFieldConfiguration(ApplicationEncryptionFieldNames.EntityIdentifier, OrmAleMode.Deterministic);
+            yield return new OrmFieldConfiguration(ApplicationEncryptionFieldNames.AddressComponent, OrmAleMode.Deterministic);
+            yield return new OrmFieldConfiguration(ApplicationEncryptionFieldNames.TelecomValue, OrmAleMode.Deterministic);
+            yield return new OrmFieldConfiguration(ApplicationEncryptionFieldNames.ActIdentifier, OrmAleMode.Deterministic);
+            yield return new OrmFieldConfiguration(ApplicationEncryptionFieldNames.NarrativeText, OrmAleMode.Random);
+            yield return new OrmFieldConfiguration(ApplicationEncryptionFieldNames.NarrativeTitle, OrmAleMode.Deterministic);
+            yield return new OrmFieldConfiguration(ApplicationEncryptionFieldNames.ActNoteText, OrmAleMode.Random);
+            yield return new OrmFieldConfiguration(ApplicationEncryptionFieldNames.MailBody, OrmAleMode.Random);
+            yield return new OrmFieldConfiguration(ApplicationEncryptionFieldNames.EntityNoteText, OrmAleMode.Random);
+            yield return new OrmFieldConfiguration(ApplicationEncryptionFieldNames.TextObservationValue, OrmAleMode.Random);    
         }
     }
 }

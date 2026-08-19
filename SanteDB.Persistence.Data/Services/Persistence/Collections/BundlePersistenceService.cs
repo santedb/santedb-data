@@ -18,7 +18,6 @@
  * User: fyfej
  * Date: 2023-6-21
  */
-using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
@@ -32,25 +31,19 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
-using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Sys;
-using SharpCompress;
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Principal;
-using System.Threading;
-using ZstdSharp.Unsafe;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 {
@@ -137,7 +130,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             var retVal = new Bundle(input.Item.Where(o => o.BatchOperation == BatchOperationType.Delete))
             {
                 CorrelationKey = input.CorrelationKey,
-                CorrelationSequence = input.CorrelationSequence
+                CorrelationSequence = input.CorrelationSequence,
+                FocalObjects = input.FocalObjects,
             };
             try // Use newer version of the reordering function
             {
@@ -332,7 +326,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             }
 
             // Bundle has no explicit correlation sequence so use the ticks 
-            data.CorrelationSequence = data.CorrelationSequence ?? DateTimeOffset.Now.Ticks;
+            data.CorrelationSequence = data.CorrelationSequence ?? DateTimeOffset.UtcNow.Ticks;
 
             // We will determine if we've processed this bundle before
             var lastSequence = context.Query<DbBundleCorrelationSubmission>(o => o.SourceKey == data.CorrelationKey.Value).OrderByDescending(o => o.CorrelationSequence).Select(o => o.CorrelationSequence).FirstOrDefault();
@@ -462,8 +456,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                             data.Item[i] = persistenceService.Update(context, data.Item[i]);
                             data.Item[i].BatchOperation = BatchOperationType.Update;
                             break;
-                        case BatchOperationType.InsertOrUpdate:
                         case BatchOperationType.Auto:
+                            if (data.Item.Any(o => o.Key == data.Item[i].Key && o.BatchOperation == BatchOperationType.Delete)) // Deleted
+                            { // There is another entry that might be better suited
+                                continue;
+                            }
+                            goto case BatchOperationType.InsertOrUpdate;
+                        case BatchOperationType.InsertOrUpdate:
 
                             // Ensure that the object exists
                             if (data.Item[i].Key.HasValue && persistenceService.Exists(context, data.Item[i].Key.Value))

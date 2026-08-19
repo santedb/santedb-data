@@ -90,6 +90,7 @@ namespace SanteDB.Persistence.Data.Services
         // Localization service
         private readonly ILocalizationService m_localizationService;
         private readonly IDataCachingService m_dataCaching;
+        private readonly IAdhocCacheService m_adhocCache;
 
         // Hasher
         private readonly IPasswordHashingService m_hasher;
@@ -102,6 +103,7 @@ namespace SanteDB.Persistence.Data.Services
             IPasswordHashingService hashingService,
             IPolicyEnforcementService pepService,
             ISymmetricCryptographicProvider symmetricCryptographicProvider,
+            IAdhocCacheService adhocCacheService = null,
             IDataCachingService dataCaching = null)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
@@ -111,6 +113,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_symmetricCryptographicProvider = symmetricCryptographicProvider;
             this.m_localizationService = localizationService;
             this.m_dataCaching = dataCaching;
+            this.m_adhocCache = adhocCacheService;
         }
 
         /// <summary>
@@ -431,6 +434,7 @@ namespace SanteDB.Persistence.Data.Services
                             {
                                 ses.RefreshExpiration = ses.NotAfter = DateTimeOffset.Now;
                                 context.Update(ses);
+                                this.m_adhocCache?.Remove(this.CreateSessionCacheKey(ses.Key));
                             }
                         }
 
@@ -567,6 +571,7 @@ namespace SanteDB.Persistence.Data.Services
                             {
                                 ses.RefreshExpiration = ses.NotAfter = DateTimeOffset.Now;
                                 context.Update(ses);
+                                this.m_adhocCache?.Remove(this.CreateSessionCacheKey(ses.Key));
                             }
                         }
 
@@ -707,15 +712,30 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open(initializeExtensions: false);
 
-                    var dbApp = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
-                    if (dbApp == null)
+                    using (var tx = context.BeginTransaction())
                     {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_APPLICATION_KEY));
-                    }
+                        var dbApp = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
+                        if (dbApp == null)
+                        {
+                            throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_APPLICATION_KEY));
+                        }
 
-                    dbApp.ObsoletedByKey = context.EstablishProvenance(principal, null);
-                    dbApp.ObsoletionTime = DateTimeOffset.Now;
-                    context.Update(dbApp);
+                        dbApp.ObsoletedByKey = context.EstablishProvenance(principal, null);
+                        dbApp.ObsoletionTime = DateTimeOffset.Now;
+                        context.Update(dbApp);
+
+                        // Invalidate all sessions this device is attached to
+                        if (this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AbandonSessionAfterLockout, true))
+                        {
+                            foreach (var ses in context.Query<DbSession>(o => o.ApplicationKey == dbApp.Key && o.NotAfter >= DateTimeOffset.Now).ToArray())
+                            {
+                                ses.RefreshExpiration = ses.NotAfter = DateTimeOffset.Now;
+                                context.Update(ses);
+                                this.m_adhocCache?.Remove(this.CreateSessionCacheKey(ses.Key));
+                            }
+                        }
+                        tx.Commit();
+                    }
                 }
                 catch (Exception e)
                 {
@@ -863,6 +883,14 @@ namespace SanteDB.Persistence.Data.Services
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.APP_CLAIM_GEN_ERR), e);
                 }
             }
+        }
+
+        /// <summary>
+        /// Create cache key
+        /// </summary>
+        private string CreateSessionCacheKey(Guid sessionKey)
+        {
+            return $"ado.ses.{this.m_hasher.ComputeHash(sessionKey.ToString())}";
         }
 
     }

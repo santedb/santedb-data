@@ -113,7 +113,7 @@ namespace SanteDB.Persistence.Data.Model.DataType
         /// <summary>
         /// Gets or sets the value
         /// </summary>
-        [ApplicationEncrypt("entity.identifier")]
+        [ApplicationEncrypt(ApplicationEncryptionFieldNames.EntityIdentifier)]
         public override string Value { get; set; }
     }
 
@@ -138,7 +138,7 @@ namespace SanteDB.Persistence.Data.Model.DataType
         /// <summary>
         /// Gets or sets the value
         /// </summary>
-        [ApplicationEncrypt("act.identifier")]
+        [ApplicationEncrypt(ApplicationEncryptionFieldNames.ActIdentifier)]
         public override string Value { get; set; }
     }
 }

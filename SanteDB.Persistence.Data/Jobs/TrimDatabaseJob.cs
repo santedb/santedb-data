@@ -29,7 +29,6 @@ using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Services.Persistence;
-using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -89,7 +88,10 @@ namespace SanteDB.Persistence.Data.Jobs
         public bool CanCancel => true;
 
         /// <inheritdoc/>
-        public IDictionary<string, Type> Parameters => new Dictionary<String, Type>();
+        public IDictionary<string, Type> Parameters => new Dictionary<String, Type>()
+        {
+            { "cutoffDate", typeof(DateTime) }
+        };
 
         /// <inheritdoc/>
         public void Cancel()
@@ -112,6 +114,16 @@ namespace SanteDB.Persistence.Data.Jobs
             try
             {
 
+                
+                if((this.m_configuration.TrimSettings?.MaxOldVersionRetention == null ||
+                    this.m_configuration.TrimSettings?.MaxDeletedDataRetention == null ||
+                    this.m_configuration.TrimSettings?.MaxSessionRetention == null) &&
+                    parameters.Length == 0)
+                {
+                    this.m_jobStateManager.SetState(this, JobStateType.Cancelled, "No retention settings are configured");
+                    return;
+                }
+
                 this.m_cancelRequest = false;
                 this.m_jobStateManager.SetState(this, JobStateType.Running);
 
@@ -120,11 +132,13 @@ namespace SanteDB.Persistence.Data.Jobs
                     context.Open(initializeExtensions: false);
                     context.EstablishProvenance(AuthenticationContext.SystemPrincipal);
                     // First we want to trim old sessions
-                    var cutoff = DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxSessionRetention.Value);
-                    this.m_tracer.TraceInfo("Pruning sessions before {0}", cutoff);
+                    var cutoff = parameters.Length == 0 ? DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxSessionRetention.Value) :
+                        DateTime.Parse(parameters[0].ToString());
+
                     using (var tx = context.BeginTransaction())
                     {
                         var delSessions = context.Query<DbSession>(o => o.NotAfter < cutoff).Select(o => o.Key).ToArray();
+                        this.m_tracer.TraceInfo("Pruning {0} sessions before {1}...", delSessions.LongLength, cutoff);
                         // HACK: The IN() statement can only have a certain number of elements so we want to chunk our delete 
                         var c = 0;
                         while (c < delSessions.Length)
@@ -134,15 +148,16 @@ namespace SanteDB.Persistence.Data.Jobs
                             context.DeleteAll<DbSession>(o => batch.Contains(o.Key));
 
                             // Audit
-                            audit.WithAuditableObjects(batch.Select(o => new AuditableObject()
+                            audit.WithAuditableObjects(new AuditableObject()
                             {
                                 CustomIdTypeCode = ExtendedAuditCodes.CustomIdTypeSession,
                                 IDTypeCode = AuditableObjectIdType.Custom,
                                 LifecycleType = AuditableObjectLifecycle.PermanentErasure,
-                                ObjectId = o.ToString(),
                                 Role = AuditableObjectRole.SecurityResource,
-                                Type = AuditableObjectType.SystemObject
-                            }));
+                                Type = AuditableObjectType.SystemObject,
+                                ObjectData = delSessions.Select(o => new ObjectDataExtension("sid", o.ToString())).ToList()
+
+                            });
 
                             c += batch.Length;
                             this.m_jobStateManager.SetProgress(this, this.m_localizationService.GetString(UserMessageStrings.DB_TRIM_SESSION), (float)c / delSessions.Length * 0.3f);
@@ -151,8 +166,11 @@ namespace SanteDB.Persistence.Data.Jobs
                         var trimHelpers = this.m_serviceManager.GetServices().OfType<IAdoTrimProvider>().ToArray();
 
                         c = 0;
-                        var deletedCutoff = DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxDeletedDataRetention.Value);
-                        var oldVersionCutoff = DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxOldVersionRetention.Value);
+                        var deletedCutoff = parameters.Length == 0 ? DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxDeletedDataRetention.Value)
+                            : DateTimeOffset.Parse(parameters[0].ToString());
+
+                        var oldVersionCutoff = parameters.Length == 0 ? DateTimeOffset.Now.Subtract(this.m_configuration.TrimSettings.MaxOldVersionRetention.Value) :
+                                DateTimeOffset.Parse(parameters[0].ToString());
 
                         foreach (var th in trimHelpers)
                         {

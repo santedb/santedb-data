@@ -44,7 +44,7 @@ namespace SanteDB.Persistence.Data.Model.Mail
         /// <summary>
         /// Gets or sets the body of the message.
         /// </summary>
-        [Column("body"), ApplicationEncrypt("mail.body")]
+        [Column("body"), ApplicationEncrypt(ApplicationEncryptionFieldNames.MailBody)]
         public string Body { get; set; }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace SanteDB.Persistence.Data.Model.Mail
         /// <summary>
         /// Gets or sets the subject of the message.
         /// </summary>
-        [Column("subj"), ApplicationEncrypt("mail.subject")]
+        [Column("subj"), ApplicationEncrypt(ApplicationEncryptionFieldNames.MailSubject)]
         public string Subject { get; set; }
 
         /// <summary>

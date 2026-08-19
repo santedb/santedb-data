@@ -21,8 +21,6 @@
 using SanteDB.BI.Model;
 using SanteDB.BI.Services;
 using SanteDB.Core;
-using SanteDB.Core.Applets;
-using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Data.Backup;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
@@ -36,7 +34,6 @@ using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Jobs;
 using SanteDB.Persistence.Data.Services.Persistence;
-using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,7 +64,8 @@ namespace SanteDB.Persistence.Data.Services
             typeof(AdoCertificateIdentityProvider),
             typeof(AdoCdssLibraryRepository),
             typeof(AdoDataQualityConfigurationProvider),
-            typeof(AdoDataTemplateManager)
+            typeof(AdoDataTemplateManager),
+            typeof(AdoTrimService)
         };
 
         // Gets the configuration
@@ -127,6 +125,7 @@ namespace SanteDB.Persistence.Data.Services
                 serviceManager.AddServiceProvider(typeof(TagPersistenceService));
                 serviceManager.AddServiceProvider(typeof(AdoRelationshipValidationProvider));
                 serviceManager.AddServiceProvider(typeof(AdoDatasetInstallerService));
+                serviceManager.AddServiceProvider(typeof(AdoTrimService));
 
                 if (jobManager.GetJobInstance(OptimizeDatabaseJob.ID) == null)
                 {

@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
@@ -101,6 +102,7 @@ namespace SanteDB.Persistence.Data.Services
         // Localization service
         private readonly ILocalizationService m_localizationService;
         private readonly IDataCachingService m_dataCaching;
+        private readonly IAdhocCacheService m_adhocCacheService;
 
         // Hasher
         private IPasswordHashingService m_hasher;
@@ -112,6 +114,7 @@ namespace SanteDB.Persistence.Data.Services
             IPasswordHashingService hashingService,
             ILocalizationService localizationService,
             IPolicyEnforcementService pepService,
+            IAdhocCacheService adhocCacheService = null,
             IDataCachingService dataCaching = null)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
@@ -120,6 +123,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_pepService = pepService;
             this.m_localizationService = localizationService;
             this.m_dataCaching = dataCaching;
+            this.m_adhocCacheService = adhocCacheService;
         }
 
         /// <summary>
@@ -282,6 +286,7 @@ namespace SanteDB.Persistence.Data.Services
                             {
                                 ses.RefreshExpiration = ses.NotAfter = DateTimeOffset.Now;
                                 context.Update(ses);
+                                this.m_adhocCacheService?.Remove(this.CreateSessionCacheKey(ses.Key));
                             }
                         }
 
@@ -410,6 +415,7 @@ namespace SanteDB.Persistence.Data.Services
                             {
                                 ses.RefreshExpiration = ses.NotAfter = DateTimeOffset.Now;
                                 context.Update(ses);
+                                this.m_adhocCacheService?.Remove(this.CreateSessionCacheKey(ses.Key));
                             }
                         }
 
@@ -535,16 +541,33 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open(initializeExtensions: false);
 
-                    var dbDev = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
-                    if (dbDev == null)
+                    using (var tx = context.BeginTransaction())
                     {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_DEVICE_KEY));
-                    }
+                        var dbDev = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == name.ToLowerInvariant() && o.ObsoletionTime == null);
+                        if (dbDev == null)
+                        {
+                            throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.FETCH_DEVICE_KEY));
+                        }
 
-                    dbDev.ObsoletedByKey = context.EstablishProvenance(principal, null);
-                    dbDev.ObsoletionTime = DateTimeOffset.Now;
-                    context.Update(dbDev);
-                    this.Deleted?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dbDev), principal));
+                        dbDev.ObsoletedByKey = context.EstablishProvenance(principal, null);
+                        dbDev.ObsoletionTime = DateTimeOffset.Now;
+                        context.Update(dbDev);
+
+                        // Invalidate all sessions this device is attached to
+                        if (this.m_securityConfiguration.GetSecurityPolicy(SecurityPolicyIdentification.AbandonSessionAfterLockout, true))
+                        {
+                            foreach (var ses in context.Query<DbSession>(o => o.DeviceKey == dbDev.Key && o.NotAfter >= DateTimeOffset.Now).ToArray())
+                            {
+                                ses.RefreshExpiration = ses.NotAfter = DateTimeOffset.Now;
+                                context.Update(ses);
+                                this.m_adhocCacheService?.Remove(this.CreateSessionCacheKey(ses.Key));
+                            }
+                        }
+
+                        tx.Commit();
+                        this.Deleted?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dbDev), principal));
+
+                    }
                 }
                 catch (Exception e)
                 {
@@ -718,6 +741,12 @@ namespace SanteDB.Persistence.Data.Services
             }
         }
 
-
+        /// <summary>
+        /// Create cache key
+        /// </summary>
+        private string CreateSessionCacheKey(Guid sessionKey)
+        {
+            return $"ado.ses.{this.m_hasher.ComputeHash(sessionKey.ToString())}";
+        }
     }
 }
