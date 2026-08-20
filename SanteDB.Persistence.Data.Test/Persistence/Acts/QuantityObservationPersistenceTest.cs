@@ -53,7 +53,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                     MoodConceptKey = ActMoodKeys.Goal,
                     TypeConceptKey = Guid.Parse("a261f8cd-69b0-49aa-91f4-e6d3e5c612ed"),
                     InterpretationConceptKey = ActInterpretationKeys.AbnormalHigh,
-                    Value = (decimal)65.2,
+                    Value = 65.2m,
                     UnitOfMeasureKey = UnitOfMeasureKeys.Kilograms
                 };
 
@@ -73,11 +73,11 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 // Test update
                 var afterUpdate = base.TestUpdate(afterQuery, o =>
                 {
-                    o.Value = (decimal)6.52;
+                    o.Value = 6.52m;
                     return o;
                 });
-                Assert.AreEqual(6.52, afterUpdate.Value);
-                Assert.AreEqual(65.2, (afterUpdate.GetPreviousVersion() as QuantityObservation).Value);
+                Assert.AreEqual(6.52m, afterUpdate.Value);
+                Assert.AreEqual(65.2m, (afterUpdate.GetPreviousVersion() as QuantityObservation).Value);
 
                 base.TestQuery<QuantityObservation>(o => o.Value > 10 && o.UnitOfMeasure.Mnemonic == "UnitOfMeasure-Kilograms", 0);
                 base.TestQuery<QuantityObservation>(o => o.Value < 10 && o.UnitOfMeasure.Mnemonic == "UnitOfMeasure-Kilograms", 1);

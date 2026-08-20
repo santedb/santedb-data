@@ -77,7 +77,6 @@ namespace SanteDB.Persistence.Data.Test
         {
             // Force load of the DLL
             this.m_localizationService = new TestLocalizationService();
-            FirebirdSql.Data.FirebirdClient.FbCharset.Ascii.ToString();
             TestApplicationContext.TestAssembly = typeof(DataPersistenceTest).Assembly;
             TestApplicationContext.Initialize(TestContext.CurrentContext.TestDirectory);
             this.m_serviceManager = ApplicationServiceContext.Current.GetService<IServiceManager>();

@@ -70,7 +70,7 @@ namespace SanteDB.Persistence.Data.Test
                 {
                     new SubscriptionServerDefinition()
                     {
-                        InvariantName = "FirebirdSQL",
+                        InvariantName = "sqlite",
                         Definition = @"SELECT * FROM ENT_VRSN_TBL INNER JOIN ENT_TBL USING (ENT_ID) WHERE CRT_UTC > ${creationDate} ORDER BY VRSN_SEQ_ID DESC"
                     }
                 }
@@ -84,7 +84,7 @@ namespace SanteDB.Persistence.Data.Test
                 {
                     new SubscriptionServerDefinition()
                     {
-                        InvariantName = "FirebirdSQL",
+                        InvariantName = "sqlite",
                         Definition = @"SELECT * FROM PSN_TBL INNER JOIN ENT_VRSN_TBL  USING(ENT_VRSN_ID)
                                         WHERE 
                                         CLS_CD_ID IN ('" + EntityClassKeyStrings.Person + "', '" + EntityClassKeyStrings.Patient + @"')

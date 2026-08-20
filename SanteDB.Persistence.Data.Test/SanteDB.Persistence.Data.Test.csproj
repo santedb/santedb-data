@@ -4,6 +4,8 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <IsPackable>false</IsPackable>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(VersionNumber)' == ''">
     <VersionNumber>3.0-debug</VersionNumber>
@@ -13,10 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="9.1.1">
-    </PackageReference>
     <PackageReference Include="NUnit" Version="3.13.3">
     </PackageReference>
+    <PackageReference Include="System.Memory" Version="4.6.3" />
   </ItemGroup>
   
   <Choose>
@@ -30,7 +31,7 @@
     </ProjectReference>
     <ProjectReference Include="..\..\santedb-api\SanteDB.Core.TestFramework\SanteDB.Core.TestFramework.csproj">
     </ProjectReference>
-    <ProjectReference Include="..\..\santedb-data\SanteDB.Core.TestFramework.FirebirdSQL\SanteDB.Core.TestFramework.FirebirdSQL.csproj" />
+    <ProjectReference Include="..\..\santedb-data\SanteDB.Core.TestFramework.Sqlite\SanteDB.Core.TestFramework.Sqlite.csproj" />
     <ProjectReference Include="..\..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj">
     </ProjectReference>
   </ItemGroup>
@@ -71,7 +72,5 @@
     <Folder Include="Properties\" />
   </ItemGroup>
 
-  <!-- Test Framework via Nuget does this automagically -->
-  <Import Condition="$(SolutionName.Contains('-ext'))" Project="$(SolutionDir)\santedb-data\SanteDB.Core.TestFramework.FirebirdSQL\SanteDB.Core.TestFramework.FirebirdSQL.targets" />
 
 </Project>
