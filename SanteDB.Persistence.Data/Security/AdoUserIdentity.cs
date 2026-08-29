@@ -29,6 +29,7 @@ using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 
 namespace SanteDB.Persistence.Data.Security
 {
@@ -69,6 +70,18 @@ namespace SanteDB.Persistence.Data.Security
         {
             this.m_securityUser = userData;
             this.InitializeClaims();
+        }
+
+        /// <summary>
+        /// Map a user class UUID to string
+        /// </summary>
+        private string MapUserClass(Guid userClass)
+        {
+            if (ActorTypeKeys.HumanUser == userClass) return nameof(ActorTypeKeys.HumanUser);
+            else if (ActorTypeKeys.Application == userClass) return nameof(ActorTypeKeys.Application);
+            else if (ActorTypeKeys.Device == userClass) return nameof(ActorTypeKeys.Device);
+            else if (ActorTypeKeys.System == userClass) return nameof(ActorTypeKeys.System);
+            else return userClass.ToString();
         }
 
         /// <summary>
@@ -180,7 +193,22 @@ namespace SanteDB.Persistence.Data.Security
                 .OrderBy<DbEntityNameComponent>(o => o.OrderSequence)
                 .Statement;
 
-            var nameValue = String.Join(" ", contextForReadingAdditionalData.Query<DbEntityNameComponent>(subjectNameSql).Select(o => o.Value));
+            var nameParts = contextForReadingAdditionalData.Query<DbEntityNameComponent>(subjectNameSql).ToArray();
+
+            // Add a separate family name claim
+            var familyName = String.Join(" ", nameParts.Where(p => p.ComponentTypeKey == NameComponentKeys.Family).Select(o=>o.Value));
+            var givenName = String.Join(" ", nameParts.Where(p => p.ComponentTypeKey == NameComponentKeys.Given).Select(o=>o.Value));
+
+            if(!String.IsNullOrEmpty(familyName))
+            {
+                this.AddClaim(new SanteDBClaim(ClaimTypes.Surname, familyName));
+            }
+            if(!String.IsNullOrEmpty(givenName))
+            {
+                this.AddClaim(new SanteDBClaim(ClaimTypes.GivenName, givenName));
+            }
+
+            var nameValue = $"{familyName}, {givenName}";
             if (!String.IsNullOrEmpty(nameValue))
             {
                 this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaSubjectNameClaim, nameValue));
