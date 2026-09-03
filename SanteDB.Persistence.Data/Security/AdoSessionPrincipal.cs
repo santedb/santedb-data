@@ -103,7 +103,7 @@ namespace SanteDB.Persistence.Data.Security
         public bool TryGetClaimValue(string claimType, out string value)
         {
             value = this.Claims.FirstOrDefault(o => o.Type == claimType)?.Value;
-            return String.IsNullOrEmpty(claimType);
+            return !String.IsNullOrEmpty(value);
         }
     }
 }

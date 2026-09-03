@@ -101,7 +101,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             existingVersion.ParentKey = newVersion.VersionKey;
             context.Insert(existingVersion);
 
-            
+
         }
 
 
@@ -364,13 +364,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             {
                 data.StatusConceptKey = StatusKeys.New;
             }
-            else if(data.ReasonConceptKey == NullReasonKeys.Masked ||
-                data.Tags?.Any(t=>t.TagKey == SystemTagNames.PrivacyMaskingTag) == true)
+            else if (data.ReasonConceptKey == NullReasonKeys.Masked ||
+                data.Tags?.Any(t => t.TagKey == SystemTagNames.PrivacyMaskingTag) == true)
             {
                 throw new InvalidOperationException(ErrorMessages.CANNOT_SAVE_MASKED_ITEM);
             }
 
-                data.ClassConceptKey = this.EnsureExists(context, data.ClassConcept)?.Key ?? data.ClassConceptKey;
+            data.ClassConceptKey = this.EnsureExists(context, data.ClassConcept)?.Key ?? data.ClassConceptKey;
             data.MoodConceptKey = this.EnsureExists(context, data.MoodConcept)?.Key ?? data.MoodConceptKey;
             data.StatusConceptKey = this.EnsureExists(context, data.StatusConcept)?.Key ?? data.StatusConceptKey;
             data.TemplateKey = this.EnsureExists(context, data.Template)?.Key ?? data.TemplateKey;
@@ -389,27 +389,32 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             {
                 throw new DetectedIssueException(issues);
             }
-            else if(issues.Any())
+            else if (issues.Any())
             {
                 data.AddAnnotation(issues);
             }
 
-            if (data.Identifiers?.Any() == true)
+            if (!data.ShouldDisablePersistenceValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.Exists) &&
+                !context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.Exists))
             {
-                foreach (var ident in data.Identifiers.Where(o => o.Key.HasValue))
-                {
-                    var existingIdent = context.FirstOrDefault<DbActIdentifier>(o => o.Key == ident.Key);
-                    if (existingIdent == null)
-                    {
-                        continue;
-                    }
 
-                    if (ident.IdentityDomainKey != existingIdent.IdentityDomainKey ||
-                        ident.Value != existingIdent.Value ||
-                        ident.IdentifierTypeKey != existingIdent.TypeKey)
+                if (data.Identifiers?.Any() == true)
+                {
+                    foreach (var ident in data.Identifiers.Where(o => o.Key.HasValue))
                     {
-                        ident.BatchOperation = BatchOperationType.Insert;
-                        ident.Key = null;
+                        var existingIdent = context.FirstOrDefault<DbActIdentifier>(o => o.Key == ident.Key);
+                        if (existingIdent == null)
+                        {
+                            continue;
+                        }
+
+                        if (ident.IdentityDomainKey != existingIdent.IdentityDomainKey ||
+                            ident.Value != existingIdent.Value ||
+                            ident.IdentifierTypeKey != existingIdent.TypeKey)
+                        {
+                            ident.BatchOperation = BatchOperationType.Insert;
+                            ident.Key = null;
+                        }
                     }
                 }
             }
@@ -422,7 +427,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// </summary>
         protected virtual TAct DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
-            using(context.CreateInformationModelGuard(dbModel.Key)) { 
+            using (context.CreateInformationModelGuard(dbModel.Key))
+            {
                 var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
                 var conceptPersistence = typeof(Concept).GetRelatedPersistenceService() as IAdoPersistenceProvider<Concept>;
 
@@ -491,7 +497,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
                 return retVal;
             }
-            
+
         }
 
         /// <inheritdoc/>
@@ -522,7 +528,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     return this.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
                 }
             }
-           
+
         }
 
         /// <summary>
@@ -678,7 +684,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         {
             // Cascade the deletion of data down 
             if (!preserveContained &&
-                (!context.Data.TryGetValue(nameof(preserveContained), out var pcStack) || 
+                (!context.Data.TryGetValue(nameof(preserveContained), out var pcStack) ||
                 pcStack is Stack<Object> stk && !stk.Contains(key)))
             {
                 context.PushData(nameof(preserveContained), key);
@@ -693,7 +699,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 }
 
                 // Special participations that are transient are also removed
-                foreach(var ap in context.Query<DbActParticipation>(o=>o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToArray())
+                foreach (var ap in context.Query<DbActParticipation>(o => o.SourceKey == key && o.ClassificationKey == RelationshipClassKeys.ContainedObjectLink && o.ObsoleteVersionSequenceId == null).ToArray())
                 {
                     var rps = typeof(Entity).GetRelatedPersistenceService();
                     if (rps.Exists(context, ap.TargetKey))
@@ -708,7 +714,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             var retVal = base.DoDeleteModel(context, key, deleteMode, preserveContained);
 
             // Any relationships that reference this act should be invalidated as well if they are a reference
-            foreach(var ar in context.Query<DbActRelationship>(o => (o.TargetKey == key || o.SourceKey == key) && o.ObsoleteVersionSequenceId == null).ToArray())
+            foreach (var ar in context.Query<DbActRelationship>(o => (o.TargetKey == key || o.SourceKey == key) && o.ObsoleteVersionSequenceId == null).ToArray())
             {
                 if ((DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy) == DeleteMode.LogicalDelete)
                 {

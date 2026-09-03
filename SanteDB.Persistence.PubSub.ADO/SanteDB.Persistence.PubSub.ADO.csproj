@@ -76,9 +76,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="config\santedb.pubsub.firebird.config.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="config\santedb.pubsub.postgres.config.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

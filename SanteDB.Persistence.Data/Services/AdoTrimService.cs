@@ -38,7 +38,7 @@ namespace SanteDB.Persistence.Data.Services
             Guid[] purgeKeys = null;
             do
             {
-                purgeKeys = context.Query<DbEntityAddress>(o => o.ObsoleteVersionSequenceId != null && o.ObsoleteVersionSequenceId < versionSequenceTrim).Select(o => o.Key).Take(100).ToArray();
+                purgeKeys = context.Query<DbEntityAddress>(o => o.ObsoleteVersionSequenceId != null && o.ObsoleteVersionSequenceId < versionSequenceTrim).Select(o => o.Key).Take(1000).ToArray();
                 context.DeleteAll<DbEntityAddressComponent>(o => purgeKeys.Contains(o.SourceKey));
                 context.DeleteAll<DbEntityAddress>(o => purgeKeys.Contains(o.Key));
                 nrec += purgeKeys.LongLength;
@@ -48,7 +48,7 @@ namespace SanteDB.Persistence.Data.Services
             nrec = 0l;
             do
             {
-                purgeKeys = context.Query<DbEntityName>(o => o.ObsoleteVersionSequenceId != null && o.ObsoleteVersionSequenceId < versionSequenceTrim).Select(o => o.Key).Take(100).ToArray();
+                purgeKeys = context.Query<DbEntityName>(o => o.ObsoleteVersionSequenceId != null && o.ObsoleteVersionSequenceId < versionSequenceTrim).Select(o => o.Key).Take(1000).ToArray();
                 context.DeleteAll<DbEntityNameComponent>(o => purgeKeys.Contains(o.SourceKey));
                 context.DeleteAll<DbEntityName>(o => purgeKeys.Contains(o.Key));
             } while (purgeKeys.Length > 0);
@@ -74,21 +74,34 @@ namespace SanteDB.Persistence.Data.Services
             nrec = 0;
             do
             {
-                purgeKeys = context.Query<DbEntityVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).Select(o => o.VersionKey).Take(100).ToArray();
+                purgeKeys = context.Query<DbEntityVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).Select(o => o.VersionKey).Take(1000).ToArray();
                 // First we want to set the replaces version to NULL for any version in our key list
-                context.UpdateAll<DbEntityVersion>(o => purgeKeys.Contains(o.ReplacesVersionKey.Value), o => o.ReplacesVersionKey == null);
-                context.DeleteAll<DbUserEntity>(o => purgeKeys.Contains(o.ParentKey));
-                context.DeleteAll<DbProvider>(o => purgeKeys.Contains(o.ParentKey));
-                context.DeleteAll<DbPatient>(o => purgeKeys.Contains(o.ParentKey));
-                context.DeleteAll<DbPerson>(o => purgeKeys.Contains(o.ParentKey));
-                context.DeleteAll<DbPlace>(o => purgeKeys.Contains(o.ParentKey));
-                context.DeleteAll<DbOrganization>(o => purgeKeys.Contains(o.ParentKey));
-                context.DeleteAll<DbDeviceEntity>(o => purgeKeys.Contains(o.ParentKey));
-                context.DeleteAll<DbApplicationEntity>(o => purgeKeys.Contains(o.ParentKey));
-                context.DeleteAll<DbManufacturedMaterial>(o => purgeKeys.Contains(o.ParentKey));
-                context.DeleteAll<DbContainer>(o => purgeKeys.Contains(o.ParentKey));
-                context.DeleteAll<DbMaterial>(o => purgeKeys.Contains(o.ParentKey));
-                context.DeleteAll<DbEntityVersion>(o => purgeKeys.Contains(o.VersionKey));
+                var stepRec = context.UpdateAll<DbEntityVersion>(o => purgeKeys.Contains(o.ReplacesVersionKey.Value), o => o.ReplacesVersionKey == null);
+                this.m_tracer.TraceInfo("Redirected {0} version meta", stepRec);
+                stepRec = context.DeleteAll<DbUserEntity>(o => purgeKeys.Contains(o.ParentKey));
+                this.m_tracer.TraceInfo("Purged {0} user entity versions", stepRec);
+                stepRec = context.DeleteAll<DbProvider>(o => purgeKeys.Contains(o.ParentKey));
+                this.m_tracer.TraceInfo("Purged {0} provider versions", stepRec);
+                stepRec = context.DeleteAll<DbPatient>(o => purgeKeys.Contains(o.ParentKey));
+                this.m_tracer.TraceInfo("Purged {0} patient versions", stepRec);
+                stepRec = context.DeleteAll<DbPerson>(o => purgeKeys.Contains(o.ParentKey));
+                this.m_tracer.TraceInfo("Purged {0} person versions", stepRec);
+                stepRec = context.DeleteAll<DbPlace>(o => purgeKeys.Contains(o.ParentKey));
+                this.m_tracer.TraceInfo("Purged {0} place versions", stepRec);
+                stepRec = context.DeleteAll<DbOrganization>(o => purgeKeys.Contains(o.ParentKey));
+                this.m_tracer.TraceInfo("Purged {0} organization versions", stepRec);
+                stepRec = context.DeleteAll<DbDeviceEntity>(o => purgeKeys.Contains(o.ParentKey));
+                this.m_tracer.TraceInfo("Purged {0} device entity versions", stepRec);
+                stepRec = context.DeleteAll<DbApplicationEntity>(o => purgeKeys.Contains(o.ParentKey));
+                this.m_tracer.TraceInfo("Purged {0} application entity versions", stepRec);
+                stepRec = context.DeleteAll<DbManufacturedMaterial>(o => purgeKeys.Contains(o.ParentKey));
+                this.m_tracer.TraceInfo("Purged {0} manufactured material versions", stepRec);
+                stepRec = context.DeleteAll<DbContainer>(o => purgeKeys.Contains(o.ParentKey));
+                this.m_tracer.TraceInfo("Purged {0} container versions", stepRec);
+                stepRec = context.DeleteAll<DbMaterial>(o => purgeKeys.Contains(o.ParentKey));
+                this.m_tracer.TraceInfo("Purged {0} material versions", stepRec);
+                stepRec = context.DeleteAll<DbEntityVersion>(o => purgeKeys.Contains(o.VersionKey));
+                this.m_tracer.TraceInfo("Purged {0} entity versions", stepRec);
 
                 auditBuilder.WithAuditableObjects(new AuditableObject()
                 {
@@ -102,8 +115,8 @@ namespace SanteDB.Persistence.Data.Services
                 });
                 nrec += purgeKeys.LongLength;
             } while (purgeKeys.Length > 0);
-
             this.m_tracer.TraceInfo("Purged {0} old entity versions", nrec);
+
         }
 
         /// <summary>
@@ -129,7 +142,7 @@ namespace SanteDB.Persistence.Data.Services
             nrec = 0;
             do
             {
-                purgeKeys = context.Query<DbConceptVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).Select(o => o.VersionKey).Take(100).ToArray();
+                purgeKeys = context.Query<DbConceptVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).Select(o => o.VersionKey).Take(1000).ToArray();
                 // First we want to set the replaces version to NULL for any version in our key list
                 context.UpdateAll<DbConceptVersion>(o => purgeKeys.Contains(o.ReplacesVersionKey.Value), o => o.ReplacesVersionKey == null);
                 context.DeleteAll<DbConceptVersion>(o => purgeKeys.Contains(o.VersionKey));
@@ -178,7 +191,7 @@ namespace SanteDB.Persistence.Data.Services
             Guid[] purgeKeys = null;
             do
             {
-                purgeKeys = context.Query<DbActVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).Select(o => o.VersionKey).Take(100).ToArray();
+                purgeKeys = context.Query<DbActVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).Select(o => o.VersionKey).Take(1000).ToArray();
                 // First we want to set the replaces version to NULL for any version in our key list
                 context.UpdateAll<DbActVersion>(o => purgeKeys.Contains(o.ReplacesVersionKey.Value), o => o.ReplacesVersionKey == null);
                 context.DeleteAll<DbNarrative>(o => purgeKeys.Contains(o.ParentKey));
