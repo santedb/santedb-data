@@ -182,8 +182,20 @@ namespace SanteDB.Persistence.Data.Jobs
                                 return;
                             }
                             this.m_tracer.TraceInfo("Trimming {0}...", th.GetType().Name);
-                            this.m_jobStateManager.SetProgress(this, this.m_localizationService.GetString(UserMessageStrings.DB_TRIM_OBJECTS, new { objectType = th.GetType().Name }), c++ / (float)trimHelpers.Length * 0.7f + 0.3f);
-                            th.Trim(context, oldVersionCutoff, deletedCutoff, audit);
+                            var currentProgress = c++ / (float)trimHelpers.Length * 0.7f + 0.3f;
+                            this.m_jobStateManager.SetProgress(this, this.m_localizationService.GetString(UserMessageStrings.DB_TRIM_OBJECTS, new { objectType = th.GetType().Name }), currentProgress);
+
+                            if (th is IReportProgressChanged irpc)
+                            {
+                                EventHandler<ProgressChangedEventArgs> progHandler = (oc,ec) => this.m_jobStateManager.SetProgress(this, this.m_localizationService.GetString(ec.State, new { objectType = th.GetType().Name }), currentProgress + (ec.Progress / (trimHelpers.Length * 0.7f)));
+                                irpc.ProgressChanged += progHandler;
+                                th.Trim(context, oldVersionCutoff, deletedCutoff, audit);
+                                irpc.ProgressChanged -= progHandler;
+                            }
+                            else
+                            {
+                                th.Trim(context, oldVersionCutoff, deletedCutoff, audit);
+                            }
                         }
 
                         tx.Commit();
