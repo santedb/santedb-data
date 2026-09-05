@@ -1,6 +1,7 @@
 ﻿using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.Audit;
 using SanteDB.Core.Security.Audit;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Acts;
 using SanteDB.Persistence.Data.Model.Concepts;
@@ -20,10 +21,15 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// Implementation of a database trimming service
     /// </summary>
-    public class AdoTrimService : IAdoTrimProvider
+    public class AdoTrimService : IAdoTrimProvider, IReportProgressChanged
     {
 
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoTrimService));
+
+        /// <summary>
+        /// Progress has changed
+        /// </summary>
+        public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
 
         /// <summary>
         /// Trim all entities
@@ -72,6 +78,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_tracer.TraceInfo("Trimmed {0} person communications", nrec);
 
             nrec = 0;
+            var totalRec = context.Query<DbEntityVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).Select(o => o.VersionKey).Count();
             do
             {
                 purgeKeys = context.Query<DbEntityVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).Select(o => o.VersionKey).Take(1000).ToArray();
@@ -114,6 +121,8 @@ namespace SanteDB.Persistence.Data.Services
                     ObjectData = purgeKeys.Select(o => new ObjectDataExtension("vid", o.ToString())).ToList()
                 });
                 nrec += purgeKeys.LongLength;
+
+                this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(AdoTrimService), ((float)nrec / (float)totalRec) * 0.3f, $"Purging Entity Versions ({nrec} or {totalRec})"));
             } while (purgeKeys.Length > 0);
             this.m_tracer.TraceInfo("Purged {0} old entity versions", nrec);
 
@@ -140,6 +149,7 @@ namespace SanteDB.Persistence.Data.Services
 
             Guid[] purgeKeys = null;
             nrec = 0;
+            var totalRec = context.Query<DbConceptVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).Select(o => o.VersionKey).Count();
             do
             {
                 purgeKeys = context.Query<DbConceptVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).Select(o => o.VersionKey).Take(1000).ToArray();
@@ -158,6 +168,8 @@ namespace SanteDB.Persistence.Data.Services
                     ObjectData = purgeKeys.Select(o => new ObjectDataExtension("vid", o.ToString())).ToList()
                 });
                 nrec += purgeKeys.LongLength;
+                this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(AdoTrimService), ((float)nrec / (float)totalRec) * 0.3f + 0.6f, $"Purging Concept Versions ({nrec} or {totalRec})"));
+
             } while (purgeKeys.Length > 0);
             this.m_tracer.TraceInfo("Purged {0} old concept versions", nrec);
 
@@ -189,6 +201,7 @@ namespace SanteDB.Persistence.Data.Services
 
             nRec = 0;
             Guid[] purgeKeys = null;
+            var totalRec = context.Query<DbActVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).Select(o => o.VersionKey).Count();
             do
             {
                 purgeKeys = context.Query<DbActVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).Select(o => o.VersionKey).Take(1000).ToArray();
@@ -218,6 +231,7 @@ namespace SanteDB.Persistence.Data.Services
                     ObjectData = purgeKeys.Select(o => new ObjectDataExtension("vid", o.ToString())).ToList()
                 });
                 nRec += purgeKeys.LongLength;
+                this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(AdoTrimService), ((float)nRec / (float)totalRec) * 0.3f + 0.3f, $"Purging Act Versions ({nRec} or {totalRec})"));
             } while (purgeKeys.Length > 0);
 
             this.m_tracer.TraceInfo("Purged {0} old act versions", nRec);

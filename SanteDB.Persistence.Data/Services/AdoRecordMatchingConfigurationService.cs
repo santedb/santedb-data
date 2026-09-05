@@ -321,5 +321,21 @@ namespace SanteDB.Persistence.Data.Services
             return configuration;
         }
 
+        /// <inheritdoc/>
+        public bool TryLoadConfigurationFromStream(Stream configurationStream, out IRecordMatchingConfiguration configuration)
+        {
+            try
+            {
+                var retVal = MatchConfiguration.Load(configurationStream);
+                retVal.Metadata.Status = MatchConfigurationStatus.Inactive;
+                configuration = retVal;
+                return true;
+            }
+            catch
+            {
+                configuration = null;
+                return false;
+            }
+        }
     }
 }
