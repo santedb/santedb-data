@@ -136,7 +136,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             var retVal = base.DoInsertModel(context, data);
             var dbSubInstance = this.m_modelMapper.MapModelInstance<TEntity, TDbTopLevelTable>(data);
             dbSubInstance.ParentKey = retVal.VersionKey.Value;
-            dbSubInstance = context.Insert(dbSubInstance);
+            if (context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.Exists) &&
+                !context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.All) &&
+                context.Any<TDbTopLevelTable>(v => v.ParentKey == retVal.VersionKey)
+            )
+            {
+                this.m_tracer.TraceWarning("Refusing to insert {0} since its version already exists");
+                dbSubInstance = context.FirstOrDefault<TDbTopLevelTable>(o => o.ParentKey == retVal.VersionKey);
+            }
+            else
+            {
+                dbSubInstance = context.Insert(dbSubInstance);
+            }
             retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbTopLevelTable, TEntity>(dbSubInstance), onlyNullFields: true);
             return retVal;
         }
@@ -148,7 +159,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             // Update sub entity table
             var dbSubEntity = this.m_modelMapper.MapModelInstance<TEntity, TDbTopLevelTable>(data);
             dbSubEntity.ParentKey = retVal.VersionKey.Value;
-            dbSubEntity = context.Insert(dbSubEntity);
+            if (context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.Exists) &&
+                !context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.All) &&
+                context.Any<TDbTopLevelTable>(v => v.ParentKey == retVal.VersionKey)
+            )
+            {
+                this.m_tracer.TraceWarning("Refusing to insert {0} since its version already exists");
+                dbSubEntity = context.FirstOrDefault<TDbTopLevelTable>(o => o.ParentKey == retVal.VersionKey);
+            }
+            else
+            {
+                dbSubEntity = context.Insert(dbSubEntity);
+            }
             retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbTopLevelTable, TEntity>(dbSubEntity), onlyNullFields: true);
             return retVal;
         }
@@ -213,7 +235,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             var retVal = base.DoInsertModel(context, data);
             var dbSubInstance = this.m_modelMapper.MapModelInstance<TEntity, TDbEntitySubTable>(data);
             dbSubInstance.ParentKey = retVal.VersionKey.Value;
-            dbSubInstance = context.Insert(dbSubInstance);
+            if (context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.Exists) &&
+                !context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.All) &&
+                context.Any<TDbEntitySubTable>(v => v.ParentKey == retVal.VersionKey)
+            )
+            {
+                this.m_tracer.TraceWarning("Refusing to insert {0} since its version already exists");
+                dbSubInstance = context.FirstOrDefault<TDbEntitySubTable>(o => o.ParentKey == retVal.VersionKey);
+            }
+            else
+            {
+                dbSubInstance = context.Insert(dbSubInstance);
+            }
             retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbEntitySubTable, TEntity>(dbSubInstance), onlyNullFields: true);
             return retVal;
         }
@@ -225,7 +258,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             // Update sub entity table
             var dbSubEntity = this.m_modelMapper.MapModelInstance<TEntity, TDbEntitySubTable>(data);
             dbSubEntity.ParentKey = retVal.VersionKey.Value;
-            dbSubEntity = context.Insert(dbSubEntity);
+            if (context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.Exists) &&
+                !context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.All) &&
+                context.Any<TDbEntitySubTable>(v => v.ParentKey == retVal.VersionKey)
+            )
+            {
+                this.m_tracer.TraceWarning("Refusing to insert {0} since its version already exists");
+                dbSubEntity = context.FirstOrDefault<TDbEntitySubTable>(o => o.ParentKey == retVal.VersionKey);
+            }
+            else
+            {
+                dbSubEntity = context.Insert(dbSubEntity);
+            }
             retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbEntitySubTable, TEntity>(dbSubEntity), onlyNullFields: true);
             return retVal;
         }
@@ -815,7 +859,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             }
         }
 
-        
+
 
     }
 }
