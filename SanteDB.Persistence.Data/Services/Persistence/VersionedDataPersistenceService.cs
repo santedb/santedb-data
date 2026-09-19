@@ -38,6 +38,7 @@ using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.DataType;
+using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -109,64 +110,64 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 sw.Start();
 #endif
 
-                // We don't create new versions, instead we update the current data
-                var existing = context.Query<TDbModel>(o => o.Key == key).OrderByDescending(o => o.VersionSequenceId).Skip(0).Take(2).ToArray();
+            // We don't create new versions, instead we update the current data
+            var existing = context.Query<TDbModel>(o => o.Key == key).OrderByDescending(o => o.VersionSequenceId).Skip(0).Take(2).ToArray();
 
-                if (!existing.Any())
+            if (!existing.Any())
+            {
+                throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { type = typeof(TModel).Name, id = key }));
+            }
+
+            // Are we creating a new verison? or no?
+            if (!this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
+            {
+                if (existing.Count() > 1) // We only keep recent and last
                 {
-                    throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { type = typeof(TModel).Name, id = key }));
+                    var lastVersionSequence = existing[0].VersionSequenceId;
+                    this.DoDeleteAllInternal(context, o => o.Key == key && o.VersionSequence < lastVersionSequence, DeleteMode.PermanentDelete);
                 }
-
-                // Are we creating a new verison? or no?
-                if (!this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
+            }
+            else
+            {
+                // We want to obsolete the non current version(s)
+                foreach (var itm in context.Query<TDbModel>(o => o.Key == key && o.ObsoletionTime == null).ToArray())
                 {
-                    if (existing.Count() > 1) // We only keep recent and last
-                    {
-                        var lastVersionSequence = existing[0].VersionSequenceId;
-                        this.DoDeleteAllInternal(context, o => o.Key == key && o.VersionSequence < lastVersionSequence, DeleteMode.PermanentDelete);
-                    }
+                    itm.ObsoletionTime = DateTimeOffset.Now;
+                    itm.ObsoletedByKey = context.ContextId;
+                    itm.ObsoletedByKeySpecified = itm.ObsoletionTimeSpecified = true;
+                    context.Update(itm);
                 }
-                else
-                {
-                    // We want to obsolete the non current version(s)
-                    foreach (var itm in context.Query<TDbModel>(o => o.Key == key && o.ObsoletionTime == null).ToArray())
-                    {
-                        itm.ObsoletionTime = DateTimeOffset.Now;
-                        itm.ObsoletedByKey = context.ContextId;
-                        itm.ObsoletedByKeySpecified = itm.ObsoletionTimeSpecified = true;
-                        context.Update(itm);
-                    }
-                }
+            }
 
-                // next - we create a new version of dbmodel
-                var oldVersion = existing.First();
-                var newVersion = new TDbModel();
-                newVersion.CopyObjectData(oldVersion);
-                newVersion.ReplacesVersionKey = newVersion.VersionKey;
-                newVersion.CreationTime = DateTimeOffset.Now;
-                newVersion.CreatedByKey = context.ContextId;
-                newVersion.ObsoletedByKey = null;
-                newVersion.ObsoletionTime = null;
-                newVersion.VersionSequenceId = null;
-                newVersion.ObsoletedByKeySpecified = true;
-                newVersion.VersionKey = Guid.NewGuid();
-                newVersion.IsHeadVersion = true;
+            // next - we create a new version of dbmodel
+            var oldVersion = existing.First();
+            var newVersion = new TDbModel();
+            newVersion.CopyObjectData(oldVersion);
+            newVersion.ReplacesVersionKey = newVersion.VersionKey;
+            newVersion.CreationTime = DateTimeOffset.Now;
+            newVersion.CreatedByKey = context.ContextId;
+            newVersion.ObsoletedByKey = null;
+            newVersion.ObsoletionTime = null;
+            newVersion.VersionSequenceId = null;
+            newVersion.ObsoletedByKeySpecified = true;
+            newVersion.VersionKey = Guid.NewGuid();
+            newVersion.IsHeadVersion = true;
 
-                if (oldVersion.IsHeadVersion)
-                {
-                    oldVersion.ObsoletionTime = DateTimeOffset.Now;
-                    oldVersion.ObsoletedByKey = context.ContextId;
-                    oldVersion.ObsoletedByKeySpecified = oldVersion.ObsoletionTimeSpecified = true;
-                    oldVersion.IsHeadVersion = false;
-                    context.Update(oldVersion);
-                }
+            if (oldVersion.IsHeadVersion)
+            {
+                oldVersion.ObsoletionTime = DateTimeOffset.Now;
+                oldVersion.ObsoletedByKey = context.ContextId;
+                oldVersion.ObsoletedByKeySpecified = oldVersion.ObsoletionTimeSpecified = true;
+                oldVersion.IsHeadVersion = false;
+                context.Update(oldVersion);
+            }
 
-                context.Insert(newVersion);
-                this.DoCopyVersionSubTableInternal(context, newVersion);
+            context.Insert(newVersion);
+            this.DoCopyVersionSubTableInternal(context, newVersion);
 
-                // Evict from cache 
-                this.m_dataCacheService.Remove(key);
-                return this.DoConvertToInformationModel(context, newVersion);
+            // Evict from cache 
+            this.m_dataCacheService.Remove(key);
+            return this.DoConvertToInformationModel(context, newVersion);
 #if DEBUG
             }
             finally
@@ -434,30 +435,30 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
 #endif
 
-                if (versionKey.GetValueOrDefault() == Guid.Empty) // fetching the current version
+            if (versionKey.GetValueOrDefault() == Guid.Empty) // fetching the current version
+            {
+                var cacheKey = this.GetAdHocCacheKey(key);
+                if (allowCache && (this.m_configuration?.CachingPolicy?.Targets & Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects) == Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects)
                 {
-                    var cacheKey = this.GetAdHocCacheKey(key);
-                    if (allowCache && (this.m_configuration?.CachingPolicy?.Targets & Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects) == Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects)
-                    {
-                        retVal = this.m_adhocCache?.Get<TDbModel>(cacheKey);
-                    }
+                    retVal = this.m_adhocCache?.Get<TDbModel>(cacheKey);
+                }
 
-                    // Cache miss
-                    if (retVal == null)
-                    {
-                        retVal = context.Query<TDbModel>(o => o.Key == key && o.IsHeadVersion).FirstOrDefault();
+                // Cache miss
+                if (retVal == null)
+                {
+                    retVal = context.Query<TDbModel>(o => o.Key == key && o.IsHeadVersion).FirstOrDefault();
 
-                        if ((this.m_configuration?.CachingPolicy?.Targets & Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects) == Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects)
-                        {
-                            this.m_adhocCache.Add(cacheKey, retVal, this.m_configuration.CachingPolicy?.DataObjectExpiry);
-                        }
+                    if ((this.m_configuration?.CachingPolicy?.Targets & Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects) == Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects)
+                    {
+                        this.m_adhocCache.Add(cacheKey, retVal, this.m_configuration.CachingPolicy?.DataObjectExpiry);
                     }
                 }
-                else
-                {
-                    // Fetch the object
-                    retVal = this.ExecuteQueryOrm(context, o => o.Key == key && o.VersionKey == versionKey).FirstOrDefault();
-                }
+            }
+            else
+            {
+                // Fetch the object
+                retVal = this.ExecuteQueryOrm(context, o => o.Key == key && o.VersionKey == versionKey).FirstOrDefault();
+            }
 
 #if DEBUG
             }
@@ -490,31 +491,41 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             try
             {
 #endif
-                // First we want to insert the keyed object via TDbKeyTable
-                if (dbModel.Key == Guid.Empty)
-                {
-                    dbModel.Key = Guid.NewGuid();
-                }
+            // First we want to insert the keyed object via TDbKeyTable
+            if (dbModel.Key == Guid.Empty)
+            {
+                dbModel.Key = Guid.NewGuid();
+            }
 
-                // Auto-update? - some versioned entities may have 0 versions - we want to ignore duplicate insert
-                if (!(DataPersistenceControlContext.Current?.AutoUpdate ?? this.m_configuration.AutoUpdateExisting) ||
-                    !context.Any<TDbKeyModel>(o => o.Key == dbModel.Key))
-                {
-                    context.Insert(new TDbKeyModel() { Key = dbModel.Key });
-                }
+            // Auto-update? - some versioned entities may have 0 versions - we want to ignore duplicate insert
+            if (!(DataPersistenceControlContext.Current?.AutoUpdate ?? this.m_configuration.AutoUpdateExisting) ||
+                !context.Any<TDbKeyModel>(o => o.Key == dbModel.Key))
+            {
+                context.Insert(new TDbKeyModel() { Key = dbModel.Key });
+            }
 
-                // Next we want to insert the version key
-                if (dbModel.VersionKey == Guid.Empty)
-                {
-                    dbModel.VersionKey = Guid.NewGuid();
-                }
-                dbModel.IsHeadVersion = true;
-                dbModel.CreationTime = DateTimeOffset.Now;
-                dbModel.CreatedByKey = context.ContextId;
-                dbModel.VersionSequenceId = null;
-                dbModel.ReplacesVersionKey = null;
-                // Insert the version link data
-                return context.Insert(dbModel);
+            // Next we want to insert the version key
+            if (dbModel.VersionKey == Guid.Empty)
+            {
+                dbModel.VersionKey = Guid.NewGuid();
+            }
+            else if (context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.Exists) &&
+                !context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.All) &&
+                context.Any<TDbModel>(v => v.VersionKey == dbModel.VersionKey)
+            )
+            {
+                this.m_tracer.TraceWarning("Refusing to insert {0} since its version already exists");
+                return context.FirstOrDefault<TDbModel>(o => o.VersionKey == dbModel.VersionKey);
+            }
+
+            dbModel.IsHeadVersion = true;
+            dbModel.CreationTime = DateTimeOffset.Now;
+            dbModel.CreatedByKey = context.ContextId;
+            dbModel.VersionSequenceId = null;
+            dbModel.ReplacesVersionKey = null;
+
+            // Insert the version link data
+            return context.Insert(dbModel);
 #if DEBUG
             }
             finally
@@ -546,62 +557,64 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
 #endif
 
-                // We don't create new versions, instead we update the current data
-                var existing = context.Query<TDbModel>(o => o.Key == model.Key).OrderByDescending(o => o.VersionSequenceId).Skip(0).Take(2).ToArray();
+            // We don't create new versions, instead we update the current data
+            var existing = context.Query<TDbModel>(o => o.Key == model.Key).OrderByDescending(o => o.VersionSequenceId).Skip(0).Take(2).ToArray();
 
-                if (!existing.Any())
+            if (!existing.Any())
+            {
+                throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { type = typeof(TModel).Name, id = model.Key }));
+            }
+
+
+            // Are we creating a new verison? or no?
+            if (!this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning) && existing.Count() > 1)
+            {
+                var lastVersionSequence = existing[0].VersionSequenceId;
+                foreach (var itm in context.Query<TDbModel>(o => o.Key == model.Key).OrderByDescending(o => o.VersionSequenceId).Skip(1))
                 {
-                    throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { type = typeof(TModel).Name, id = model.Key }));
+                    context.Delete(itm);
+                    this.DoDeleteReferencesInternal(context, itm.VersionKey);
                 }
-
-                // Are we creating a new verison? or no?
-                if (!this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning) && existing.Count() > 1)
+            }
+            else
+            {
+                // We want to obsolete the non current version(s)
+                foreach (var itm in context.Query<TDbModel>(o => o.Key == model.Key && !o.ObsoletionTime.HasValue).ToArray())
                 {
-                    var lastVersionSequence = existing[0].VersionSequenceId;
-                    foreach (var itm in context.Query<TDbModel>(o => o.Key == model.Key).OrderByDescending(o => o.VersionSequenceId).Skip(1))
-                    {
-                        context.Delete(itm);
-                        this.DoDeleteReferencesInternal(context, itm.VersionKey);
-                    }
+                    itm.ObsoletionTime = DateTimeOffset.Now;
+                    itm.ObsoletedByKey = context.ContextId;
+                    itm.IsHeadVersion = false;
+                    itm.ObsoletedByKeySpecified = itm.ObsoletionTimeSpecified = true;
+                    context.Update(itm);
                 }
-                else
-                {
-                    // We want to obsolete the non current version(s)
-                    foreach (var itm in context.Query<TDbModel>(o => o.Key == model.Key && !o.ObsoletionTime.HasValue).ToArray())
-                    {
-                        itm.ObsoletionTime = DateTimeOffset.Now;
-                        itm.ObsoletedByKey = context.ContextId;
-                        itm.IsHeadVersion = false;
-                        itm.ObsoletedByKeySpecified = itm.ObsoletionTimeSpecified = true;
-                        context.Update(itm);
-                    }
-                }
+            }
 
-                // next - we create a new version of dbmodel
-                var oldVersion = existing.First();
-                var newVersion = new TDbModel();
-                newVersion.CopyObjectData(model, true);
-                newVersion.ReplacesVersionKey = oldVersion.VersionKey;
-                newVersion.CreationTime = DateTimeOffset.Now;
-                newVersion.CreatedByKey = context.ContextId;
-                newVersion.IsHeadVersion = true;
-                newVersion.ObsoletedByKey = null;
-                newVersion.ObsoletionTime = null;
-                newVersion.VersionSequenceId = null;
+            // next - we create a new version of dbmodel
+            var oldVersion = existing.First();
 
-                newVersion.ObsoletedByKeySpecified = model.ObsoletionTimeSpecified = true;
-                newVersion.VersionKey = Guid.NewGuid();
+            var newVersion = new TDbModel();
+            newVersion.CopyObjectData(model, true);
+            newVersion.ReplacesVersionKey = oldVersion.VersionKey;
+            newVersion.CreationTime = DateTimeOffset.Now;
+            newVersion.CreatedByKey = context.ContextId;
+            newVersion.IsHeadVersion = true;
+            newVersion.ObsoletedByKey = null;
+            newVersion.ObsoletionTime = null;
+            newVersion.VersionSequenceId = null;
 
-                if (oldVersion.IsHeadVersion)
-                {
-                    oldVersion.ObsoletionTime = DateTimeOffset.Now;
-                    oldVersion.ObsoletedByKey = context.ContextId;
-                    oldVersion.IsHeadVersion = false;
-                    oldVersion.ObsoletedByKeySpecified = oldVersion.ObsoletionTimeSpecified = true;
-                    context.Update(oldVersion);
-                }
+            newVersion.ObsoletedByKeySpecified = model.ObsoletionTimeSpecified = true;
+            newVersion.VersionKey = Guid.NewGuid();
 
-                return context.Insert(newVersion); // Insert the core version
+            if (oldVersion.IsHeadVersion)
+            {
+                oldVersion.ObsoletionTime = DateTimeOffset.Now;
+                oldVersion.ObsoletedByKey = context.ContextId;
+                oldVersion.IsHeadVersion = false;
+                oldVersion.ObsoletedByKeySpecified = oldVersion.ObsoletionTimeSpecified = true;
+                context.Update(oldVersion);
+            }
+
+            return context.Insert(newVersion); // Insert the core version
 #if DEBUG
             }
             finally
@@ -632,68 +645,68 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             try
             {
 #endif
-                // First - we determine if the query has an explicit status concept set
-                if (typeof(IHasState).IsAssignableFrom(typeof(TModel)) && !expression.ToString().Contains(nameof(IHasState.StatusConceptKey)))
+            // First - we determine if the query has an explicit status concept set
+            if (typeof(IHasState).IsAssignableFrom(typeof(TModel)) && !expression.ToString().Contains(nameof(IHasState.StatusConceptKey)))
+            {
+                var statusKeyProperty = Expression.MakeMemberAccess(expression.Parameters[0], typeof(TModel).GetProperty(nameof(IHasState.StatusConceptKey)));
+                statusKeyProperty = Expression.MakeMemberAccess(statusKeyProperty, statusKeyProperty.Type.GetProperty("Value"));
+                expression = Expression.Lambda<Func<TModel, bool>>(Expression.And(expression.Body, Expression.MakeBinary(ExpressionType.NotEqual, statusKeyProperty, Expression.Constant(StatusKeys.Obsolete))), expression.Parameters);
+            }
+
+            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
+            {
+                // Convert the query to a domain query so that the object persistence layer can turn the
+                // structured LINQ query into a SQL statement
+                var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
+                if (domainExpression == null)
                 {
-                    var statusKeyProperty = Expression.MakeMemberAccess(expression.Parameters[0], typeof(TModel).GetProperty(nameof(IHasState.StatusConceptKey)));
-                    statusKeyProperty = Expression.MakeMemberAccess(statusKeyProperty, statusKeyProperty.Type.GetProperty("Value"));
-                    expression = Expression.Lambda<Func<TModel, bool>>(Expression.And(expression.Body, Expression.MakeBinary(ExpressionType.NotEqual, statusKeyProperty, Expression.Constant(StatusKeys.Obsolete))), expression.Parameters);
+                    this.m_tracer.TraceVerbose("WARNING: Using very slow DeleteAll() method - consider using only primary properties for delete all");
+                    var columnKey = TableMapping.Get(typeof(TDbModel)).GetColumn(nameof(DbVersionedData.Key));
+                    var keyQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(expression, columnKey).Statement;
+                    var keys = context.Query<TDbModel>(keyQuery).Select(o => o.Key);
+                    domainExpression = o => keys.Contains(o.Key);
                 }
 
-                if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
+                // Add obsolete filter - only apply this to current versions
+                var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(domainExpression.Parameters[0], typeof(TDbModel).GetProperty(nameof(DbVersionedData.ObsoletionTime))), Expression.Constant(null));
+                domainExpression = Expression.Lambda<Func<TDbModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, domainExpression.Body), domainExpression.Parameters);
+
+                // determine our deletion mode
+                switch (deletionMode)
                 {
-                    // Convert the query to a domain query so that the object persistence layer can turn the
-                    // structured LINQ query into a SQL statement
-                    var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
-                    if (domainExpression == null)
-                    {
-                        this.m_tracer.TraceVerbose("WARNING: Using very slow DeleteAll() method - consider using only primary properties for delete all");
-                        var columnKey = TableMapping.Get(typeof(TDbModel)).GetColumn(nameof(DbVersionedData.Key));
-                        var keyQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(expression, columnKey).Statement;
-                        var keys = context.Query<TDbModel>(keyQuery).Select(o => o.Key);
-                        domainExpression = o => keys.Contains(o.Key);
-                    }
+                    case DeleteMode.LogicalDelete:
+                        context.UpdateAll(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId);
+                        foreach (var newVersion in context.Query<TDbModel>(o => o.ObsoletionTime != null && o.ObsoletedByKey == context.ContextId).Select(o => o.Key))
+                        {
+                            yield return newVersion;
+                        }
+                        yield break;
+                    case DeleteMode.PermanentDelete:
+                        foreach (var existing in context.Query<TDbModel>(domainExpression).ToArray())
+                        {
+                            this.DoDeleteReferencesInternal(context, existing.Key);
+                            this.DoDeleteReferencesInternal(context, existing.VersionKey);
+                            context.DeleteAll<TDbModel>(o => o.VersionKey == existing.VersionKey);
 
-                    // Add obsolete filter - only apply this to current versions
-                    var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(domainExpression.Parameters[0], typeof(TDbModel).GetProperty(nameof(DbVersionedData.ObsoletionTime))), Expression.Constant(null));
-                    domainExpression = Expression.Lambda<Func<TDbModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, domainExpression.Body), domainExpression.Parameters);
-
-                    // determine our deletion mode
-                    switch (deletionMode)
-                    {
-                        case DeleteMode.LogicalDelete:
-                            context.UpdateAll(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId);
-                            foreach (var newVersion in context.Query<TDbModel>(o => o.ObsoletionTime != null && o.ObsoletedByKey == context.ContextId).Select(o => o.Key))
+                            // Reverse the history
+                            foreach (var ver in context.Query<TDbModel>(o => o.Key == existing.Key).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionKey))
                             {
-                                yield return newVersion;
+                                this.DoDeleteReferencesInternal(context, ver);
+                                context.DeleteAll<TDbModel>(o => o.VersionKey == ver);
+
                             }
-                            yield break;
-                        case DeleteMode.PermanentDelete:
-                            foreach (var existing in context.Query<TDbModel>(domainExpression).ToArray())
-                            {
-                                this.DoDeleteReferencesInternal(context, existing.Key);
-                                this.DoDeleteReferencesInternal(context, existing.VersionKey);
-                                context.DeleteAll<TDbModel>(o => o.VersionKey == existing.VersionKey);
 
-                                // Reverse the history
-                                foreach (var ver in context.Query<TDbModel>(o => o.Key == existing.Key).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionKey))
-                                {
-                                    this.DoDeleteReferencesInternal(context, ver);
-                                    context.DeleteAll<TDbModel>(o => o.VersionKey == ver);
-
-                                }
-
-                                context.DeleteAll<TDbKeyModel>(o => o.Key == existing.Key);
-                                this.m_dataCacheService.Remove(existing.Key);
-                                yield return existing.Key;
-                            }
-                            break;
-                    }
+                            context.DeleteAll<TDbKeyModel>(o => o.Key == existing.Key);
+                            this.m_dataCacheService.Remove(existing.Key);
+                            yield return existing.Key;
+                        }
+                        break;
                 }
-                else
-                {
-                    base.DoDeleteAllInternal(context, expression, DeleteMode.PermanentDelete);
-                }
+            }
+            else
+            {
+                base.DoDeleteAllInternal(context, expression, DeleteMode.PermanentDelete);
+            }
 #if DEBUG
             }
             finally
@@ -729,61 +742,61 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
 #endif
 
-                // How are we obsoleting this? - is it full versioning?
-                if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
+            // How are we obsoleting this? - is it full versioning?
+            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
+            {
+                // Get the current version
+                var existing = context.Query<TDbModel>(o => o.Key == key && o.IsHeadVersion).FirstOrDefault();
+                if (existing == null)
                 {
-                    // Get the current version
-                    var existing = context.Query<TDbModel>(o => o.Key == key && o.IsHeadVersion).FirstOrDefault();
-                    if (existing == null)
-                    {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { type = typeof(TModel).Name, id = key }));
-                    }
-
-                    TDbModel retVal = null;
-                    switch (deletionMode)
-                    {
-                        case DeleteMode.LogicalDelete:
-
-                            existing.ObsoletionTime = DateTimeOffset.Now;
-                            existing.ObsoletedByKey = context.ContextId;
-                            retVal = context.Update(existing);
-
-                            break;
-                        case DeleteMode.PermanentDelete:
-                            this.DoDeleteReferencesInternal(context, existing.Key);
-                            this.DoDeleteReferencesInternal(context, existing.VersionKey);
-                            context.DeleteAll<TDbModel>(o => o.VersionKey == existing.VersionKey);
-                            // Reverse the history
-                            foreach (var ver in context.Query<TDbModel>(o => o.Key == existing.Key).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionKey).ToList())
-                            {
-                                this.DoDeleteReferencesInternal(context, ver);
-                                context.DeleteAll<TDbModel>(o => o.VersionKey == ver);
-                            }
-
-                            context.DeleteAll<TDbKeyModel>(o => o.Key == existing.Key);
-                            existing.StatusConceptKey = StatusKeys.Purged;
-                            existing.ObsoletionTime = DateTimeOffset.Now;
-                            existing.ObsoletedByKey = context.ContextId;
-                            existing.ReplacesVersionKey = existing.VersionKey;
-                            existing.VersionKey = Guid.Empty;
-                            return existing;
-
-                        default:
-                            throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_DELETE_MODE_SUPPORT, new { mode = deletionMode }));
-                    }
-
-                    // JF - This is not needed since the new method of delete doesn't
-                    //      create a new version rather terminates the head
-                    // Copy a new version of dependent tables
-                    // this.DoCopyVersionSubTableInternal(context, retVal);
-
-                    return retVal;
-
+                    throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { type = typeof(TModel).Name, id = key }));
                 }
-                else
+
+                TDbModel retVal = null;
+                switch (deletionMode)
                 {
-                    return base.DoDeleteInternal(context, key, deletionMode);
+                    case DeleteMode.LogicalDelete:
+
+                        existing.ObsoletionTime = DateTimeOffset.Now;
+                        existing.ObsoletedByKey = context.ContextId;
+                        retVal = context.Update(existing);
+
+                        break;
+                    case DeleteMode.PermanentDelete:
+                        this.DoDeleteReferencesInternal(context, existing.Key);
+                        this.DoDeleteReferencesInternal(context, existing.VersionKey);
+                        context.DeleteAll<TDbModel>(o => o.VersionKey == existing.VersionKey);
+                        // Reverse the history
+                        foreach (var ver in context.Query<TDbModel>(o => o.Key == existing.Key).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionKey).ToList())
+                        {
+                            this.DoDeleteReferencesInternal(context, ver);
+                            context.DeleteAll<TDbModel>(o => o.VersionKey == ver);
+                        }
+
+                        context.DeleteAll<TDbKeyModel>(o => o.Key == existing.Key);
+                        existing.StatusConceptKey = StatusKeys.Purged;
+                        existing.ObsoletionTime = DateTimeOffset.Now;
+                        existing.ObsoletedByKey = context.ContextId;
+                        existing.ReplacesVersionKey = existing.VersionKey;
+                        existing.VersionKey = Guid.Empty;
+                        return existing;
+
+                    default:
+                        throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_DELETE_MODE_SUPPORT, new { mode = deletionMode }));
                 }
+
+                // JF - This is not needed since the new method of delete doesn't
+                //      create a new version rather terminates the head
+                // Copy a new version of dependent tables
+                // this.DoCopyVersionSubTableInternal(context, retVal);
+
+                return retVal;
+
+            }
+            else
+            {
+                return base.DoDeleteInternal(context, key, deletionMode);
+            }
 #if DEBUG
             }
             finally
@@ -944,7 +957,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             toDelete = toDelete.Except(contextKeys).ToArray();
 
-            if(typeof(IClassifiedRelationship).IsAssignableFrom(persistenceService.ModelType) &&
+            if (typeof(IClassifiedRelationship).IsAssignableFrom(persistenceService.ModelType) &&
                 !context.ShouldDisableObjectValidation().HasFlag(DataContextExtensions.DisablePersistenceValidationFlags.StickyRelationships)) //Not part of a synchronization operation (i.e. the server is telling us we should delete)
             {
                 // Get all classification keys from the persister
@@ -992,7 +1005,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return a;
             });
 
-            var retVal = updatedRelationships.Union(addedRelationships).Union(associations.Where(o=>o.BatchOperation == BatchOperationType.Ignore)).ToArray();
+            var retVal = updatedRelationships.Union(addedRelationships).Union(associations.Where(o => o.BatchOperation == BatchOperationType.Ignore)).ToArray();
             context.PopData(DataConstants.NoTouchSourceContextKey, out _);
             return retVal;
         }
