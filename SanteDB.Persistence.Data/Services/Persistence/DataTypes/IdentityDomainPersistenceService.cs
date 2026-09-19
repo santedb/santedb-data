@@ -143,6 +143,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             {
                 retVal.AssigningAuthority = base.UpdateModelAssociations(context, retVal, data.AssigningAuthority).ToList();
             }
+            this.m_adhocCache?.Remove($"{DataConstants.AdhocAuthorityKey}{retVal.Key}");
 
             return retVal;
         }
