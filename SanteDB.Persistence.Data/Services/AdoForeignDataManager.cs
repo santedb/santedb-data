@@ -240,7 +240,7 @@ namespace SanteDB.Persistence.Data.Services
                                     for (currentSubsetOffset = 0; currentSubsetOffset < subsetNames.Length; currentSubsetOffset++)
                                     {
                                         var sourceName = subsetNames[currentSubsetOffset];
-                                        var map = foreignDataMap.Maps.FirstOrDefault(o => (o.Source ?? String.Empty) == sourceName);
+                                        var map = foreignDataMap.Maps.FirstOrDefault(o => (o.Source ?? sourceName) == sourceName);
                                         if (map != null)
                                         {
                                             using (var reader = sourceFile.CreateReader(sourceName))
