@@ -142,49 +142,65 @@ namespace SanteDB.Persistence.Data.Security
 
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.CdrEntityId, cdrEntityId.ToString()));
 
-            
+
+            //if (this.FindFirst(SanteDBClaimTypes.XspaOrganizationIdClaim) == null)
+            //{
+            //    var organizationId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.Employee && o.ObsoleteVersionSequenceId == null).Select(o => o.TargetKey);
+            //    // Remove any facilities that are deleted
+            //    organizationId = organizationId.Intersect(contextForReadingAdditionalData.Query<DbEntityVersion>(o => StatusKeys.ActiveStates.Contains(o.StatusConceptKey) && o.ClassConceptKey == EntityClassKeys.Organization && organizationId.Contains(o.Key) && o.ObsoletionTime == null && o.IsHeadVersion).Select(o => o.Key));
+
+            //    if (organizationId.Any())
+            //    {
+            //        organizationId.ForEach(o => this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaOrganizationIdClaim, o.ToString())));
+            //    }
+            //}
+            //else
+            //{
+            //    // Validate the claim
+            //    var claimedOrgIds = this.FindAll(SanteDBClaimTypes.XspaOrganizationIdClaim).Select(o => Guid.Parse(o.Value)).ToArray();
+            //    if (!contextForReadingAdditionalData.Any<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.Employee && o.ObsoleteVersionSequenceId == null && claimedOrgIds.Contains(o.TargetKey)))
+            //    {
+            //        throw new ClaimAssertionException(SanteDBClaimTypes.XspaOrganizationIdClaim, claimedOrgIds.First().ToString(), "*****");
+            //    }
+            //}
+
             if (this.FindFirst(SanteDBClaimTypes.XspaOrganizationIdClaim) == null)
-            {
-                var organizationId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.Employee && o.ObsoleteVersionSequenceId == null).Select(o => o.TargetKey);
-                // Remove any facilities that are deleted
-                organizationId = organizationId.Intersect(contextForReadingAdditionalData.Query<DbEntityVersion>(o => StatusKeys.ActiveStates.Contains(o.StatusConceptKey) && o.ClassConceptKey == EntityClassKeys.Organization && organizationId.Contains(o.Key) && o.ObsoletionTime == null && o.IsHeadVersion).Select(o => o.Key));
-
-                if (organizationId.Any())
-                {
-                    organizationId.ForEach(o => this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaOrganizationIdClaim, o.ToString())));
-                }
-            }
-            else
-            {
-                // Validate the claim
-                var claimedOrgIds = this.FindAll(SanteDBClaimTypes.XspaOrganizationIdClaim).Select(o => Guid.Parse(o.Value)).ToArray();
-                if (!contextForReadingAdditionalData.Any<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.Employee && o.ObsoleteVersionSequenceId == null && claimedOrgIds.Contains(o.TargetKey)))
-                {
-                    throw new ClaimAssertionException(SanteDBClaimTypes.XspaOrganizationIdClaim, claimedOrgIds.First().ToString(), "*****");
-                }
-            }
-
-            if (this.FindFirst(SanteDBClaimTypes.XspaFacilityClaim) == null)
             {
                 var facilityId = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation && o.ObsoleteVersionSequenceId == null).Select(o => o.TargetKey).ToArray();
                 // Remove any facilities that are deleted
                 facilityId = facilityId.Intersect(contextForReadingAdditionalData.Query<DbEntityVersion>(o => StatusKeys.ActiveStates.Contains(o.StatusConceptKey) && o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && facilityId.Contains(o.Key) && o.ObsoletionTime == null && o.IsHeadVersion).Select(o => o.Key)).ToArray();
                 if (facilityId.Any())
                 {
-                    facilityId.ForEach(o => this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaFacilityClaim, o.ToString())));
+                    facilityId.ForEach(o => this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaOrganizationIdClaim, o.ToString())));
                 }
             }
             else
             {
                 // Validate the claim
-                var claimedFacIds = this.FindAll(SanteDBClaimTypes.XspaFacilityClaim).Select(o => Guid.Parse(o.Value)).ToArray();
+                var claimedFacIds = this.FindAll(SanteDBClaimTypes.XspaOrganizationIdClaim).Select(o => Guid.Parse(o.Value)).ToArray();
                 var actualFacIds = contextForReadingAdditionalData.Query<DbEntityRelationship>(o => o.SourceKey == cdrEntityId && o.RelationshipTypeKey == EntityRelationshipTypeKeys.DedicatedServiceDeliveryLocation && o.ObsoleteVersionSequenceId == null).Select(o => o.TargetKey).ToArray();
                 actualFacIds = actualFacIds.Intersect(contextForReadingAdditionalData.Query<DbEntityVersion>(o => StatusKeys.ActiveStates.Contains(o.StatusConceptKey) && o.ClassConceptKey == EntityClassKeys.ServiceDeliveryLocation && actualFacIds.Contains(o.Key) && o.ObsoletionTime == null && o.IsHeadVersion).Select(o => o.Key)).ToArray();
 
-                if (actualFacIds.Any() && !claimedFacIds.All(f=>actualFacIds.Contains(f)))
+                if (actualFacIds.Any() && !claimedFacIds.All(f => actualFacIds.Contains(f)))
                 {
-                    throw new ClaimAssertionException(SanteDBClaimTypes.XspaFacilityClaim, claimedFacIds.First().ToString(), String.Join(",", actualFacIds));
+                    throw new ClaimAssertionException(SanteDBClaimTypes.XspaOrganizationIdClaim, claimedFacIds.First().ToString(), String.Join(",", actualFacIds));
                 }
+            }
+
+            // Fetch the Organization name
+            if (this.FindFirst(SanteDBClaimTypes.XspaOrganizationIdClaim) != null && this.FindFirst(SanteDBClaimTypes.XspaOrganizationNameClaim) == null)
+            {
+                var facilityGuids = this.FindAll(SanteDBClaimTypes.XspaOrganizationIdClaim).Select(o => Guid.Parse(o.Value)).ToArray();
+
+                var organizationNameSql  = contextForReadingAdditionalData.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityNameComponent))
+                    .InnerJoin<DbEntityNameComponent, DbEntityName>(o => o.SourceKey, o => o.Key)
+                    .Where<DbEntityName>(o => facilityGuids.Contains(o.SourceKey) && o.ObsoleteVersionSequenceId == null && o.UseConceptKey == NameUseKeys.OfficialRecord)
+                    .OrderBy<DbEntityNameComponent>(o => o.OrderSequence)
+                    .Statement;
+
+                var facilityName = contextForReadingAdditionalData.Query<DbEntityNameComponent>(organizationNameSql).Select(o => o.Value).ToArray();
+                // Remove any facilities that are deleted
+                facilityName.ForEach(c => this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.XspaOrganizationNameClaim, c)));
             }
 
             var subjectNameSql = contextForReadingAdditionalData.CreateSqlStatementBuilder().SelectFrom(typeof(DbEntityNameComponent))

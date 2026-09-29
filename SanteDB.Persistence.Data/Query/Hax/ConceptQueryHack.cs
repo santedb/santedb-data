@@ -77,8 +77,8 @@ namespace SanteDB.Persistence.Data.Query.Hax
                 if (!declProp.IsAlwaysJoin)
                 {
                     var fkColumn = fkTbl.GetColumn(declProp.ForeignKey.Column);
-                    sqlStatement.Append($" INNER JOIN {fkTbl.TableName} AS {directFkName}_{declProp.Name} ON ({queryPrefix}{declType.TableName}.{declProp.Name} = {directFkName}_{declProp.Name}.{fkColumn.Name})");
-                    directFkName += $"_{declProp.Name}";
+                    sqlStatement.Append($" INNER JOIN {fkTbl.TableName} AS {declProp.Name}_{directFkName} ON ({queryPrefix}{declType.TableName}.{declProp.Name} = {declProp.Name}_{directFkName}.{fkColumn.Name})");
+                    directFkName = $"{declProp.Name}_{directFkName}";
                 }
 
                 // We aren't yet joined to our table, we need to join to our table though!!!!
@@ -103,6 +103,11 @@ namespace SanteDB.Persistence.Data.Query.Hax
                     {
                         whereClause.And($"{tblName}.{tblMap.GetColumn(nameof(IDbBaseData.ObsoletionTime)).Name} IS NULL");
                     }
+                }
+                else
+                {
+                    // Append the where clause
+                    whereClause.And(builder.CreateWhereCondition(property.PropertyType, predicate.SubPath, values, $"{queryPrefix}{declProp.Name}_", new List<TableMapping>() { tblMap }));
                 }
 
                 return true;
