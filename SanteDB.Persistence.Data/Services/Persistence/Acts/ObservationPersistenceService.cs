@@ -54,7 +54,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 case "TS":
                     return (DateObservation)typeof(DateObservation).GetRelatedPersistenceService().Insert(context, data);
                 default:
-                    throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_OUT_OF_RANGE, data.ValueType, "ST,CD,PQ,TS"));
+                    return base.DoInsertModel(context, data);
             }
         }
 
@@ -88,7 +88,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     context.Insert(existingTs);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_OUT_OF_RANGE, obsType, "ST,CD,PQ,TS"));
+                    break;
             }
 
         }
@@ -108,7 +108,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 case "TS":
                     return (DateObservation)typeof(DateObservation).GetRelatedPersistenceService().Update(context, data);
                 default:
-                    throw new ArgumentOutOfRangeException(String.Format(ErrorMessages.ARGUMENT_OUT_OF_RANGE, data.ValueType, "ST,CD,PQ,TS"));
+                    return base.DoUpdateModel(context, data);
             }
         }
 
@@ -125,7 +125,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 {
                     obsData = context.FirstOrDefault<DbObservation>(o => o.ParentKey == dbModel.VersionKey);
                 }
-
+                
                 IAdoClassMapper mapper = null;
                 switch (obsData?.ValueType)
                 {
@@ -145,7 +145,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
                 if (referenceObjects.Length == 0)
                 {
-                    referenceObjects = mapper.GetReferencedObjects(context, dbModel);
+                    referenceObjects = mapper?.GetReferencedObjects(context, dbModel);
                 }
                 return mapper?.MapToModelInstanceEx(context, dbModel, referenceObjects) as Observation ??
                     base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
