@@ -31,6 +31,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.OrmLite.Attributes;
 using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.OrmLite.Migration;
 using SanteDB.OrmLite.Providers;
@@ -48,7 +49,7 @@ namespace SanteDB.Persistence.PubSub.ADO
     /// Represents a pub/sub manager which stores definitions in a database
     /// </summary>
     [ServiceProvider("ADO.NET Pub/Sub Subscription Manager", Configuration = typeof(AdoPubSubConfigurationSection))]
-    public class AdoPubSubManager : IPubSubManagerService, IPubSubLogService, IMappedQueryProvider<PubSubChannelDefinition>, IMappedQueryProvider<PubSubSubscriptionDefinition>, IReportProgressChanged
+    public class AdoPubSubManager : IPubSubManagerService, IPubSubLogService, IMappedQueryProvider<PubSubChannelDefinition>, IMappedQueryProvider<PubSubSubscriptionDefinition>, IMappedQueryProvider<PubSubDispatchLog>, IReportProgressChanged
     {
         /// <summary>
         /// Gets the service name for this service
@@ -199,11 +200,30 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// </summary>
         private PubSubChannelDefinition MapInstance(DataContext context, DbChannel domainInstance)
         {
+            if (domainInstance == null) return null;
             var retVal = this.m_mapper.MapDomainInstance<DbChannel, PubSubChannelDefinition>(domainInstance);
             retVal.DispatcherFactoryId = domainInstance.DispatchFactoryType; // TODO: Refactor this mapping to a fn
             retVal.Endpoint = domainInstance.Endpoint;
             retVal.Settings = context.Query<DbChannelSetting>(r => r.ChannelKey == retVal.Key).ToList().Select(r => new PubSubChannelSetting() { Name = r.Name, Value = r.Value }).ToList();
             return retVal;
+        }
+
+        /// <summary>
+        /// Map a domain instance of a log entry
+        /// </summary>
+        private PubSubDispatchLog MapInstance(DataContext context, DbSubscriptionProcessLog domainInstance)
+        {
+            if (domainInstance == null) return null;
+            return new PubSubDispatchLog()
+            {
+                DispatchTime = domainInstance.DispatchTime,
+                Event = domainInstance.Event,
+                ObjectKey = domainInstance.ObjectKey,
+                Outcome = domainInstance.Outcome,
+                SubscriptionKey = domainInstance.SubscriptionKey,
+                Key = domainInstance.Key,
+                VersionSequence = domainInstance.VersionSequence
+            };
         }
 
         /// <summary>
@@ -324,6 +344,8 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// </summary>
         private PubSubSubscriptionDefinition MapInstance(DataContext context, DbSubscription domainInstance)
         {
+            if (domainInstance == null) return null;
+
             var retVal = this.m_mapper.MapDomainInstance<DbSubscription, PubSubSubscriptionDefinition>(domainInstance);
             retVal.ResourceTypeName = domainInstance.ResourceType;
             retVal.Filter = context.Query<DbSubscriptionFilter>(r => r.SubscriptionKey == domainInstance.Key).Select(r => r.Filter).ToList();
@@ -918,7 +940,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                         VersionSequence = (dispachedEntity as IVersionedData)?.VersionSequence ?? 1,
                         Outcome = outcome,
                         SubscriptionKey = subscription.Key.Value,
-                        EventType = eventType
+                        Event = eventType
                     });
 
                     return new PubSubDispatchLog()
@@ -928,7 +950,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                         ObjectKey = persisted.ObjectKey,
                         Outcome = persisted.Outcome,
                         VersionSequence = persisted.VersionSequence,
-                        Event = persisted.EventType
+                        Event = persisted.Event
                     };
                 }
             }
@@ -939,34 +961,65 @@ namespace SanteDB.Persistence.PubSub.ADO
         }
 
         /// <inheritdoc/>
-        public IEnumerable<PubSubDispatchLog> GetDispatches(string subscriptionName, Guid objectKey)
+        public IQueryResultSet<PubSubDispatchLog> GetDispatches(string subscriptionName, Guid objectKey) => this.GetDispatches(subscriptionName).Where(o => o.ObjectKey == objectKey);
+
+        /// <inheritdoc/>
+        public PubSubDispatchLog GetLastDispatch(string subscriptionName, Guid objectKey) => this.GetDispatches(subscriptionName, objectKey).OrderByDescending(o=>o.DispatchTime).FirstOrDefault();
+
+        /// <inheritdoc/>
+        public IQueryResultSet<PubSubDispatchLog> GetDispatches(String subscriptionName)
         {
-            using (var conn = this.m_configuration.Provider.GetWriteConnection())
+            this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.ReadPubSubSubscription);
+
+            try
             {
-                conn.Open();
-
-                var subscription = conn.FirstOrDefault<DbSubscription>(o => o.IsActive && o.Name.ToLowerInvariant() == subscriptionName.ToLowerInvariant() && o.ObsoletionTime == null);
-                if (subscription == null)
-                {
-                    throw new KeyNotFoundException(String.Format(ErrorMessages.OBJECT_NOT_FOUND, subscriptionName));
-                }
-
-                foreach (var log in conn.Query<DbSubscriptionProcessLog>(o => o.SubscriptionKey == subscription.Key && o.ObjectKey == objectKey).OrderByDescending(o => o.DispatchTime))
-                {
-                    yield return new PubSubDispatchLog()
-                    {
-                        DispatchTime = log.DispatchTime,
-                        Key = log.Key,
-                        ObjectKey = log.ObjectKey,
-                        Outcome = log.Outcome,
-                        VersionSequence = log.VersionSequence,
-                        Event = log.EventType
-                    };
-                }
+                var subscription = this.GetSubscriptionByName(subscriptionName);
+                return new MappedQueryResultSet<PubSubDispatchLog>(this).Where(o=>o.SubscriptionKey == subscription.Key);
             }
+            catch (Exception e)
+            {
+                throw new Exception($"Error querying for subscription logs {subscriptionName}", e);
+            }
+
         }
 
         /// <inheritdoc/>
-        public PubSubDispatchLog GetLastDispatch(string subscriptionName, Guid objectKey) => this.GetDispatches(subscriptionName, objectKey).FirstOrDefault();
+        public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<PubSubDispatchLog, bool>> query)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+            else if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+            var domainQuery = this.m_mapper.MapModelExpression<PubSubDispatchLog, DbSubscriptionProcessLog, bool>(query, true);
+            return context.Query<DbSubscriptionProcessLog>(domainQuery);
+            
+        }
+
+        /// <inheritdoc/>
+        PubSubDispatchLog IMappedQueryProvider<PubSubDispatchLog>.Get(DataContext context, Guid key)
+        {
+            return this.MapInstance(context, context.FirstOrDefault<DbSubscriptionProcessLog>(o => o.Key == key ));
+        }
+
+        /// <inheritdoc/>
+        PubSubDispatchLog IMappedQueryProvider<PubSubDispatchLog>.ToModelInstance(DataContext context, object result) => this.MapInstance(context, result as DbSubscriptionProcessLog);
+
+        /// <inheritdoc/>
+        public LambdaExpression MapExpression<TReturn>(Expression<Func<PubSubDispatchLog, TReturn>> sortExpression)
+        {
+            return this.m_mapper.MapModelExpression<PubSubDispatchLog, DbSubscriptionProcessLog, TReturn>(sortExpression, true);
+
+        }
+
+        /// <inheritdoc/>
+        SqlStatement IMappedQueryProvider<PubSubDispatchLog>.GetCurrentVersionFilter(string tableAlias)
+        {
+            return new SqlStatement("TRUE");
+        }
     }
 }
