@@ -224,6 +224,9 @@ namespace SanteDB.Persistence.Data.Services
                 context.UpdateAll<DbActVersion>(o => purgeKeySet.Contains(o.ReplacesVersionKey.Value), o => o.ReplacesVersionKey == null);
                 context.DeleteAll<DbNarrative>(o => purgeKeySet.Contains(o.ParentKey));
                 context.DeleteAll<DbQuantityObservation>(o => purgeKeySet.Contains(o.ParentKey));
+                context.DeleteAll<DbNumericObservation>(o => purgeKeySet.Contains(o.ParentKey));
+                context.DeleteAll<DbBooleanObservation>(o => purgeKeySet.Contains(o.ParentKey));
+                context.DeleteAll<DbUriObservation>(o => purgeKeySet.Contains(o.ParentKey));
                 context.DeleteAll<DbTextObservation>(o => purgeKeySet.Contains(o.ParentKey));
                 context.DeleteAll<DbCodedObservation>(o => purgeKeySet.Contains(o.ParentKey));
                 context.DeleteAll<DbDateObservation>(o => purgeKeySet.Contains(o.ParentKey));

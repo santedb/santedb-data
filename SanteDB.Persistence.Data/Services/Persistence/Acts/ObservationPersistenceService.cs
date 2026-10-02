@@ -53,6 +53,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     return (CodedObservation)typeof(CodedObservation).GetRelatedPersistenceService().Insert(context, data);
                 case "TS":
                     return (DateObservation)typeof(DateObservation).GetRelatedPersistenceService().Insert(context, data);
+                case "NM":
+                    return (NumericObservation)typeof(NumericObservation).GetRelatedPersistenceService().Insert(context, data);
+                case "BL":
+                    return (BooleanObservation)typeof(BooleanObservation).GetRelatedPersistenceService().Insert(context, data);
+                case "UR":
+                    return (UriObservation)typeof(UriObservation).GetRelatedPersistenceService().Insert(context, data);
                 default:
                     return base.DoInsertModel(context, data);
             }
@@ -87,6 +93,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     existingTs.ParentKey = newVersion.VersionKey;
                     context.Insert(existingTs);
                     break;
+                case "NM":
+                    var existingNm = context.FirstOrDefault<DbNumericObservation>(o => o.ParentKey == newVersion.ReplacesVersionKey) ?? new DbNumericObservation();
+                    existingNm.ParentKey = newVersion.VersionKey;
+                    context.Insert(existingNm);
+                    break;
+                case "BL":
+                    var existingBl = context.FirstOrDefault<DbBooleanObservation>(o => o.ParentKey == newVersion.ReplacesVersionKey) ?? new DbBooleanObservation();
+                    existingBl.ParentKey = newVersion.VersionKey;
+                    context.Insert(existingBl);
+                    break;
+                case "UR":
+                    var existingUr = context.FirstOrDefault<DbUriObservation>(o => o.ParentKey == newVersion.ReplacesVersionKey) ?? new DbUriObservation();
+                    existingUr.ParentKey = newVersion.VersionKey;
+                    context.Insert(existingUr);
+                    break;
                 default:
                     break;
             }
@@ -107,6 +128,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     return (CodedObservation)typeof(CodedObservation).GetRelatedPersistenceService().Update(context, data);
                 case "TS":
                     return (DateObservation)typeof(DateObservation).GetRelatedPersistenceService().Update(context, data);
+                case "NM":
+                    return (NumericObservation)typeof(NumericObservation).GetRelatedPersistenceService().Update(context, data);
+                case "BL":
+                    return (BooleanObservation)typeof(BooleanObservation).GetRelatedPersistenceService().Update(context, data);
+                case "UR":
+                    return (UriObservation)typeof(UriObservation).GetRelatedPersistenceService().Update(context, data);
                 default:
                     return base.DoUpdateModel(context, data);
             }
@@ -141,6 +168,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     case "TS":
                         mapper = typeof(DateObservation).GetRelatedPersistenceService() as IAdoClassMapper;
                         break;
+                    case "NM":
+                        mapper = typeof(NumericObservation).GetRelatedPersistenceService() as IAdoClassMapper;
+                        break; 
+                    case "BL":
+                        mapper = typeof(BooleanObservation).GetRelatedPersistenceService() as IAdoClassMapper;
+                        break; 
+                    case "UR":
+                        mapper = typeof(UriObservation).GetRelatedPersistenceService() as IAdoClassMapper;
+                        break; 
                 }
 
                 if (referenceObjects.Length == 0)
