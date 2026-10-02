@@ -12,9 +12,9 @@
 	ct_cls_cd_id blob(16) NOT NULL, 
 	mime VARCHAR(256) NOT NULL,
 	hash BYTEA,
-	val_uri VARCHAR(MAX) NOT NULL,
+	val_uri VARCHAR(1024) NOT NULL,
 	avail_start_utc TIMESTAMPTZ, 
-	avail_stop_utc BIGINT CHECK (avail_stop_utc IS NULL OR (avail_start_utc IS NULL OR avail_start_utc < avail_stop_utc))
+	avail_stop_utc BIGINT CHECK (avail_stop_utc IS NULL OR (avail_start_utc IS NULL OR avail_start_utc < avail_stop_utc)),
 	CONSTRAINT pk_uri_obs_tbl PRIMARY KEY (act_vrsn_id),
 	CONSTRAINT fk_uri_obs_obs_tbl FOREIGN KEY (act_vrsn_id) REFERENCES obs_tbl(act_vrsn_id),
 	CONSTRAINT fk_uri_obs_ct_cls_cd FOREIGN KEY (ct_cls_cd_id) REFERENCES cd_tbl(cd_id)
