@@ -513,6 +513,26 @@
 	  <property modelName="Tag" queryOnly="true" domainName="ParentKey" />
   </class>
 
+	<class modelClass="SanteDB.Core.Model.Acts.BooleanObservation, SanteDB.Core.Model"
+		 domainClass="SanteDB.Persistence.Data.Model.Acts.DbBooleanObservation, SanteDB.Persistence.Data">
+		<property modelName="VersionKey" domainName="ParentKey" />
+		<property modelName="Tag" queryOnly="true" domainName="ParentKey" />
+	</class>
+
+
+	<class modelClass="SanteDB.Core.Model.Acts.UriObservation, SanteDB.Core.Model"
+		 domainClass="SanteDB.Persistence.Data.Model.Acts.DbUriObservation, SanteDB.Persistence.Data">
+		<property modelName="VersionKey" domainName="ParentKey" />
+		<property modelName="Tag" queryOnly="true" domainName="ParentKey" />
+	</class>
+
+
+	<class modelClass="SanteDB.Core.Model.Acts.NumericObservation, SanteDB.Core.Model"
+		 domainClass="SanteDB.Persistence.Data.Model.Acts.DbNumericObservation, SanteDB.Persistence.Data">
+		<property modelName="VersionKey" domainName="ParentKey" />
+		<property modelName="Tag" queryOnly="true" domainName="ParentKey" />
+	</class>
+
   <class modelClass="SanteDB.Core.Model.Acts.CodedObservation, SanteDB.Core.Model"
        domainClass="SanteDB.Persistence.Data.Model.Acts.DbCodedObservation, SanteDB.Persistence.Data">
     <property modelName="ValueKey" domainName="Value" />

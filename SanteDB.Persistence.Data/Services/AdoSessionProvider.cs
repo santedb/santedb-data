@@ -41,6 +41,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Security.Authentication;
+using System.Security.Claims;
 using System.Security.Principal;
 
 namespace SanteDB.Persistence.Data.Services
@@ -85,15 +86,15 @@ namespace SanteDB.Persistence.Data.Services
 
         private readonly String[] m_principalClaimsToSession =
         {
-            SanteDBClaimTypes.XspaFacilityClaim,
             SanteDBClaimTypes.XspaOrganizationIdClaim,
             SanteDBClaimTypes.XspaOrganizationNameClaim,
-            SanteDBClaimTypes.XspaPurposeOfUseClaim,
             SanteDBClaimTypes.XspaUserNpi,
             SanteDBClaimTypes.XspaUserRoleClaim,
             SanteDBClaimTypes.Language,
             SanteDBClaimTypes.SingleUseToken,
-            SanteDBClaimTypes.TemporarySession
+            SanteDBClaimTypes.TemporarySession,
+            ClaimTypes.Surname,
+            ClaimTypes.GivenName
         };
 
         /// <summary>
@@ -328,7 +329,7 @@ namespace SanteDB.Persistence.Data.Services
                         var assignedFacility = this.m_securityConfiguration.GetSecurityPolicy<Guid?>(SecurityPolicyIdentification.AssignedFacilityUuid, null);
                         var permittedFacilities = assignedFacility.HasValue ? this.m_securityConfiguration.GetSecurityPolicy<List<String>>(SecurityPolicyIdentification.PermittedFacilities, new List<String>() { assignedFacility.ToString() }).Select(o => Guid.Parse(o)).ToArray() : null;
 
-                        var facilityClaims = claimsPrincipal.FindAll(SanteDBClaimTypes.XspaFacilityClaim);
+                        var facilityClaims = claimsPrincipal.FindAll(SanteDBClaimTypes.XspaOrganizationIdClaim);
                         // TODO: Allow login up hierarchy
                         if (!facilityClaims.Any() ||
                             facilityClaims.Count() != 1
@@ -365,7 +366,7 @@ namespace SanteDB.Persistence.Data.Services
                             else
                             {
                                 var exception = new SecuritySessionException(SessionExceptionType.MissingRequiredClaim, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_REQUIRE_FACILITY), null);
-                                exception.Data.Add(SecuritySessionException.DATA_CLAIM_TYPE_KEY, SanteDBClaimTypes.XspaFacilityClaim);
+                                exception.Data.Add(SecuritySessionException.DATA_CLAIM_TYPE_KEY, SanteDBClaimTypes.XspaOrganizationIdClaim);
                                 exception.Data.Add(SecuritySessionException.DATA_CLAIM_VALUE_KEY, String.Join(",", availableFacilities));
                                 throw exception;
                             }
@@ -528,6 +529,7 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             claims.Add(new SanteDBClaim(SanteDBClaimTypes.SanteDBOverrideClaim, "true"));
                         }
+
                         // POU?
                         if (!String.IsNullOrEmpty(purpose))
                         {

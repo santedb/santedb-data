@@ -55,7 +55,7 @@ namespace SanteDB.Persistence.PubSub.ADO.Data.Model
         /// Gets or sets the event type
         /// </summary>
         [Column("evt")]
-        public PubSubEventType EventType { get; set; }
+        public PubSubEventType Event { get; set; }
 
     }
 }

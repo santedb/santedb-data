@@ -37,6 +37,8 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// Parent key
         /// </summary>
         [JoinFilter(PropertyName = nameof(DbActVersion.ClassConceptKey), Value = ActClassKeyStrings.Observation)]
+        [JoinFilter(PropertyName = nameof(DbActVersion.ClassConceptKey), Value = ActClassKeyStrings.ObservationSeries)]
+        [JoinFilter(PropertyName = nameof(DbActVersion.ClassConceptKey), Value = ActClassKeyStrings.CorrelatedObservationSequences)]
         public override Guid ParentKey
         {
             get
@@ -129,5 +131,78 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// </summary>
         [Column("val_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid Value { get; set; }
+    }
+
+
+    /// <summary>
+    /// Data related to a URI observation
+    /// </summary>
+    [Table("uri_obs_tbl")]
+    public class DbUriObservation :DbObsSubTable
+    {
+        /// <summary>
+        /// The content classification
+        /// </summary>
+        [Column("ct_cls_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key)), NotNull]
+        public Guid ContentClassKey { get; set; }
+
+        /// <summary>
+        /// The mime type expected at the URL
+        /// </summary>
+        [Column("mime"), NotNull]
+        public string MimeType { get; set; }
+
+        /// <summary>
+        /// If known, the expected hash of the data at the URL when the observation was recorded
+        /// </summary>
+        [Column("hash")]
+        public byte[] Hash { get; set; }
+
+        /// <summary>
+        /// The value 
+        /// </summary>
+        [Column("val_uri"), NotNull]
+        public String Value { get; set; }
+
+        /// <summary>
+        /// The time when the link will be active
+        /// </summary>
+        [Column("avail_start_utc")]
+        public DateTimeOffset? AvailabilityStartTime { get; set; }
+
+        /// <summary>
+        /// The time when the link is no longer available 
+        /// </summary>
+        [Column("avail_stop_utc")]
+        public DateTimeOffset? AvailabilityStopTime { get; set; }
+    }
+
+    /// <summary>
+    /// Boolean observations
+    /// </summary>
+    [Table("bl_obs_tbl")]
+    public class DbBooleanObservation : DbObsSubTable
+    {
+
+        /// <summary>
+        /// Gets or sets the value
+        /// </summary>
+        [Column("val_bl"), NotNull]
+        public bool? Value { get; set; }
+    }
+
+    /// <summary>
+    /// Numeric observations
+    /// </summary>
+    [Table("nm_obs_tbl")]
+    public class DbNumericObservation : DbObsSubTable
+    {
+
+        /// <summary>
+        /// Gets or sets the value
+        /// </summary>
+        [Column("val_nm")]
+        public Decimal? Value { get; set; }
+
     }
 }

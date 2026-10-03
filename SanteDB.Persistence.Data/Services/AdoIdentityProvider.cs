@@ -64,7 +64,7 @@ namespace SanteDB.Persistence.Data.Services
 
         private readonly String[] m_allowedCallerClaims =
         {
-            SanteDBClaimTypes.XspaFacilityClaim,
+            SanteDBClaimTypes.XspaOrganizationIdClaim,
             SanteDBClaimTypes.PurposeOfUse,
             SanteDBClaimTypes.XspaOrganizationIdClaim,
             SanteDBClaimTypes.Language,

@@ -39,4 +39,9 @@
   <class modelClass="SanteDB.Core.PubSub.PubSubChannelSetting, SanteDB.Core.Api"
     domainClass="SanteDB.Persistence.PubSub.ADO.Data.Model.DbChannelSetting, SanteDB.Persistence.PubSub.ADO">
   </class>
+
+	<!-- Subscription Log -->
+	<class modelClass="SanteDB.Core.PubSub.PubSubDispatchLog, SanteDB.Core.Api"
+	  domainClass="SanteDB.Persistence.PubSub.ADO.Data.Model.DbSubscriptionProcessLog, SanteDB.Persistence.PubSub.ADO">
+	</class>
 </modelMap>

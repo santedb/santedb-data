@@ -358,6 +358,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             context.DeleteAll<DbTextObservation>(o => o.ParentKey == key);
             context.DeleteAll<DbQuantityObservation>(o => o.ParentKey == key);
             context.DeleteAll<DbDateObservation>(o => o.ParentKey == key);
+            context.DeleteAll<DbUriObservation>(o => o.ParentKey == key);
+            context.DeleteAll<DbBooleanObservation>(o => o.ParentKey == key);
+            context.DeleteAll<DbNumericObservation>(o => o.ParentKey == key);
             context.DeleteAll<DbObservation>(o => o.ParentKey == key);
             context.DeleteAll<DbPatientEncounter>(o => o.ParentKey == key);
             context.DeleteAll<DbProcedure>(o => o.ParentKey == key);

@@ -29,7 +29,7 @@ using System.Linq;
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
     /// <summary>
-    /// An observation persistence service which can manage observations which are quantities (value + unit)
+    /// An observation persistence service which can manage observations which are date with a precision
     /// </summary>
     public class DateObservationPersistenceService : ObservationDerivedPersistenceService<DateObservation, DbDateObservation>
     {
