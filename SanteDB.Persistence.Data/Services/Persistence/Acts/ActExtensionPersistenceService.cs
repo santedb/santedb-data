@@ -22,13 +22,15 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Extensibility;
+using System;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
     /// <summary>
     /// Entity extension persistence service
     /// </summary>
-    public class ActExtensionPersistenceService : ActAssociationPersistenceService<ActExtension, DbActExtension>
+    public class ActExtensionPersistenceService : ActAssociationPersistenceService<ActExtension, DbActExtension>, IAdoKeyResolver<ActExtension>, IAdoKeyResolver<DbActExtension>
     {
         /// <summary>
         /// Creates a DI injected service header
@@ -47,5 +49,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             }
             return base.BeforePersisting(context, data);
         }
+
+        /// <inheritdoc/>
+        public Expression<Func<ActExtension, bool>> GetKeyExpression(ActExtension model) => o => o.SourceEntityKey == model.SourceEntityKey && o.ExtensionTypeKey == model.ExtensionTypeKey && o.ObsoleteVersionSequenceId == null;
+
+        /// <inheritdoc/>
+        public Expression<Func<DbActExtension, bool>> GetKeyExpression(DbActExtension model) => o => o.SourceKey == model.SourceKey && o.ExtensionTypeKey == model.ExtensionTypeKey && o.ObsoleteVersionSequenceId == null;
+
     }
 }

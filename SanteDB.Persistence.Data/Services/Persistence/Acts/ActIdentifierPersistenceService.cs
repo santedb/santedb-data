@@ -25,13 +25,14 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.DataType;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
     /// <summary>
     /// Persistence service for act identifiers
     /// </summary>
-    public class ActIdentifierPersistenceService : ActAssociationPersistenceService<ActIdentifier, DbActIdentifier>
+    public class ActIdentifierPersistenceService : ActAssociationPersistenceService<ActIdentifier, DbActIdentifier>, IAdoKeyResolver<ActIdentifier>, IAdoKeyResolver<DbActIdentifier>
     {
         /// <summary>
         /// Dependency injection of configuration
@@ -86,6 +87,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             }
           
         }
+
+        public Expression<Func<ActIdentifier, bool>> GetKeyExpression(ActIdentifier model) => o => o.SourceEntityKey == model.SourceEntityKey && o.IdentityDomainKey == model.IdentityDomainKey && o.Value == model.Value;
+
+        public Expression<Func<DbActIdentifier, bool>> GetKeyExpression(DbActIdentifier model) => o => o.SourceKey == model.SourceKey && o.IdentityDomainKey == model.IdentityDomainKey && o.Value == model.Value;
 
     }
 }
