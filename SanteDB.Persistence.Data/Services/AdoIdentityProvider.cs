@@ -449,12 +449,12 @@ namespace SanteDB.Persistence.Data.Services
                 }
                 catch (AuthenticationException)
                 {
-                    this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, null, false));
+                    this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, new GenericPrincipal(new GenericIdentity(userName), new string[0]), false));
                     throw;
                 }
                 catch (Exception e)
                 {
-                    this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, null, false));
+                    this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, new GenericPrincipal(new GenericIdentity(userName), new string[0]), false));
                     this.m_tracer.TraceError("Could not authenticate user {0} - {1}", userName, e);
                     throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_GENERAL), e);
                 }
