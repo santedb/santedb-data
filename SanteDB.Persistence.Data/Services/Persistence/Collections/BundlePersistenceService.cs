@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using DocumentFormat.OpenXml.EMMA;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
@@ -449,8 +450,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                             }
                             break;
                         case BatchOperationType.Insert:
-                            data.Item[i] = persistenceService.Insert(context, data.Item[i]);
-                            data.Item[i].BatchOperation = BatchOperationType.Insert;
+                            var notExists = !data.Item[i].Key.HasValue || !persistenceService.Exists(context, data.Item[i].Key.Value);
+                            if (notExists)
+                            {
+                                data.Item[i] = persistenceService.Insert(context, data.Item[i]);
+                                data.Item[i].BatchOperation = BatchOperationType.Insert;
+                            }
+                            else if (this.m_configuration.AutoUpdateExisting)
+                            {
+                                data.Item[i] = persistenceService.Update(context, data.Item[i]);
+                                data.Item[i].BatchOperation = BatchOperationType.Update;
+                            }
+                            else
+                            {
+                                throw new DataPersistenceException(String.Format(ErrorMessages.INSERT_ALREADY_EXISTING_OBJECT, data.Item[i].Key));
+                            }
                             break;
                         case BatchOperationType.Update:
                             data.Item[i] = persistenceService.Update(context, data.Item[i]);

@@ -274,9 +274,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         return context.Insert(dbModel);
                     }
                 }
-                else
+                else if(!context.Exists(dbModel))
                 {
                     return context.Insert(dbModel);
+                }
+                else
+                {
+                    throw new DataPersistenceException(String.Format(ErrorMessages.INSERT_ALREADY_EXISTING_OBJECT, dbModel.Key));
                 }
 #if DEBUG
             }

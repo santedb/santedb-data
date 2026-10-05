@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using DocumentFormat.OpenXml.EMMA;
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
@@ -302,6 +303,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return data;
             }
 
+
             data = this.BeforePersisting(context, data);
 
 #if DEBUG
@@ -310,18 +312,40 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-            this.m_tracer.TraceVerbose("Inserting {0}", data);
-            var dbInstance = this.DoConvertToDataModel(context, data);
-            dbInstance = this.DoInsertInternal(context, dbInstance);
-            var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
-            retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
+                this.m_tracer.TraceVerbose("Inserting {0}", data);
+                var dbInstance = this.DoConvertToDataModel(context, data);
 
-            var issueAnnotation = data.GetAnnotations<DetectedIssue[]>();
-            if (issueAnnotation.Any() && retVal is IExtendable ext)
-            {
-                ext.AddExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issueAnnotation.First());
-            }
-            return this.AfterPersisted(context, retVal); // TODO: Perhaps
+                // Validate exists 
+                if (DataPersistenceControlContext.Current?.AutoUpdate ?? this.m_configuration.AutoUpdateExisting)
+                {
+                    if (context.Exists(dbInstance))
+                    {
+                        this.m_tracer.TraceVerbose("Update will be performed instead of insert");
+                        dbInstance = this.DoUpdateInternal(context, dbInstance);
+                    }
+                    else
+                    {
+                        dbInstance = this.DoInsertInternal(context, dbInstance);
+                    }
+                }
+                else if(!context.Exists(dbInstance))
+                {
+                    dbInstance = this.DoInsertInternal(context, dbInstance);
+                }
+                else
+                {
+                    throw new DataPersistenceException(String.Format(ErrorMessages.INSERT_ALREADY_EXISTING_OBJECT, data.Key));
+                }
+
+                var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
+                retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
+
+                var issueAnnotation = data.GetAnnotations<DetectedIssue[]>();
+                if (issueAnnotation.Any() && retVal is IExtendable ext)
+                {
+                    ext.AddExtension(ExtensionTypeKeys.DataQualityExtension, typeof(DictionaryExtensionHandler), issueAnnotation.First());
+                }
+                return this.AfterPersisted(context, retVal); // TODO: Perhaps
 #if DEBUG
             }
             finally
@@ -399,10 +423,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-            foreach (var itm in this.DoDeleteAllInternal(context, expression, deleteMode))
-            {
-                this.m_dataCacheService?.Remove(itm);
-            }
+                foreach (var itm in this.DoDeleteAllInternal(context, expression, deleteMode))
+                {
+                    this.m_dataCacheService?.Remove(itm);
+                }
 #if DEBUG
             }
             finally
@@ -430,33 +454,33 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-            if (deleteMode == DeleteMode.PermanentDelete)
-            {
-                this.DoDeleteReferencesInternal(context, key);
-
-                if (this.m_configuration.Provider.StatementFactory.Features.HasFlag(SqlEngineFeatures.StoredFreetextIndex))
+                if (deleteMode == DeleteMode.PermanentDelete)
                 {
-                    this.DoDeleteFreeTextIndexInternal(context, key);
+                    this.DoDeleteReferencesInternal(context, key);
+
+                    if (this.m_configuration.Provider.StatementFactory.Features.HasFlag(SqlEngineFeatures.StoredFreetextIndex))
+                    {
+                        this.DoDeleteFreeTextIndexInternal(context, key);
+                    }
                 }
-            }
-            this.m_tracer.TraceVerbose("Deleting {0}", key);
+                this.m_tracer.TraceVerbose("Deleting {0}", key);
 
-            var dbInstance = this.DoDeleteInternal(context, key, deleteMode);
+                var dbInstance = this.DoDeleteInternal(context, key, deleteMode);
 
-            // Remove from cache 
-            this.m_dataCacheService?.Remove(key);
+                // Remove from cache 
+                this.m_dataCacheService?.Remove(key);
 
-            TModel retVal = null;
-            if (!this.m_configuration.FastDelete && deleteMode != DeleteMode.PermanentDelete)
-            {
-                retVal = this.DoConvertToInformationModel(context, dbInstance);
-            }
-            else
-            {
-                retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
-            }
-            retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Delete;
-            return retVal;
+                TModel retVal = null;
+                if (!this.m_configuration.FastDelete && deleteMode != DeleteMode.PermanentDelete)
+                {
+                    retVal = this.DoConvertToInformationModel(context, dbInstance);
+                }
+                else
+                {
+                    retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
+                }
+                retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Delete;
+                return retVal;
 #if DEBUG
             }
             finally
@@ -501,42 +525,42 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-            // Attempt fetch from master cache
-            TModel retVal = null;
-            var useCache = allowCached &&
-                this.m_configuration.CachingPolicy?.Targets.HasFlag(AdoDataCachingPolicyTarget.ModelObjects) == true;
+                // Attempt fetch from master cache
+                TModel retVal = null;
+                var useCache = allowCached &&
+                    this.m_configuration.CachingPolicy?.Targets.HasFlag(AdoDataCachingPolicyTarget.ModelObjects) == true;
 
-            if (useCache)
-            {
-                retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
-                if (!this.ValidateCacheItemLoadMode(retVal))
+                if (useCache)
                 {
-                    retVal = null;
-                }
-            }
-
-            // Fetch from database
-            if (retVal == null || versionKey.HasValue)
-            {
-                var dbInstance = this.DoGetInternal(context, key, versionKey, allowCached);
-                if (dbInstance == null) // not found
-                {
-                    retVal = null;
-                }
-                else
-                {
-                    retVal = this.ToModelInstance(context, dbInstance);
+                    retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
+                    if (!this.ValidateCacheItemLoadMode(retVal))
+                    {
+                        retVal = null;
+                    }
                 }
 
-                // Add the cache object if caching is allowed on this query and if the load strategy used is less than the load strategy which would have already 
-                // been used to load it before
-                if (useCache && versionKey.GetValueOrDefault() != Guid.Empty)
+                // Fetch from database
+                if (retVal == null || versionKey.HasValue)
                 {
-                    this.m_dataCacheService?.Add(retVal);
-                }
-            }
+                    var dbInstance = this.DoGetInternal(context, key, versionKey, allowCached);
+                    if (dbInstance == null) // not found
+                    {
+                        retVal = null;
+                    }
+                    else
+                    {
+                        retVal = this.ToModelInstance(context, dbInstance);
+                    }
 
-            return retVal;
+                    // Add the cache object if caching is allowed on this query and if the load strategy used is less than the load strategy which would have already 
+                    // been used to load it before
+                    if (useCache && versionKey.GetValueOrDefault() != Guid.Empty)
+                    {
+                        this.m_dataCacheService?.Add(retVal);
+                    }
+                }
+
+                return retVal;
 #if DEBUG
             }
             finally
