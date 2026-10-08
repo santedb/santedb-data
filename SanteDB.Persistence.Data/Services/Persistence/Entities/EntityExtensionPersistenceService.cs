@@ -22,13 +22,15 @@ using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Extensibility;
+using System;
+using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
     /// <summary>
     /// Entity extension persistence service
     /// </summary>
-    public class EntityExtensionPersistenceService : EntityAssociationPersistenceService<EntityExtension, DbEntityExtension>
+    public class EntityExtensionPersistenceService : EntityAssociationPersistenceService<EntityExtension, DbEntityExtension>, IAdoKeyResolver<EntityExtension>, IAdoKeyResolver<DbEntityExtension>
     {
         /// <summary>
         /// Creates a DI injected service header
@@ -36,6 +38,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         public EntityExtensionPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
+
+
+        /// <inheritdoc/>
+        public Expression<Func<EntityExtension, bool>> GetKeyExpression(EntityExtension model) => o => o.SourceEntityKey == model.SourceEntityKey && o.ExtensionTypeKey == model.ExtensionTypeKey && o.ObsoleteVersionSequenceId == null;
+
+        /// <inheritdoc/>
+        public Expression<Func<DbEntityExtension, bool>> GetKeyExpression(DbEntityExtension model) => o => o.SourceKey == model.SourceKey && o.ExtensionTypeKey == model.ExtensionTypeKey && o.ObsoleteVersionSequenceId == null;
 
         /// <remarks>
         /// Will lookup the extension type if none is set

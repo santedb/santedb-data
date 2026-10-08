@@ -31,7 +31,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// <summary>
     /// Persistence service for entity identifiers
     /// </summary>
-    public class EntityIdentifierPersistenceService : EntityAssociationPersistenceService<EntityIdentifier, DbEntityIdentifier>
+    public class EntityIdentifierPersistenceService : EntityAssociationPersistenceService<EntityIdentifier, DbEntityIdentifier>, IAdoKeyResolver<EntityIdentifier>, IAdoKeyResolver<DbEntityIdentifier>
     {
         /// <summary>
         /// Dependency injection of configuration
@@ -100,5 +100,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 return retVal;
             }
         }
+
+        public Expression<Func<EntityIdentifier, bool>> GetKeyExpression(EntityIdentifier model) => o => o.SourceEntityKey == model.SourceEntityKey && o.IdentityDomainKey == model.IdentityDomainKey && o.Value == model.Value;
+
+        public Expression<Func<DbEntityIdentifier, bool>> GetKeyExpression(DbEntityIdentifier model) => o => o.SourceKey == model.SourceKey && o.IdentityDomainKey == model.IdentityDomainKey && o.Value == model.Value;
     }
 }

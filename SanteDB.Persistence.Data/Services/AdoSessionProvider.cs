@@ -875,6 +875,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         this.m_adhocCacheService?.Add($"{this.CreateSessionCacheKey(sessionId)}.idt", identities);
+                        this.m_adhocCacheService?.Add($"{this.CreateSessionCacheKey(sessionId)}", adoSession);
 
                         return identities.OfType<IIdentity>().ToArray();
                     }
