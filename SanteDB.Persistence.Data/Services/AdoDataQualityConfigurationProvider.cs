@@ -314,6 +314,11 @@ namespace SanteDB.Persistence.Data.Services
                             }));
                         }
 
+                        // Remove previous rule sets
+                        foreach(var typ in configuration.Resources)
+                        {
+                            this.m_adhocCache?.Remove($"dq.res.{typ.ResourceName}");
+                        }
 
                         var retVal = this.ConvertToRuleSet(ctx, existingConfiguration);
                         tx.Commit();
