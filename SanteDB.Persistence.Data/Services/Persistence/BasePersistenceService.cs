@@ -590,6 +590,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 try
                 {
                     context.Open();
+                    if(DataPersistenceControlContext.Current?.CommandTimeout != null)
+                    {
+                        context.CommandTimeout = DataPersistenceControlContext.Current?.CommandTimeout;
+                    }
                     return this.DoQueryInternal(context, query).Count();
                 }
                 catch (DbException e)
@@ -670,7 +674,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     try
                     {
                         context.Open(initializeExtensions: false);
-
+                        if (DataPersistenceControlContext.Current?.CommandTimeout != null)
+                        {
+                            context.CommandTimeout = DataPersistenceControlContext.Current?.CommandTimeout;
+                        }
                         // Is there an ad-hoc version from the database?
                         retVal = this.DoGetModel(context, key, versionKey, true);
                         retVal?.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey, this.m_configuration.StrictKeyAgreement);
@@ -738,7 +745,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 using (var context = this.Provider.GetWriteConnection())
                 {
                     context.Open(initializeExtensions: false);
-
+                    if (DataPersistenceControlContext.Current?.CommandTimeout != null)
+                    {
+                        context.CommandTimeout = DataPersistenceControlContext.Current?.CommandTimeout;
+                    }
                     if (data.ShouldDisablePersistenceValidation() != DataContextExtensions.DisablePersistenceValidationFlags.None)
                     {
                         context.Data.Add(DataConstants.DisableObjectValidation, data.ShouldDisablePersistenceValidation());
@@ -969,7 +979,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 try
                 {
                     context.Open(initializeExtensions: false);
-
+                    if (DataPersistenceControlContext.Current?.CommandTimeout != null)
+                    {
+                        context.CommandTimeout = DataPersistenceControlContext.Current?.CommandTimeout;
+                    }
                     if (data.ShouldDisablePersistenceValidation() != DataContextExtensions.DisablePersistenceValidationFlags.None)
                     {
                         context.Data.Add(DataConstants.DisableObjectValidation, data.ShouldDisablePersistenceValidation());
@@ -1189,7 +1202,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 try
                 {
                     context.Open(initializeExtensions: false);
-
+                    if (DataPersistenceControlContext.Current?.CommandTimeout != null)
+                    {
+                        context.CommandTimeout = DataPersistenceControlContext.Current?.CommandTimeout;
+                    }
                     TModel retVal = default(TModel);
                     using (var tx = context.BeginTransaction())
                     {
@@ -1246,7 +1262,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 try
                 {
                     context.Open();
-
+                    if (DataPersistenceControlContext.Current?.CommandTimeout != null)
+                    {
+                        context.CommandTimeout = DataPersistenceControlContext.Current?.CommandTimeout;
+                    }
                     using (var tx = context.BeginTransaction())
                     {
                         // Establish provenance object
@@ -1293,7 +1312,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 try
                 {
                     context.Open(initializeExtensions: false);
-
+                    if (DataPersistenceControlContext.Current?.CommandTimeout != null)
+                    {
+                        context.CommandTimeout = DataPersistenceControlContext.Current?.CommandTimeout;
+                    }
                     using (var tx = context.BeginTransaction())
                     {
                         // Establish provenance object

@@ -130,7 +130,7 @@ namespace SanteDB.Persistence.Data.Services
                 if (jobManager.GetJobInstance(OptimizeDatabaseJob.ID) == null)
                 {
                     var job = serviceManager.CreateInjected<OptimizeDatabaseJob>();
-                    jobManager.AddJob(job, JobStartType.DelayStart);
+                    jobManager.AddJob(job, JobStartType.TimerOnly);
                     jobManager.SetJobSchedule(job, new DayOfWeek[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday }, DateTime.Now.Date.AddHours(3));
                 }
 

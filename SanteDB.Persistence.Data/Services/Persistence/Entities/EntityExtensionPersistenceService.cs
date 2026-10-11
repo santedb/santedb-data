@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -57,7 +58,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 data.ExtensionType = data.ExtensionType.GetRelatedPersistenceService().Query(context, resolver.GetKeyExpression(data.ExtensionType)).First();
                 data.ExtensionTypeKey = data.ExtensionType.Key;
             }
-            return base.BeforePersisting(context, data);
+            var noTouchSource = data.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension;
+            try
+            {
+                if (noTouchSource) {
+                    context.PushData(DataConstants.NoTouchSourceContextKey, true);
+                }
+                return base.BeforePersisting(context, data);
+            }
+            finally
+            {
+                if(noTouchSource)
+                {
+                    context.PopData(DataConstants.NoTouchSourceContextKey, out _);
+                }
+            }
         }
     }
 }
