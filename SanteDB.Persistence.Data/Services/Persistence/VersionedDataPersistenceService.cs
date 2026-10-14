@@ -65,7 +65,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         private readonly TimeSpan VALIDATION_CACHE_TIMEOUT = new TimeSpan(0, 1, 0);
 
         // Validation configuration
-        private readonly IDictionary<Type, AdoValidationPolicy> m_validationConfigurationCache = new ConcurrentDictionary<Type, AdoValidationPolicy>();
+        private readonly ConcurrentDictionary<Type, AdoValidationPolicy> m_validationConfigurationCache = new ConcurrentDictionary<Type, AdoValidationPolicy>();
 
         // Default validation
         private readonly AdoValidationPolicy m_defaultValidationPolicy = new AdoValidationPolicy()
@@ -221,7 +221,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     validation.Scope = validation.Scope < itm.Scope ? itm.Scope : validation.Scope;
                     validation.Uniqueness = validation.Uniqueness < itm.Uniqueness ? itm.Uniqueness : validation.Uniqueness;
                 }
-                this.m_validationConfigurationCache.Add(objectToVerify.GetType(), validation);
+                this.m_validationConfigurationCache.TryAdd(objectToVerify.GetType(), validation);
             }
 
             // No validation is enabled
