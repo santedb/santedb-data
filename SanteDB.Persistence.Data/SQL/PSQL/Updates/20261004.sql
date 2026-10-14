@@ -1,7 +1,7 @@
 /** 
- * <feature scope="SanteDB.Persistence.Data" id="20261004-02" name="Update:20261004-02"   invariantName="npgsql" >
+ * <feature scope="SanteDB.Persistence.Data" id="20261004-03" name="Update:20261004-03"   invariantName="npgsql" >
  *	<summary>Update: Fixes duplicated entity extensions</summary>
- *	<isInstalled>select ck_patch('20261004-02')</isInstalled>
+ *	<isInstalled>select ck_patch('20261004-03')</isInstalled>
  * </feature>
  */
  WITH duplicate_records AS (
@@ -35,7 +35,10 @@ WHERE
 	AND A.act_id = ACT_EXT_TBL.act_id
 	AND act_ext_id <> keep_id;
 
-CREATE UNIQUE INDEX ent_ext_uq_idx ON ent_ext_tbl(ent_id, ext_typ_id) WHERE (obslt_vrsn_seq_id IS NULL);
-CREATE UNIQUE INDEX act_ext_uq_idx ON act_ext_tbl(act_id, ext_typ_id) WHERE (obslt_vrsn_seq_id IS NULL);
+CREATE UNIQUE INDEX IF NOT EXISTS ent_ext_uq_idx ON ent_ext_tbl(ent_id, ext_typ_id) WHERE (obslt_vrsn_seq_id IS NULL);
+CREATE UNIQUE INDEX IF NOT EXISTS act_ext_uq_idx ON act_ext_tbl(act_id, ext_typ_id) WHERE (obslt_vrsn_seq_id IS NULL);
 
- SELECT REG_PATCH('20261004-02');
+DROP INDEX IF EXISTS ent_vrsn_sts_cd_idx;
+DROP INDEX IF EXISTS act_vrsn_sts_cd_idx;
+
+ SELECT REG_PATCH('20261004-03');

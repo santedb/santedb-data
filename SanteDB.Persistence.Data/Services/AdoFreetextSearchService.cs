@@ -84,23 +84,23 @@ namespace SanteDB.Persistence.Data.Services
 
             // Subscribe to common types and events
             var appServiceProvider = ApplicationServiceContext.Current;
-            appServiceProvider.GetService<IDataPersistenceService<Bundle>>().Inserted += (o, e) => e.Data.Item.ForEach(i => this.ReIndex(i));
-            appServiceProvider.GetService<IDataPersistenceService<Patient>>().Inserted += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<Provider>>().Inserted += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<Material>>().Inserted += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<ManufacturedMaterial>>().Inserted += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<Entity>>().Inserted += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<Place>>().Inserted += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<Organization>>().Inserted += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<Person>>().Inserted += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<Patient>>().Updated += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<Provider>>().Updated += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<Material>>().Updated += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<ManufacturedMaterial>>().Updated += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<Entity>>().Updated += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<Place>>().Updated += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<Organization>>().Updated += (o, e) => this.ReIndex(e.Data);
-            appServiceProvider.GetService<IDataPersistenceService<Person>>().Updated += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<Bundle>>().Inserted += (o, e) => e.Data.Item.ForEach(i => this.ReIndex(i));
+            appServiceProvider.GetService<INotifyRepositoryService<Patient>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<Provider>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<Material>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<ManufacturedMaterial>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<Entity>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<Place>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<Organization>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<Person>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<Patient>>().Saved += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<Provider>>().Saved += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<Material>>().Saved += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<ManufacturedMaterial>>().Saved += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<Entity>>().Saved += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<Place>>().Saved += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<Organization>>().Saved += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<INotifyRepositoryService<Person>>().Saved += (o, e) => this.ReIndex(e.Data);
         }
 
         /// <summary>
