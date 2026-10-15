@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Jobs;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite.Configuration;
@@ -32,6 +33,7 @@ namespace SanteDB.Persistence.Data.Jobs
     /// </summary>
     public class OptimizeDatabaseJob : IJob
     {
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(OptimizeDatabaseJob));
         private readonly IConfigurationManager m_configurationManager;
         private readonly IJobStateManagerService m_jobState;
         internal static readonly Guid ID = Guid.Parse("08122590-3BC0-4D2F-BCF7-419DE363E2E7");
@@ -94,6 +96,7 @@ namespace SanteDB.Persistence.Data.Jobs
             }
             catch (Exception ex)
             {
+                this.m_tracer.TraceError("Error optimizing database - {0}", ex);
                 this.m_jobState.SetState(this, JobStateType.Aborted, ex.ToHumanReadableString());
                 this.m_jobState.SetProgress(this, ex.Message, 1.0f);
             }

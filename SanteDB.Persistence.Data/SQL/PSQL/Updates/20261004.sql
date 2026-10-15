@@ -35,11 +35,8 @@ WHERE
 	AND A.act_id = ACT_EXT_TBL.act_id
 	AND act_ext_id <> keep_id;
 
-DROP INDEX IF EXISTS ent_ext_uq_idx;
-DROP INDEX IF EXISTS act_ext_uq_idx;
-
-CREATE UNIQUE INDEX ent_ext_uq_idx ON ent_ext_tbl(ent_id, ext_typ_id) WHERE (obslt_vrsn_seq_id IS NULL);
-CREATE UNIQUE INDEX act_ext_uq_idx ON act_ext_tbl(act_id, ext_typ_id) WHERE (obslt_vrsn_seq_id IS NULL);
+CREATE UNIQUE INDEX IF NOT EXISTS ent_ext_uq_idx ON ent_ext_tbl(ent_id, ext_typ_id) WHERE (obslt_vrsn_seq_id IS NULL);
+CREATE UNIQUE INDEX IF NOT EXISTS act_ext_uq_idx ON act_ext_tbl(act_id, ext_typ_id) WHERE (obslt_vrsn_seq_id IS NULL);
 
 DROP INDEX IF EXISTS ent_vrsn_sts_cd_idx;
 DROP INDEX IF EXISTS act_vrsn_sts_cd_idx;
