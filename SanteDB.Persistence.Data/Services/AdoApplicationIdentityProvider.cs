@@ -172,7 +172,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     var pepperSecret = this.m_configuration.GetPepperCombos(applicationSecret).Select(o => this.m_hasher.ComputeHash(o));
                     // Pepper authentication
-                    if (!context.Any<DbSecurityApplication>(a => a.PublicId.ToLowerInvariant() == applicationId.ToLower() && pepperSecret.Contains(a.Secret)))
+                    if (!context.Any<DbSecurityApplication>(a => a.PublicId.ToLowerInvariant() == applicationId.ToLower() && pepperSecret.Contains(a.Secret) && a.ObsoletionTime == null))
                     {
                         app.InvalidAuthAttempts = app.InvalidAuthAttempts.GetValueOrDefault() + 1;
 
@@ -244,7 +244,7 @@ namespace SanteDB.Persistence.Data.Services
 
             if (identity is IDeviceIdentity)
             {
-                var device = dataContext.FirstOrDefault<DbSecurityDevice>(d => d.PublicId.ToLowerInvariant() == name);
+                var device = dataContext.FirstOrDefault<DbSecurityDevice>(d => d.PublicId.ToLowerInvariant() == name && d.ObsoletionTime == null);
 
                 if (null == device)
                 {
@@ -258,7 +258,7 @@ namespace SanteDB.Persistence.Data.Services
             }
             else if (identity is IApplicationIdentity)
             {
-                var app = dataContext.FirstOrDefault<DbSecurityApplication>(a => a.PublicId.ToLowerInvariant() == name);
+                var app = dataContext.FirstOrDefault<DbSecurityApplication>(a => a.PublicId.ToLowerInvariant() == name && a.ObsoletionTime == null);
 
                 if (null == app)
                 {
@@ -272,7 +272,7 @@ namespace SanteDB.Persistence.Data.Services
             }
             else
             {
-                var user = dataContext.FirstOrDefault<DbSecurityUser>(u => u.UserName.ToLowerInvariant() == name);
+                var user = dataContext.FirstOrDefault<DbSecurityUser>(u => u.UserName.ToLowerInvariant() == name && u.ObsoletionTime == null);
 
                 if (null == user)
                 {
@@ -635,7 +635,7 @@ namespace SanteDB.Persistence.Data.Services
                         // Assign default group policies
                         var skelSql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbSecurityRolePolicy))
                             .InnerJoin<DbSecurityRolePolicy, DbSecurityRole>(o => o.SourceKey, o => o.Key)
-                            .Where<DbSecurityRole>(o => o.Name == "APPLICATIONS")
+                            .Where<DbSecurityRole>(o => o.Name == "APPLICATIONS" && o.ObsoletionTime == null)
                             .Statement;
 
                         context.Query<DbSecurityRolePolicy>(skelSql)

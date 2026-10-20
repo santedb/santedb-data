@@ -406,7 +406,7 @@ namespace SanteDB.Persistence.Data.Services
                                 audience = claimApplication.FindFirst(SanteDBClaimTypes.AudienceClaim)?.Value ?? context.FirstOrDefault<DbApplicationClaim>(o => o.SourceKey == applicationKey && o.ClaimType == SanteDBClaimTypes.AudienceClaim && (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now))?.ClaimValue ?? claimApplication.Name;
                                 break;
                             case IIdentity idApplication:
-                                applicationKey = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationId.Name.ToLowerInvariant())?.Key;
+                                applicationKey = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationId.Name.ToLowerInvariant() && o.ObsoletionTime == null)?.Key;
                                 audience = context.FirstOrDefault<DbApplicationClaim>(o => o.SourceKey == applicationKey && o.ClaimType == SanteDBClaimTypes.AudienceClaim && (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now))?.ClaimValue ?? idApplication.Name;
                                 break;
                             default:
@@ -423,7 +423,7 @@ namespace SanteDB.Persistence.Data.Services
                                 deviceKey = Guid.Parse(claimDevice.FindFirst(SanteDBClaimTypes.SecurityId)?.Value ?? claimDevice.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim)?.Value);
                                 break;
                             case IIdentity idDevice:
-                                deviceKey = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceId.Name.ToLowerInvariant())?.Key;
+                                deviceKey = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceId.Name.ToLowerInvariant() && o.ObsoletionTime == null)?.Key;
                                 break;
                         }
 
@@ -437,7 +437,7 @@ namespace SanteDB.Persistence.Data.Services
                                 userKey = Guid.Parse(claimUser.FindFirst(SanteDBClaimTypes.SecurityId)?.Value);
                                 break;
                             case IIdentity idUser:
-                                userKey = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userId.Name)?.Key;
+                                userKey = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userId.Name && o.ObsoletionTime == null)?.Key;
                                 break;
                         }
 
@@ -636,11 +636,11 @@ namespace SanteDB.Persistence.Data.Services
                                 providedAudience = context.FirstOrDefault<DbApplicationClaim>(o => o.SourceKey == adoApplication.Sid && o.ClaimType == SanteDBClaimTypes.AudienceClaim && (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now))?.ClaimValue ?? adoApplication.Name;
                                 break;
                             case IClaimsIdentity claimApplication:
-                                var applicationKey = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == claimApplication.Name.ToLowerInvariant())?.Key;
+                                var applicationKey = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == claimApplication.Name.ToLowerInvariant() && o.ObsoletionTime == null)?.Key;
                                 providedAudience = claimApplication.FindFirst(SanteDBClaimTypes.AudienceClaim)?.Value ?? context.FirstOrDefault<DbApplicationClaim>(o => o.SourceKey == applicationKey && o.ClaimType == SanteDBClaimTypes.AudienceClaim && (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now))?.ClaimValue ?? claimApplication.Name;
                                 break;
                             case IIdentity idApplication:
-                                applicationKey = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == idApplication.Name.ToLowerInvariant())?.Key;
+                                applicationKey = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == idApplication.Name.ToLowerInvariant() && o.ObsoletionTime == null)?.Key;
                                 providedAudience = context.FirstOrDefault<DbApplicationClaim>(o => o.SourceKey == applicationKey && o.ClaimType == SanteDBClaimTypes.AudienceClaim && (o.ClaimExpiry == null || o.ClaimExpiry > DateTimeOffset.Now))?.ClaimValue ?? idApplication.Name;
                                 break;
                             default:

@@ -100,8 +100,8 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         string[] lroles = roles.Select(o => o.ToLowerInvariant()).ToArray(), lusers = users.Select(o => o.ToLowerInvariant()).ToArray();
 
-                        var roleIds = context.Query<DbSecurityRole>(o => lroles.Contains(o.Name.ToLowerInvariant())).Select(o => o.Key).ToArray();
-                        var userIds = context.Query<DbSecurityUser>(o => lusers.Contains(o.UserName.ToLowerInvariant())).Select(o => o.Key).ToArray();
+                        var roleIds = context.Query<DbSecurityRole>(o => o.ObsoletionTime == null && lroles.Contains(o.Name.ToLowerInvariant())).Select(o => o.Key).ToArray();
+                        var userIds = context.Query<DbSecurityUser>(o => o.ObsoletionTime == null && lusers.Contains(o.UserName.ToLowerInvariant())).Select(o => o.Key).ToArray();
 
                         // Add
                         foreach (var rol in roleIds.SelectMany(r => userIds.Select(u => new { U = u, R = r })))
@@ -189,7 +189,8 @@ namespace SanteDB.Persistence.Data.Services
                         .SelectFrom(typeof(DbSecurityUser))
                         .InnerJoin<DbSecurityUser, DbSecurityUserRole>(o => o.Key, o => o.UserKey)
                         .InnerJoin<DbSecurityUserRole, DbSecurityRole>(o => o.RoleKey, o => o.Key)
-                        .Where<DbSecurityRole>(o => o.Name.ToLowerInvariant() == role.ToLowerInvariant())
+                        .Where<DbSecurityRole>(o => o.Name.ToLowerInvariant() == role.ToLowerInvariant() && o.ObsoletionTime == null)
+                        .And<DbSecurityUser>(o => o.ObsoletionTime == null)
                         .Statement
                         ).Select(o => o.UserName).ToArray();
                 }
@@ -278,8 +279,8 @@ namespace SanteDB.Persistence.Data.Services
                         .SelectFrom(typeof(DbSecurityUserRole))
                         .InnerJoin<DbSecurityUserRole, DbSecurityUser>(o => o.UserKey, o => o.Key)
                         .InnerJoin<DbSecurityUserRole, DbSecurityRole>(o => o.RoleKey, o => o.Key)
-                        .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant())
-                        .And<DbSecurityRole>(o => o.Name.ToLowerInvariant() == roleName.ToLowerInvariant())
+                        .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null)
+                        .And<DbSecurityRole>(o => o.Name.ToLowerInvariant() == roleName.ToLowerInvariant() && o.ObsoletionTime == null)
                         .Statement
                         );
                 }
@@ -319,8 +320,8 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         string[] lroles = roles.Select(o => o.ToLowerInvariant()).ToArray(), lusers = users.Select(o => o.ToLowerInvariant()).ToArray();
 
-                        var roleIds = context.Query<DbSecurityRole>(o => lroles.Contains(o.Name.ToLowerInvariant())).Select(o => o.Key).ToList();
-                        var userIds = context.Query<DbSecurityUser>(o => lusers.Contains(o.UserName.ToLowerInvariant())).Select(o => o.Key).ToArray();
+                        var roleIds = context.Query<DbSecurityRole>(o => o.ObsoletionTime == null && lroles.Contains(o.Name.ToLowerInvariant())).Select(o => o.Key).ToList();
+                        var userIds = context.Query<DbSecurityUser>(o => o.ObsoletionTime == null && lusers.Contains(o.UserName.ToLowerInvariant())).Select(o => o.Key).ToArray();
 
                         // Add
                         foreach (var rol in roleIds.SelectMany(r => userIds.Select(u => new { U = u, R = r })))

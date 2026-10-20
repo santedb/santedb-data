@@ -185,7 +185,7 @@ namespace SanteDB.Persistence.Data.Services
                         bool isChallengeResponseValid = false;
                         if (challengeKey == Guid.Empty && dbUser.PasswordExpiration.HasValue)
                         {
-                            isChallengeResponseValid = context.Any<DbSecurityUser>(a => a.UserName.ToLowerInvariant() == userName.ToLower() && pepperResponses.Contains(a.Password));
+                            isChallengeResponseValid = context.Any<DbSecurityUser>(a => a.UserName.ToLowerInvariant() == userName.ToLower() && pepperResponses.Contains(a.Password) && a.ObsoletionTime == null);
                         }
                         else
                         {
@@ -222,6 +222,7 @@ namespace SanteDB.Persistence.Data.Services
                                 .SelectFrom(typeof(DbSecurityRole))
                                 .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                                 .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key)
+                                .And<DbSecurityRole>(o => o.ObsoletionTime == null)
                                 .Statement;
                             identity.AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
 

@@ -490,11 +490,11 @@ namespace SanteDB.Persistence.Data
                 switch (principal.Identity)
                 {
                     case IDeviceIdentity di:
-                        retVal.DeviceKey = me.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == di.Name.ToLowerInvariant()).Select(o => o.Key).First();
+                        retVal.DeviceKey = me.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == di.Name.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).First();
                         retVal.ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid);
                         break;
                     case IApplicationIdentity ai:
-                        retVal.ApplicationKey = me.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == ai.Name.ToLowerInvariant()).Select(o => o.Key).First();
+                        retVal.ApplicationKey = me.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == ai.Name.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).First();
                         retVal.UserKey = Guid.Parse(AuthenticationContext.SystemUserSid);
                         break;
                     default:
@@ -510,7 +510,7 @@ namespace SanteDB.Persistence.Data
                         }
                         else
                         {
-                            retVal.UserKey = me.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == principal.Identity.Name.ToLowerInvariant())?.Key;
+                            retVal.UserKey = me.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == principal.Identity.Name.ToLowerInvariant() && o.ObsoletionTime == null)?.Key;
                         }
                         retVal.ApplicationKey = Guid.Parse(AuthenticationContext.SystemApplicationSid);
 

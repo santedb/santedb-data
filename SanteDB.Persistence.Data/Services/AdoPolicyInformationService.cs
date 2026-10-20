@@ -143,7 +143,7 @@ namespace SanteDB.Persistence.Data.Services
                                 {
                                     if (null == sr.Key)
                                     {
-                                        sr.Key = context.Query<DbSecurityRole>(r => r.Name == sr.Name).FirstOrDefault()?.Key;
+                                        sr.Key = context.Query<DbSecurityRole>(r => r.Name == sr.Name && r.ObsoletionTime == null).FirstOrDefault()?.Key;
 
                                         if (null == sr.Key)
                                         {
@@ -164,7 +164,7 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                             case IApplicationIdentity iaid:
                                 {
-                                    var sid = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == iaid.Name.ToLowerInvariant()).Select(o => o.Key).First();
+                                    var sid = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == iaid.Name.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).First();
                                     context.DeleteAll<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sid);
                                     context.InsertAll(policies.Select(o => new DbSecurityApplicationPolicy()
                                     {
@@ -189,7 +189,7 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                             case IDeviceIdentity idid:
                                 {
-                                    var sid = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == idid.Name.ToLowerInvariant()).Select(o => o.Key).First();
+                                    var sid = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == idid.Name.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).First();
                                     context.DeleteAll<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sid);
                                     context.InsertAll(policies.Select(o => new DbSecurityDevicePolicy()
                                     {
@@ -556,7 +556,7 @@ namespace SanteDB.Persistence.Data.Services
                         .SelectFrom(typeof(DbSecurityApplicationPolicy), typeof(DbSecurityPolicy))
                         .InnerJoin<DbSecurityApplicationPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                         .InnerJoin<DbSecurityApplicationPolicy, DbSecurityApplication>(o => o.SourceKey, o => o.Key)
-                        .Where<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == appId.Name.ToLowerInvariant())
+                        .Where<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == appId.Name.ToLowerInvariant() && o.ObsoletionTime == null)
                         .Statement
                     );
             }
@@ -567,7 +567,7 @@ namespace SanteDB.Persistence.Data.Services
                         .SelectFrom(typeof(DbSecurityDevicePolicy), typeof(DbSecurityPolicy))
                         .InnerJoin<DbSecurityDevicePolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                         .InnerJoin<DbSecurityDevicePolicy, DbSecurityDevice>(o => o.SourceKey, o => o.Key)
-                        .Where<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == devId.Name.ToLowerInvariant())
+                        .Where<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == devId.Name.ToLowerInvariant() && o.ObsoletionTime == null)
                         .Statement
                         );
             }
@@ -579,7 +579,7 @@ namespace SanteDB.Persistence.Data.Services
                         .InnerJoin<DbSecurityRolePolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                         .InnerJoin<DbSecurityRolePolicy, DbSecurityUserRole>(o => o.SourceKey, o => o.RoleKey)
                         .InnerJoin<DbSecurityUserRole, DbSecurityUser>(o => o.UserKey, o => o.Key)
-                        .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == identity.Name.ToLowerInvariant())
+                        .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == identity.Name.ToLowerInvariant() && o.ObsoletionTime == null)
                         .Statement
                     );
             }

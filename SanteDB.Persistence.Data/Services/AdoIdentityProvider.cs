@@ -306,7 +306,7 @@ namespace SanteDB.Persistence.Data.Services
                                 // Peppered authentication
                                 var pepperSecret = this.m_configuration.GetPepperCombos(password).Select(o => this.m_passwordHashingService.ComputeHash(o));
                                 // Pepper authentication
-                                if (!context.Any<DbSecurityUser>(a => a.UserName.ToLowerInvariant() == userName.ToLower() && pepperSecret.Contains(a.Password)))
+                                if (!context.Any<DbSecurityUser>(a => a.UserName.ToLowerInvariant() == userName.ToLower() && pepperSecret.Contains(a.Password) && a.ObsoletionTime == null))
                                 {
                                     throw new InvalidIdentityAuthenticationException();
                                 }
@@ -378,6 +378,7 @@ namespace SanteDB.Persistence.Data.Services
                                 .SelectFrom(typeof(DbSecurityRole))
                                 .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                                 .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key)
+                                .And<DbSecurityRole>(o => o.ObsoletionTime == null)
                                 .Statement;
 
 
@@ -636,7 +637,7 @@ namespace SanteDB.Persistence.Data.Services
                         // Register the group
                         context.InsertAll(context.Query<DbSecurityRole>(context.CreateSqlStatementBuilder()
                             .SelectFrom(typeof(DbSecurityRole))
-                            .Where<DbSecurityRole>(o => o.Name == SanteDBConstants.UserGroupName)
+                            .Where<DbSecurityRole>(o => o.Name == SanteDBConstants.UserGroupName && o.ObsoletionTime == null)
                             .Statement)
                             .ToArray()
                             .Select(o => new DbSecurityUserRole()
@@ -750,6 +751,7 @@ namespace SanteDB.Persistence.Data.Services
                                 .SelectFrom(typeof(DbSecurityRole))
                                 .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                                 .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key)
+                                .And<DbSecurityRole>(o => o.ObsoletionTime == null)
                                 .Statement;
                     retVal.AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
 
@@ -1066,6 +1068,7 @@ namespace SanteDB.Persistence.Data.Services
                         .SelectFrom(typeof(DbSecurityRole))
                         .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                         .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key)
+                        .And<DbSecurityRole>(o => o.ObsoletionTime == null)
                         .Statement;
                     identity.AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
 
