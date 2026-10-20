@@ -303,7 +303,7 @@ namespace SanteDB.Persistence.Data.Services
                     var sqlQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbSecurityChallenge), typeof(DbSecurityUserChallengeAssoc))
                             .InnerJoin<DbSecurityChallenge, DbSecurityUserChallengeAssoc>(o => o.Key, o => o.ChallengeKey)
                             .InnerJoin<DbSecurityUserChallengeAssoc, DbSecurityUser>(o => o.UserKey, o => o.Key)
-                            .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant())
+                            .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null)
                             .Statement;
 
                     var retVal = context.Query<CompositeResult<DbSecurityChallenge, DbSecurityUserChallengeAssoc>>(sqlQuery).ToArray().Select(o => new SecurityChallenge()
@@ -415,7 +415,7 @@ namespace SanteDB.Persistence.Data.Services
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open(initializeExtensions: false);
-                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant());
+                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (dbUser == null)
                     {
                         throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.USR_CHL_GEN_ERR, new { userName = userName }));
@@ -464,7 +464,7 @@ namespace SanteDB.Persistence.Data.Services
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open(initializeExtensions: false);
-                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant());
+                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (dbUser == null)
                     {
                         throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.USR_CHL_GEN_ERR, new { userName = userName }));
