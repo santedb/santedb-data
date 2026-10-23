@@ -18,6 +18,8 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using SanteDB.BI.Model;
+using SanteDB.BI.Services;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.i18n;
@@ -99,7 +101,8 @@ namespace SanteDB.Persistence.PubSub.ADO
             ISecurityRepositoryService securityRepository,
             IDataCachingService cachingService,
             IQueryPersistenceService queryPersistence,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            IBiMetadataRepository biMetadataRepository = null)
         {
             this.m_cache = cachingService;
             this.m_serviceManager = serviceManager;
@@ -110,6 +113,29 @@ namespace SanteDB.Persistence.PubSub.ADO
             this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.PubSub.ADO", serviceManager.NotifyStartupProgress);
             this.m_queryPersistence = queryPersistence;
             this.m_localizationService = localizationService;
+
+            // Add this to the BI layer
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                // Add audits as a BI data source
+                biMetadataRepository?.Insert(new BiDataSourceDefinition()
+                {
+                    IsSystemObject = true,
+                    ConnectionString = this.m_configuration.ReadonlyConnectionString,
+                    Status = BiDefinitionStatus.Active,
+                    MetaData = new BiMetadata()
+                    {
+                        Version = typeof(AdoPubSubManager).Assembly.GetName().Version.ToString(),
+                        Demands = new List<string>()
+                                {
+                                PermissionPolicyIdentifiers.Login
+                                }
+                    },
+                    Id = "org.santedb.bi.dataSource.pubsub",
+                    Name = "pubsub",
+                    ProviderType = typeof(OrmBiDataProvider)
+                });
+            }
         }
 
         // Ado Pub Sub Manager Tracer source
