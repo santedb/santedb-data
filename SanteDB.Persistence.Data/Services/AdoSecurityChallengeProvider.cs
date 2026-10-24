@@ -185,7 +185,7 @@ namespace SanteDB.Persistence.Data.Services
                         bool isChallengeResponseValid = false;
                         if (challengeKey == Guid.Empty && dbUser.PasswordExpiration.HasValue)
                         {
-                            isChallengeResponseValid = context.Any<DbSecurityUser>(a => a.UserName.ToLowerInvariant() == userName.ToLower() && pepperResponses.Contains(a.Password));
+                            isChallengeResponseValid = context.Any<DbSecurityUser>(a => a.UserName.ToLowerInvariant() == userName.ToLower() && pepperResponses.Contains(a.Password) && a.ObsoletionTime == null);
                         }
                         else
                         {
@@ -222,6 +222,7 @@ namespace SanteDB.Persistence.Data.Services
                                 .SelectFrom(typeof(DbSecurityRole))
                                 .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                                 .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key)
+                                .And<DbSecurityRole>(o => o.ObsoletionTime == null)
                                 .Statement;
                             identity.AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
 
@@ -303,7 +304,7 @@ namespace SanteDB.Persistence.Data.Services
                     var sqlQuery = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbSecurityChallenge), typeof(DbSecurityUserChallengeAssoc))
                             .InnerJoin<DbSecurityChallenge, DbSecurityUserChallengeAssoc>(o => o.Key, o => o.ChallengeKey)
                             .InnerJoin<DbSecurityUserChallengeAssoc, DbSecurityUser>(o => o.UserKey, o => o.Key)
-                            .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant())
+                            .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null)
                             .Statement;
 
                     var retVal = context.Query<CompositeResult<DbSecurityChallenge, DbSecurityUserChallengeAssoc>>(sqlQuery).ToArray().Select(o => new SecurityChallenge()
@@ -415,7 +416,7 @@ namespace SanteDB.Persistence.Data.Services
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open(initializeExtensions: false);
-                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant());
+                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (dbUser == null)
                     {
                         throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.USR_CHL_GEN_ERR, new { userName = userName }));
@@ -464,7 +465,7 @@ namespace SanteDB.Persistence.Data.Services
                 using (var context = this.m_configuration.Provider.GetWriteConnection())
                 {
                     context.Open(initializeExtensions: false);
-                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant());
+                    var dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
                     if (dbUser == null)
                     {
                         throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.USR_CHL_GEN_ERR, new { userName = userName }));

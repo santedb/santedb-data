@@ -181,7 +181,7 @@ namespace SanteDB.Persistence.Data.Services
                     // Peppered authentication
                     var pepperSecret = this.m_configuration.GetPepperCombos(deviceSecret).Select(o => this.m_hasher.ComputeHash(o));
                     // Pepper authentication
-                    if (!context.Any<DbSecurityDevice>(a => a.PublicId.ToLowerInvariant() == deviceId.ToLower() && pepperSecret.Contains(a.DeviceSecret)))
+                    if (!context.Any<DbSecurityDevice>(a => a.PublicId.ToLowerInvariant() == deviceId.ToLower() && pepperSecret.Contains(a.DeviceSecret) && a.ObsoletionTime == null))
                     {
                         dev.InvalidAuthAttempts = dev.InvalidAuthAttempts.GetValueOrDefault() + 1;
                         if (dev.InvalidAuthAttempts > this.m_securityConfiguration.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxInvalidLogins))
@@ -492,7 +492,7 @@ namespace SanteDB.Persistence.Data.Services
                         // Assign default group policies
                         var skelSql = context.CreateSqlStatementBuilder().SelectFrom(typeof(DbSecurityRolePolicy))
                             .InnerJoin<DbSecurityRolePolicy, DbSecurityRole>(o => o.SourceKey, o => o.Key)
-                            .Where<DbSecurityRole>(o => o.Name == "DEVICE")
+                            .Where<DbSecurityRole>(o => o.Name == "DEVICE" && o.ObsoletionTime == null)
                             .Statement;
 
                         context.Query<DbSecurityRolePolicy>(skelSql)

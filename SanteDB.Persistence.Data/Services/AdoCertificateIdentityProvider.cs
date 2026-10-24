@@ -135,13 +135,13 @@ namespace SanteDB.Persistence.Data.Services
                     switch (identityToBeMapped)
                     {
                         case IDeviceIdentity did:
-                            certificateRegistration.SecurityDeviceKey = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == did.Name.ToLowerInvariant()).Select(o => o.Key).FirstOrDefault();
+                            certificateRegistration.SecurityDeviceKey = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == did.Name.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
                             break;
                         case IApplicationIdentity aid:
-                            certificateRegistration.SecurityApplicationKey = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == aid.Name.ToLowerInvariant()).Select(o => o.Key).FirstOrDefault();
+                            certificateRegistration.SecurityApplicationKey = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == aid.Name.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
                             break;
                         default:
-                            certificateRegistration.SecurityUserKey = context.Query<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == identityToBeMapped.Name.ToLowerInvariant()).Select(o => o.Key).FirstOrDefault();
+                            certificateRegistration.SecurityUserKey = context.Query<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == identityToBeMapped.Name.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
                             break;
                     }
 
@@ -256,6 +256,7 @@ namespace SanteDB.Persistence.Data.Services
                             .SelectFrom(typeof(DbSecurityRole))
                             .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
                             .Where<DbSecurityUserRole>(o => o.UserKey == authData.Object1.SecurityUserKey)
+                            .And<DbSecurityRole>(o => o.ObsoletionTime == null)
                             .Statement;
                         (authenticatedIdentity as AdoUserIdentity).AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
 
