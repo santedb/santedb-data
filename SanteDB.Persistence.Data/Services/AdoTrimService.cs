@@ -84,7 +84,7 @@ namespace SanteDB.Persistence.Data.Services
             nrec = 0;
 
             // Prepare 
-            var purgeKeySet = context.Query<DbEntityVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).OrderBy(o=>o.VersionKey).Select(o => o.VersionKey);
+            var purgeKeySet = context.Query<DbEntityVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion && o.ReplacesVersionKey != null).OrderBy(o=>o.VersionKey).Select(o => o.VersionKey);
             var totalRec = purgeKeySet.Count();
             purgeKeySet = purgeKeySet.Take(10_000); // 10,000 recs at a time
             this.m_tracer.TraceInfo("Will purge {0} EntityVersion records", totalRec);
@@ -161,7 +161,7 @@ namespace SanteDB.Persistence.Data.Services
             nrec = 0;
 
             // Prepare 
-            var purgeKeySet = context.Query<DbConceptVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).Select(o => o.VersionKey);
+            var purgeKeySet = context.Query<DbConceptVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion && o.ReplacesVersionKey != null).Select(o => o.VersionKey);
             var totalRec = purgeKeySet.Count();
             purgeKeySet = purgeKeySet.Take(10_000); // 10,000 recs at a time
             this.m_tracer.TraceInfo("Will purge {0} Concept Version records", totalRec);
@@ -214,7 +214,7 @@ namespace SanteDB.Persistence.Data.Services
             nRec = 0;
 
             // Prepare 
-            var purgeKeySet = context.Query<DbActVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion).Select(o => o.VersionKey);
+            var purgeKeySet = context.Query<DbActVersion>(o => o.VersionSequenceId < versionSequenceTrim && o.ObsoletionTime != null && !o.IsHeadVersion && o.ReplacesVersionKey != null).Select(o => o.VersionKey);
             var totalRec = purgeKeySet.Count();
             purgeKeySet = purgeKeySet.Take(10_000); // 10,000 recs at a time
             this.m_tracer.TraceInfo("Will purge {0} ActVersion records", totalRec);

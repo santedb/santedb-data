@@ -892,18 +892,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
             // Ensure that we always apply HEAD filter if not applied
-
-            if (!query.ContainsPropertyReference(nameof(IVersionedData.IsHeadVersion)) && !query.ContainsPropertyReference(nameof(IVersionedData.VersionKey)))
+            if (!query.ContainsPropertyReference(nameof(IVersionedData.PreviousVersionKey)) && 
+                !query.ContainsPropertyReference(nameof(IVersionedData.VersionSequence)) && 
+                !query.ContainsPropertyReference(nameof(IVersionedData.VersionKey)))
             {
-                var headProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedData.IsHeadVersion)));
-                query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, headProperty, Expression.Constant(true))), query.Parameters[0]);
+                if (!query.ContainsPropertyReference(nameof(IVersionedData.IsHeadVersion)) && !query.ContainsPropertyReference(nameof(IVersionedData.VersionKey)))
+                {
+                    var headProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedData.IsHeadVersion)));
+                    query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, headProperty, Expression.Constant(true))), query.Parameters[0]);
+                }
+
+                if (!query.ContainsPropertyReference(nameof(BaseEntityData.ObsoletionTime)) && !query.ContainsPropertyReference(nameof(IVersionedData.VersionKey)))
+                {
+                    var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
+                    query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
+                }
             }
 
-            if (!query.ContainsPropertyReference(nameof(BaseEntityData.ObsoletionTime)) && !query.ContainsPropertyReference(nameof(IVersionedData.VersionKey)))
-            {
-                var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
-                query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
-            }
             return query;
 
         }
