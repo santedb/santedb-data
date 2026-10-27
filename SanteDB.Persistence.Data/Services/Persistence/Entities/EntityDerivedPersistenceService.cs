@@ -525,6 +525,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
                 }
             }
+
+            // Prevent changing class keys
+            var existingClassKey = context.Query<DbEntityVersion>(o => o.IsHeadVersion && o.Key == data.Key.GetValueOrDefault() && o.ObsoletionTime == null).Select(o => o.ClassConceptKey).FirstOrDefault();
+            if(!existingClassKey.Equals(Guid.Empty) && !existingClassKey.Equals(data.ClassConceptKey))
+            {
+                throw new InvalidOperationException(String.Format(ErrorMessages.PROPERTY_READONLY, typeof(TEntity), "ClassConceptKey"));
+            }
+
             return base.BeforePersisting(context, data);
         }
 

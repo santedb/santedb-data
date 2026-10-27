@@ -466,6 +466,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 }
             }
 
+            // Prevent changing class keys
+            var existingClassKey = context.Query<DbActVersion>(o => o.IsHeadVersion && o.Key == data.Key.GetValueOrDefault() && o.ObsoletionTime == null).Select(o => o.ClassConceptKey).FirstOrDefault();
+            if (!existingClassKey.Equals(Guid.Empty) && !existingClassKey.Equals(data.ClassConceptKey))
+            {
+                throw new InvalidOperationException(String.Format(ErrorMessages.PROPERTY_READONLY, typeof(TAct), "ClassConceptKey"));
+            }
+
             return base.BeforePersisting(context, data);
         }
 
