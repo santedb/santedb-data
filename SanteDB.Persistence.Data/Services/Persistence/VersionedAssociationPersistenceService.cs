@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Services;
@@ -59,7 +60,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <inheritdoc/>
         protected override TModel BeforePersisting(DataContext context, TModel data)
         {
-            if (data.SourceEntityKey.HasValue && (!context.PeekData(DataConstants.NoTouchSourceContextKey, out var noTouch) || !(bool)noTouch)) // Touch the entity version
+            if (data.SourceEntityKey.HasValue && (!context.PeekData(DataConstants.NoTouchSourceContextKey, out var noTouch) || !(bool)noTouch) &&
+                context.Data.TryGetValue(data.SourceEntityKey.ToString(), out var batchTransactMode) && !BatchOperationType.Insert.Equals(batchTransactMode)) // Touch the entity version
             {
                 data.SourceType.GetRelatedPersistenceService().Touch(context, data.SourceEntityKey.Value);
             }
