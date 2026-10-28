@@ -500,11 +500,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 }
                 catch (DbException e)
                 {
-                    throw new DataPersistenceException(String.Format(ErrorMessages.BUNDLE_PERSISTENCE_ERROR, i, data.Item[i]), e.TranslateDbException());
+                    throw new DataPersistenceException(String.Format(ErrorMessages.BUNDLE_PERSISTENCE_ERROR, i, data.Item[i], String.Join(", ", data.Item)), e.TranslateDbException());
                 }
                 catch (Exception e)
                 {
-                    throw new DataPersistenceException(String.Format(ErrorMessages.BUNDLE_PERSISTENCE_ERROR, i, data.Item[i]), e);
+                    throw new DataPersistenceException(String.Format(ErrorMessages.BUNDLE_PERSISTENCE_ERROR, i, data.Item[i], String.Join(", ", data.Item)), e);
                 }
             }
 
