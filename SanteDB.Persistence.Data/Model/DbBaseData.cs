@@ -110,6 +110,7 @@ namespace SanteDB.Persistence.Data.Model
         /// Identifies whether obsoletion time is specified
         /// </summary>
         public bool ObsoletedByKeySpecified { get; set; }
+
     }
 
     /// <summary>
