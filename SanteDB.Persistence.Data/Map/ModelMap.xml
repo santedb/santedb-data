@@ -64,7 +64,7 @@
   <class modelClass="SanteDB.Core.Model.Security.SecurityUser, SanteDB.Core.Model"
 		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityUser, SanteDB.Persistence.Data">
     <property modelName="ModifiedOn" domainName="UpdatedTime" />
-     <property modelName="Tag" queryOnly="true" domainName="Key" /> 
+     <property modelName="Tag" queryOnly="true" domainName="SecurityHash" /> 
   </class>
 
   <!-- Security Users -->

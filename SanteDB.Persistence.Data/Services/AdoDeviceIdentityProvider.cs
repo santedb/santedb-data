@@ -193,6 +193,8 @@ namespace SanteDB.Persistence.Data.Services
                             }
                         }
                         context.Update(dev);
+                        this.m_dataCaching?.Remove(dev.Key);
+
                         throw new InvalidIdentityAuthenticationException();
                     }
 
@@ -292,6 +294,8 @@ namespace SanteDB.Persistence.Data.Services
 
                         context.Update(dev);
                         tx.Commit();
+                        this.m_dataCaching?.Remove(dev.Key);
+
                         this.Changed?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dev), principal));
                     }
                 }
@@ -566,6 +570,7 @@ namespace SanteDB.Persistence.Data.Services
 
                         tx.Commit();
                         this.Deleted?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dbDev), principal));
+                        this.m_dataCaching?.Remove(dbDev.Key);
 
                     }
                 }
@@ -656,6 +661,7 @@ namespace SanteDB.Persistence.Data.Services
                     }
 
                     this.Changed?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dbDevice), principal));
+                    this.m_dataCaching?.Remove(dbDevice.Key);
 
                 }
                 catch (Exception e)
@@ -704,6 +710,7 @@ namespace SanteDB.Persistence.Data.Services
                         tx.Commit();
                     }
                     this.Changed?.Invoke(this, new IdentityEventArgs(new AdoDeviceIdentity(dbDevice), principal));
+                    this.m_dataCaching?.Remove(dbDevice.Key);
 
                 }
                 catch (Exception e)

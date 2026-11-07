@@ -58,6 +58,8 @@ namespace SanteDB.Persistence.Data.Services
         private readonly SecurityConfigurationSection m_securityConfiguration;
         private readonly IPasswordHashingService m_passwordHashingService;
         private readonly IPolicyEnforcementService m_pepService;
+        private readonly IDataCachingService m_dataCachingService;
+
         //private readonly ITfaRelayService m_tfaRelay;
         private readonly ILocalizationService m_localizationService;
 
@@ -68,12 +70,14 @@ namespace SanteDB.Persistence.Data.Services
             ILocalizationService localizationService,
             IPasswordHashingService passwordHashingService,
             IPolicyEnforcementService policyEnforcementService,
-            ITfaService twoFactorSecretGenerator = null)
+            ITfaService twoFactorSecretGenerator = null,
+            IDataCachingService dataCaching = null)
         {
             this.m_configuration = configuration.GetSection<AdoPersistenceConfigurationSection>();
             this.m_securityConfiguration = configuration.GetSection<SecurityConfigurationSection>();
             this.m_passwordHashingService = passwordHashingService;
             this.m_pepService = policyEnforcementService;
+            this.m_dataCachingService = dataCaching;
             //this.m_tfaRelay = twoFactorSecretGenerator;
             this.m_localizationService = localizationService;
         }
@@ -136,12 +140,18 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         case IDeviceIdentity did:
                             certificateRegistration.SecurityDeviceKey = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == did.Name.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
+                            this.m_dataCachingService?.Remove(certificateRegistration.SecurityDeviceKey.Value);
+
                             break;
                         case IApplicationIdentity aid:
                             certificateRegistration.SecurityApplicationKey = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == aid.Name.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
+                            this.m_dataCachingService?.Remove(certificateRegistration.SecurityApplicationKey.Value);
+
                             break;
                         default:
                             certificateRegistration.SecurityUserKey = context.Query<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == identityToBeMapped.Name.ToLowerInvariant() && o.ObsoletionTime == null).Select(o => o.Key).FirstOrDefault();
+                            this.m_dataCachingService?.Remove(certificateRegistration.SecurityUserKey.Value);
+
                             break;
                     }
 
@@ -163,6 +173,7 @@ namespace SanteDB.Persistence.Data.Services
                         // attempt storage
                         context.Insert(certificateRegistration);
                     }
+
 
                 }
             }

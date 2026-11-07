@@ -356,6 +356,7 @@ namespace SanteDB.Persistence.Data.Services
                             dbUser.InvalidLoginAttempts = 0;
                             dbUser.LastLoginTime = DateTimeOffset.Now;
                             dbUser.Password = this.m_passwordHashingService.ComputeHash(this.m_configuration.AddPepper(password));
+                            dbUser.SecurityHash = this.ComputeSecurityHash(dbUser);
 
                             dbUser = context.Update(dbUser);
 
@@ -421,7 +422,9 @@ namespace SanteDB.Persistence.Data.Services
                                     dbUser.Lockout = DateTimeOffset.Now.AddSeconds(lockoutSlide);
                                 }
                             }
+                            dbUser.SecurityHash = this.ComputeSecurityHash(dbUser);
                             context.Update(dbUser);
+                            this.m_dataCachingService?.Remove(dbUser.Key);
                             throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_INVALID));
                         }
                         catch (InvalidIdentityAuthenticationException)
@@ -530,7 +533,7 @@ namespace SanteDB.Persistence.Data.Services
                         dbUser.Password = this.m_passwordHashingService.ComputeHash(this.m_configuration.AddPepper(newPassword));
                         dbUser.UpdatedByKey = context.EstablishProvenance(principal, null);
                         dbUser.UpdatedTime = DateTimeOffset.Now;
-                        dbUser.SecurityHash = this.m_passwordHashingService.ComputeHash(userName + newPassword);
+                        dbUser.SecurityHash = this.ComputeSecurityHash(dbUser);
                         // Password expire policy
                         var pwdExpire = this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.MaxPasswordAge);
                         if (pwdExpire != default(TimeSpan) && AuthenticationContext.Current.Principal != AuthenticationContext.SystemPrincipal) // system principal setting password doesn't expire
@@ -568,6 +571,14 @@ namespace SanteDB.Persistence.Data.Services
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.USR_PWD_GEN_ERR, new { userName = userName }), e);
                 }
             }
+        }
+
+        /// <summary>
+        /// Compute the security hash
+        /// </summary>
+        private string ComputeSecurityHash(DbSecurityUser dbUser)
+        {
+            return this.m_passwordHashingService.ComputeHash($"{dbUser.UserName}{dbUser.Password}{dbUser.Lockout}{dbUser.InvalidLoginAttempts}");
         }
 
         /// <summary>
@@ -619,12 +630,12 @@ namespace SanteDB.Persistence.Data.Services
                             Key = withSid ?? Guid.NewGuid(),
                             UserName = userName,
                             Password = this.m_passwordHashingService.ComputeHash(this.m_configuration.AddPepper(password)),
-                            SecurityHash = this.m_passwordHashingService.ComputeHash(userName + password),
                             UserClass = ActorTypeKeys.HumanUser,
                             InvalidLoginAttempts = 0,
                             CreatedByKey = context.EstablishProvenance(principal, null),
                             CreationTime = DateTimeOffset.Now
                         };
+                        newIdentity.SecurityHash = this.ComputeSecurityHash(newIdentity);
 
                         var expirePwd = this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.MaxPasswordAge);
                         if (expirePwd != default(TimeSpan))
