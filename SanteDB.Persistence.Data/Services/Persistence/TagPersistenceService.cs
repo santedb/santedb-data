@@ -28,6 +28,7 @@ using SanteDB.Persistence.Data.Model.Acts;
 using SanteDB.Persistence.Data.Model.Entities;
 using SanteDB.Persistence.Data.Model.Extensibility;
 using System;
+using System.Collections.Generic;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
@@ -133,7 +134,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     }
                     else
                     {
-                        throw new NotSupportedException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(ITaggable), null));
+                        throw new KeyNotFoundException(String.Format(ErrorMessages.OBJECT_NOT_FOUND, sourceKey));
                     }
                     this.m_dataCache?.Remove(sourceKey);
                 }
