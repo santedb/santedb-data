@@ -133,7 +133,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     using (var tx = context.BeginTransaction())
                     {
-                        var policies = context.Query<DbSecurityPolicy>(o => policyOids.Contains(o.Oid)).Select(o => o.Key).ToArray();
+                        var policies = context.Query<DbSecurityPolicy>(o => policyOids.Contains(o.Oid) && o.ObsoletionTime == null).Select(o => o.Key).ToArray();
 
                         this.Demand(securable, principal);
 
@@ -337,6 +337,7 @@ namespace SanteDB.Persistence.Data.Services
                                 .SelectFrom(typeof(DbSecurityDevicePolicy), typeof(DbSecurityPolicy))
                             .InnerJoin<DbSecurityPolicy, DbSecurityDevicePolicy>(o => o.Key, o => o.PolicyKey)
                             .Where<DbSecurityDevicePolicy>(o => o.SourceKey == sd.Key)
+                            .And<DbSecurityPolicy>(p => p.ObsoletionTime == null)
                             .Statement);
                     }
                     else if (securable is SecurityApplication sa)
@@ -346,6 +347,7 @@ namespace SanteDB.Persistence.Data.Services
                                 .SelectFrom(typeof(DbSecurityApplicationPolicy), typeof(DbSecurityPolicy))
                             .InnerJoin<DbSecurityPolicy, DbSecurityApplicationPolicy>(o => o.Key, o => o.PolicyKey)
                             .Where<DbSecurityApplicationPolicy>(o => o.SourceKey == sa.Key)
+                            .And<DbSecurityPolicy>(p => p.ObsoletionTime == null)
                             .Statement);
                     }
                     else if (securable is SecurityRole sr)
@@ -355,6 +357,7 @@ namespace SanteDB.Persistence.Data.Services
                                 .SelectFrom(typeof(DbSecurityRolePolicy), typeof(DbSecurityPolicy))
                             .InnerJoin<DbSecurityPolicy, DbSecurityRolePolicy>(o => o.Key, o => o.PolicyKey)
                             .Where<DbSecurityRolePolicy>(o => o.SourceKey == sr.Key)
+                            .And<DbSecurityPolicy>(p => p.ObsoletionTime == null)
                             .Statement);
                     }
                     else if (securable is Entity entity)
@@ -364,6 +367,7 @@ namespace SanteDB.Persistence.Data.Services
                                 .SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
                             .InnerJoin<DbSecurityPolicy, DbEntitySecurityPolicy>(o => o.Key, o => o.PolicyKey)
                                 .Where<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && o.ObsoleteVersionSequenceId == null)
+                                .And<DbSecurityPolicy>(p => p.ObsoletionTime == null)
                                 .Statement);
                     }
                     else if (securable is Act act)
@@ -373,6 +377,7 @@ namespace SanteDB.Persistence.Data.Services
                                 .SelectFrom(typeof(DbActSecurityPolicy), typeof(DbSecurityPolicy))
                             .InnerJoin<DbSecurityPolicy, DbActSecurityPolicy>(o => o.Key, o => o.PolicyKey)
                                 .Where<DbActSecurityPolicy>(o => o.SourceKey == act.Key && o.ObsoleteVersionSequenceId == null)
+                                .And<DbSecurityPolicy>(p => p.ObsoletionTime == null)
                                 .Statement);
                     }
                     else
@@ -425,6 +430,7 @@ namespace SanteDB.Persistence.Data.Services
                                             .InnerJoin<DbSecurityRolePolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                                             .InnerJoin<DbSecurityRolePolicy, DbSecurityUserRole>(o => o.SourceKey, o => o.RoleKey)
                                             .Where<DbSecurityUserRole>(o => o.UserKey == su.Key)
+                                            .And<DbSecurityPolicy>(p => p.ObsoletionTime == null)
                                             .Statement
                                         ).ToArray()
                                         .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
@@ -437,6 +443,7 @@ namespace SanteDB.Persistence.Data.Services
                                             .SelectFrom(typeof(DbSecurityDevicePolicy), typeof(DbSecurityPolicy))
                                         .InnerJoin<DbSecurityDevicePolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                                         .Where<DbSecurityDevicePolicy>(o => o.SourceKey == sd.Key)
+                                        .And<DbSecurityPolicy>(p => p.ObsoletionTime == null)
                                         .Statement)
                                         .ToArray()
                                         .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
@@ -449,6 +456,7 @@ namespace SanteDB.Persistence.Data.Services
                                             .SelectFrom(typeof(DbSecurityApplicationPolicy), typeof(DbSecurityPolicy))
                                         .InnerJoin<DbSecurityApplicationPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                                         .Where<DbSecurityApplicationPolicy>(o => o.SourceKey == sa.Key)
+                                        .And<DbSecurityPolicy>(p => p.ObsoletionTime == null)
                                         .Statement)
                                         .ToArray()
                                         .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
@@ -461,6 +469,7 @@ namespace SanteDB.Persistence.Data.Services
                                             .SelectFrom(typeof(DbSecurityRolePolicy), typeof(DbSecurityPolicy))
                                         .InnerJoin<DbSecurityRolePolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                                         .Where<DbSecurityRolePolicy>(o => o.SourceKey == sr.Key)
+                                        .And<DbSecurityPolicy>(p => p.ObsoletionTime == null)
                                         .Statement)
                                         .ToArray()
                                         .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, securable));
@@ -494,6 +503,7 @@ namespace SanteDB.Persistence.Data.Services
                                             .SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
                                         .InnerJoin<DbEntitySecurityPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                                             .Where<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && o.ObsoleteVersionSequenceId == null)
+                                            .And<DbSecurityPolicy>(p => p.ObsoletionTime == null)
                                             .Statement)
                                         .ToArray()
                                         .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, entity));
@@ -506,6 +516,7 @@ namespace SanteDB.Persistence.Data.Services
                                             .SelectFrom(typeof(DbActSecurityPolicy), typeof(DbSecurityPolicy))
                                         .InnerJoin<DbActSecurityPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                                             .Where<DbActSecurityPolicy>(o => o.SourceKey == act.Key && o.ObsoleteVersionSequenceId == null)
+                                            .And<DbSecurityPolicy>(p => p.ObsoletionTime == null)
                                             .Statement)
                                         .ToArray()
                                         .Select(o => new AdoSecurityPolicyInstance(o.Object1, o.Object2, act));
@@ -521,7 +532,7 @@ namespace SanteDB.Persistence.Data.Services
                         if (securable is IHasPolicies ihp && ihp.Policies?.Any() == true)
                         {
                             results = results.Union(
-                                ihp.Policies.Select(o => new AdoSecurityPolicyInstance(context.FirstOrDefault<DbSecurityPolicy>(p => p.Key == o.PolicyKey), o.GrantType, securable))
+                                ihp.Policies.Select(o => new AdoSecurityPolicyInstance(context.FirstOrDefault<DbSecurityPolicy>(p => p.Key == o.PolicyKey && p.ObsoletionTime == null), o.GrantType, securable))
                             ).ToArray();
                         }
                         // Most-restrictive apply
@@ -557,6 +568,7 @@ namespace SanteDB.Persistence.Data.Services
                         .InnerJoin<DbSecurityApplicationPolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                         .InnerJoin<DbSecurityApplicationPolicy, DbSecurityApplication>(o => o.SourceKey, o => o.Key)
                         .Where<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == appId.Name.ToLowerInvariant() && o.ObsoletionTime == null)
+                        .And<DbSecurityPolicy>(p => p.ObsoletionTime == null)
                         .Statement
                     );
             }
@@ -568,6 +580,7 @@ namespace SanteDB.Persistence.Data.Services
                         .InnerJoin<DbSecurityDevicePolicy, DbSecurityPolicy>(o => o.PolicyKey, o => o.Key)
                         .InnerJoin<DbSecurityDevicePolicy, DbSecurityDevice>(o => o.SourceKey, o => o.Key)
                         .Where<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == devId.Name.ToLowerInvariant() && o.ObsoletionTime == null)
+                        .And<DbSecurityPolicy>(p => p.ObsoletionTime == null)
                         .Statement
                         );
             }
@@ -580,6 +593,7 @@ namespace SanteDB.Persistence.Data.Services
                         .InnerJoin<DbSecurityRolePolicy, DbSecurityUserRole>(o => o.SourceKey, o => o.RoleKey)
                         .InnerJoin<DbSecurityUserRole, DbSecurityUser>(o => o.UserKey, o => o.Key)
                         .Where<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == identity.Name.ToLowerInvariant() && o.ObsoletionTime == null)
+                        .And<DbSecurityPolicy>(p => p.ObsoletionTime == null)
                         .Statement
                     );
             }
