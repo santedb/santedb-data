@@ -288,7 +288,7 @@ namespace SanteDB.Persistence.Data
             var policy = s_adhocCache?.Get<DbSecurityPolicy>($"pol.{me.PolicyKey}");
             if (policy == null)
             {
-                policy = context.FirstOrDefault<DbSecurityPolicy>(o => o.Key == me.PolicyKey);
+                policy = context.FirstOrDefault<DbSecurityPolicy>(o => o.Key == me.PolicyKey && o.ObsoletionTime == null);
                 s_adhocCache?.Add($"pol.{me.PolicyKey}", policy);
             }
 
