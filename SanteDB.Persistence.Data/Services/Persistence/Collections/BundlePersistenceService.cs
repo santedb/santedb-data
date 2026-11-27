@@ -19,6 +19,7 @@
  * Date: 2023-6-21
  */
 using DocumentFormat.OpenXml.EMMA;
+using DocumentFormat.OpenXml.Wordprocessing;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
@@ -32,6 +33,7 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -134,6 +136,25 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 CorrelationSequence = input.CorrelationSequence,
                 FocalObjects = input.FocalObjects,
             };
+
+            // HACK: Normally we apply security policy instances at the object level 
+            foreach(var pi in input.Item.OfType<SecurityPolicyInstance>().ToArray())
+            {
+                var sourceItm = input.Item.FirstOrDefault(o => o.Key == pi.SourceEntityKey);
+                switch(sourceItm)
+                {
+                    case Entity e:
+                        e.Policies = e.Policies ?? new List<SecurityPolicyInstance>();
+                        e.Policies.Add(pi);
+                        break;
+                    case Act a:
+                        a.Policies = a.Policies ?? new List<SecurityPolicyInstance>();
+                        a.Policies.Add(pi);
+                        break;
+                }
+                input.Item.Remove(pi);
+            }
+
             try // Use newer version of the reordering function
             {
                 retVal.AddRange(input.Item.Where(o => o.BatchOperation != BatchOperationType.Delete).ReorganizeForInsert());
