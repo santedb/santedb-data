@@ -18,11 +18,13 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using DocumentFormat.OpenXml.InkML;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
@@ -48,6 +50,9 @@ namespace SanteDB.Persistence.Data.Services
     /// </summary>
     public class AdoSecurityChallengeProvider : ISecurityChallengeService, ISecurityChallengeIdentityService, ILocalServiceProvider<ISecurityChallengeIdentityService>, ILocalServiceProvider<ISecurityChallengeService>
     {
+                        
+        const string AUTHENTICATIONMETHOD_LOCALCHALLENGE = "LOCAL_CHALLENGE";
+
 
         /// <inheritdoc/>
         ISecurityChallengeIdentityService ILocalServiceProvider<ISecurityChallengeIdentityService>.LocalProvider => this;
@@ -103,6 +108,8 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public event EventHandler<AuthenticatedEventArgs> Authenticated;
 
+
+
         /// <summary>
         /// Authenticate a user using their challenge response
         /// </summary>
@@ -110,26 +117,35 @@ namespace SanteDB.Persistence.Data.Services
         /// <param name="response">The response to the challenge</param>
         /// <param name="tfaSecret">The TFA one time password to fulfill the authentication request</param>
         /// <param name="userName">The name of the user which is being authenticated</param>
-        public IPrincipal Authenticate(string userName, Guid challengeKey, string response, String tfaSecret)
+        public IPrincipal Authenticate(string userName, Guid challengeKey, string response, string tfaSecret)
         {
-
-            if (String.IsNullOrEmpty(userName))
-            {
+            if (string.IsNullOrWhiteSpace(userName))
                 throw new ArgumentNullException(nameof(userName), ErrorMessages.ARGUMENT_NULL);
-            }
-            else if (String.IsNullOrEmpty(response))
-            {
-                throw new ArgumentNullException(nameof(response), ErrorMessages.ARGUMENT_NULL);
-            }
 
+            if (string.IsNullOrWhiteSpace(response))
+                throw new ArgumentNullException(nameof(response), ErrorMessages.ARGUMENT_NULL);
+
+            //Normalize the username for all operations.
+            userName = userName.ToLowerInvariant();
+
+            response = response.Trim();
+
+            if (!string.IsNullOrEmpty(tfaSecret))
+                tfaSecret = tfaSecret.Trim();
+
+#if DEBUG
+            m_tracer.TraceVerbose("{0}.{1} for userName {2}", nameof(AdoSecurityChallengeProvider), nameof(Authenticate), userName);
+#endif
+
+            m_tracer.TraceVerbose("Calling Pre-Authenticate trigger.");
 
             var preEvtArgs = new AuthenticatingEventArgs(userName);
             this.Authenticating?.Invoke(this, preEvtArgs);
             if (preEvtArgs.Cancel)
             {
-                this.m_tracer.TraceWarning("Pre-Authenticate trigger signals cancel");
                 if (preEvtArgs.Success)
                 {
+                    this.m_tracer.TraceInfo("Pre-Authenticate trigger signals success with a principal.");
                     return preEvtArgs.Principal;
                 }
                 else
@@ -138,145 +154,201 @@ namespace SanteDB.Persistence.Data.Services
                 }
             }
 
-            var pepperResponses = this.m_configuration.GetPepperCombos(response).Select(o => this.m_passwordHashingService.ComputeHash(o));
-
             try
             {
-                // Connection to perform auth
-                using (var context = this.m_configuration.Provider.GetWriteConnection())
-                {
-                    DbSecurityUser dbUser = null;
-                    try
-                    {
-                        context.Open(initializeExtensions: false);
-                        dbUser = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userName.ToLowerInvariant() && o.ObsoletionTime == null);
-
-                        // User found?
-                        if (dbUser == null)
-                        {
-                            throw new InvalidIdentityAuthenticationException();
-                        }
-                        else if (dbUser.Lockout.GetValueOrDefault() > DateTimeOffset.Now)
-                        {
-                            throw new LockedIdentityAuthenticationException(dbUser.Lockout.Value);
-                        }
-
-                        var identity = new AdoUserIdentity(dbUser);
-                        var challengeIsMfa = this.m_tfaRelay?.Mechanisms.Any(m => m.Id == challengeKey) == true;
-                        // Is the challenge a TFA code?
-                        if (challengeIsMfa)
-                        {
-                            tfaSecret = response;
-                        }
-
-                        if (dbUser.TwoFactorEnabled && String.IsNullOrEmpty(tfaSecret) &&
-                            dbUser.TwoFactorMechnaismKey.HasValue &&
-                            this.m_tfaRelay != null)
-                        {
-                            var secretString = this.m_tfaRelay.SendSecret(dbUser.TwoFactorMechnaismKey.Value, new AdoUserIdentity(dbUser));
-                            throw new TfaRequiredAuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ, new { message = this.m_localizationService.GetString(secretString) }));
-                        }
-                        else if (dbUser.TwoFactorEnabled && !this.m_tfaRelay.ValidateSecret(dbUser.TwoFactorMechnaismKey.Value, identity, tfaSecret))
-                        {
-                            throw new InvalidIdentityAuthenticationException();
-                        }
-
-                        // HACK: User is using an expiration reset
-                        bool isChallengeResponseValid = false;
-                        if (challengeKey == Guid.Empty && dbUser.PasswordExpiration.HasValue)
-                        {
-                            isChallengeResponseValid = context.Any<DbSecurityUser>(a => a.UserName.ToLowerInvariant() == userName.ToLower() && pepperResponses.Contains(a.Password) && a.ObsoletionTime == null);
-                        }
-                        else
-                        {
-                            isChallengeResponseValid = context.Any<DbSecurityUserChallengeAssoc>(c => pepperResponses.Contains(c.ChallengeResponse) && c.ChallengeKey == challengeKey && c.ExpiryTime > DateTimeOffset.Now);
-                        }
-
-                        if (challengeIsMfa && this.m_tfaRelay?.ValidateSecret(challengeKey, identity, response) == true ||
-                            !challengeIsMfa && !isChallengeResponseValid) // Increment invalid
-                        {
-                            dbUser.InvalidLoginAttempts++;
-                            if (dbUser.InvalidLoginAttempts > this.m_securityConfiguration.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxInvalidLogins, 5))
-                            {
-                                dbUser.Lockout = DateTimeOffset.Now.Add(new TimeSpan(0, 0, dbUser.InvalidLoginAttempts.Value * 30));
-                            }
-                            dbUser.UpdatedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
-                            dbUser.UpdatedTime = DateTimeOffset.Now;
-                            context.Update(dbUser);
-                            if (dbUser.Lockout > DateTimeOffset.Now)
-                            {
-                                throw new LockedIdentityAuthenticationException(dbUser.Lockout.Value);
-                            }
-                            else
-                            {
-                                throw new InvalidIdentityAuthenticationException();
-                            }
-                        }
-                        else
-                        {
-                            identity = new AdoUserIdentity(dbUser, "LOCAL_CHALLENGE");
-                            this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.Login, new AdoClaimsPrincipal(identity)); // must still be allowed to login
-
-                            // Establish role
-                            var roleSql = context.CreateSqlStatementBuilder()
-                                .SelectFrom(typeof(DbSecurityRole))
-                                .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
-                                .Where<DbSecurityUserRole>(o => o.UserKey == dbUser.Key)
-                                .And<DbSecurityRole>(o => o.ObsoletionTime == null)
-                                .Statement;
-                            identity.AddRoleClaims(context.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
-
-                            // Establish additional claims
-                            identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
-                            identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
-                            identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
-                            identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.Login));
-                            identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginAnywhere));
-                            identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.ForceResetPassword, "true"));
-
-                            var retVal = new AdoClaimsPrincipal(identity);
-                            this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, retVal, true));
-                            return retVal;
-                        }
-                    }
-                    catch (LockedIdentityAuthenticationException e)
-                    {
-                        throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED), e);
-                    }
-                    catch (InvalidIdentityAuthenticationException) when (dbUser != null)
-                    {
-                        dbUser.InvalidLoginAttempts = dbUser.InvalidLoginAttempts.GetValueOrDefault() + 1;
-                        if (dbUser.InvalidLoginAttempts > this.m_securityConfiguration.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxInvalidLogins, 5))
-                        {
-                            var lockoutSlide = 30 * dbUser.InvalidLoginAttempts.Value;
-                            if (DateTimeOffset.Now < DateTimeOffset.MaxValue.AddSeconds(-lockoutSlide))
-                            {
-                                dbUser.Lockout = DateTimeOffset.Now.AddSeconds(lockoutSlide);
-                            }
-                        }
-                        context.Update(dbUser);
-                        throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_INVALID));
-                    }
-                    catch (InvalidIdentityAuthenticationException)
-                    {
-                        throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_INVALID));
-                    }
-
-                }
+                var principal = AuthenticateInternal(userName, challengeKey, response, tfaSecret, DateTimeOffset.Now);
+                this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, principal, true));
+                return principal;
             }
             catch (AuthenticationException)
             {
-                this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, null, false));
+                this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, null, false)); //TODO: Provide the exception to the event.
                 throw;
             }
-            catch (Exception e)
+            catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
             {
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, null, false));
-                this.m_tracer.TraceError("Could not authenticate user {0}- {1]", userName, e);
-                throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_GENERAL), e);
-            }
 
+                this.m_tracer.TraceError("Could not authenticate user {0}- {1]", userName, ex); //TODO: Determine if this is needed, a caught error should print out to the tracer.
+
+                throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_GENERAL), ex);
+            }
         }
+
+        /// <summary>
+        /// Handles the internal authentication process for this service.
+        /// </summary>
+        /// <param name="userName">The pre-normalized username being authenticated. Call <see cref="String.ToLowerInvariant" /> before calling <see cref="AuthenticateInternal(string, Guid, string, string)"/></param>
+        /// <param name="challengeKey">When using a TFA challenge, set this to <see cref="ITfaMechanism.Id"/>. When using a security challenge, set this to the id of the security challenge. When using an expired password set, set this to <see cref="Guid.Empty"/>.</param>
+        /// <param name="response">When <paramref name="challengeKey"/> is a TFA mechanism, this value is ignored. When <paramref name="challengeKey"/> is a security challenge, set this to the security response. When this is for an expired password, set this to the expired password.</param>
+        /// <param name="tfaSecret">When <paramref name="challengeKey"/> is a TFA mechanism, set this to the response to the TFA mechanism challenge.</param>
+        /// <param name="authenticationTime">The time the authentication is taking place.</param>
+        /// <returns>An <see cref="IPrincipal"/> instance backed by a short lived session which can be used to reset the password of the user which can then be used to obtain a normal session. <em>If autentication is not successful, an exception is thrown.</em></returns>
+        /// <remarks>
+        /// This method does not perform any argument null checking.
+        /// </remarks>
+        protected virtual IPrincipal AuthenticateInternal(string userName, Guid challengeKey, string response, string tfaSecret, DateTimeOffset authenticationTime)
+        {
+            using (var ctx = m_configuration.Provider.GetWriteConnection())
+            {
+                ctx.Open(initializeExtensions: false);
+
+                var dbuser = ctx.FirstOrDefault<DbSecurityUser>(usr => usr.UserName.ToLowerInvariant() == userName && usr.ObsoletionTime == null);
+
+                try
+                {
+                    if (null == dbuser)
+                        throw new InvalidIdentityAuthenticationException("SDBAUTH001: Invalid Username.");
+                    else if (dbuser.Lockout.GetValueOrDefault() > authenticationTime)
+                        throw new LockedIdentityAuthenticationException(dbuser.Lockout.Value);
+
+                    var ischallengetfamechanism = m_tfaRelay?.Mechanisms?.Any(mech => mech.Id == challengeKey) == true;
+
+                    //Set to true when m_tfaRelay.ValidateSecret() was called for tfaSecret and succeeded.
+                    bool tfavalidatepassed = false;
+
+                    //This temp identity is used when sending TFA messages or other auth related processing.
+                    //It is not the final identity that will be returned.
+                    var temporaryidentity = new AdoUserIdentity(dbuser);
+
+                    if (ischallengetfamechanism && string.IsNullOrEmpty(tfaSecret))
+                        tfaSecret = response; //TODO: This should be fixed in the UI; The TFA for the response could be different from the tfa for the user.
+
+                    //Do we need to validate or send a tfa code?
+                    if (dbuser.TwoFactorEnabled)
+                    {
+                        if (string.IsNullOrEmpty(tfaSecret)
+                            && dbuser.TwoFactorMechnaismKey.HasValue && null != m_tfaRelay)
+                        {
+#if DEBUG
+                            m_tracer.TraceVerbose("User has Two Factor Enabled and challenge has no TFA secret. Sending secret.");
+#endif
+                            var responsemessage = m_tfaRelay.SendSecret(dbuser.TwoFactorMechnaismKey.Value, temporaryidentity);
+                            throw new TfaRequiredAuthenticationException(m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_TFA_REQ, new { message = m_localizationService.GetString(responsemessage) }));
+                        }
+
+                        if (!m_tfaRelay.ValidateSecret(dbuser.TwoFactorMechnaismKey.Value, temporaryidentity, tfaSecret))
+                            throw new InvalidIdentityAuthenticationException("SDBAUTH002: TFA Validation failed.");
+
+                        tfavalidatepassed = true;
+                    }
+
+                    if (challengeKey == Guid.Empty)
+                    {
+                        //Case 1 - Expired Password challenge
+#if DEBUG
+                        m_tracer.TraceVerbose("Using expired password challenge process.");
+#endif
+
+                        if (!dbuser.PasswordExpiration.HasValue)
+                            throw new InvalidIdentityAuthenticationException("SDBAUTH004: User password is not expired.");
+                        else if (authenticationTime < dbuser.PasswordExpiration.Value)
+                            throw new InvalidIdentityAuthenticationException("SDBAUTH005: User password is not expired.");
+
+                        var passwordpeppers = GetPepperCombos(response);
+
+                        if (!ctx.Any<DbSecurityUser>(usr => 
+                            usr.UserName == userName && 
+                            usr.ObsoletionTime == null && 
+                            passwordpeppers.Contains(usr.Password)))
+                            throw new InvalidIdentityAuthenticationException("SDBAUTH006: User password does not match.");
+
+                    }
+                    else if (ischallengetfamechanism)
+                    {
+                        //Case 2 - MFA Challenge
+#if DEBUG
+                        m_tracer.TraceVerbose("Using TFA challenge process.");
+#endif
+
+                        if (!tfavalidatepassed && m_tfaRelay?.ValidateSecret(challengeKey, temporaryidentity, response) != true)
+                            throw new InvalidIdentityAuthenticationException("SDBAUTH003: TFA Validation failed.");
+                    }
+                    else
+                    {
+                        //Case 3 - Security Question challenge.
+#if DEBUG
+                        m_tracer.TraceVerbose("Using security question challenge process.");
+#endif
+                        var challengeresponsepeppers = GetPepperCombos(response);
+
+                        if (!ctx.Any<DbSecurityUserChallengeAssoc>(challenge =>
+                            challenge.ChallengeKey == challengeKey &&
+                            challenge.ExpiryTime > authenticationTime &&
+                            challengeresponsepeppers.Contains(challenge.ChallengeResponse)))
+                            throw new InvalidIdentityAuthenticationException("SDBAUTH007: Security challenge is invalid or expired.");
+                        
+                    }
+
+                    //If an exception has not been raised already, we can issue the reset identity.
+                    var identity = new AdoUserIdentity(dbuser, AUTHENTICATIONMETHOD_LOCALCHALLENGE);
+
+                    //Create a temporary identity for the user for demanding policies.
+                    m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.Login, new AdoClaimsPrincipal(identity));
+
+                    // Establish role
+                    var roleSql = ctx.CreateSqlStatementBuilder()
+                        .SelectFrom(typeof(DbSecurityRole))
+                        .InnerJoin<DbSecurityRole, DbSecurityUserRole>(o => o.Key, o => o.RoleKey)
+                        .Where<DbSecurityUserRole>(o => o.UserKey == dbuser.Key)
+                        .And<DbSecurityRole>(o => o.ObsoletionTime == null)
+                        .Statement;
+                    identity.AddRoleClaims(ctx.Query<DbSecurityRole>(roleSql).Select(o => o.Name));
+
+                    // Establish additional claims
+                    identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
+                    identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
+                    identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
+                    identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.Login));
+                    identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginAnywhere));
+                    identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.ForceResetPassword, "true"));
+
+                    return new AdoClaimsPrincipal(identity);
+                }
+                catch (LockedIdentityAuthenticationException liaex)
+                {
+                    throw new AuthenticationException(m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED), liaex);
+                }
+                catch (InvalidIdentityAuthenticationException iiaex)
+                {
+
+                    //Increment the invalid login attempts and lock out the user.
+                    if (null != dbuser)
+                    {
+#if DEBUG
+                        m_tracer.TraceVerbose("Incrementing invalid login attempt for {0}", userName);
+#endif
+
+                        dbuser.InvalidLoginAttempts = dbuser.InvalidLoginAttempts.GetValueOrDefault() + 1;
+                        if (dbuser.InvalidLoginAttempts > this.m_securityConfiguration.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxInvalidLogins, 5))
+                        {
+                            var lockoutSlide = 30 * dbuser.InvalidLoginAttempts.Value;
+                            if (authenticationTime < DateTimeOffset.MaxValue.AddSeconds(-lockoutSlide))
+                            {
+                                dbuser.Lockout = authenticationTime.AddSeconds(lockoutSlide);
+                            }
+                        }
+                        dbuser.UpdatedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
+                        dbuser.UpdatedTime = DateTimeOffset.Now;
+                        ctx.Update(dbuser);
+                    }
+
+                    m_tracer.TraceWarning("Security challenge authentication failed: {0}", iiaex);
+
+                    //SECURITY CRITICAL - DO NOT PROPAGATE INTERNAL ERROR IT WILL BE SERIALIZED IN AN API RESPONSE.
+                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_INVALID));
+                    //SECURITY CRITICAL
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets an enumeration of all possible pepper combinations for a given input string.
+        /// </summary>
+        /// <param name="input">The input to be peppered.</param>
+        /// <returns>An enumeration of all pepper combos for the input string.</returns>
+        private IEnumerable<string> GetPepperCombos(string input)
+            => m_configuration.GetPepperCombos(input).Select(pepper => m_passwordHashingService.ComputeHash(pepper));
 
         /// <summary>
         /// Get the security challenges for the specified user key

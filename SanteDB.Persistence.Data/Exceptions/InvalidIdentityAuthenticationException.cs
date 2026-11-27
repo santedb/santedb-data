@@ -18,6 +18,8 @@
  * User: fyfej
  * Date: 2023-6-21
  */
+using System;
+
 namespace SanteDB.Persistence.Data.Exceptions
 {
     /// <summary>
@@ -25,6 +27,8 @@ namespace SanteDB.Persistence.Data.Exceptions
     /// </summary>
     internal sealed class InvalidIdentityAuthenticationException : System.Security.Authentication.AuthenticationException
     {
-
+        public InvalidIdentityAuthenticationException() : base() { }
+        public InvalidIdentityAuthenticationException(string message) : base(message) { }
+        public InvalidIdentityAuthenticationException(string message, Exception innerException) : base(message) { }
     }
 }
